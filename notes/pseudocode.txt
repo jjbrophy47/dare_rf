@@ -1,0 +1,61 @@
+Exact Unlearning for GBDT (1 instance at a time)
+
+
+High-Level Pseudocode:
+
+At node, for each attribute, split pair:
+	If left is affected:
+		Decrement left sum and count, recompute mean and sum of square loss.
+	If right is affected:
+       		Decrement right sum and count, recompute mean and sum of square loss.
+	Recompute objective.
+	If attribute, split is the same as before:
+		Update mean node value.
+		Traverse to the left or right node, whichever is affected by the removal.
+	Else
+		Split the data to the left and right.
+		Rebuild the subtree below this node.
+
+Rebuilding
+
+Ordering the values for each attribute.
+For each attribute, split pair:
+	Left compute mean and sum of square loss.
+	Right compute mean and sum of square loss.
+	Compute objective.
+
+
+Difference between checking and rebuilding
+
+Checking requires the decrement of the sum and count, and a division to compute the mean.
+Then, the sum of square loss needs to be recomputed, and one addition to recompute the
+objective. This only needs to be done to either the left or right side. This results
+in O(1)+O(1)+O(1)+O(n)+O(1) = O(n)
+
+Rebuilding needs to recompute the mean, and count, both are O(n) operations. Then, the
+sum of square loss needs to be recomputed, another O(n), and the objective. This also
+needs to be done for both left and right, resulting in O(n)+O(n)+O(1) times 2 = 2*2*O(n)
+
+Additional metadata to store in the tree to accommodate this procedure:
+
+If leaf node:
+	Instance indices.
+	Label sum and count.
+
+If non-leaf node:
+	Instance indices.
+	For each attribute, split pair:
+		Left label sum and count.
+		Right label sum and count.
+
+Info on splitting for GBDT using least square error as the criterion:
+
+MSE for the mean squared error, which is equal to variance
+        reduction as feature selection criterion and minimizes the L2 loss
+        using the mean of each terminal node, "friedman_mse", which uses mean
+        squared error with Friedman's improvement score for potential splits,
+        and "mae" for the mean absolute error, which minimizes the L1 loss
+        using the median of each terminal node.
+
+So variance reduction in a regression tree is the same as using MSE in GBDT
+to find the optimal splits.
