@@ -96,6 +96,11 @@ class GradientBoosting:
 
         return True
 
+    def print_trees(self):
+        for i, tree in enumerate(self.trees):
+            print('\nTree {}'.format(i + 1))
+            tree.print_tree()
+
     def _gradient(self, y, y_pred):
         return -(y - y_pred)
 
@@ -108,6 +113,6 @@ if __name__ == '__main__':
     y = np.random.randint(2, size=100)
     print(X[:5], y[:5])
 
-    g = GradientBoosting(n_estimators=20, max_depth=4, learning_rate=0.69).fit(X, y)
-    g2 = GradientBoosting(n_estimators=20, max_depth=4, learning_rate=0.69).fit(X, y)
-    print(g.equals(g2))
+    g = GradientBoosting(n_estimators=5, max_depth=4, learning_rate=0.5).fit(X, y)
+    g2 = GradientBoosting(n_estimators=5, max_depth=4, learning_rate=0.5).fit(X, y)
+    g.print_trees()

@@ -8,12 +8,17 @@ At node, for each attribute, split pair:
 		Decrement left sum and count, recompute mean and sum of square loss.
 	If right is affected:
        		Decrement right sum and count, recompute mean and sum of square loss.
+
 	Recompute objective.
-	If attribute, split is the same as before:
-		Update mean node value.
-		Traverse to the left or right node, whichever is affected by the removal.
-	Else
-		Split the data to the left and right.
+	If this objective is the best:
+		Save this attribute and split.
+
+If attribute is the same as before:
+	If split is the same as before or split is one neighbor lower:
+		The check is done.
+		Traverse left or right, depending on which branch is affected.
+	Else:
+		Split data to the left and right.
 		Rebuild the subtree below this node.
 
 Rebuilding
