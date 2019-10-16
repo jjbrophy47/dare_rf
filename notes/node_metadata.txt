@@ -1,7 +1,7 @@
 Node metadata structure:
 
 attribute1_index:
-	attribute1_threshold1:
+	threshold1:
 		'left':
 			'y_sum'
 			'y_count':
@@ -9,12 +9,13 @@ attribute1_index:
 			'ssle':
 		'right':
 			...
-	attribute1_threshold2:
+	threshold2:
 		...
 attribute2_index:
 	...
 
-Node metadata example:
+
+Example:
 
 x1:
   0.1:

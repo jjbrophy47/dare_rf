@@ -1,0 +1,113 @@
+Exact Unlearning for binary classification tree with binary attributes
+(removing 1 instance at a time):
+
+
+High-Level Pseudocode (Single Tree using Gini index):
+
+At node, for each attribute:
+	If left is affected:
+		Decrement instance count and class count.
+	If right is affected:
+		Decrement instance count and class count.
+
+	Recompute objective.
+	If this objective is the best:
+		Save this attribute.
+
+If attribute is the same as before:
+	The check is done.
+	Traverse left or right, depending on which branch is affected.
+Else:
+	Split data to the left and right.
+	Rebuild the subtree below this node.
+
+
+Objective:
+Gini(D) = 1 - sum_i P_i^2 where i is the class
+Gini_A(D) = |D1|/|D| Gini(D1) + |D2|/|D| Gini(D2)
+Gini Gain = Gini(D) - Gini_A(D)
+
+Only need to compute Gini_Xi(D) for each attribute Xi, the attribute with
+the minimum Gini index is the splitting attribute.
+
+
+Node Metadata:
+
+'count':
+'pos_count':
+attribute1_index:
+	'left':
+		'count':
+		'pos_count':
+		'weight':
+		'pos_prob':
+		'index':
+		'weighted_index':
+	'right':
+		...
+attribute2_index:
+	...
+
+Example:
+
+'count': 69,
+'pos_count': 11,
+x1:
+	'left':
+		'count': 10,
+		'pos_count': 11,
+		'weight': 0.2,
+		'pos_prob': 0.28,
+		'index': 0.4
+		'weighted_index': 0.69
+	'right':
+		...
+x2:
+  ...
+
+
+Time Complexity:
+
+When updating a node, the runtime is correlated to the number of attributes
+that need to checked. As checking progresses down the tree, the number
+of attributes needing to be checked decreases by 1 for each level.
+
+
+Difference between checking and rebuilding:
+
+Checking requires only recomputing one half of the objective
+for each node. Checking also only requires one path through the tree, the
+affected branches. Also, metadata is stored to making checking each
+attribute quicker.
+
+Rebuilding needs to separate the instances and then compute the full objective
+for each side of a node. It needs to do this for all paths through the tree.
+The number of attributes to consider decreases by 1 for each level in the tree.
+
+
+Algorithmic Analysis (single tree):
+
+Checking the root node requires checking all m attributes. Then checking proceeds
+to each level in the tree through one path. For a tree of height d, updating the
+metadata of each attribute in a node requires constant time algebraic operations.
+Thus, the resulting complexity is O(m*d) to check m attributes at d different
+levels in the tree.
+
+Rebuilding needs to do the same as updating, except it needs to split the data
+as it goes along, and it needs to do this for every path in the tree. The
+resulting complexity is O(m*2^d) where 2^(d+1)-1 represents the number of nodes
+in the tree.
+
+
+Reducing the number of attributes to check at a node:
+
+The O(m*d) complexity may be reduced to a much smaller number (possibly 2 or 3)
+by computing a bounding gap between the best attribute and the next best attributes.
+For example, if we remove an instance, and we know how that this instance will
+not be able to become the best attribute on this removal, then we do not need
+to check it. This can be very beneficial if m is large.
+
+
+Computing the bounding gap between two attributes:
+
+
