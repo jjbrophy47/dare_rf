@@ -66,6 +66,38 @@ x2:
   ...
 
 
+Deletion Types
+
+Type 1:
+The check makes it all the way through the tree to a leaf with more than 1
+instance. The leaf metadata is updated, along with all intermediate nodes
+along the way.
+
+Type 2a:
+The check makes it to a decision node, who's affected branch contains only
+the instance to be deleted. If the other branch only contains 1 instance,
+turn this decision node into a leaf node with the appropriate metadata,
+making sure the metadata of all intermediate nodes are updated as well.
+
+Type 2b:
+Same scenario as 2a, except the other branch has >1 instance, in this case
+simply rebuild at this decision node. Again make sure all metadata along
+the way is updated.
+
+There are more special cases to 2b, such as the other branch containing
+all instances of the same class (this could be turned into a leaf), or
+the other branch contains an attribute split already to which we could simply
+pull this branch up to replace this decision node, but further down this path
+there may be leaves that could have been split but were not due to max depth
+limits or insufficient impurities; if this is the case, it is conceptually
+simpler to rebuild at this node than handle all hyper parameter special
+cases.
+
+Type 3:
+This decision node has changed attributes, update this metadata and all
+node metadata along this path, and rebuild below this node.
+
+
 Time Complexity:
 
 When updating a node, the runtime is correlated to the number of attributes

@@ -5,9 +5,6 @@ Adapted from MLFromScratch: https://github.com/eriklindernoren/ML-From-Scratch.
 import time
 
 import numpy as np
-import pandas as pd
-from sklearn.datasets import load_iris, load_boston, load_breast_cancer, load_diabetes, load_wine, load_digits
-from sklearn.datasets import fetch_california_housing
 
 
 class DecisionNode():
@@ -91,6 +88,8 @@ class BABC_Tree(object):
         n_samples = len(indices)
         node_dict = {'count': n_samples, 'pos_count': np.sum(self.y_train_[indices])}
 
+        # print(indices)
+
         # error checking
         if n_samples >= self.min_samples_split and current_depth < self.max_depth and \
                 self.n_features_ - current_depth > 0:
@@ -110,21 +109,25 @@ class BABC_Tree(object):
                 # make sure there is atleast 1 sample in each branch
                 if len(left_indices) > 0 and len(right_indices) > 0:
 
+                    # print(left_indices, right_indices)
+
                     # gather stats about the split to compute the Gini index
                     left_count = len(left_indices)
                     left_pos_count = np.sum(self.y_train_[left_indices])
                     right_count = n_samples - left_count
                     right_pos_count = np.sum(self.y_train_[right_indices])
 
+                    # print(i, left_count, left_pos_count, right_count, right_pos_count)
+
                     # compute the weighted Gini index of this feature
                     left_pos_prob = left_pos_count / left_count
                     left_weight = left_count / n_samples
-                    left_index = 1 - left_pos_prob + (1 - left_pos_prob)
+                    left_index = 1 - (np.square(left_pos_prob) + np.square(1 - left_pos_prob))
                     left_weighted_index = left_weight * left_index
 
                     right_pos_prob = right_pos_count / right_count
                     right_weight = right_count / n_samples
-                    right_index = 1 - right_pos_prob + (1 - right_pos_prob)
+                    right_index = 1 - (np.square(right_pos_prob) + np.square(1 - right_pos_prob))
                     right_weighted_index = right_weight * right_index
 
                     # save the metadata for efficient updating
@@ -146,6 +149,13 @@ class BABC_Tree(object):
                     gini_index = self._compute_gini_index(node_dict['attr'][i])
                     node_dict['attr'][i]['gini_index'] = gini_index
 
+                    # if i == 0:
+                    #     print(node_dict)
+                    #     print(self.X_train_, self.y_train_)
+
+                    # print(i, gini_index)
+                    # exit(0)
+
                     # keep the best attribute
                     if gini_index < best_gini_index:
                         best_gini_index = gini_index
@@ -154,7 +164,7 @@ class BABC_Tree(object):
                         best_feature_ndx = i
 
             # split on the best saved attribute
-            if best_feature_ndx is not None and best_gini_index >= self.min_impurity:
+            if best_feature_ndx is not None and best_gini_index >= 0:
                 left_node = self._build_tree(best_left_indices, current_depth + 1)
                 right_node = self._build_tree(best_right_indices, current_depth + 1)
                 return DecisionNode(feature_i=best_feature_ndx, node_dict=node_dict,
@@ -184,7 +194,15 @@ class BABC_Tree(object):
         x = self.X_train_[remove_ndx]
         y = self.y_train_[remove_ndx]
         self.deletion_type_ = None
-        self._delete(x, y, remove_ndx)
+        self.root_ = self._delete(x, y, remove_ndx)
+
+        # remove the instance from the data
+        self.X_train_ = np.delete(self.X_train_, remove_ndx, axis=0)
+        self.y_train_ = np.delete(self.y_train_, remove_ndx)
+
+        # update all leaf indices
+        self._update_leaves(self.root_, remove_ndx)
+
         return self.deletion_type_
 
     def _delete(self, x, y, remove_ndx, tree=None, current_depth=0):
@@ -193,59 +211,67 @@ class BABC_Tree(object):
         if tree is None:
             tree = self.root_
 
-        # made it to a leaf, update its metadata
+        # type 1: leaf node, update its metadata
         if tree.value is not None:
             self._update_leaf_node(tree, remove_ndx)
             if self.verbose > 0:
                 print('check complete, ended at depth {}'.format(current_depth))
-            self.deletion_type_ = 0
+            self.deletion_type_ = '1'
             return tree
 
+        # decision node, update the high-level metadata
+        tree.node_dict['pos_count'] -= self.y_train_[remove_ndx]
+        tree.node_dict['count'] -= 1
+
+        # find the affected branch
         abranch = 'left' if x[tree.feature_i] == 1 else 'right'
 
         # handle edge cases
-        # the affected branch only contains the instance to be removed, turn this node into a leaf
+        # type 2: the affected branch only contains the instance to be removed
         if tree.node_dict['attr'][tree.feature_i][abranch]['count'] == 1:
             nabranch = 'right' if abranch == 'left' else 'left'
             na_branch = tree.left_branch if nabranch == 'left' else tree.right_branch
 
-            # both branches contain one example, turn this node into a leaf
+            # type 2a: both branches contain one example, turn this node into a leaf
             if tree.node_dict['attr'][tree.feature_i][nabranch]['count'] == 1:
                 if self.verbose > 0:
                     print('tree check complete, creating a leaf at depth {}'.format(current_depth))
+                # print(tree.node_dict)
                 tree.node_dict['attr'] = None
-                tree.node_dict['pos_count'] -= y
-                tree.node_dict['count'] -= 1
                 tree.node_dict['leaf_value'] = tree.node_dict['pos_count'] / tree.node_dict['count']
                 tree.node_dict['indices'] = self.get_indices(na_branch, current_depth + 1)
                 tree.node_dict['indices'] = tree.node_dict['indices'][tree.node_dict['indices'] != remove_ndx]
                 tree_branch = DecisionNode(value=tree.node_dict['leaf_value'], node_dict=tree.node_dict)
-                self.deletion_type_ = 1
+                self.deletion_type_ = '2a'
                 return tree_branch
 
-            # the other branch still has more than one instance so rebuild at this node
+            # type 2b: other branch still has more than one instance, rebuild at this node
             else:
                 if self.verbose > 0:
                     print('hanging branch with >1 instance, rebuilding at depth {}'.format(current_depth))
                 indices = self.get_indices(tree, current_depth)
                 indices = indices[indices != remove_ndx]
-                self.deletion_type_ = 2
+                self.deletion_type_ = '2b'
                 return self._build_tree(indices, current_depth)
 
         # keep track of the new best attribute
-        n_samples = tree.node_dict['count']
         best_attr_ndx = None
         best_gini_index = 1e7
 
-        # update the metadata for each attribute
+        # print(tree.node_dict)
+
+        # update the metadata for each attribute's affected branch
         for attr_ndx in tree.node_dict['attr']:
             abranch = 'left' if x[attr_ndx] == 1 else 'right'
             attr_dict = tree.node_dict['attr'][attr_ndx]
-            if self._update_decision_node(attr_dict[abranch], y, n_samples) is None:
+            if self._update_decision_node(attr_dict[abranch], y, tree.node_dict['count']) is None:
                 continue
 
             # recompute the gini index for this attribute
             gini_index = self._compute_gini_index(attr_dict)
+            attr_dict['gini_index'] = gini_index
+
+            # print(attr_dict, attr_ndx, gini_index)
 
             # save the attribute with the best gini index
             if gini_index < best_gini_index:
@@ -253,10 +279,13 @@ class BABC_Tree(object):
                 best_attr_ndx = attr_ndx
                 best_branch = abranch
 
+        # print(tree.node_dict)
+
         # edge case: keep original attribute split if it is tied for the smallest error after removal
-        if tree.node_dict['attr'][tree.feature_i]['gini_index'] == best_gini_index:
-            best_attr_ndx = tree.feature_i
-            best_branch = 'left' if x[best_attr_ndx] == 1 else 'right'
+        # no long useful because original building just picks the first best attribute
+        # if tree.node_dict['attr'][tree.feature_i]['gini_index'] == best_gini_index:
+        #     best_attr_ndx = tree.feature_i
+        #     best_branch = 'left' if x[best_attr_ndx] == 1 else 'right'
 
         # check to see if the tree needs to be restructured
         if best_attr_ndx == tree.feature_i:
@@ -273,17 +302,41 @@ class BABC_Tree(object):
                 tree.right_branch = new_branch
             return tree
 
-        # split data left and right, rebuild subtree below this node
+        # type 3: split data left and right, rebuild at this node
         else:
             if self.verbose > 0:
                 print('rebuilding at depth {}'.format(current_depth))
-            left_indices = self.get_indices(tree.left_branch, current_depth + 1)
-            right_indices = self.get_indices(tree.right_branch, current_depth + 1)
-            left_branch = self._build_tree(left_indices, current_depth + 1)
-            right_branch = self._build_tree(right_indices, current_depth + 1)
-            self.deletion_type_ = 3
-            return DecisionNode(feature_i=best_attr_ndx, node_dict=tree.node_dict,
-                                left_branch=left_branch, right_branch=right_branch)
+            indices = self.get_indices(tree, current_depth)
+            indices = indices[indices != remove_ndx]
+            self.deletion_type_ = '2b'
+            return self._build_tree(indices, current_depth)
+
+            # left_indices = self.get_indices(tree.left_branch, current_depth + 1)
+            # left_indices = left_indices[left_indices != remove_ndx]
+            # right_indices = self.get_indices(tree.right_branch, current_depth + 1)
+            # right_indices = right_indices[right_indices != remove_ndx]
+            # print(left_indices, right_indices, best_attr_ndx)
+            # left_branch = self._build_tree(left_indices, current_depth + 1)
+            # right_branch = self._build_tree(right_indices, current_depth + 1)
+            # self.deletion_type_ = '3'
+            # return DecisionNode(feature_i=best_attr_ndx, node_dict=tree.node_dict,
+            #                     left_branch=left_branch, right_branch=right_branch)
+
+    def _update_leaves(self, tree, remove_ndx):
+
+        # a leaf! update indices
+        if tree.value is not None:
+            # print('\nbefore: {}'.format(tree.node_dict['indices']))
+            indices = tree.node_dict['indices']
+            for i in range(len(indices)):
+                if remove_ndx < indices[i]:
+                    indices[i] -= 1
+            # print('after: {}'.format(tree.node_dict['indices']))
+
+        # keep traversing the tree
+        else:
+            self._update_leaves(tree.left_branch, remove_ndx)
+            self._update_leaves(tree.right_branch, remove_ndx)
 
     def _update_leaf_node(self, tree, remove_ndx):
         """
@@ -309,7 +362,7 @@ class BABC_Tree(object):
             branch_dict['pos_count'] -= y_val
             branch_dict['weight'] = branch_dict['count'] / n_samples
             branch_dict['pos_prob'] = branch_dict['pos_count'] / branch_dict['count']
-            branch_dict['index'] = 1 - branch_dict['pos_prob'] + (1 - branch_dict['pos_prob'])
+            branch_dict['index'] = 1 - (np.square(branch_dict['pos_prob']) + np.square(1 - branch_dict['pos_prob']))
             branch_dict['weighted_index'] = branch_dict['weight'] * branch_dict['index']
         return 1
 
@@ -344,7 +397,7 @@ class BABC_Tree(object):
 
         # If we're at leaf => print the label
         if tree.value is not None:
-            print(tree.value)
+            print(tree.value, tree.node_dict['indices'], self.y_train_[tree.node_dict['indices']])
 
         # Go deeper down the tree
         else:
@@ -405,91 +458,3 @@ class BABC_Tree(object):
 
         # test subtree
         return self._predict_value(x, branch)
-
-
-if __name__ == '__main__':
-    n_samples = 10
-    n_attributes = 4
- #    X = np.array([[-0.29362757,  1.11209527],
- # [ 1.19558301,  0.60989782],
- # [ 1.10471031,  0.53683857],
- # [-0.15406803,  1.62150782],
- # [-0.81344221,  0.58873173],
- # [-0.82792201, -1.59256728],
- # [ 0.54958107, -1.25057147],
- # [ 0.26360193,  0.98537034],
- # [-0.18309012, -0.07985705],
- # [ 0.30179708,  0.06100709]])
- #    y = np.array([1, 1, 1, 0, 0, 1, 0, 1, 0, 0])
-
-    seed = np.random.randint(1000)
-    seed = 423
-    print('seed: {}'.format(seed))
-
-    np.random.seed(seed)
-    X = np.random.randint(2, size=(n_samples, n_attributes))
-    np.random.seed(seed)
-    y = np.random.randint(2, size=n_samples)
-
-    # train = pd.read_csv('data/spect/train.csv', header=None).to_numpy()
-    # test = pd.read_csv('data/spect/test.csv', header=None).to_numpy()
-    # data = np.concatenate([train, test])
-    # y = data[:, 0]
-    # X = data[:, 1:]
-
-    # bunch = fetch_california_housing()
-    # X, y = bunch.data, bunch.target
-    # split = int(X.shape[0] / 4)
-    # X = X[:split]
-    # y = y[:split]
-    # data = load_digits()
-    # X = data['data']
-    # y = data['target']
-
-    # print(X, y)
-    print(X.shape, y.shape)
-
-    start = time.time()
-    t = BABC_Tree(max_depth=4).fit(X, y)
-    fit_time = time.time() - start
-
-    print(X[[0]], t.predict(X[[0]]), y[0])
-    print('original tree:')
-    t.print_tree()
-
-    delete_ndx = np.random.randint(X.shape[0])
-    delete_ndx = 9
-    print(delete_ndx, X[delete_ndx], y[delete_ndx])
-
-    X_new = np.delete(X, delete_ndx, axis=0)
-    y_new = np.delete(y, delete_ndx)
-
-    # print(X, y)
-    # print(X_new, y_new)
-    print(X_new.shape, y_new.shape)
-    start = time.time()
-    t2 = BABC_Tree(max_depth=4).fit(X_new, y_new)
-    refit_time = time.time() - start
-
-    # t.print_tree()
-
-    start = time.time()
-    t.delete(delete_ndx)
-    delete_time = time.time() - start
-
-    print('fit time: {:.5f}'.format(fit_time))
-    print('refit time: {:.5f}'.format(refit_time))
-    print('delete time: {:.5f}'.format(delete_time))
-
-    print('deleted tree:')
-    t.print_tree()
-    print()
-    # print(t.X_train_.shape)
-
-    print('refit tree:')
-    t2.print_tree()
-    print(t2.X_train_.shape)
-    print(t.equals(t2))
-
-    # print(t.predict(X[[delete_ndx]]), y[delete_ndx])
-    # print(t2.predict(X[[delete_ndx]]), y[delete_ndx])
