@@ -30,16 +30,14 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, max_depth=4):
     # print(X_new, y_new)
     # print(X_new[delete_ndx], y_new[delete_ndx], delete_ndx)
 
+    print(delete_ndx)
+
     X_new = np.delete(X_new, delete_ndx, axis=0)
     y_new = np.delete(y_new, delete_ndx)
-
-    # print(X_new, y_new)
 
     start = time.time()
     result['delete_type'] = t1.delete(delete_ndx)
     result['delete'] = time.time() - start
-
-    # print()
 
     start = time.time()
     t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)

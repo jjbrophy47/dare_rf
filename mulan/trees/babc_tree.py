@@ -2,8 +2,6 @@
 Decision tree implementation for binary classification with binary attributes.
 Adapted from MLFromScratch: https://github.com/eriklindernoren/ML-From-Scratch.
 """
-import time
-
 import numpy as np
 
 
@@ -88,11 +86,27 @@ class BABC_Tree(object):
         n_samples = len(indices)
         node_dict = {'count': n_samples, 'pos_count': np.sum(self.y_train_[indices])}
 
-        # print(indices)
+        # handle edge cases
+        create_leaf = False
+        if node_dict['count'] > 0:
+
+            # all instances of the same class
+            if node_dict['pos_count'] == 0 or node_dict['pos_count'] == node_dict['count']:
+
+                # the root node contains instances ll from the same class
+                if current_depth == 0:
+                    raise ValueError('root node contains only instances from the same class!')
+
+                # create leaf
+                else:
+                    create_leaf = True
+
+        else:
+            raise ValueError('Zero samples in this node!')
 
         # error checking
         if n_samples >= self.min_samples_split and current_depth < self.max_depth and \
-                self.n_features_ - current_depth > 0:
+                self.n_features_ - current_depth > 0 and not create_leaf:
             node_dict['attr'] = {}
 
             # iterate through each feature
@@ -226,7 +240,24 @@ class BABC_Tree(object):
         # find the affected branch
         abranch = 'left' if x[tree.feature_i] == 1 else 'right'
 
-        # handle edge cases
+        # raise an error if there are only instances from one class at the root
+        if current_depth == 0:
+            if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
+                raise ValueError('Instances in the root node are all from the same class!')
+
+        # edge case: if remaining instances in this node are of the same class, make leaf
+        if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
+            if self.verbose > 0:
+                pstr = 'tree check complete, remaining instances in the same class, creating a leaf at depth {}'
+                print(pstr.format(current_depth))
+            tree.node_dict['attr'] = None
+            tree.node_dict['leaf_value'] = tree.node_dict['pos_count'] / tree.node_dict['count']
+            tree.node_dict['indices'] = self.get_indices(tree, current_depth)
+            tree.node_dict['indices'] = tree.node_dict['indices'][tree.node_dict['indices'] != remove_ndx]
+            tree_branch = DecisionNode(value=tree.node_dict['leaf_value'], node_dict=tree.node_dict)
+            self.deletion_type_ = '1b'
+            return tree_branch
+
         # type 2: the affected branch only contains the instance to be removed
         if tree.node_dict['attr'][tree.feature_i][abranch]['count'] == 1:
             nabranch = 'right' if abranch == 'left' else 'left'
@@ -236,7 +267,6 @@ class BABC_Tree(object):
             if tree.node_dict['attr'][tree.feature_i][nabranch]['count'] == 1:
                 if self.verbose > 0:
                     print('tree check complete, creating a leaf at depth {}'.format(current_depth))
-                # print(tree.node_dict)
                 tree.node_dict['attr'] = None
                 tree.node_dict['leaf_value'] = tree.node_dict['pos_count'] / tree.node_dict['count']
                 tree.node_dict['indices'] = self.get_indices(na_branch, current_depth + 1)
@@ -263,13 +293,17 @@ class BABC_Tree(object):
         # update the metadata for each attribute's affected branch
         for attr_ndx in tree.node_dict['attr']:
             abranch = 'left' if x[attr_ndx] == 1 else 'right'
-            attr_dict = tree.node_dict['attr'][attr_ndx]
-            if self._update_decision_node(attr_dict[abranch], y, tree.node_dict['count']) is None:
+            if self._update_decision_node(tree.node_dict, attr_ndx, abranch, y) is None:
                 continue
 
+            # if self._update_decision_node(attr_dict[abranch], y, tree.node_dict['count']) is None:
+            #     continue
+
             # recompute the gini index for this attribute
+            attr_dict = tree.node_dict['attr'][attr_ndx]
             gini_index = self._compute_gini_index(attr_dict)
             attr_dict['gini_index'] = gini_index
+            # print(attr_ndx, gini_index, attr_dict)
 
             # print(attr_dict, attr_ndx, gini_index)
 
@@ -349,22 +383,50 @@ class BABC_Tree(object):
         node_dict['indices'] = node_dict['indices'][node_dict['indices'] != remove_ndx]
         tree.value = node_dict['leaf_value']
 
-    def _update_decision_node(self, branch_dict, y_val, n_samples):
+    def _update_decision_node(self, node_dict, attr_ndx, abranch, y_val):
         """
-        Update the attribute split branch metadata.
+        Update the attribute dictionary of the node metadata.
         """
 
+        # access the attriubute metadata
+        abranch_dict = node_dict['attr'][attr_ndx][abranch]
+
         # only the affected instance is in this branch
-        if branch_dict['count'] <= 1:
+        if abranch_dict['count'] <= 1:
             return None
-        else:
-            branch_dict['count'] -= 1
-            branch_dict['pos_count'] -= y_val
-            branch_dict['weight'] = branch_dict['count'] / n_samples
-            branch_dict['pos_prob'] = branch_dict['pos_count'] / branch_dict['count']
-            branch_dict['index'] = 1 - (np.square(branch_dict['pos_prob']) + np.square(1 - branch_dict['pos_prob']))
-            branch_dict['weighted_index'] = branch_dict['weight'] * branch_dict['index']
+
+        # update the affected branch
+        abranch_dict['count'] -= 1
+        abranch_dict['pos_count'] -= y_val
+        abranch_dict['weight'] = abranch_dict['count'] / node_dict['count']
+        abranch_dict['pos_prob'] = abranch_dict['pos_count'] / abranch_dict['count']
+        abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
+        abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
+
+        # update the non-affected branch
+        nabranch = 'left' if abranch == 'right' else 'right'
+        nabranch_dict = node_dict['attr'][attr_ndx][nabranch]
+        nabranch_dict['weight'] = nabranch_dict['count'] / node_dict['count']
+        nabranch_dict['weighted_index'] = nabranch_dict['weight'] * nabranch_dict['index']
+
         return 1
+
+    # def _update_decision_node(self, branch_dict, y_val, n_samples):
+    #     """
+    #     Update the attribute split branch metadata.
+    #     """
+
+    #     # only the affected instance is in this branch
+    #     if branch_dict['count'] <= 1:
+    #         return None
+    #     else:
+    #         branch_dict['count'] -= 1
+    #         branch_dict['pos_count'] -= y_val
+    #         branch_dict['weight'] = branch_dict['count'] / n_samples
+    #         branch_dict['pos_prob'] = branch_dict['pos_count'] / branch_dict['count']
+    #         branch_dict['index'] = 1 - (np.square(branch_dict['pos_prob']) + np.square(1 - branch_dict['pos_prob']))
+    #         branch_dict['weighted_index'] = branch_dict['weight'] * branch_dict['index']
+    #     return 1
 
     def _compute_gini_index(self, attr_dict):
         gini_index = attr_dict['left']['weighted_index'] + attr_dict['right']['weighted_index']

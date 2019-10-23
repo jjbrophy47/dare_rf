@@ -68,10 +68,16 @@ x2:
 
 Deletion Types
 
-Type 1:
+Type 1a:
 The check makes it all the way through the tree to a leaf with more than 1
 instance. The leaf metadata is updated, along with all intermediate nodes
 along the way.
+
+Type 1b:
+While traveling along the path to the leaf containing the target instance
+to remove, if the updated decision nodes on this path result in that path
+only containing instances of the same class after removing the target
+instance, this node is turned into a leaf.
 
 Type 2a:
 The check makes it to a decision node, who's affected branch contains only
@@ -96,6 +102,11 @@ cases.
 Type 3:
 This decision node has changed attributes, update this metadata and all
 node metadata along this path, and rebuild below this node.
+
+In an actual implementation, it's easier to rebuild at this node instead
+of below it. If we rebuild below it, we need to keep track of which
+indices go where for each attribute. It's easier to just store the
+indices of the current structure at the leaves of the tree.
 
 
 Time Complexity:
