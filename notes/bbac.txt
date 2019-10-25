@@ -10,6 +10,9 @@ At node, for each attribute:
 	If right is affected:
 		Decrement instance count and class count.
 
+	Update other branch's weight since the overall
+	node count has changed.
+
 	Recompute objective.
 	If this objective is the best:
 		Save this attribute.

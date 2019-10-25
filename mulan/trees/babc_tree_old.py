@@ -63,31 +63,14 @@ class BABC_Tree(object):
         """
         Build decision tree.
         """
-        assert isinstance(X, dict)
-        assert isinstance(y, dict)
-        self.n_features_ = len(X[next(iter(X))])
+        assert y.ndim == 1
+        assert X.ndim == 2
+        assert X.shape[0] == len(y)
+        self.n_features_ = X.shape[1]
         self.X_train_ = X
         self.y_train_ = y
-
-        self.root_ = self._build_tree(list(X.keys()))
+        self.root_ = self._build_tree(np.arange(len(X)))
         return self
-
-    def _get_pos_count(self, indices):
-        pos_count = 0
-        for ndx in indices:
-            pos_count += self.y_train_[ndx]
-        return pos_count
-
-    def _split_data(self, indices, attr_ndx):
-        left_indices, right_indices = [], []
-
-        for ndx in indices:
-            if self.X_train_[ndx][attr_ndx] == 1:
-                left_indices.append(ndx)
-            else:
-                right_indices.append(ndx)
-
-        return left_indices, right_indices
 
     def _build_tree(self, indices, current_depth=0):
         """
@@ -101,8 +84,7 @@ class BABC_Tree(object):
 
         # additional data structure to maintain attribute split info
         n_samples = len(indices)
-        node_dict = {'count': n_samples, 'pos_count': self._get_pos_count(indices)}
-        # node_dict = {'count': n_samples, 'pos_count': np.sum(self.y_train_[indices])}
+        node_dict = {'count': n_samples, 'pos_count': np.sum(self.y_train_[indices])}
 
         # handle edge cases
         create_leaf = False
@@ -131,13 +113,12 @@ class BABC_Tree(object):
             for i in range(self.n_features_):
 
                 # split the binary attribute
-                left_indices, right_indices = self._split_data(indices, i)
-                # left_indices = indices[np.where(self.X_train_[indices][:, i] == 1)]
-                # right_indices = np.setdiff1d(indices, left_indices)
+                left_indices = indices[np.where(self.X_train_[indices][:, i] == 1)]
+                right_indices = np.setdiff1d(indices, left_indices)
 
                 if self.verbose > 1:
                     print(i, left_indices, right_indices)
-                    # print(i, self.y_train_[left_indices], self.y_train_[right_indices])
+                    print(i, self.y_train_[left_indices], self.y_train_[right_indices])
 
                 # make sure there is atleast 1 sample in each branch
                 if len(left_indices) > 0 and len(right_indices) > 0:
@@ -146,11 +127,9 @@ class BABC_Tree(object):
 
                     # gather stats about the split to compute the Gini index
                     left_count = len(left_indices)
-                    left_pos_count = self._get_pos_count(left_indices)
-                    # left_pos_count = np.sum(self.y_train_[left_indices])
+                    left_pos_count = np.sum(self.y_train_[left_indices])
                     right_count = n_samples - left_count
-                    right_pos_count = self._get_pos_count(right_indices)
-                    # right_pos_count = np.sum(self.y_train_[right_indices])
+                    right_pos_count = np.sum(self.y_train_[right_indices])
 
                     # print(i, left_count, left_pos_count, right_count, right_pos_count)
 
@@ -206,13 +185,9 @@ class BABC_Tree(object):
                                     left_branch=left_node, right_branch=right_node)
 
         # we're at a leaf => determine value
-        count = len(indices)
-        pos_count = self._get_pos_count(indices)
-        leaf_value = pos_count / len(indices)
-        # leaf_value = self._get_mean(indices)
-        # leaf_value = np.mean(self.y_train_[indices])
-        node_dict['count'] = count
-        node_dict['pos_count'] = pos_count
+        leaf_value = np.mean(self.y_train_[indices])
+        node_dict['pos_count'] = np.sum(self.y_train_[indices])
+        node_dict['count'] = len(indices)
         node_dict['indices'] = indices
         return DecisionNode(value=leaf_value, node_dict=node_dict)
 
@@ -229,19 +204,18 @@ class BABC_Tree(object):
         Removes instance remove_ndx from the training data and updates the model.
         """
         assert isinstance(remove_ndx, int)
-        x = self.X_train_.get(remove_ndx)
-        y = self.y_train_.get(remove_ndx)
-        assert x is not None and y is not None
-
+        assert remove_ndx <= self.X_train_.shape[0]
+        x = self.X_train_[remove_ndx]
+        y = self.y_train_[remove_ndx]
         self.deletion_type_ = None
         self.root_ = self._delete(x, y, remove_ndx)
 
         # remove the instance from the data
-        del self.X_train_[remove_ndx]
-        del self.y_train_[remove_ndx]
+        self.X_train_ = np.delete(self.X_train_, remove_ndx, axis=0)
+        self.y_train_ = np.delete(self.y_train_, remove_ndx)
 
-        # # update all leaf indices
-        # self._update_leaves(self.root_, remove_ndx)
+        # update all leaf indices
+        self._update_leaves(self.root_, remove_ndx)
 
         return self.deletion_type_
 
@@ -255,7 +229,7 @@ class BABC_Tree(object):
         if tree.value is not None:
             self._update_leaf_node(tree, remove_ndx)
             if self.verbose > 0:
-                print('tree check complete, ended at depth {}'.format(current_depth))
+                print('check complete, ended at depth {}'.format(current_depth))
             self.deletion_type_ = '1a'
             return tree
 
@@ -266,7 +240,7 @@ class BABC_Tree(object):
         # find the affected branch
         abranch = 'left' if x[tree.feature_i] == 1 else 'right'
 
-        # raise an error if there are only instances from one class are at the root
+        # raise an error if there are only instances from one class at the root
         if current_depth == 0:
             if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
                 raise ValueError('Instances in the root node are all from the same class!')
@@ -279,7 +253,7 @@ class BABC_Tree(object):
             tree.node_dict['attr'] = None
             tree.node_dict['leaf_value'] = tree.node_dict['pos_count'] / tree.node_dict['count']
             tree.node_dict['indices'] = self.get_indices(tree, current_depth)
-            tree.node_dict['indices'].remove(remove_ndx)
+            tree.node_dict['indices'] = tree.node_dict['indices'][tree.node_dict['indices'] != remove_ndx]
             tree_branch = DecisionNode(value=tree.node_dict['leaf_value'], node_dict=tree.node_dict)
             self.deletion_type_ = '1b'
             return tree_branch
@@ -296,7 +270,7 @@ class BABC_Tree(object):
                 tree.node_dict['attr'] = None
                 tree.node_dict['leaf_value'] = tree.node_dict['pos_count'] / tree.node_dict['count']
                 tree.node_dict['indices'] = self.get_indices(na_branch, current_depth + 1)
-                tree.node_dict['indices'].remove(remove_ndx)
+                tree.node_dict['indices'] = tree.node_dict['indices'][tree.node_dict['indices'] != remove_ndx]
                 tree_branch = DecisionNode(value=tree.node_dict['leaf_value'], node_dict=tree.node_dict)
                 self.deletion_type_ = '2a'
                 return tree_branch
@@ -306,8 +280,7 @@ class BABC_Tree(object):
                 if self.verbose > 0:
                     print('hanging branch with >1 instance, rebuilding at depth {}'.format(current_depth))
                 indices = self.get_indices(tree, current_depth)
-                indices.remove(remove_ndx)
-                # indices = indices[indices != remove_ndx]
+                indices = indices[indices != remove_ndx]
                 self.deletion_type_ = '2b'
                 return self._build_tree(indices, current_depth)
 
@@ -317,7 +290,7 @@ class BABC_Tree(object):
 
         # print(tree.node_dict)
 
-        # update the metadata for each attribute
+        # update the metadata for each attribute's affected branch
         for attr_ndx in tree.node_dict['attr']:
             abranch = 'left' if x[attr_ndx] == 1 else 'right'
             if self._update_decision_node(tree.node_dict, attr_ndx, abranch, y) is None:
@@ -363,15 +336,25 @@ class BABC_Tree(object):
                 tree.right_branch = new_branch
             return tree
 
-        # type 3: the attribute has changed, rebuild at this node
+        # type 3: split data left and right, rebuild at this node
         else:
             if self.verbose > 0:
                 print('rebuilding at depth {}'.format(current_depth))
             indices = self.get_indices(tree, current_depth)
-            indices.remove(remove_ndx)
-            # indices = indices[indices != remove_ndx]
+            indices = indices[indices != remove_ndx]
             self.deletion_type_ = '3'
             return self._build_tree(indices, current_depth)
+
+            # left_indices = self.get_indices(tree.left_branch, current_depth + 1)
+            # left_indices = left_indices[left_indices != remove_ndx]
+            # right_indices = self.get_indices(tree.right_branch, current_depth + 1)
+            # right_indices = right_indices[right_indices != remove_ndx]
+            # print(left_indices, right_indices, best_attr_ndx)
+            # left_branch = self._build_tree(left_indices, current_depth + 1)
+            # right_branch = self._build_tree(right_indices, current_depth + 1)
+            # self.deletion_type_ = '3'
+            # return DecisionNode(feature_i=best_attr_ndx, node_dict=tree.node_dict,
+            #                     left_branch=left_branch, right_branch=right_branch)
 
     def _update_leaves(self, tree, remove_ndx):
 
@@ -397,7 +380,7 @@ class BABC_Tree(object):
         node_dict['pos_count'] -= self.y_train_[remove_ndx]
         node_dict['count'] -= 1
         node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
-        node_dict['indices'].remove(remove_ndx)
+        node_dict['indices'] = node_dict['indices'][node_dict['indices'] != remove_ndx]
         tree.value = node_dict['leaf_value']
 
     def _update_decision_node(self, node_dict, attr_ndx, abranch, y_val):
@@ -463,8 +446,7 @@ class BABC_Tree(object):
         else:
             left_indices = self.get_indices(tree.left_branch, depth + 1)
             right_indices = self.get_indices(tree.right_branch, depth + 1)
-            return left_indices + right_indices
-            # return np.concatenate([left_indices, right_indices])
+            return np.concatenate([left_indices, right_indices])
 
     def print_tree(self, tree=None, indent='\t', depth=0):
         """
@@ -477,8 +459,7 @@ class BABC_Tree(object):
 
         # If we're at leaf => print the label
         if tree.value is not None:
-            print(tree.value, tree.node_dict['indices'])
-            # print(tree.value, tree.node_dict['indices'], self.y_train_[tree.node_dict['indices']])
+            print(tree.value, tree.node_dict['indices'], self.y_train_[tree.node_dict['indices']])
 
         # Go deeper down the tree
         else:
