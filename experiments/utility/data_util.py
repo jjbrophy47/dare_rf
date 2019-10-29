@@ -6,11 +6,11 @@ import os
 import numpy as np
 
 
-def get_data(dataset, data_dir='data'):
+def get_data(dataset, data_dir='data', convert=True):
     """
     Returns a train and test set from the desired dataset.
     """
-    return _load_data(dataset, data_dir=data_dir)
+    return _load_data(dataset, data_dir=data_dir, convert=convert)
 
 
 def convert_data(X, y):
@@ -27,7 +27,7 @@ def convert_data(X, y):
     return new_X, new_y
 
 
-def _load_data(dataset, data_dir='data'):
+def _load_data(dataset, data_dir='data', convert=True):
     """
     Load the binary dataset.
     """
@@ -43,7 +43,8 @@ def _load_data(dataset, data_dir='data'):
     X_test = test[:, :-1]
     y_test = test[:, -1]
 
-    X_train, y_train = convert_data(X_train, y_train)
-    X_test, y_test = convert_data(X_test, y_test)
+    if convert:
+        X_train, y_train = convert_data(X_train, y_train)
+        X_test, y_test = convert_data(X_test, y_test)
 
     return X_train, X_test, y_train, y_test

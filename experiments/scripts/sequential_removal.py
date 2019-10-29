@@ -17,10 +17,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 from mulan.trees.babc_tree import BABC_Tree
+# from mulan.trees.babc_tree_old import BABC_Tree_Old
 from utility import data_util
 
 
-def _fit_delete_refit(t1, X_new, y_new, delete_ndx, max_depth=4):
+def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, max_depth=4):
     """
     This method first a tree, efficiently deletes the target instance,
     and refits a new tree without the target instance, and
@@ -33,23 +34,26 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, max_depth=4):
 
     # print(delete_ndx)
 
-    del X_new[delete_ndx]
-    del y_new[delete_ndx]
+    # del X_new[delete_ndx]
+    # del y_new[delete_ndx]
 
     start = time.time()
     result['delete_type'] = t1.delete(delete_ndx)
     result['delete'] = time.time() - start
 
-    start = time.time()
-    t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
-    result['refit'] = time.time() - start
+    if refit:
+        X_new = np.delete(X_new, adjusted_ndx, axis=0)
+        y_new = np.delete(y_new, adjusted_ndx)
 
-    result['refit_to_delete_ratio'] = result['refit'] / result['delete']
+        start = time.time()
+        t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
+        result['refit'] = time.time() - start
+        result['refit_to_delete_ratio'] = result['refit'] / result['delete']
+        assert t1.equals(t2)
 
     # t1.print_tree()
     # t2.print_tree()
 
-    assert t1.equals(t2)
     return result, t1, X_new, y_new
 
 
@@ -58,21 +62,29 @@ def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='
     Plot the average time of deletion for each deletion type.
     """
     df = pd.DataFrame(results)
+
+    deletion_sum = df['delete'].sum()
+    print('deletion sum: {:.3f}s'.format(deletion_sum))
+    print(df[df['delete_type'] == '3'])
+
     f = plt.figure(figsize=(20, 4))
     ax0 = f.add_subplot(141)
     ax1 = f.add_subplot(142)
     ax2 = f.add_subplot(143, sharey=ax1)
     ax3 = f.add_subplot(144)
     sns.countplot(x='delete_type', data=df, ax=ax0)
-    df.boxplot(column='refit', by='delete_type', ax=ax1)
     df.boxplot(column='delete', by='delete_type', ax=ax2)
-    df.boxplot(column='refit_to_delete_ratio', by='delete_type', ax=ax3)
+    if not args.no_refit:
+        refit_sum = df['refit'].sum()
+        print('refit sum: {:.3f}s'.format(refit_sum))
+        df.boxplot(column='refit', by='delete_type', ax=ax1)
+        df.boxplot(column='refit_to_delete_ratio', by='delete_type', ax=ax3)
+        ax1.set_ylabel('seconds')
+        ax3.set_ylabel('ratio')
 
     ax0.set_ylabel('count')
     ax0.set_xlabel('delete_type')
     ax0.set_title('deletion occurrences')
-    ax1.set_ylabel('seconds')
-    ax3.set_ylabel('ratio')
     title_str = 'dataset: {}, samples: {}, attributes: {}, removed: {}\n'
     f.suptitle(title_str.format(args.dataset, n_samples, n_attributes, n_remove))
 
@@ -116,39 +128,56 @@ def main(args):
         X, y = data_util.convert_data(X, y)
 
     else:
-
-        X, _, y, _ = data_util.get_data(args.dataset)
+        X, _, y, _ = data_util.get_data(args.dataset, convert=False)
+        # X_np, _, y_np, _ = data_util.get_data(args.dataset, convert=False)
 
     # retrieve the indices to remove
-    n_remove = int(args.remove_frac * len(X.keys())) if args.n_remove is None else args.n_remove
-    n_samples = len(X.keys())
-    n_attributes = len(X[next(iter(X))])
-    indices_to_delete = np.random.choice(list(X.keys()), size=n_remove, replace=False)
+    n_samples = X.shape[0]
+    n_attributes = X.shape[1]
+    n_remove = int(args.remove_frac * n_samples) if args.n_remove is None else args.n_remove
+    # n_samples = len(X.keys())
+    # n_attributes = len(X[next(iter(X))])
+    np.random.seed(args.seed)
+    indices_to_delete = np.random.choice(np.arange(n_samples), size=n_remove, replace=False)
+    adjusted_indices = _adjust_indices(indices_to_delete)
+
+    print(indices_to_delete)
 
     print('n_samples: {}, n_attributes: {}'.format(n_samples, n_attributes))
-    print(indices_to_delete)
 
     # create new mutable varibles to hold the decreasing datasets
     X_new, y_new = X.copy(), y.copy()
-    t1 = BABC_Tree(max_depth=args.max_depth).fit(X.copy(), y.copy())
+    X_copy, y_copy = X.copy(), y.copy()
+
+    # print('building tree...')
+    # start = time.time()
+    # t1 = BABC_Tree_Old(max_depth=args.max_depth).fit(X_np, y_np)
+    # print('{:.3f}s'.format(time.time() - start))
+
+    print('building tree...')
+    start = time.time()
+    t1 = BABC_Tree(max_depth=args.max_depth).fit(X_copy, y_copy)
+    print('{:.3f}s'.format(time.time() - start))
 
     # t1.print_tree()
 
     # delete instances one at a time and measure the time
     results = []
     for i, ndx in enumerate(indices_to_delete):
-        result, t1, X_new, y_new = _fit_delete_refit(t1, X_new, y_new, int(ndx), max_depth=args.max_depth)
+        result, t1, X_new, y_new = _fit_delete_refit(t1, X_new, y_new, int(ndx), int(adjusted_indices[i]),
+                                                     refit=not args.no_refit, max_depth=args.max_depth)
 
         if args.verbose > 0:
             if int(0.1 * n_remove) != 0 and i % int(0.1 * n_remove) == 0:
-                print('removed: '.format(i))
+                print('removed: {}'.format(i))
 
         if args.verbose > 1:
-            print('\nDeleting instance {}, adjusted: {}'.format(ndx))
+            print('\nDeleting instance {}'.format(ndx))
             print('delete_type: {}'.format(result['delete_type']))
-            print('refit: {:.5f}'.format(result['refit']))
             print('delete: {:.5f}'.format(result['delete']))
-            print('refit-to-delete ratio: {:.3f}'.format(result['refit_to_delete_ratio']))
+            if not args.no_refit:
+                print('refit: {:.5f}'.format(result['refit']))
+                print('refit-to-delete ratio: {:.3f}'.format(result['refit_to_delete_ratio']))
 
         results.append(result)
 
@@ -169,6 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=423, help='seed to populate the data.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+    parser.add_argument('--no_refit', action='store_true', default=False, help='do not record refits.')
     args = parser.parse_args()
     print(args)
     main(args)
