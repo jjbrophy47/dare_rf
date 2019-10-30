@@ -1,6 +1,6 @@
 """
 This experiment chooses m random instances to delete,
-then deletes them sequentially.
+then deletes them individually.
 BABC: Binary Attributes Binary Classification.
 """
 import os
@@ -17,11 +17,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 from mulan.trees.babc_tree import BABC_Tree
-# from mulan.trees.babc_tree_old import BABC_Tree_Old
 from utility import data_util
 
 
-def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, max_depth=4):
+def _fit_delete_refit(X, y, delete_ndx, refit=False, max_depth=4):
     """
     This method first a tree, efficiently deletes the target instance,
     and refits a new tree without the target instance, and
@@ -29,21 +28,14 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, m
     """
     result = {}
 
-    # print(X_new, y_new)
-    # print(X_new[delete_ndx], y_new[delete_ndx], delete_ndx)
-
-    # print(delete_ndx)
-
-    # del X_new[delete_ndx]
-    # del y_new[delete_ndx]
-
+    t1 = BABC_Tree(max_depth=args.max_depth).fit(X, y)
     start = time.time()
     result['delete_type'] = t1.delete(delete_ndx)
     result['delete'] = time.time() - start
 
     if refit:
-        X_new = np.delete(X_new, adjusted_ndx, axis=0)
-        y_new = np.delete(y_new, adjusted_ndx)
+        X_new = np.delete(X, delete_ndx, axis=0)
+        y_new = np.delete(y, delete_ndx)
 
         start = time.time()
         t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
@@ -51,13 +43,10 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, m
         result['refit_to_delete_ratio'] = result['refit'] / result['delete']
         assert t1.equals(t2)
 
-    # t1.print_tree()
-    # t2.print_tree()
-
-    return result, t1, X_new, y_new
+    return result
 
 
-def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='output/bbac/sequential_removal'):
+def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='output/bbac/individual_removal'):
     """
     Plot the average time of deletion for each deletion type.
     """
@@ -94,26 +83,6 @@ def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='
                 bbox_inches='tight')
 
 
-def _adjust_indices(indices_to_delete):
-    """
-    Return an adjusted array of indices, taking into account removing rach on sequentially.
-
-    Example:
-    indices_to_delete = [4, 1, 10, 0] => desired result = [4, 1, 8, 0]
-    """
-    assert not _contains_duplicates(indices_to_delete)
-    indices = indices_to_delete.copy()
-    for i in range(len(indices)):
-        for j in range(i + 1, len(indices)):
-            if indices[i] < indices[j]:
-                indices[j] -= 1
-    return indices
-
-
-def _contains_duplicates(x):
-    return len(np.unique(x)) != len(x)
-
-
 def main(args):
 
     # obtain dataset
@@ -125,11 +94,8 @@ def main(args):
         np.random.seed(args.seed)
         y = np.random.randint(2, size=args.n_samples)
 
-        # X, y = data_util.convert_data(X, y)
-
     else:
         X, _, y, _ = data_util.get_data(args.dataset, convert=False)
-        # X_np, _, y_np, _ = data_util.get_data(args.dataset, convert=False)
 
     # retrieve the indices to remove
     n_samples = X.shape[0]
@@ -137,31 +103,12 @@ def main(args):
     n_remove = int(args.remove_frac * n_samples) if args.n_remove is None else args.n_remove
     np.random.seed(args.seed)
     indices_to_delete = np.random.choice(np.arange(n_samples), size=n_remove, replace=False)
-    adjusted_indices = _adjust_indices(indices_to_delete)
-
     print('n_samples: {}, n_attributes: {}'.format(n_samples, n_attributes))
-
-    # create new mutable varibles to hold the decreasing datasets
-    X_new, y_new = X.copy(), y.copy()
-    X_copy, y_copy = X.copy(), y.copy()
-
-    # print('building tree...')
-    # start = time.time()
-    # t1 = BABC_Tree_Old(max_depth=args.max_depth).fit(X_np, y_np)
-    # print('{:.3f}s'.format(time.time() - start))
-
-    print('building tree...')
-    start = time.time()
-    t1 = BABC_Tree(max_depth=args.max_depth).fit(X_copy, y_copy)
-    print('{:.3f}s'.format(time.time() - start))
-
-    # t1.print_tree()
 
     # delete instances one at a time and measure the time
     results = []
     for i, ndx in enumerate(indices_to_delete):
-        result, t1, X_new, y_new = _fit_delete_refit(t1, X_new, y_new, int(ndx), int(adjusted_indices[i]),
-                                                     refit=not args.no_refit, max_depth=args.max_depth)
+        result = _fit_delete_refit(X, y, int(ndx), refit=not args.no_refit, max_depth=args.max_depth)
 
         if args.verbose > 0:
             if int(0.1 * n_remove) != 0 and i % int(0.1 * n_remove) == 0:
@@ -176,10 +123,6 @@ def main(args):
                 print('refit-to-delete ratio: {:.3f}'.format(result['refit_to_delete_ratio']))
 
         results.append(result)
-
-    # make sure decremental tree is the same as a learned tree without the desired indices
-    desired_tree = BABC_Tree(max_depth=args.max_depth).fit(X_new, y_new)
-    assert t1.equals(desired_tree)
 
     _display_results(results, args, n_samples, n_attributes, n_remove)
 

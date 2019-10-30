@@ -30,6 +30,14 @@ class DecisionNode():
         self.right_branch = right_branch    # 'Right' subtree
         self.node_dict = node_dict          # Attribute split / leaf metadata
 
+    def copy(self):
+        left_node = self.left_branch.copy() if self.left_branch is not None else None
+        right_node = self.right_branch.copy() if self.right_branch is not None else None
+        node_dict = self.node_dict.copy()
+        node = DecisionNode(feature_i=self.feature_i, threshold=self.threshold, value=self.value,
+                            left_branch=left_node, right_branch=right_node, node_dict=node_dict)
+        return node
+
 
 class BABC_Tree(object):
     """
@@ -147,7 +155,7 @@ class BABC_Tree(object):
 
                 # split the binary attribute
                 # left_indices, right_indices = self._split_data(indices, i)
-                left_indices = np.argwhere(X[:, i] == 1)
+                left_indices = np.where(X[:, i] == 1)
                 right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
                 if self.verbose > 1:
@@ -231,12 +239,28 @@ class BABC_Tree(object):
         node_dict['indices'] = keys
         return DecisionNode(value=leaf_value, node_dict=node_dict)
 
-    def predict(self, X):
+    def copy(self):
+        """
+        Return a deep copy of this object.
+        """
+        tree = BABC_Tree(min_samples_split=self.min_samples_split, min_impurity=self.min_impurity,
+                         max_depth=self.max_depth, verbose=self.verbose)
+        tree.n_features_ = self.n_features_
+        tree.X_train_ = self.X_train_.copy()
+        tree.y_train_ = self.y_train_.copy()
+
+        # recursively copy the tree
+        tree.root_ = self.root_.copy()
+
+        return tree
+
+    def predict_proba(self, X):
         """
         Classify samples one by one and return the set of labels.
         """
         assert X.ndim == 2
-        y_pred = [self._predict_value(sample) for sample in X]
+        y_positive = np.array([self._predict_value(sample) for sample in X]).reshape(-1, 1)
+        y_pred = np.hstack([1 - y_positive, y_positive])
         return y_pred
 
     def delete(self, remove_ndx):
