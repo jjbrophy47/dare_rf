@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 
-def get_data(dataset, data_dir='data', convert=True):
+def get_data(dataset, data_dir='data', convert=False):
     """
     Returns a train and test set from the desired dataset.
     """
@@ -27,7 +27,7 @@ def convert_data(X, y):
     return new_X, new_y
 
 
-def _load_data(dataset, data_dir='data', convert=True):
+def _load_data(dataset, data_dir='data', convert=False):
     """
     Load the binary dataset.
     """
