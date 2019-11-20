@@ -29,30 +29,36 @@ def _plot(ax, gini_gains_best, gini_gains_worst, best_ndx, worst_ndx, ltype=''):
 def _lower_bound(ax, r_best, r_worst, best_ndx, worst_ndx, type_counts=None, ltype=''):
 
     # theoretical lower bound on the number and type of instances given a starting dataset
-    gini_gains_best = []
-    gini_gains_worst = []
+    gini_gains_best = [r_best['gini_gain']]
+    gini_gains_worst = [r_worst['gini_gain']]
     converged = True
 
-    while r_best['gini_gain'] >= r_worst['gini_gain']:
+    n_instances = 0
+    while r_best['gini_gain'] > r_worst['gini_gain']:
         r_best, r_worst, _, _, _ = _find_delta(r_best, r_worst, type_counts)
         if r_best is None or r_worst is None:
             converged = False
-            print('[{}}] failed to find min # of instances to change split'.format(ltype.capitalize()))
+            print('[{}] failed to find min # of instances to change split'.format(ltype.capitalize()))
             break
-        gini_gains_best.append(r_best['gini_gain'])
-        gini_gains_worst.append(r_worst['gini_gain'])
+        else:
+            gini_gains_best.append(r_best['gini_gain'])
+            gini_gains_worst.append(r_worst['gini_gain'])
+            n_instances += 1
 
     if converged:
         _plot(ax, gini_gains_best, gini_gains_worst, best_ndx, worst_ndx, ltype='"Greedy" {}'.format(ltype))
+
+    return n_instances
 
 
 def _random_bound(ax, X, y, attr1_ndx, attr2_ndx, r_best, r_worst, best_ndx, worst_ndx):
 
     # actual instances in the dataset that lead to a switch in attributes
-    gini_gains_best = []
-    gini_gains_worst = []
+    gini_gains_best = [r_best['gini_gain']]
+    gini_gains_worst = [r_worst['gini_gain']]
     converged = True
 
+    n_instances = 0
     random_indices = np.random.choice(np.arange(len(X)), size=X.shape[0], replace=False)
     for ndx in random_indices[:-1]:
         xa, xb, yi = X[ndx][attr1_ndx], X[ndx][attr2_ndx], y[ndx]
@@ -65,12 +71,15 @@ def _random_bound(ax, X, y, attr1_ndx, attr2_ndx, r_best, r_worst, best_ndx, wor
             r_best, r_worst = _decrement2(r_best, xa, yi), _decrement2(r_worst, xb, yi)
             gini_gains_best.append(r_best['gini_gain'])
             gini_gains_worst.append(r_worst['gini_gain'])
+            n_instances += 1
 
-        if r_worst['gini_gain'] > r_best['gini_gain']:
+        if r_worst['gini_gain'] >= r_best['gini_gain']:
             break
 
     if converged:
         _plot(ax, gini_gains_best, gini_gains_worst, best_ndx, worst_ndx, ltype='random')
+
+    return n_instances
 
 
 def _find_best_attributes(X, y):
@@ -89,6 +98,8 @@ def _find_best_attributes(X, y):
 
         # keep the best attribute
         if gini_gain > best_gini_gain:
+            second_best_gini_gain = best_gini_gain
+            second_best_feature_ndx = best_feature_ndx
             best_gini_gain = gini_gain
             best_feature_ndx = i
 
@@ -293,7 +304,9 @@ def _compute_gini_gain(x, y):
     return result
 
 
-def main(args):
+def bounding_gap(args, out_dir='output/bbac/bounding_gap'):
+
+    print(args.seed)
 
     # create data
     if args.dataset == 'synthetic':
@@ -302,12 +315,15 @@ def main(args):
         X = np.random.randint(2, size=(args.n_samples, args.n_attributes))
         np.random.seed(args.seed)
         y = np.random.randint(2, size=args.n_samples)
-        print('creation time: {:.3f}s'.format(time.time() - start))
+
+        if args.verbose > 0:
+            print('creation time: {:.3f}s'.format(time.time() - start))
 
     else:
         X, _, y, _ = data_util.get_data(args.dataset)
 
-    print('training instances: {}, features: {}'.format(X.shape[0], X.shape[1]))
+    if args.verbose > 0:
+        print('training instances: {}, features: {}'.format(X.shape[0], X.shape[1]))
 
     # choose two attributes to analyze
     if args.random_attributes:
@@ -316,7 +332,8 @@ def main(args):
     else:
         attr1_ndx, attr2_ndx = _find_best_attributes(X, y)
 
-    print('1st and 2nd attribute indices: {}, {}'.format(attr1_ndx, attr2_ndx))
+    if args.verbose > 0:
+        print('1st and 2nd attribute indices: {}, {}'.format(attr1_ndx, attr2_ndx))
 
     # extract their respective arrays
     x_a = X[:, attr1_ndx]
@@ -338,14 +355,58 @@ def main(args):
     fig, axs = plt.subplots(1, 3, figsize=(14, 4))
 
     # theoretical and empirical lower bounds
-    _lower_bound(axs[0], r_best.copy(), r_worst.copy(), best_ndx, worst_ndx, ltype='theoretical')
-    _lower_bound(axs[1], r_best.copy(), r_worst.copy(), best_ndx, worst_ndx, type_counts, ltype='empirical')
+    theo = _lower_bound(axs[0], r_best.copy(), r_worst.copy(), best_ndx, worst_ndx, ltype='theoretical')
+    empi = _lower_bound(axs[1], r_best.copy(), r_worst.copy(), best_ndx, worst_ndx, type_counts, ltype='empirical')
 
     # lower bound using random
-    _random_bound(axs[2], X, y, attr1_ndx, attr2_ndx, r_best.copy(), r_worst.copy(), best_ndx, worst_ndx)
+    random = _random_bound(axs[2], X, y, attr1_ndx, attr2_ndx, r_best.copy(), r_worst.copy(), best_ndx, worst_ndx)
 
-    plt.tight_layout()
-    plt.show()
+    if args.iterations is None:
+
+        # save plot
+        out_dir = os.path.join(out_dir, args.dataset)
+        os.makedirs(out_dir, exist_ok=True)
+        fig.suptitle('dataset: {}, instances: {}, attributes: {}'.format(args.dataset, X.shape[0], X.shape[1]))
+        plt.savefig(os.path.join(out_dir, 'seed{}.png'.format(args.seed)), bbox_inches='tight',
+                    rasterize=True)
+
+    else:
+        plt.close(fig)
+
+    return theo, empi, random
+
+
+def main(args, out_dir='output/bbac/bounding_gap'):
+
+    results = []
+    if args.iterations is not None:
+        for i in range(args.iterations):
+            args.seed += 1
+            results.append(bounding_gap(args))
+
+        theos, empis, randoms = zip(*results)
+        theos, empis, randoms = np.array(theos), np.array(empis), np.array(randoms)
+        means = [theos.mean(), empis.mean(), randoms.mean()]
+        stds = [theos.std(), empis.std(), randoms.std()]
+        names = ['theoretical', 'empirical', 'random']
+
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        fig.suptitle('dataset: {}, instances: {}, iterations: {}'.format(args.dataset,
+                     args.n_samples, args.iterations))
+        ax1.bar(names[:-1], means[:-1], yerr=stds[:-1])
+        ax1.set_ylabel('# deletes')
+        ax2.bar(names[-1], means[-1], yerr=stds[-1])
+        ax2.set_ylabel('# deletes')
+        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+
+        # save plot
+        out_dir = os.path.join(out_dir, args.dataset)
+        os.makedirs(out_dir, exist_ok=True)
+        plt.savefig(os.path.join(out_dir, 'mean{}.png'.format(args.seed)), bbox_inches='tight',
+                    rasterize=True)
+
+    else:
+        bounding_gap(args)
 
 
 if __name__ == '__main__':
@@ -355,6 +416,8 @@ if __name__ == '__main__':
     parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
     parser.add_argument('--random_attributes', action='store_true', default=False, help='Uses two random attributes.')
     parser.add_argument('--seed', type=int, default=423, help='seed to populate the data.')
+    parser.add_argument('--iterations', type=int, default=None, help='repeats of the experiment.')
+    parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
     print(args)
     main(args)
