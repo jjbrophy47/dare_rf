@@ -119,13 +119,15 @@ class BABC_Tree(object):
         """
 
         # keeps track of the best attribute
-        best_gini_index = 1e7
+        best_gini_gain = -1
         best_feature_ndx = None
 
         # additional data structure to maintain attribute split info
         n_samples = len(keys)
         pos_count = np.sum(y)
-        node_dict = {'count': n_samples, 'pos_count': pos_count}
+        neg_count = n_samples - pos_count
+        gini_data = round(1 - (pos_count / n_samples)**2 - (neg_count / n_samples)**2, 8)
+        node_dict = {'count': n_samples, 'pos_count': pos_count, 'gini_data': gini_data}
 
         # handle edge cases
         create_leaf = False
@@ -134,7 +136,7 @@ class BABC_Tree(object):
             # all instances of the same class
             if node_dict['pos_count'] == 0 or node_dict['pos_count'] == node_dict['count']:
 
-                # the root node contains instances ll from the same class
+                # the root node contains instances from the same class
                 if current_depth == 0:
                     raise ValueError('root node contains only instances from the same class!')
 
@@ -143,7 +145,7 @@ class BABC_Tree(object):
                     create_leaf = True
 
         else:
-            raise ValueError('Zero samples in this node!')
+            raise ValueError('Zero samples in this node!, depth: {}'.format(current_depth))
 
         # error checking
         if n_samples >= self.min_samples_split and current_depth < self.max_depth and \
@@ -154,7 +156,7 @@ class BABC_Tree(object):
             for i in range(self.n_features_):
 
                 # split the binary attribute
-                left_indices = np.where(X[:, i] == 1)
+                left_indices = np.where(X[:, i] == 1)[0]
                 right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
                 if self.verbose > 1:
@@ -197,17 +199,19 @@ class BABC_Tree(object):
                     node_dict['attr'][i]['right']['weighted_index'] = right_weighted_index
 
                     gini_index = self._compute_gini_index(node_dict['attr'][i])
+                    gini_gain = gini_data - gini_index
                     node_dict['attr'][i]['gini_index'] = gini_index
+                    node_dict['attr'][i]['gini_gain'] = gini_gain
 
                     # keep the best attribute
-                    if gini_index < best_gini_index:
-                        best_gini_index = gini_index
+                    if gini_gain > best_gini_gain:
+                        best_gini_gain = gini_gain
                         best_left_indices = left_indices
                         best_right_indices = right_indices
                         best_feature_ndx = i
 
             # split on the best saved attribute
-            if best_feature_ndx is not None and best_gini_index >= 0:
+            if best_feature_ndx is not None:
                 left_node = self._build_tree(X[best_left_indices], y[best_left_indices],
                                              keys[best_left_indices], current_depth + 1)
                 right_node = self._build_tree(X[best_right_indices], y[best_right_indices],
@@ -219,6 +223,7 @@ class BABC_Tree(object):
         leaf_value = pos_count / n_samples
         node_dict['count'] = n_samples
         node_dict['pos_count'] = pos_count
+        node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
         node_dict['indices'] = keys
         return DecisionNode(value=leaf_value, node_dict=node_dict)
 
@@ -262,9 +267,6 @@ class BABC_Tree(object):
         del self.X_train_[remove_ndx]
         del self.y_train_[remove_ndx]
 
-        # # update all leaf indices
-        # self._update_leaves(self.root_, remove_ndx)
-
         return self.deletion_type_
 
     def _delete(self, x, y, remove_ndx, tree=None, current_depth=0):
@@ -282,8 +284,13 @@ class BABC_Tree(object):
             return tree
 
         # decision node, update the high-level metadata
-        tree.node_dict['pos_count'] -= self.y_train_[remove_ndx]
-        tree.node_dict['count'] -= 1
+        count = tree.node_dict['count'] - 1
+        pos_count = tree.node_dict['pos_count'] - self.y_train_[remove_ndx]
+        neg_count = pos_count - count
+        gini_data = round(1 - (pos_count / count)**2 - (neg_count / count)**2, 8)
+        tree.node_dict['pos_count'] = pos_count
+        tree.node_dict['count'] = count
+        tree.node_dict['gini_data'] = gini_data
 
         # find the affected branch
         abranch = 'left' if x[tree.feature_i] == 1 else 'right'
@@ -330,12 +337,12 @@ class BABC_Tree(object):
                 indices = self.get_indices(tree, current_depth)
                 indices = self._remove_element(indices, remove_ndx)
                 Xa, ya, keys = self._get_numpy_data(indices)
-                self.deletion_type_ = '2b'
+                self.deletion_type_ = '2b_{}'.format(current_depth)
                 return self._build_tree(Xa, ya, keys, current_depth)
 
         # keep track of the new best attribute
         best_attr_ndx = None
-        best_gini_index = 1e7
+        best_gini_gain = -1
 
         # update the metadata for each attribute
         for attr_ndx in tree.node_dict['attr']:
@@ -343,14 +350,16 @@ class BABC_Tree(object):
             if self._update_decision_node(tree.node_dict, attr_ndx, abranch, y) is None:
                 continue
 
-            # recompute the gini index for this attribute
+            # recompute the gini gain for this attribute
             attr_dict = tree.node_dict['attr'][attr_ndx]
             gini_index = self._compute_gini_index(attr_dict)
+            gini_gain = tree.node_dict['gini_data'] - gini_index
             attr_dict['gini_index'] = gini_index
+            attr_dict['gini_gain'] = gini_gain
 
-            # save the attribute with the best gini index
-            if gini_index < best_gini_index:
-                best_gini_index = gini_index
+            # save the attribute with the best gini gain
+            if gini_gain > best_gini_gain:
+                best_gini_gain = gini_gain
                 best_attr_ndx = attr_ndx
                 best_branch = abranch
 
@@ -376,7 +385,7 @@ class BABC_Tree(object):
             indices = self.get_indices(tree, current_depth)
             indices = self._remove_element(indices, remove_ndx)
             Xa, ya, keys = self._get_numpy_data(indices)
-            self.deletion_type_ = '3'
+            self.deletion_type_ = '3_{}'.format(current_depth)
             return self._build_tree(Xa, ya, keys, current_depth)
 
     def _update_leaf_node(self, tree, remove_ndx):
@@ -436,7 +445,7 @@ class BABC_Tree(object):
         else:
             left_indices = self.get_indices(tree.left_branch, depth + 1)
             right_indices = self.get_indices(tree.right_branch, depth + 1)
-            return left_indices + right_indices
+            return np.concatenate([left_indices, right_indices])
 
     def print_tree(self, tree=None, indent='\t', depth=0):
         """
@@ -449,7 +458,11 @@ class BABC_Tree(object):
 
         # If we're at leaf => print the label
         if tree.value is not None:
-            print(tree.value, tree.node_dict['indices'])
+            if self.verbose > 1:
+                y_vals = [self.y_train_[ndx] for ndx in tree.node_dict['indices']]
+                print(tree.value, tree.node_dict['indices'], y_vals)
+            else:
+                print(tree.value, tree.node_dict['indices'])
 
         # Go deeper down the tree
         else:

@@ -17,7 +17,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 from mulan.trees.babc_tree import BABC_Tree
-# from mulan.trees.babc_tree_old import BABC_Tree_Old
 from utility import data_util
 
 
@@ -28,14 +27,6 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, m
     returns the times for each of these events.
     """
     result = {}
-
-    # print(X_new, y_new)
-    # print(X_new[delete_ndx], y_new[delete_ndx], delete_ndx)
-
-    # print(delete_ndx)
-
-    # del X_new[delete_ndx]
-    # del y_new[delete_ndx]
 
     start = time.time()
     result['delete_type'] = t1.delete(delete_ndx)
@@ -51,9 +42,6 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, m
         result['refit_to_delete_ratio'] = result['refit'] / result['delete']
         assert t1.equals(t2)
 
-    # t1.print_tree()
-    # t2.print_tree()
-
     return result, t1, X_new, y_new
 
 
@@ -65,7 +53,7 @@ def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='
 
     deletion_sum = df['delete'].sum()
     print('deletion sum: {:.3f}s'.format(deletion_sum))
-    print(df[df['delete_type'] == '3'])
+    print(df[df['delete_type'].str.startswith('3')])
 
     f = plt.figure(figsize=(20, 4))
     ax0 = f.add_subplot(141)
@@ -152,10 +140,8 @@ def main(args):
 
     print('building tree...')
     start = time.time()
-    t1 = BABC_Tree(max_depth=args.max_depth).fit(X_copy, y_copy)
+    t1 = BABC_Tree(max_depth=args.max_depth, verbose=args.verbose).fit(X_copy, y_copy)
     print('{:.3f}s'.format(time.time() - start))
-
-    # t1.print_tree()
 
     # delete instances one at a time and measure the time
     results = []
@@ -165,10 +151,10 @@ def main(args):
 
         if args.verbose > 0:
             if int(0.1 * n_remove) != 0 and i % int(0.1 * n_remove) == 0:
-                print('removed: {}'.format(i))
+                print('number of instances removed: {}'.format(i))
 
         if args.verbose > 1:
-            print('\nDeleting instance {}'.format(ndx))
+            print('\nDeleted instance {}'.format(ndx))
             print('delete_type: {}'.format(result['delete_type']))
             print('delete: {:.5f}'.format(result['delete']))
             if not args.no_refit:
