@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-from mulan.trees.babc_tree import BABC_Tree
+from mulan.trees.babc_tree_d import BABC_Tree_D
 from utility import data_util
 
 
@@ -28,7 +28,7 @@ def _fit_delete_refit(X, y, delete_ndx, refit=False, max_depth=4):
     """
     result = {}
 
-    t1 = BABC_Tree(max_depth=args.max_depth).fit(X, y)
+    t1 = BABC_Tree_D(max_depth=args.max_depth).fit(X, y)
     start = time.time()
     result['delete_type'] = t1.delete(delete_ndx)
     result['delete'] = time.time() - start
@@ -38,7 +38,7 @@ def _fit_delete_refit(X, y, delete_ndx, refit=False, max_depth=4):
         y_new = np.delete(y, delete_ndx)
 
         start = time.time()
-        t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
+        t2 = BABC_Tree_D(max_depth=max_depth).fit(X_new, y_new)
         result['refit'] = time.time() - start
         result['refit_to_delete_ratio'] = result['refit'] / result['delete']
         assert t1.equals(t2)

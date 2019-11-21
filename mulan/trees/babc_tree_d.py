@@ -39,7 +39,7 @@ class DecisionNode():
         return node
 
 
-class BABC_Tree(object):
+class BABC_Tree_D(object):
     """
     Decision Tree using Gini index for the splitting criterion.
 
@@ -54,10 +54,11 @@ class BABC_Tree(object):
     verbose: int
         Verbosity level.
     """
-    def __init__(self, min_samples_split=2, min_impurity=1e-7, max_depth=4, verbose=0):
+    def __init__(self, min_samples_split=2, min_impurity=1e-7, max_depth=4, alpha=0.01, verbose=0):
         self.min_samples_split = min_samples_split
         self.min_impurity = min_impurity
         self.max_depth = max_depth
+        self.alpha = alpha
         self.verbose = verbose
 
     def __str__(self):
@@ -210,7 +211,7 @@ class BABC_Tree(object):
                         best_right_indices = right_indices
                         best_feature_ndx = i
 
-            # split on the best saved attribute
+            # build the node with the best attribute
             if best_feature_ndx is not None:
                 left_node = self._build_tree(X[best_left_indices], y[best_left_indices],
                                              keys[best_left_indices], current_depth + 1)
@@ -231,8 +232,8 @@ class BABC_Tree(object):
         """
         Return a deep copy of this object.
         """
-        tree = BABC_Tree(min_samples_split=self.min_samples_split, min_impurity=self.min_impurity,
-                         max_depth=self.max_depth, verbose=self.verbose)
+        tree = BABC_Tree_D(min_samples_split=self.min_samples_split, min_impurity=self.min_impurity,
+                           max_depth=self.max_depth, verbose=self.verbose)
         tree.n_features_ = self.n_features_
         tree.X_train_ = self.X_train_.copy()
         tree.y_train_ = self.y_train_.copy()
@@ -242,14 +243,22 @@ class BABC_Tree(object):
 
         return tree
 
+    def predict(self, X):
+        """
+        Classify samples one by one and return the set of labels.
+        """
+        y_proba = self.predict_proba(X)
+        y_pred = np.argmax(y_proba, axis=1)
+        return y_pred
+
     def predict_proba(self, X):
         """
         Classify samples one by one and return the set of labels.
         """
         assert X.ndim == 2
         y_positive = np.array([self._predict_value(sample) for sample in X]).reshape(-1, 1)
-        y_pred = np.hstack([1 - y_positive, y_positive])
-        return y_pred
+        y_proba = np.hstack([1 - y_positive, y_positive])
+        return y_proba
 
     def delete(self, remove_ndx):
         """

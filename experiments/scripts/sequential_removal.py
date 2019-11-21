@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-from mulan.trees.babc_tree import BABC_Tree
+from mulan.trees.babc_tree_d import BABC_Tree_D
+from mulan.trees.babc_tree_r import BABC_Tree_R
 from utility import data_util
 
 
@@ -37,7 +38,8 @@ def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, m
         y_new = np.delete(y_new, adjusted_ndx)
 
         start = time.time()
-        t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
+        t2 = BABC_Tree_R(max_depth=max_depth).fit(X_new, y_new)
+        # t2 = BABC_Tree_D(max_depth=max_depth).fit(X_new, y_new)
         result['refit'] = time.time() - start
         result['refit_to_delete_ratio'] = result['refit'] / result['delete']
         assert t1.equals(t2)
@@ -55,11 +57,18 @@ def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='
     print('deletion sum: {:.3f}s'.format(deletion_sum))
     print(df[df['delete_type'].str.startswith('3')])
 
-    f = plt.figure(figsize=(20, 4))
-    ax0 = f.add_subplot(141)
-    ax1 = f.add_subplot(142)
-    ax2 = f.add_subplot(143, sharey=ax1)
-    ax3 = f.add_subplot(144)
+    # count the number of retrains over the number of deletions
+    df3 = df[df['delete_type'].str.startswith('3')]
+    arr = df['delete_type']
+    arr = arr.apply(lambda x: 1 if '3' in x else 0)
+    arr = arr.to_numpy()
+    arr = np.cumsum(arr)
+
+    f = plt.figure(figsize=(20, 8))
+    ax0 = f.add_subplot(241)
+    ax1 = f.add_subplot(242)
+    ax2 = f.add_subplot(243, sharey=ax1)
+    ax3 = f.add_subplot(244)
     sns.countplot(x='delete_type', data=df, ax=ax0)
     df.boxplot(column='delete', by='delete_type', ax=ax2)
     if not args.no_refit:
@@ -73,6 +82,13 @@ def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='
     ax0.set_ylabel('count')
     ax0.set_xlabel('delete_type')
     ax0.set_title('deletion occurrences')
+
+    ax4 = f.add_subplot(245)
+    ax4.plot(np.arange(arr.shape[0]), arr)
+    ax4.set_xlabel('# deletions')
+    ax4.set_ylabel('# retrains')
+    ax4.set_title('retraining')
+
     title_str = 'dataset: {}, samples: {}, attributes: {}, removed: {}\n'
     f.suptitle(title_str.format(args.dataset, n_samples, n_attributes, n_remove))
 
@@ -102,9 +118,15 @@ def _contains_duplicates(x):
     return len(np.unique(x)) != len(x)
 
 
+# TODO: add amortized runtime over the number of deletions
+# TODO: add multiple runs
+# TODO: if multiple runs, show plot with average number of retrains over the number of deletions, otherwise
+# just show the number of retrains over the number of deletions
+# TODO: show test accuracy over the number of deletions
 def main(args):
 
     # obtain dataset
+    print('getting data...')
     if args.dataset == 'synthetic':
 
         np.random.seed(args.seed)
@@ -113,34 +135,30 @@ def main(args):
         np.random.seed(args.seed)
         y = np.random.randint(2, size=args.n_samples)
 
-        # X, y = data_util.convert_data(X, y)
-
     else:
         X, _, y, _ = data_util.get_data(args.dataset, convert=False)
-        # X_np, _, y_np, _ = data_util.get_data(args.dataset, convert=False)
 
     # retrieve the indices to remove
+    print('computing indices to remove...')
     n_samples = X.shape[0]
     n_attributes = X.shape[1]
     n_remove = int(args.remove_frac * n_samples) if args.n_remove is None else args.n_remove
     np.random.seed(args.seed)
     indices_to_delete = np.random.choice(np.arange(n_samples), size=n_remove, replace=False)
+    print('adjusting indices...')
     adjusted_indices = _adjust_indices(indices_to_delete)
 
     print('n_samples: {}, n_attributes: {}'.format(n_samples, n_attributes))
+    print('n_remove: {}'.format(n_remove))
 
     # create new mutable varibles to hold the decreasing datasets
     X_new, y_new = X.copy(), y.copy()
     X_copy, y_copy = X.copy(), y.copy()
 
-    # print('building tree...')
-    # start = time.time()
-    # t1 = BABC_Tree_Old(max_depth=args.max_depth).fit(X_np, y_np)
-    # print('{:.3f}s'.format(time.time() - start))
-
     print('building tree...')
     start = time.time()
-    t1 = BABC_Tree(max_depth=args.max_depth, verbose=args.verbose).fit(X_copy, y_copy)
+    # t1 = BABC_Tree_D(max_depth=args.max_depth).fit(X_copy, y_copy)
+    t1 = BABC_Tree_R(max_depth=args.max_depth).fit(X_copy, y_copy)
     print('{:.3f}s'.format(time.time() - start))
 
     # delete instances one at a time and measure the time
@@ -164,8 +182,9 @@ def main(args):
         results.append(result)
 
     # make sure decremental tree is the same as a learned tree without the desired indices
-    desired_tree = BABC_Tree(max_depth=args.max_depth).fit(X_new, y_new)
-    assert t1.equals(desired_tree)
+    desired_tree = BABC_Tree_D(max_depth=args.max_depth).fit(X_new, y_new)
+    # desired_tree = BABC_Tree_R(max_depth=args.max_depth).fit(X_new, y_new)
+    # assert t1.equals(desired_tree)
 
     _display_results(results, args, n_samples, n_attributes, n_remove)
 

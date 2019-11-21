@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-from mulan.trees.babc_tree import BABC_Tree
+from mulan.trees.babc_tree_d import BABC_Tree_D
 from utility import data_util
 
 
@@ -32,7 +32,7 @@ def _refit_method(tree_original, X_train, y_train, x_test, y_test, indices, max_
         X_new, y_new = np.delete(X_train, ndx, axis=0), np.delete(y_train, ndx)
 
         start = time.time()
-        tree = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
+        tree = BABC_Tree_D(max_depth=max_depth).fit(X_new, y_new)
         result['refit_time'].append(time.time() - start)
 
         influence = tree.predict_proba(x_test)[:, 1][0] - yhat_original
@@ -80,7 +80,7 @@ def _fit_delete_refit(X, y, delete_ndx, refit=False, max_depth=4):
     """
     result = {}
 
-    t1 = BABC_Tree(max_depth=args.max_depth).fit(X, y)
+    t1 = BABC_Tree_D(max_depth=args.max_depth).fit(X, y)
     start = time.time()
     result['delete_type'] = t1.delete(delete_ndx)
     result['delete'] = time.time() - start
@@ -90,7 +90,7 @@ def _fit_delete_refit(X, y, delete_ndx, refit=False, max_depth=4):
         y_new = np.delete(y, delete_ndx)
 
         start = time.time()
-        t2 = BABC_Tree(max_depth=max_depth).fit(X_new, y_new)
+        t2 = BABC_Tree_D(max_depth=max_depth).fit(X_new, y_new)
         result['refit'] = time.time() - start
         result['refit_to_delete_ratio'] = result['refit'] / result['delete']
         assert t1.equals(t2)
@@ -190,7 +190,7 @@ def main(args):
     indices_to_delete = np.random.choice(np.arange(n_samples), size=n_remove, replace=False)
     print('n_samples: {}, n_attributes: {}'.format(n_samples, n_attributes))
 
-    tree_original = BABC_Tree(max_depth=args.max_depth).fit(X_train, y_train)
+    tree_original = BABC_Tree_D(max_depth=args.max_depth).fit(X_train, y_train)
 
     result = {}
     if not args.no_refit:
