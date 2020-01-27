@@ -13,7 +13,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 from mulan.trees.babc_tree_d import BABC_Tree_D
-from mulan.trees.babc_tree_r import BABC_Tree_R
+from mulan.trees.tree import Tree
 from utility import data_util, exp_util
 
 
@@ -44,16 +44,14 @@ def main(args):
     td = BABC_Tree_D(max_depth=args.max_depth, verbose=args.verbose).fit(X_train, y_train)
     print('{:.3f}s'.format(time.time() - start))
 
-    print('building r tree...')
+    print('building tree...')
     start = time.time()
-    tr = BABC_Tree_R(max_depth=args.max_depth, verbose=args.verbose).fit(X_train, y_train)
+    tr = Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth, verbose=args.verbose)
+    tr = tr.fit(X_train, y_train)
     print('{:.3f}s'.format(time.time() - start))
 
     exp_util.performance(td, X_test, y_test, name='tree_D')
-    exp_util.performance(tr, X_test, y_test, name='tree_R')
-
-    td.print_tree()
-    tr.print_tree()
+    exp_util.performance(tr, X_test, y_test, name='tree')
 
 
 if __name__ == '__main__':
@@ -62,7 +60,9 @@ if __name__ == '__main__':
     parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
     parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
     parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
-    parser.add_argument('--seed', type=int, default=423, help='seed to populate the data.')
+    parser.add_argument('--seed', type=int, default=1, help='seed to populate the data.')
+    parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
+    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()

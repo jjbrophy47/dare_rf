@@ -6,25 +6,27 @@ import os
 import numpy as np
 
 
-def get_data(dataset, data_dir='data', convert=False):
+def get_data(dataset, seed, data_dir='data', convert=False, n_samples=100, n_attributes=4, test_frac=0.2):
     """
     Returns a train and test set from the desired dataset.
     """
+    if dataset == 'synthetic':
+        return _create_synthetic_data(seed, n_samples=n_samples, n_attributes=n_attributes, test_frac=test_frac)
     return _load_data(dataset, data_dir=data_dir, convert=convert)
 
 
-def convert_data(X, y):
-    """
-    Convert numpy array data to dicts.
-    """
-    new_X = dict()
-    new_y = dict()
+def _create_synthetic_data(seed, n_samples=100, n_attributes=4, test_frac=0.2):
+    np.random.seed(seed)
+    X = np.random.randint(2, size=(n_samples, n_attributes))
 
-    for i in range(X.shape[0]):
-        new_X[i] = X[i]
-        new_y[i] = y[i]
+    np.random.seed(seed)
+    y = np.random.randint(2, size=n_samples)
 
-    return new_X, new_y
+    n_train = X.shape[0] - int(X.shape[0] * test_frac)
+    X_train, X_test = X[:n_train], X[n_train:]
+    y_train, y_test = y[:n_train], y[n_train:]
+
+    return X_train, X_test, y_train, y_test
 
 
 def _load_data(dataset, data_dir='data', convert=False):
@@ -44,7 +46,21 @@ def _load_data(dataset, data_dir='data', convert=False):
     y_test = test[:, -1]
 
     if convert:
-        X_train, y_train = convert_data(X_train, y_train)
-        X_test, y_test = convert_data(X_test, y_test)
+        X_train, y_train = _convert_data(X_train, y_train)
+        X_test, y_test = _convert_data(X_test, y_test)
 
     return X_train, X_test, y_train, y_test
+
+
+def _convert_data(X, y):
+    """
+    Convert numpy array data to dicts.
+    """
+    new_X = dict()
+    new_y = dict()
+
+    for i in range(X.shape[0]):
+        new_X[i] = X[i]
+        new_y[i] = y[i]
+
+    return new_X, new_y

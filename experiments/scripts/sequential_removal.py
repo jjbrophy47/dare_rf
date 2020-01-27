@@ -1,101 +1,21 @@
 """
-This experiment chooses m random instances to delete,
-then deletes them sequentially.
-BABC: Binary Attributes Binary Classification.
+This experiment chooses m random instances to delete.
+TODO: compare against retraining a deterministic model or our model?
 """
 import os
 import sys
 import time
 import argparse
+from collections import Counter
 
 import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 from mulan.trees.babc_tree_d import BABC_Tree_D
-from mulan.trees.babc_tree_r import BABC_Tree_R
-from utility import data_util
-
-
-def _fit_delete_refit(t1, X_new, y_new, delete_ndx, adjusted_ndx, refit=False, max_depth=4):
-    """
-    This method first a tree, efficiently deletes the target instance,
-    and refits a new tree without the target instance, and
-    returns the times for each of these events.
-    """
-    result = {}
-
-    start = time.time()
-    result['delete_type'] = t1.delete(delete_ndx)
-    result['delete'] = time.time() - start
-
-    if refit:
-        X_new = np.delete(X_new, adjusted_ndx, axis=0)
-        y_new = np.delete(y_new, adjusted_ndx)
-
-        start = time.time()
-        t2 = BABC_Tree_R(max_depth=max_depth).fit(X_new, y_new)
-        # t2 = BABC_Tree_D(max_depth=max_depth).fit(X_new, y_new)
-        result['refit'] = time.time() - start
-        result['refit_to_delete_ratio'] = result['refit'] / result['delete']
-        assert t1.equals(t2)
-
-    return result, t1, X_new, y_new
-
-
-def _display_results(results, args, n_samples, n_attributes, n_remove, out_dir='output/bbac/sequential_removal'):
-    """
-    Plot the average time of deletion for each deletion type.
-    """
-    df = pd.DataFrame(results)
-
-    deletion_sum = df['delete'].sum()
-    print('deletion sum: {:.3f}s'.format(deletion_sum))
-    print(df[df['delete_type'].str.startswith('3')])
-
-    # count the number of retrains over the number of deletions
-    df3 = df[df['delete_type'].str.startswith('3')]
-    arr = df['delete_type']
-    arr = arr.apply(lambda x: 1 if '3' in x else 0)
-    arr = arr.to_numpy()
-    arr = np.cumsum(arr)
-
-    f = plt.figure(figsize=(20, 8))
-    ax0 = f.add_subplot(241)
-    ax1 = f.add_subplot(242)
-    ax2 = f.add_subplot(243, sharey=ax1)
-    ax3 = f.add_subplot(244)
-    sns.countplot(x='delete_type', data=df, ax=ax0)
-    df.boxplot(column='delete', by='delete_type', ax=ax2)
-    if not args.no_refit:
-        refit_sum = df['refit'].sum()
-        print('refit sum: {:.3f}s'.format(refit_sum))
-        df.boxplot(column='refit', by='delete_type', ax=ax1)
-        df.boxplot(column='refit_to_delete_ratio', by='delete_type', ax=ax3)
-        ax1.set_ylabel('seconds')
-        ax3.set_ylabel('ratio')
-
-    ax0.set_ylabel('count')
-    ax0.set_xlabel('delete_type')
-    ax0.set_title('deletion occurrences')
-
-    ax4 = f.add_subplot(245)
-    ax4.plot(np.arange(arr.shape[0]), arr)
-    ax4.set_xlabel('# deletions')
-    ax4.set_ylabel('# retrains')
-    ax4.set_title('retraining')
-
-    title_str = 'dataset: {}, samples: {}, attributes: {}, removed: {}\n'
-    f.suptitle(title_str.format(args.dataset, n_samples, n_attributes, n_remove))
-
-    out_dir = os.path.join(out_dir, args.dataset)
-    os.makedirs(out_dir, exist_ok=True)
-    plt.savefig(os.path.join(out_dir, 's{}_a{}_r{}.pdf'.format(n_samples, n_attributes, n_remove)),
-                bbox_inches='tight')
+from mulan.trees.tree import Tree
+from utility import data_util, exp_util, print_util
 
 
 def _adjust_indices(indices_to_delete):
@@ -105,7 +25,7 @@ def _adjust_indices(indices_to_delete):
     Example:
     indices_to_delete = [4, 1, 10, 0] => desired result = [4, 1, 8, 0]
     """
-    assert not _contains_duplicates(indices_to_delete)
+    assert len(np.unique(indices_to_delete)) == len(indices_to_delete)
     indices = indices_to_delete.copy()
     for i in range(len(indices)):
         for j in range(i + 1, len(indices)):
@@ -114,92 +34,123 @@ def _adjust_indices(indices_to_delete):
     return indices
 
 
-def _contains_duplicates(x):
-    return len(np.unique(x)) != len(x)
+def remove_sample(args, logger, out_dir, seed):
 
+    # obtain data
+    data = data_util.get_data(args.dataset, seed, data_dir=args.data_dir, n_samples=args.n_samples,
+                              n_attributes=args.n_attributes, test_frac=args.test_frac, convert=False)
+    X_train, X_test, y_train, y_test = data
 
-# TODO: add amortized runtime over the number of deletions
-# TODO: add multiple runs
-# TODO: if multiple runs, show plot with average number of retrains over the number of deletions, otherwise
-# just show the number of retrains over the number of deletions
-# TODO: show test accuracy over the number of deletions
-def main(args):
+    # dataset statistics
+    logger.info('train instances: {}'.format(X_train.shape[0]))
+    logger.info('test instances: {}'.format(X_test.shape[0]))
+    logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    # obtain dataset
-    print('getting data...')
-    if args.dataset == 'synthetic':
+    # choose instances to delete
+    np.random.seed(seed)
+    delete_indices = np.random.choice(X_train.shape[0], size=args.n_remove, replace=False)
+    adjusted_indices = _adjust_indices(delete_indices)
+    logger.info('instances to delete: {}'.format(len(delete_indices)))
 
-        np.random.seed(args.seed)
-        X = np.random.randint(2, size=(args.n_samples, args.n_attributes))
+    # deterministic model - training
+    logger.info('\nBABC_Tree_D')
+    start = time.time()
+    tree = BABC_Tree_D(max_depth=args.max_depth).fit(X_train, y_train)
+    end_time = time.time() - start
+    logger.info('train time: {:.3f}s'.format(end_time))
 
-        np.random.seed(args.seed)
-        y = np.random.randint(2, size=args.n_samples)
+    if not args.no_retrain:
+
+        # deterministic model - deleting (i.e. retraining)
+        tree_delete_times = [end_time]
+        X_train_new, y_train_new = X_train.copy(), y_train.copy()
+        for i, delete_ndx in enumerate(adjusted_indices):
+
+            X_train_new = np.delete(X_train_new, delete_ndx, axis=0)
+            y_train_new = np.delete(y_train_new, delete_ndx)
+
+            start = time.time()
+            tree = BABC_Tree_D(max_depth=args.max_depth).fit(X_train_new, y_train_new)
+            end_time = time.time() - start
+
+            logger.info('{}. [{}] retrain time: {:.3f}s'.format(i, delete_ndx, end_time))
+            tree_delete_times.append(end_time)
 
     else:
-        X, _, y, _ = data_util.get_data(args.dataset, convert=False)
+        tree_delete_times = [end_time] * (args.repeats + 1)
 
-    # retrieve the indices to remove
-    print('computing indices to remove...')
-    n_samples = X.shape[0]
-    n_attributes = X.shape[1]
-    n_remove = int(args.remove_frac * n_samples) if args.n_remove is None else args.n_remove
-    np.random.seed(args.seed)
-    indices_to_delete = np.random.choice(np.arange(n_samples), size=n_remove, replace=False)
-    print('adjusting indices...')
-    adjusted_indices = _adjust_indices(indices_to_delete)
-
-    print('n_samples: {}, n_attributes: {}'.format(n_samples, n_attributes))
-    print('n_remove: {}'.format(n_remove))
-
-    # create new mutable varibles to hold the decreasing datasets
-    X_new, y_new = X.copy(), y.copy()
-    X_copy, y_copy = X.copy(), y.copy()
-
-    print('building tree...')
+    # removal-enabled model - training
+    logger.info('\nDeTRACE')
     start = time.time()
-    # t1 = BABC_Tree_D(max_depth=args.max_depth).fit(X_copy, y_copy)
-    t1 = BABC_Tree_R(max_depth=args.max_depth).fit(X_copy, y_copy)
-    print('{:.3f}s'.format(time.time() - start))
+    dtrace = Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth, verbose=args.verbose)
+    dtrace = dtrace.fit(X_train, y_train)
+    end_time = time.time() - start
+    logger.info('train time: {:.3f}s'.format(end_time))
 
-    # delete instances one at a time and measure the time
-    results = []
-    for i, ndx in enumerate(indices_to_delete):
-        result, t1, X_new, y_new = _fit_delete_refit(t1, X_new, y_new, int(ndx), int(adjusted_indices[i]),
-                                                     refit=not args.no_refit, max_depth=args.max_depth)
+    # removal-enabled model - deleting
+    detrace_delete_types = []
+    detrace_delete_times = [end_time]
+    for i, delete_ndx in enumerate(delete_indices):
 
-        if args.verbose > 0:
-            if int(0.1 * n_remove) != 0 and i % int(0.1 * n_remove) == 0:
-                print('number of instances removed: {}'.format(i))
+        start = time.time()
+        delete_types = dtrace.delete(int(delete_ndx))
+        end_time = time.time() - start
+        detrace_delete_types += delete_types
 
-        if args.verbose > 1:
-            print('\nDeleted instance {}'.format(ndx))
-            print('delete_type: {}'.format(result['delete_type']))
-            print('delete: {:.5f}'.format(result['delete']))
-            if not args.no_refit:
-                print('refit: {:.5f}'.format(result['refit']))
-                print('refit-to-delete ratio: {:.3f}'.format(result['refit_to_delete_ratio']))
+        logger.info('{}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
+        detrace_delete_times.append(end_time)
 
-        results.append(result)
+    counter = Counter(detrace_delete_types)
+    logger.info('\n[DeTRACE] delete types: {}\n'.format(counter))
 
-    # make sure decremental tree is the same as a learned tree without the desired indices
-    desired_tree = BABC_Tree_D(max_depth=args.max_depth).fit(X_new, y_new)
-    # desired_tree = BABC_Tree_R(max_depth=args.max_depth).fit(X_new, y_new)
-    # assert t1.equals(desired_tree)
+    # amortized runtime
+    logger.info('[{}] amortized: {:.3f}s'.format('BABC_Tree_D', np.mean(tree_delete_times)))
+    logger.info('[{}] amortized: {:.3f}s'.format('DeTRACE', np.mean(detrace_delete_times)))
 
-    _display_results(results, args, n_samples, n_attributes, n_remove)
+    # log the predictive performance
+    logger.info('')
+    exp_util.performance(tree, X_test, y_test, logger=logger, name='BABC_Tree_D')
+    exp_util.performance(dtrace, X_test, y_test, logger=logger, name='DeTRACE')
+    logger.info('')
+
+
+def main(args):
+
+    # run experiment multiple times
+    for i in range(args.repeats):
+
+        # create output dir
+        rs_dir = os.path.join(args.out_dir, args.dataset, 'rs{}'.format(args.rs))
+        os.makedirs(rs_dir, exist_ok=True)
+
+        # create logger
+        logger = print_util.get_logger(os.path.join(rs_dir, 'log.txt'.format(args.dataset)))
+        logger.info(args)
+        logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
+
+        # run experiment
+        remove_sample(args, logger, rs_dir, seed=args.rs)
+        args.rs += 1
+
+        # remove logger
+        print_util.remove_logger(logger)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--out_dir', type=str, default='output/sequential_removal', help='output directory.')
+    parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
     parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
-    parser.add_argument('--remove_frac', type=float, default=0.1, help='fraction of instances to delete.')
-    parser.add_argument('--n_remove', type=int, default=None, help='number of instances to delete.')
-    parser.add_argument('--seed', type=int, default=423, help='seed to populate the data.')
+    parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
+    parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
+    parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
+    parser.add_argument('--no_retrain', action='store_true', default=False, help='Do not retrain every time.')
+    parser.add_argument('--n_remove', type=int, default=1, help='number of instances to sequentially delete.')
+    parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
+    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
-    parser.add_argument('--no_refit', action='store_true', default=False, help='do not record refits.')
     args = parser.parse_args()
-    print(args)
     main(args)

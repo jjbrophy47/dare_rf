@@ -4,7 +4,7 @@ Utility methods to make epxeriments easier.
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 
-def performance(model, X_test, y_test, display=True, name=''):
+def performance(model, X_test, y_test, display=True, logger=None, name=''):
     """
     Returns AUROC and accuracy scores.
     """
@@ -13,7 +13,9 @@ def performance(model, X_test, y_test, display=True, name=''):
     auc = roc_auc_score(y_test, proba)
     acc = accuracy_score(y_test, pred)
 
-    if display:
+    if logger:
+        logger.info('[{}] roc_auc: {:.3f}, acc: {:.3f}'.format(name, auc, acc))
+    else:
         print('[{}] roc_auc: {:.3f}, acc: {:.3f}'.format(name, auc, acc))
 
     return auc, acc
