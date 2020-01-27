@@ -55,22 +55,26 @@ class Tree(object):
         The maximum depth of a tree.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
+    random_state: int (default=None)
+        Random state for reproducibility.
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, gamma=0.1, max_depth=4, min_samples_split=2, verbose=0):
+    def __init__(self, epsilon=0.1, gamma=0.1, max_depth=4, min_samples_split=2, verbose=0, random_state=None):
         self.epsilon = epsilon
         self.gamma = gamma
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.random_state = random_state
         self.verbose = verbose
 
     def __str__(self):
         s = 'Tree:'
         s += '\nepsilon={}'.format(self.epsilon)
-        s += '\nmax_gamma={}'.format(self.gamma)
+        s += '\ngamma={}'.format(self.gamma)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
+        s += '\nrandom_state={}'.format(self.random_state)
         s += '\nverbose={}'.format(self.verbose)
         return s
 
@@ -230,15 +234,12 @@ class Tree(object):
             p = p / p.sum()
 
             # sample from this distribution
+            np.random.seed(self.random_state)
             chosen_i = np.random.choice(attr_indices, p=p)
-
-            # print(chosen_i)
 
             # retrieve samples for the chosen attribute
             left_indices = np.where(X[:, chosen_i] == 1)[0]
             right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
-
-            # print(left_indices.shape[0], y[left_indices].sum(), right_indices.shape[0], y[right_indices].sum())
 
             # build the node with the best attribute
             left = self._build_tree(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1)
@@ -359,7 +360,7 @@ class Tree(object):
             indices = self.get_indices(tree, current_depth)
             indices = self._remove_elements(indices, remove_indices)
             Xa, ya, keys = self._get_numpy_data(indices)
-            self.deletion_types_.append('2b_{}'.format(current_depth))
+            self.deletion_types_.append('2a_{}'.format(current_depth))
             return self._build_tree(Xa, ya, keys, current_depth)
 
             # # type 2a: both branches contain one example, turn this node into a leaf
@@ -428,7 +429,6 @@ class Tree(object):
         # create probability distribution over the updated gini indexes
         p = np.exp(-(self.epsilon * np.array(gini_indexes)) / (5 * self.gamma))
         if len(invalid_attr_indices) > 0:
-            print(invalid_indices, invalid_attr_indices)
             p[np.array(invalid_indices)] = 0
         p = p / p.sum()
 
@@ -441,7 +441,10 @@ class Tree(object):
             indices = self.get_indices(tree, current_depth)
             indices = self._remove_elements(indices, remove_indices)
             Xa, ya, keys = self._get_numpy_data(indices)
-            self.deletion_types_.append('3_{}'.format(current_depth))
+
+            dtype = '2b' if len(invalid_indices) > 0 else '2c'
+            self.deletion_types_.append('{}_{}'.format(dtype, current_depth))
+
             return self._build_tree(Xa, ya, keys, current_depth)
 
         # continue checking the tree
