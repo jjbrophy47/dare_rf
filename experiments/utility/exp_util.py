@@ -19,3 +19,26 @@ def performance(model, X_test, y_test, display=True, logger=None, name=''):
         print('[{}] roc_auc: {:.3f}, acc: {:.3f}'.format(name, auc, acc))
 
     return auc, acc
+
+
+def check_args(args):
+    """
+    Checks specific args thta support multiple dtypes.
+    """
+    if hasattr(args, 'max_features'):
+        if args.max_features == 'sqrt':
+            return args
+        elif '.' in args.max_features:
+            args.max_features = float(args.max_features)
+        else:
+            args.max_features = int(args.max_features)
+
+    if hasattr(args, 'max_samples'):
+        if args.max_samples is None:
+            return args
+        elif '.' in args.max_samples:
+            args.max_samples = float(args.max_samples)
+        else:
+            args.max_samples = int(args.max_samples)
+
+    return args
