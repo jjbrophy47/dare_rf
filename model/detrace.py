@@ -145,6 +145,31 @@ class RF(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
+    def add(self, X, y):
+        """
+        Adds instances to the training data and updates the model.
+        """
+        assert X.ndim == 2 and y.ndim == 1
+
+        # assign index numbers to the new instances
+        current_keys = self.X_train_.keys()
+        gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
+        if len(X) > len(gaps):
+            extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
+        keys = np.concatenate([gaps, extra])
+
+        # add instances to the data
+        for i, key in enumerate(keys):
+            self.X_train_[key] = X[i]
+            self.y_train_[key] = y[i]
+
+        # add instances to each tree
+        addition_types = []
+        for tree in self.trees:
+            addition_types += tree.add(X, y, keys)
+
+        return addition_types
+
     def delete(self, remove_indices):
         """
         Removes instances from the training data and updates the model.
@@ -349,6 +374,35 @@ class Tree(object):
                 self.equals(this.left_branch, other.left_branch) and \
                 self.equals(this.right_branch, other.right_branch) else 0
 
+    def add(self, X, y, keys=None):
+        """
+        Adds instances to the training data and updates the model.
+        """
+        assert X.ndim == 2 and y.ndim == 1
+
+        # assign index numbers to the new instances
+        if self.single_tree_:
+            current_keys = self.X_train_.keys()
+            gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
+            if len(X) > len(gaps):
+                extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
+            keys = np.concatenate([gaps, extra])
+        else:
+            X = X[:, self.feature_indices]
+            assert keys is not None
+
+        # add instances to the data
+        if self.single_tree_:
+            for i, key in enumerate(keys):
+                self.X_train_[key] = X[i]
+                self.y_train_[key] = y[i]
+
+        # update model
+        self.addition_types_ = []
+        self.root_ = self._add(X, y, keys, utype='add')
+
+        return self.addition_types_
+
     def delete(self, remove_indices):
         """
         Removes instance remove_ndx from the training data and updates the model.
@@ -363,7 +417,7 @@ class Tree(object):
 
         # update model
         self.deletion_types_ = []
-        self.root_ = self._delete(X, y, remove_indices)
+        self.root_ = self._delete(X, y, remove_indices, utype='delete')
 
         # remove the instances from the data
         if self.single_tree_:
@@ -503,6 +557,116 @@ class Tree(object):
             right = self._build_tree(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1)
             return DecisionNode(feature_i=chosen_i, node_dict=node_dict, left_branch=left, right_branch=right)
 
+    def _add(self, X, y, add_indices, tree=None, current_depth=0):
+
+        # get root node of the tree
+        if tree is None:
+            tree = self.root_
+
+        # type 1: leaf node, update its metadata
+        if tree.value is not None:
+            self._increment_leaf_node(tree, y, add_indices)
+
+            if self.verbose > 0:
+                print('tree check complete, ended at depth {}'.format(current_depth))
+
+            self.addition_types_.append('1a')
+            return tree
+
+        # decision node, update the high-level metadata
+        count = tree.node_dict['count'] + len(y)
+        pos_count = tree.node_dict['pos_count'] + np.sum(y)
+        neg_count = pos_count - count
+        gini_data = round(1 - (pos_count / count)**2 - (neg_count / count)**2, 8)
+        tree.node_dict['pos_count'] = pos_count
+        tree.node_dict['count'] = count
+        tree.node_dict['gini_data'] = gini_data
+
+        # udpate gini_index for each attribute in this node
+        old_gini_indexes = []
+        gini_indexes = []
+        invalid_indices = []
+        invalid_attr_indices = []
+
+        for i, attr_ndx in enumerate(tree.node_dict['attr']):
+
+            left_indices = np.where(X[:, attr_ndx] == 1)[0]
+            right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
+            y_left, y_right = y[left_indices], y[right_indices]
+
+            if len(y_left) > 0:
+                self._increment_decision_node(tree.node_dict, attr_ndx, 'left', y_left)
+
+            if len(y_right) > 0:
+                self._increment_decision_node(tree.node_dict, attr_ndx, 'right', y_right)
+
+            # recompute the gini index for this attribute
+            attr_dict = tree.node_dict['attr'][attr_ndx]
+            gini_index = self._compute_gini_index(attr_dict)
+            old_gini_indexes.append(attr_dict['gini_index'])
+            gini_indexes.append(gini_index)
+            attr_dict['gini_index'] = gini_index
+
+        # remove invalid attributes from the model
+        for invalid_attr_ndx in invalid_attr_indices:
+            del tree.node_dict['attr'][invalid_attr_ndx]
+
+        # recreate old probability distribution over the attributes
+        old_p = np.exp(-(self.epsilon * np.array(old_gini_indexes)) / (5 * self.gamma))
+        old_p = old_p / old_p.sum()
+
+        # create probability distribution over the updated gini indexes
+        p = np.exp(-(self.epsilon * np.array(gini_indexes)) / (5 * self.gamma))
+        if len(invalid_attr_indices) > 0:
+            p[np.array(invalid_indices)] = 0
+        p = p / p.sum()
+
+        # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
+        if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):
+
+            if self.verbose > 0:
+                print('rebuilding at depth {}'.format(current_depth))
+
+            indices = self._get_indices(tree, current_depth)
+            indices = self._add_elements(indices, add_indices)
+            Xa, ya, keys = self.get_data(indices)
+
+            dtype = '2a' if len(invalid_indices) > 0 else '2b'
+            self.deletion_types_.append('{}_{}'.format(dtype, current_depth))
+
+            return self._build_tree(Xa, ya, keys, current_depth)
+
+        # continue checking the tree
+        else:
+
+            left_indices = np.where(X[:, tree.feature_i] == 1)[0]
+            right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
+            y_left, y_right = y[left_indices], y[right_indices]
+
+            if len(left_indices) > 0:
+
+                if self.verbose > 0:
+                    print('check complete at depth {}, traversing left'.format(current_depth))
+
+                X_left = X[left_indices]
+                left_add_indices = add_indices[left_indices]
+                left_branch = self._add(X_left, y_left, left_add_indices, tree=tree.left_branch,
+                                        current_depth=current_depth + 1)
+                tree.left_branch = left_branch
+
+            if len(right_indices) > 0:
+
+                if self.verbose > 0:
+                    print('check complete at depth {}, traversing right'.format(current_depth))
+
+                X_right = X[right_indices]
+                right_add_indices = add_indices[right_indices]
+                right_branch = self._add(X_right, y_right, right_add_indices, tree=tree.right_branch,
+                                         current_depth=current_depth + 1)
+                tree.right_branch = right_branch
+
+            return tree
+
     def _delete(self, X, y, remove_indices, tree=None, current_depth=0):
 
         # get root node of the tree
@@ -511,7 +675,7 @@ class Tree(object):
 
         # type 1: leaf node, update its metadata
         if tree.value is not None:
-            self._update_leaf_node(tree, y, remove_indices)
+            self._decrement_leaf_node(tree, y, remove_indices)
 
             if self.verbose > 0:
                 print('tree check complete, ended at depth {}'.format(current_depth))
@@ -562,10 +726,10 @@ class Tree(object):
             y_left, y_right = y[left_indices], y[right_indices]
 
             if len(y_left) > 0:
-                left_status = self._update_decision_node(tree.node_dict, attr_ndx, 'left', y_left)
+                left_status = self._decrement_decision_node(tree.node_dict, attr_ndx, 'left', y_left)
 
             if len(y_right) > 0:
-                right_status = self._update_decision_node(tree.node_dict, attr_ndx, 'right', y_right)
+                right_status = self._decrement_decision_node(tree.node_dict, attr_ndx, 'right', y_right)
 
             # this attribute causes a hanging branch, remove it from future tree models
             if left_status is None or right_status is None:
@@ -643,9 +807,20 @@ class Tree(object):
 
             return tree
 
-    def _update_leaf_node(self, tree, y, remove_indices):
+    def _increment_leaf_node(self, tree, y, add_indices):
         """
-        Update this leaf node to effectively remove the target index.
+        Update this leaf node to effectively add the target indices.
+        """
+        node_dict = tree.node_dict
+        node_dict['count'] += len(y)
+        node_dict['pos_count'] += np.sum(y)
+        node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
+        node_dict['indices'] = self._add_elements(node_dict['indices'], add_indices)
+        tree.value = node_dict['leaf_value']
+
+    def _decrement_leaf_node(self, tree, y, remove_indices):
+        """
+        Update this leaf node to effectively remove the target indices.
         """
         node_dict = tree.node_dict
         node_dict['count'] -= len(y)
@@ -654,9 +829,27 @@ class Tree(object):
         node_dict['indices'] = self._remove_elements(node_dict['indices'], remove_indices)
         tree.value = node_dict['leaf_value']
 
-    def _update_decision_node(self, node_dict, attr_ndx, abranch, y):
+    def _increment_decision_node(self, node_dict, attr_ndx, abranch, y):
         """
-        Update the attribute dictionary of the node metadata.
+        Update the attribute dictionary of the node metadata of an addition operation.
+        """
+
+        # access the attriubute metadata
+        abranch_dict = node_dict['attr'][attr_ndx][abranch]
+
+        # update the affected branch
+        abranch_dict['count'] += len(y)
+        abranch_dict['pos_count'] += np.sum(y)
+        abranch_dict['weight'] = abranch_dict['count'] / node_dict['count']
+        abranch_dict['pos_prob'] = abranch_dict['pos_count'] / abranch_dict['count']
+        abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
+        abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
+
+        return True
+
+    def _decrement_decision_node(self, node_dict, attr_ndx, abranch, y):
+        """
+        Update the attribute dictionary of the node metadata from a deletion operation.
         """
 
         # access the attriubute metadata
@@ -722,6 +915,12 @@ class Tree(object):
                 self._predict_value(X[right_indices], tree=tree.right_branch, keys=keys[right_indices])
 
         return self.preds_
+
+    def _add_elements(self, arr, elements):
+        """
+        Add elements to array.
+        """
+        return np.concatenate([arr, elements])
 
     def _remove_elements(self, arr, elements):
         """
