@@ -3,6 +3,7 @@ Decision tree implementation for binary-class classification and binary-valued a
 Adapted from MLFromScratch: https://github.com/eriklindernoren/ML-From-Scratch.
 
 Uses certified removal to improve deletion efficiency.
+TODO: Add ability to add instances.
 """
 import numpy as np
 
@@ -144,6 +145,30 @@ class Tree(object):
             return 1 if this.feature_i == other.feature_i and \
                 self.equals(this.left_branch, other.left_branch) and \
                 self.equals(this.right_branch, other.right_branch) else 0
+
+    def add(self, X, y):
+        """
+        Adds instances to the training data and updates the model.
+        """
+        assert X.ndim == 2 and y.ndim == 1
+
+        # assign index numbers to the new instances
+        current_keys = self.X_train_.keys()
+        gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
+        if len(X) > len(gaps):
+            extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
+        keys = np.concatenate([gaps, extra])
+
+        # update model
+        self.addition_types_ = []
+        self.root_ = self._add(X, y, keys)
+
+        # add instances to the data
+        for i, key in enumerate(keys):
+            self.X_train_[key] = X[i]
+            self.y_train_[key] = y[i]
+
+        return self.addition_types_
 
     def delete(self, remove_indices):
         """

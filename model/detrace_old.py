@@ -216,8 +216,9 @@ class Tree(object):
     feature_indices: list (default=None)
         Indices of the features present in this tree.
     """
-    def __init__(self, epsilon=0.1, gamma=0.1, max_depth=4, min_samples_split=2,
-                 random_state=None, verbose=0, get_data=None, feature_indices=None):
+    def __init__(self, get_data, epsilon=0.1, gamma=0.1, max_depth=4, min_samples_split=2,
+                 random_state=None, verbose=0, feature_indices=None):
+        self.get_data = get_data
         self.epsilon = epsilon
         self.gamma = gamma
         self.max_depth = max_depth
@@ -225,12 +226,6 @@ class Tree(object):
         self.random_state = random_state
         self.verbose = verbose
         self.feature_indices = feature_indices
-        self.get_data = get_data
-
-        self.single_tree_ = False
-        if self.feature_indices is None or self.get_data is None:
-            self.get_data = self._get_numpy_data
-            self.single_tree_ = True
 
     def __str__(self):
         s = 'Tree:'
@@ -243,21 +238,13 @@ class Tree(object):
         s += '\nfeature_indices={}'.format(self.feature_indices)
         return s
 
-    def fit(self, X, y, keys=None):
+    def fit(self, X, y, keys):
         """
         Build decision tree.
         """
         assert X.ndim == 2
         assert y.ndim == 1
         self.n_features_ = X.shape[1]
-
-        # save the data for easy deletion
-        if self.single_tree_:
-            self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
-            keys = np.arange(X.shape[0])
-        else:
-            assert keys is not None
-
         self.root_ = self._build_tree(X, y, keys)
         return self
 
@@ -266,12 +253,10 @@ class Tree(object):
         Return a deep copy of this object.
         """
         tree = Tree(epsilon=self.epsilon, gamma=self.gamma, min_samples_split=self.min_samples_split,
-                    max_depth=self.max_depth, verbose=self.verbose, random_state=self.random_state,
-                    feature_indices=self.feature_indices, get_data=self.get_data)
+                    max_depth=self.max_depth, verbose=self.verbose, random_state=self.random_state)
         tree.n_features_ = self.n_features_
-        if self.single_tree_:
-            tree.X_train_ = self.X_train_.copy()
-            tree.y_train_ = self.y_train_.copy()
+        tree.X_train_ = self.X_train_.copy()
+        tree.y_train_ = self.y_train_.copy()
 
         # recursively copy the tree
         tree.root_ = self.root_.copy()
@@ -351,25 +336,16 @@ class Tree(object):
 
     def delete(self, remove_indices):
         """
-        Removes instance remove_ndx from the training data and updates the model.
+        Removes instances from the training data and updates the model.
         """
         if isinstance(remove_indices, int):
             remove_indices = np.array([remove_indices], dtype=np.int32)
 
-        # get data to remove
         X, y, keys = self.get_data(remove_indices)
-        if not self.single_tree_:
-            X = X[:, self.feature_indices]
+        X = X[:, self.feature_indices]
 
-        # update model
         self.deletion_types_ = []
-        self.root_ = self._delete(X, y, remove_indices)
-
-        # remove the instances from the data
-        if self.single_tree_:
-            for remove_ndx in remove_indices:
-                del self.X_train_[remove_ndx]
-                del self.y_train_[remove_ndx]
+        self.root_ = self._delete(X, y, keys)
 
         return self.deletion_types_
 
@@ -728,33 +704,6 @@ class Tree(object):
         Remove elements from array.
         """
         return np.setdiff1d(arr, elements)
-
-    def _get_numpy_data(self, indices):
-        """
-        Collects the data from the dicts as specified by indices,
-        then puts them into numpy arrays.
-        """
-        n_samples = len(indices)
-        X = np.zeros((n_samples, self.n_features_), np.int32)
-        y = np.zeros(n_samples, np.int32)
-        keys = np.zeros(n_samples, np.int32)
-
-        for i, ndx in enumerate(indices):
-            X[i] = self.X_train_[ndx]
-            y[i] = self.y_train_[ndx]
-            keys[i] = ndx
-
-        return X, y, keys
-
-    def _numpy_to_dict(self, X, y):
-        """
-        Converts numpy data into dicts.
-        """
-        Xd, yd = {}, {}
-        for i in range(X.shape[0]):
-            Xd[i] = X[i]
-            yd[i] = y[i]
-        return Xd, yd
 
 
 class DecisionNode():
