@@ -114,9 +114,9 @@ class RF(object):
             sample_indices = np.random.choice(self.n_samples_, size=self.max_samples_, replace=False)
 
             X_sub, y_sub = X[np.ix_(sample_indices, feature_indices)], y[sample_indices]
-            tree = Tree(self._get_numpy_data, epsilon=self.epsilon, gamma=self.gamma, max_depth=self.max_depth,
+            tree = Tree(epsilon=self.epsilon, gamma=self.gamma, max_depth=self.max_depth,
                         min_samples_split=self.min_samples_split, random_state=self.random_state,
-                        feature_indices=feature_indices, verbose=self.verbose)
+                        feature_indices=feature_indices, verbose=self.verbose, get_data=self._get_numpy_data)
             tree = tree.fit(X_sub, y_sub, sample_indices)
             self.trees.append(tree)
 
@@ -152,7 +152,7 @@ class RF(object):
         assert X.ndim == 2 and y.ndim == 1
 
         # assign index numbers to the new instances
-        current_keys = self.X_train_.keys()
+        current_keys = np.fromiter(self.X_train_.keys(), dtype=np.int64)
         gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
         if len(X) > len(gaps):
             extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
@@ -286,23 +286,6 @@ class Tree(object):
         self.root_ = self._build_tree(X, y, keys)
         return self
 
-    def copy(self):
-        """
-        Return a deep copy of this object.
-        """
-        tree = Tree(epsilon=self.epsilon, gamma=self.gamma, min_samples_split=self.min_samples_split,
-                    max_depth=self.max_depth, verbose=self.verbose, random_state=self.random_state,
-                    feature_indices=self.feature_indices, get_data=self.get_data)
-        tree.n_features_ = self.n_features_
-        if self.single_tree_:
-            tree.X_train_ = self.X_train_.copy()
-            tree.y_train_ = self.y_train_.copy()
-
-        # recursively copy the tree
-        tree.root_ = self.root_.copy()
-
-        return tree
-
     def predict(self, X):
         """
         Classify samples one by one and return the set of labels.
@@ -351,29 +334,6 @@ class Tree(object):
             print("%sF->" % (indent_str), end="")
             self.print_tree(tree.right_branch, depth=depth + 1)
 
-    def equals(self, other=None, this=None):
-        """
-        Tests if this tree is equal to another tree.
-        """
-
-        # initialize tree
-        if this is None:
-            this = self.root_
-            if other is None:
-                return 0
-            else:
-                other = other.root_
-
-        # check to make sure they are both leaf nodes
-        if this.value is not None:
-            return 1 if this.value == other.value else 0
-
-        # check to make sure they have the same attribute split
-        if this.feature_i is not None:
-            return 1 if this.feature_i == other.feature_i and \
-                self.equals(this.left_branch, other.left_branch) and \
-                self.equals(this.right_branch, other.right_branch) else 0
-
     def add(self, X, y, keys=None):
         """
         Adds instances to the training data and updates the model.
@@ -382,7 +342,7 @@ class Tree(object):
 
         # assign index numbers to the new instances
         if self.single_tree_:
-            current_keys = self.X_train_.keys()
+            current_keys = np.fromiter(self.X_train_.keys(), dtype=np.int64)
             gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
             if len(X) > len(gaps):
                 extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
@@ -399,7 +359,7 @@ class Tree(object):
 
         # update model
         self.addition_types_ = []
-        self.root_ = self._add(X, y, keys, utype='add')
+        self.root_ = self._add(X, y, keys)
 
         return self.addition_types_
 
@@ -417,7 +377,7 @@ class Tree(object):
 
         # update model
         self.deletion_types_ = []
-        self.root_ = self._delete(X, y, remove_indices, utype='delete')
+        self.root_ = self._delete(X, y, remove_indices)
 
         # remove the instances from the data
         if self.single_tree_:
@@ -536,7 +496,7 @@ class Tree(object):
                 leaf_value = pos_count / n_samples
                 node_dict['count'] = n_samples
                 node_dict['pos_count'] = pos_count
-                node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
+                node_dict['leaf_value'] = 0 if pos_count == 0 else pos_count / n_samples
                 node_dict['indices'] = keys
                 return DecisionNode(value=leaf_value, node_dict=node_dict)
 

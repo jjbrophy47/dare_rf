@@ -11,10 +11,9 @@ from collections import Counter
 import numpy as np
 
 here = os.path.abspath(os.path.dirname(__file__))
-sys.path.insert(0, here + '/../../')
-sys.path.insert(0, here + '/../')
-from mulan.trees.babc_tree_d import BABC_Tree_D
-from mulan.trees.tree import Tree
+sys.path.insert(0, here + '/../../..')
+sys.path.insert(0, here + '/../..')
+from model import deterministic, detrace
 from utility import data_util, exp_util, print_util
 
 
@@ -37,9 +36,10 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('instances to delete: {}'.format(len(delete_indices)))
 
     # deterministic model - training
-    logger.info('\nBABC_Tree_D')
+    logger.info('\nd_tree')
     start = time.time()
-    tree = BABC_Tree_D(max_depth=args.max_depth).fit(X_train, y_train)
+    d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+    d_tree = d_tree.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
 
@@ -47,32 +47,34 @@ def remove_sample(args, logger, out_dir, seed):
     X_train_new = np.delete(X_train, delete_indices, axis=0)
     y_train_new = np.delete(y_train, delete_indices)
     start = time.time()
-    tree = BABC_Tree_D(max_depth=args.max_depth).fit(X_train_new, y_train_new)
+    d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+    d_tree = d_tree.fit(X_train_new, y_train_new)
     end_time = time.time() - start
     logger.info('retrain time: {:.3f}s'.format(end_time))
 
     # removal-enabled model - training
-    logger.info('\nDeTRACE')
+    logger.info('\ndt_tree')
     start = time.time()
-    dtrace = Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth, verbose=args.verbose)
-    dtrace = dtrace.fit(X_train, y_train)
+    dt_tree = detrace.Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth,
+                           verbose=args.verbose, random_state=seed)
+    dt_tree = dt_tree.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
 
     # removal-enabled model - deleting
     start = time.time()
-    detrace_delete_types = dtrace.delete(delete_indices)
+    deletion_types = dt_tree.delete(delete_indices)
     end_time = time.time() - start
     logger.info('delete time: {:.3f}s'.format(end_time))
 
     # log the deletion types
-    counter = Counter(detrace_delete_types)
-    logger.info('\n[DeTRACE] delete types: {}'.format(counter))
+    counter = Counter(deletion_types)
+    logger.info('\n[dt_tree] delete types: {}'.format(counter))
 
     # log the predictive performance
     logger.info('')
-    exp_util.performance(tree, X_test, y_test, logger=logger, name='BABC_Tree_D')
-    exp_util.performance(dtrace, X_test, y_test, logger=logger, name='DeTRACE')
+    exp_util.performance(d_tree, X_test, y_test, logger=logger, name='d_tree')
+    exp_util.performance(dt_tree, X_test, y_test, logger=logger, name='dt_tree')
     logger.info('')
 
 
@@ -108,7 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
-    parser.add_argument('--n_remove', type=int, default=1, help='number of instances to sequentially delete.')
+    parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
     parser.add_argument('--frac_remove', type=float, default=None, help='fraction of training data to remove.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
     parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')

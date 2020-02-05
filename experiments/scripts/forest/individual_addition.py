@@ -1,7 +1,6 @@
 """
-This experiment chooses m random instances to delete.
-TODO: Compare against retraining a deterministic model or our model?
-TODO: Add ability to remove samples that will cause the most retrainings, at what level?
+This experiment chooses a random instance to delete.
+TODO: compare against retraining a deterministic model or our model?
 """
 import os
 import sys
@@ -18,23 +17,7 @@ from model import deterministic, detrace
 from utility import data_util, exp_util, print_util
 
 
-def _adjust_indices(indices_to_delete):
-    """
-    Return an adjusted array of indices, taking into account removing rach on sequentially.
-
-    Example:
-    indices_to_delete = [4, 1, 10, 0] => desired result = [4, 1, 8, 0]
-    """
-    assert len(np.unique(indices_to_delete)) == len(indices_to_delete)
-    indices = indices_to_delete.copy()
-    for i in range(len(indices)):
-        for j in range(i + 1, len(indices)):
-            if indices[i] < indices[j]:
-                indices[j] -= 1
-    return indices
-
-
-def remove_sample(args, logger, out_dir, seed):
+def add_sample(args, logger, out_dir, seed):
 
     # obtain data
     data = data_util.get_data(args.dataset, seed, data_dir=args.data_dir, n_samples=args.n_samples,
@@ -46,11 +29,11 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('test instances: {}'.format(X_test.shape[0]))
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    # choose instances to delete
+    # choose instance to add
     np.random.seed(seed)
-    delete_indices = np.random.choice(X_train.shape[0], size=args.n_remove, replace=False)
-    adjusted_indices = _adjust_indices(delete_indices)
-    logger.info('instances to delete: {}'.format(len(delete_indices)))
+    add_ndx = np.random.choice(X_train.shape[0])
+    X_add, y_add = X_train[add_ndx].reshape(1, X_train.shape[1]), y_train[[add_ndx]]
+    logger.info('instance to add: {}'.format(add_ndx))
 
     # deterministic model - training
     logger.info('\nd_rf')
@@ -59,31 +42,17 @@ def remove_sample(args, logger, out_dir, seed):
                             max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
                             random_state=seed)
     d_rf = d_rf.fit(X_train, y_train)
-    end_time = time.time() - start
-    logger.info('train time: {:.3f}s'.format(end_time))
+    logger.info('train time: {:.3f}s'.format(time.time() - start))
 
-    if not args.no_retrain:
-
-        # deterministic model - deleting (i.e. retraining)
-        tree_delete_times = [end_time]
-        X_train_new, y_train_new = X_train.copy(), y_train.copy()
-        for i, delete_ndx in enumerate(adjusted_indices):
-
-            X_train_new = np.delete(X_train_new, delete_ndx, axis=0)
-            y_train_new = np.delete(y_train_new, delete_ndx)
-
-            start = time.time()
-            d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                                    max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                                    random_state=seed)
-            d_rf = d_rf.fit(X_train, y_train)
-            end_time = time.time() - start
-
-            logger.info('{}. [{}] retrain time: {:.3f}s'.format(i, delete_ndx, end_time))
-            tree_delete_times.append(end_time)
-
-    else:
-        tree_delete_times = [end_time] * (args.repeats + 1)
+    # deterministic model - adding (i.e. retraining)
+    X_train_new = np.vstack([X_train, X_add])
+    y_train_new = np.concatenate([y_train, y_add])
+    start = time.time()
+    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
+                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
+                            random_state=seed)
+    d_rf = d_rf.fit(X_train_new, y_train_new)
+    logger.info('retrain time: {:.3f}s'.format(time.time() - start))
 
     # removal-enabled model - training
     logger.info('\ndt_rf')
@@ -92,31 +61,18 @@ def remove_sample(args, logger, out_dir, seed):
                        max_features=args.max_features, max_samples=args.max_samples,
                        max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     dt_rf = dt_rf.fit(X_train, y_train)
-    end_time = time.time() - start
-    logger.info('train time: {:.3f}s'.format(end_time))
+    logger.info('train time: {:.3f}s'.format(time.time() - start))
 
     # removal-enabled model - deleting
-    detrace_delete_types = []
-    detrace_delete_times = [end_time]
-    for i, delete_ndx in enumerate(delete_indices):
+    start = time.time()
+    deletion_types = dt_rf.add(X_add, y_add)
+    logger.info('add time: {:.3f}s'.format(time.time() - start))
 
-        start = time.time()
-        delete_types = dt_rf.delete(int(delete_ndx))
-        end_time = time.time() - start
-        detrace_delete_types += delete_types
-
-        logger.info('{}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
-        detrace_delete_times.append(end_time)
-
-    counter = Counter(detrace_delete_types)
-    logger.info('\n[dt_rf] delete types: {}\n'.format(counter))
-
-    # amortized runtime
-    logger.info('[{}] amortized: {:.3f}s'.format('d_rf', np.mean(tree_delete_times)))
-    logger.info('[{}] amortized: {:.3f}s'.format('dt_rf', np.mean(detrace_delete_times)))
+    # display deletion types
+    counter = Counter(deletion_types)
+    logger.info('add types: {}\n'.format(counter))
 
     # log the predictive performance
-    logger.info('')
     exp_util.performance(d_rf, X_test, y_test, logger=logger, name='d_rf')
     exp_util.performance(dt_rf, X_test, y_test, logger=logger, name='dt_rf')
     logger.info('')
@@ -137,7 +93,7 @@ def main(args):
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment
-        remove_sample(args, logger, rs_dir, seed=args.rs)
+        add_sample(args, logger, rs_dir, seed=args.rs)
         args.rs += 1
 
         # remove logger
@@ -146,7 +102,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/sequential_removal', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/forest/individual_addition', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
@@ -154,8 +110,6 @@ if __name__ == '__main__':
     parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
-    parser.add_argument('--no_retrain', action='store_true', default=False, help='Do not retrain every time.')
-    parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
     parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
@@ -164,4 +118,5 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
+    args = exp_util.check_args(args)
     main(args)

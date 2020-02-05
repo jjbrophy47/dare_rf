@@ -35,36 +35,32 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('instance to delete: {}'.format(delete_ndx))
 
     # deterministic model - training
-    logger.info('\nBABC_Tree_D')
+    logger.info('\nd_tree')
     start = time.time()
-    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                            random_state=seed)
-    d_rf = d_rf.fit(X_train, y_train)
+    d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+    d_tree = d_tree.fit(X_train, y_train)
     logger.info('train time: {:.3f}s'.format(time.time() - start))
 
     # deterministic model - deleting (i.e. retraining)
     X_train_new = np.delete(X_train, delete_ndx, axis=0)
     y_train_new = np.delete(y_train, delete_ndx)
     start = time.time()
-    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                            random_state=seed)
-    d_rf = d_rf.fit(X_train_new, y_train_new)
+    dt_tree = detrace.Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth,
+                           verbose=args.verbose, random_state=seed)
+    dt_tree = dt_tree.fit(X_train_new, y_train_new)
     logger.info('retrain time: {:.3f}s'.format(time.time() - start))
 
     # removal-enabled model - training
-    logger.info('\nDeTRACE')
+    logger.info('\ndt_tree')
     start = time.time()
-    dt_rf = detrace.RF(epsilon=args.epsilon, gamma=args.gamma, n_estimators=args.n_estimators,
-                       max_features=args.max_features, max_samples=args.max_samples,
-                       max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
-    dt_rf = dt_rf.fit(X_train, y_train)
+    dt_tree = detrace.Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth,
+                           verbose=args.verbose, random_state=seed)
+    dt_tree = dt_tree.fit(X_train, y_train)
     logger.info('train time: {:.3f}s'.format(time.time() - start))
 
     # removal-enabled model - deleting
     start = time.time()
-    deletion_types = dt_rf.delete(delete_ndx)
+    deletion_types = dt_tree.delete(delete_ndx)
     logger.info('delete time: {:.3f}s'.format(time.time() - start))
 
     # display deletion types
@@ -72,8 +68,8 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('delete types: {}\n'.format(counter))
 
     # log the predictive performance
-    exp_util.performance(d_rf, X_test, y_test, logger=logger, name='d_rf')
-    exp_util.performance(dt_rf, X_test, y_test, logger=logger, name='dt_rf')
+    exp_util.performance(d_tree, X_test, y_test, logger=logger, name='d_tree')
+    exp_util.performance(dt_tree, X_test, y_test, logger=logger, name='dt_tree')
     logger.info('')
 
 
@@ -101,7 +97,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/forest/individual_removal', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/tree/individual_removal', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
