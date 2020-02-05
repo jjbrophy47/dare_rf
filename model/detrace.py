@@ -245,7 +245,6 @@ class Tree(object):
         assert X.ndim == 2
         assert y.ndim == 1
         self.n_features_ = X.shape[1]
-
         self.root_ = self._build_tree(X, y, keys)
         return self
 
@@ -342,10 +341,11 @@ class Tree(object):
         if isinstance(remove_indices, int):
             remove_indices = np.array([remove_indices], dtype=np.int32)
 
-        X, y = self.get_data(remove_indices)
+        X, y, keys = self.get_data(remove_indices)
+        X = X[:, self.feature_indices]
 
         self.deletion_types_ = []
-        self.root_ = self._delete(X, y, remove_indices)
+        self.root_ = self._delete(X, y, keys)
 
         return self.deletion_types_
 
@@ -520,26 +520,10 @@ class Tree(object):
             tree.node_dict['indices'] = self._get_indices(tree, current_depth)
             tree.node_dict['indices'] = self._remove_elements(tree.node_dict['indices'], remove_indices)
             tree_branch = DecisionNode(value=tree.node_dict['leaf_value'], node_dict=tree.node_dict)
-            self.deletion_types_.append('1b')
+            self.deletion_types_.append('1b_{}'.format(current_depth))
             return tree_branch
 
         # type 2: all instances are removed from the left or right branch, rebuild at this node
-        left_indices = np.where(X[:, tree.feature_i] == 1)[0]
-        right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
-        y_left, y_right = y[left_indices], y[right_indices]
-
-        if tree.node_dict['attr'][tree.feature_i]['left']['count'] - len(left_indices) <= 0 or\
-           tree.node_dict['attr'][tree.feature_i]['right']['count'] - len(right_indices) <= 0:
-
-            if self.verbose > 0:
-                print('hanging branch with >1 instance, rebuilding at depth {}'.format(current_depth))
-
-            indices = self._get_indices(tree, current_depth)
-            indices = self._remove_elements(indices, remove_indices)
-            Xa, ya, keys = self._get_numpy_data(indices)
-            self.deletion_types_.append('2a_{}'.format(current_depth))
-            return self._build_tree(Xa, ya, keys, current_depth)
-
         # udpate gini_index for each attribute in this node
         old_gini_indexes = []
         gini_indexes = []
@@ -566,7 +550,7 @@ class Tree(object):
                 old_gini_indexes.append(tree.node_dict['attr'][attr_ndx]['gini_index'])
                 gini_indexes.append(0)
 
-            # recompute the gini gain for this attribute
+            # recompute the gini index for this attribute
             else:
                 attr_dict = tree.node_dict['attr'][attr_ndx]
                 gini_index = self._compute_gini_index(attr_dict)
@@ -597,9 +581,9 @@ class Tree(object):
 
             indices = self._get_indices(tree, current_depth)
             indices = self._remove_elements(indices, remove_indices)
-            Xa, ya, keys = self._get_numpy_data(indices)
+            Xa, ya, keys = self.get_data(indices)
 
-            dtype = '2b' if len(invalid_indices) > 0 else '2c'
+            dtype = '2a' if len(invalid_indices) > 0 else '2b'
             self.deletion_types_.append('{}_{}'.format(dtype, current_depth))
 
             return self._build_tree(Xa, ya, keys, current_depth)
