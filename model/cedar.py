@@ -407,9 +407,7 @@ class Tree(object):
         # additional data structure to maintain attribute split info
         n_samples = len(keys)
         pos_count = np.sum(y)
-        neg_count = n_samples - pos_count
-        gini_data = round(1 - (pos_count / n_samples)**2 - (neg_count / n_samples)**2, 8)
-        node_dict = {'count': n_samples, 'pos_count': pos_count, 'gini_data': gini_data}
+        node_dict = {'count': n_samples, 'pos_count': pos_count}
 
         # handle edge cases
         create_leaf = False
@@ -577,13 +575,8 @@ class Tree(object):
             return tree
 
         # decision node, update the high-level metadata
-        count = tree.node_dict['count'] + len(y)
-        pos_count = tree.node_dict['pos_count'] + np.sum(y)
-        neg_count = pos_count - count
-        gini_data = round(1 - (pos_count / count)**2 - (neg_count / count)**2, 8)
-        tree.node_dict['pos_count'] = pos_count
-        tree.node_dict['count'] = count
-        tree.node_dict['gini_data'] = gini_data
+        tree.node_dict['count'] += len(y)
+        tree.node_dict['pos_count'] += np.sum(y)
 
         # udpate gini_index for each attribute in this node
         old_gini_indexes = []
@@ -613,7 +606,8 @@ class Tree(object):
         p = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
-        if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):
+        ratio = self._div1(p, old_p)
+        if np.any(ratio > np.exp(self.epsilon)) or np.any(ratio < np.exp(-self.epsilon)):
 
             if self.verbose > 0:
                 print('rebuilding at depth {}'.format(current_depth))
@@ -673,13 +667,8 @@ class Tree(object):
             return tree
 
         # decision node, update the high-level metadata
-        count = tree.node_dict['count'] - len(y)
-        pos_count = tree.node_dict['pos_count'] - np.sum(y)
-        neg_count = pos_count - count
-        gini_data = round(1 - (pos_count / count)**2 - (neg_count / count)**2, 8)
-        tree.node_dict['pos_count'] = pos_count
-        tree.node_dict['count'] = count
-        tree.node_dict['gini_data'] = gini_data
+        tree.node_dict['count'] -= len(y)
+        tree.node_dict['pos_count'] -= np.sum(y)
 
         # raise an error if there are only instances from one class are at the root
         if current_depth == 0:
@@ -744,7 +733,8 @@ class Tree(object):
         p = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices, cur_ndx=np.argmax(old_p))
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
-        if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):
+        ratio = self._div1(p, old_p)
+        if len(invalid_indices) > 0 or np.any(ratio > np.exp(self.epsilon)) or np.any(ratio < np.exp(-self.epsilon)):
 
             if self.verbose > 0:
                 print('rebuilding at depth {}'.format(current_depth))
@@ -827,6 +817,12 @@ class Tree(object):
         abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
         abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
 
+        # update the non-affected branch
+        nabranch = 'left' if abranch == 'right' else 'right'
+        nabranch_dict = node_dict['attr'][attr_ndx][nabranch]
+        nabranch_dict['weight'] = 1 - abranch_dict['weight']
+        nabranch_dict['weighted_index'] = nabranch_dict['weight'] * nabranch_dict['index']
+
         return True
 
     def _decrement_decision_node(self, node_dict, attr_ndx, abranch, y):
@@ -837,7 +833,7 @@ class Tree(object):
         # access the attriubute metadata
         abranch_dict = node_dict['attr'][attr_ndx][abranch]
 
-        # # only the affected instances are in this branch
+        # only the affected instances are in this branch
         if abranch_dict['count'] <= len(y):
             return None
 
@@ -848,6 +844,12 @@ class Tree(object):
         abranch_dict['pos_prob'] = abranch_dict['pos_count'] / abranch_dict['count']
         abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
         abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
+
+        # update the non-affected branch
+        nabranch = 'left' if abranch == 'right' else 'right'
+        nabranch_dict = node_dict['attr'][attr_ndx][nabranch]
+        nabranch_dict['weight'] = 1 - abranch_dict['weight']
+        nabranch_dict['weighted_index'] = nabranch_dict['weight'] * nabranch_dict['index']
 
         return True
 
@@ -936,6 +938,12 @@ class Tree(object):
             Xd[i] = X[i]
             yd[i] = y[i]
         return Xd, yd
+
+    def _div1(self, a, b):
+        """
+        Returns 1 if the numerator and denominator are both zero.
+        """
+        return np.divide(a, b, out=np.ones_like(a, dtype=np.float64), where=b != 0)
 
 
 class DecisionNode():
