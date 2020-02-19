@@ -1,7 +1,6 @@
 """
 This experiment chooses m random instances to delete.
-TODO: Compare against retraining a deterministic model or our model?
-TODO: Add ability to remove samples that will cause the most retrainings, at what level?
+TODO: Add adversarial ordering against certified model.
 """
 import os
 import sys
@@ -14,7 +13,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
-from model import deterministic, detrace
+from model import cedar
 from utility import data_util, exp_util, print_util, adv_util
 
 
@@ -47,7 +46,7 @@ def remove_sample(args, logger, out_dir, seed):
     # choose instances to delete
     if args.adv:
         delete_indices = adv_util.adversarial_ordering(X_train, y_train, n_samples=args.n_remove, seed=seed,
-                                                       verbose=args.verbose)
+                                                       verbose=args.verbose, logger=logger)
     else:
         np.random.seed(seed)
         delete_indices = np.random.choice(X_train.shape[0], size=args.n_remove, replace=False)
@@ -57,7 +56,8 @@ def remove_sample(args, logger, out_dir, seed):
     # deterministic model - training
     logger.info('\nd_tree')
     start = time.time()
-    d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+    d_tree = cedar.Tree(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma, max_depth=args.max_depth,
+                        verbose=args.verbose, random_state=seed)
     d_tree = d_tree.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
@@ -73,8 +73,9 @@ def remove_sample(args, logger, out_dir, seed):
             y_train_new = np.delete(y_train_new, delete_ndx)
 
             start = time.time()
-            d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
-            d_tree = d_tree.fit(X_train, y_train)
+            d_tree = cedar.Tree(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma, max_depth=args.max_depth,
+                                verbose=args.verbose, random_state=seed)
+            d_tree = d_tree.fit(X_train_new, y_train_new)
             end_time = time.time() - start
 
             logger.info('{}. [{}] retrain time: {:.3f}s'.format(i, delete_ndx, end_time))
@@ -86,8 +87,8 @@ def remove_sample(args, logger, out_dir, seed):
     # removal-enabled model - training
     logger.info('\ndt_tree')
     start = time.time()
-    dt_tree = detrace.Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth,
-                           verbose=args.verbose, random_state=seed)
+    dt_tree = cedar.Tree(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+                         max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     dt_tree = dt_tree.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
@@ -146,16 +147,14 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/tree/sequential_removal', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
-    parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
-    parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
-    parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
     parser.add_argument('--no_retrain', action='store_true', default=False, help='Do not retrain every time.')
     parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
     parser.add_argument('--adv', action='store_true', default=False, help='chooses adversarial samples to delete.')
-    parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
-    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
+    parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
+    parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
+    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to support removal of.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()

@@ -14,7 +14,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
-from model import deterministic, detrace
+from model import cedar
 from utility import data_util, exp_util, print_util, adv_util
 
 
@@ -57,9 +57,10 @@ def remove_sample(args, logger, out_dir, seed):
     # deterministic model - training
     logger.info('\nd_rf')
     start = time.time()
-    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                            random_state=seed)
+    d_rf = cedar.RF(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma,
+                    n_estimators=args.n_estimators, max_features=args.max_features,
+                    max_samples=args.max_samples, max_depth=args.max_depth,
+                    verbose=args.verbose, random_state=seed)
     d_rf = d_rf.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
@@ -75,9 +76,10 @@ def remove_sample(args, logger, out_dir, seed):
             y_train_new = np.delete(y_train_new, delete_ndx)
 
             start = time.time()
-            d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                                    max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                                    random_state=seed)
+            d_rf = cedar.RF(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma,
+                            n_estimators=args.n_estimators, max_features=args.max_features,
+                            max_samples=args.max_samples, max_depth=args.max_depth,
+                            verbose=args.verbose, random_state=seed)
             d_rf = d_rf.fit(X_train, y_train)
             end_time = time.time() - start
 
@@ -90,9 +92,10 @@ def remove_sample(args, logger, out_dir, seed):
     # removal-enabled model - training
     logger.info('\ndt_rf')
     start = time.time()
-    dt_rf = detrace.RF(epsilon=args.epsilon, gamma=args.gamma, n_estimators=args.n_estimators,
-                       max_features=args.max_features, max_samples=args.max_samples,
-                       max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
+    dt_rf = cedar.RF(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+                     n_estimators=args.n_estimators, max_features=args.max_features,
+                     max_samples=args.max_samples, max_depth=args.max_depth,
+                     verbose=args.verbose, random_state=seed)
     dt_rf = dt_rf.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
@@ -156,8 +159,9 @@ if __name__ == '__main__':
     parser.add_argument('--no_retrain', action='store_true', default=False, help='Do not retrain every time.')
     parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
     parser.add_argument('--adv', action='store_true', default=False, help='chooses adversarial samples to delete.')
-    parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
-    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
+    parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
+    parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
+    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to support removal of.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')

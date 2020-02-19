@@ -501,7 +501,7 @@ class Tree(object):
                     gini_indexes.append(gini_index)
                     attr_indices.append(i)
 
-            # all remaining attributes create hanging branches - create leaf
+            # all attributes create hanging branches - create leaf
             if len(gini_indexes) == 0:
                 leaf_value = pos_count / n_samples
                 node_dict['count'] = n_samples
@@ -521,12 +521,12 @@ class Tree(object):
             left_indices = np.where(X[:, chosen_i] == 1)[0]
             right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
-            # build the node with the best attribute
+            # build the node with the chosen attribute
             left = self._build_tree(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1)
             right = self._build_tree(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1)
             return DecisionNode(feature_i=chosen_i, node_dict=node_dict, left_branch=left, right_branch=right)
 
-    def _generate_distribution(self, gini_indexes, invalid_indices=[]):
+    def _generate_distribution(self, gini_indexes, invalid_indices=[], cur_ndx=None):
         """
         Creates a probability distribution over the attributes given
         their gini index scores.
@@ -536,6 +536,20 @@ class Tree(object):
         # numbers are too small, go into deterministic mode
         if np.exp(-(self.lmbda * gini_indexes.min()) / (5 * self.gamma)) == 0:
             p = np.where(gini_indexes == gini_indexes.min(), 1, 0)
+
+            # there is a tie between 2 or more attributes
+            if p.sum() > 1:
+
+                # choose existing attribute if it is tied for first
+                if cur_ndx and p[cur_ndx] == 1:
+                    chosen_ndx = cur_ndx
+
+                # choose the first attribute encountered that is tied for first
+                else:
+                    chosen_ndx = np.argmax(p == 1)
+
+                # set the probability of the other attributes to zero
+                p[np.setdiff1d(np.arange(len(p)), chosen_ndx)] = 0
 
         # create probability distribution over the attributes
         else:
@@ -559,7 +573,7 @@ class Tree(object):
             if self.verbose > 0:
                 print('tree check complete, ended at depth {}'.format(current_depth))
 
-            self.addition_types_.append('1a')
+            self.addition_types_.append('1')
             return tree
 
         # decision node, update the high-level metadata
@@ -596,7 +610,7 @@ class Tree(object):
 
         # get old and updated probability distributions
         old_p = self._generate_distribution(old_gini_indexes)
-        p = self._generate_distribution(gini_indexes)
+        p = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
         if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):
@@ -607,7 +621,7 @@ class Tree(object):
             indices = self._get_indices(tree, current_depth)
             indices = self._add_elements(indices, add_indices)
             Xa, ya, keys = self.get_data(indices)
-            self.deletion_types_.append('{}_{}'.format('2b', current_depth))
+            self.deletion_types_.append('{}_{}'.format('2', current_depth))
 
             return self._build_tree(Xa, ya, keys, current_depth)
 
@@ -727,7 +741,7 @@ class Tree(object):
 
         # get old and updated probability distributions
         old_p = self._generate_distribution(old_gini_indexes)
-        p = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices)
+        p = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices, cur_ndx=np.argmax(old_p))
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
         if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):

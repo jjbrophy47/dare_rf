@@ -11,7 +11,7 @@ from sklearn.tree import DecisionTreeClassifier
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../../')
 sys.path.insert(0, here + '/../../')
-from model import deterministic, detrace
+from model import cedar
 from utility import data_util, exp_util, print_util
 
 
@@ -33,21 +33,22 @@ def performance(args, logger, seed):
 
     logger.info('building d_tree...')
     start = time.time()
-    d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+    d_tree = cedar.Tree(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma, max_depth=args.max_depth,
+                        verbose=args.verbose, random_state=seed)
     d_tree = d_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
     logger.info('building dt_tree...')
     start = time.time()
-    dt_tree = detrace.Tree(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
-                           max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
+    dt_tree = cedar.Tree(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+                         max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     dt_tree = dt_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
     # display performance
     exp_util.performance(sk_tree, X_test, y_test, name='sk_tree', logger=logger)
     exp_util.performance(d_tree, X_test, y_test, name='d_tree', logger=logger)
-    exp_util.performance(dt_tree, X_test, y_test, name='dt_tree', logger=logger)
+    exp_util.performance(dt_tree, X_test, y_test, name='cedar_tree', logger=logger)
 
 
 def main(args):

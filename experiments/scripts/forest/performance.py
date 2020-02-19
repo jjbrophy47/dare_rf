@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../../')
 sys.path.insert(0, here + '/../../')
-from model import deterministic, detrace
+from model import cedar
 from utility import data_util, exp_util, print_util
 
 
@@ -36,18 +36,19 @@ def performance(args, logger, seed):
 
     logger.info('building d_rf...')
     start = time.time()
-    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                            random_state=seed)
+    d_rf = cedar.RF(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma,
+                    n_estimators=args.n_estimators, max_features=args.max_features,
+                    max_samples=args.max_samples, max_depth=args.max_depth,
+                    verbose=args.verbose, random_state=seed)
     d_rf = d_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
     logger.info('building dt_rf...')
     start = time.time()
-    dt_rf = detrace.RF(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
-                       n_estimators=args.n_estimators, max_features=args.max_features,
-                       max_samples=args.max_samples, max_depth=args.max_depth,
-                       verbose=args.verbose, random_state=seed)
+    dt_rf = cedar.RF(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+                     n_estimators=args.n_estimators, max_features=args.max_features,
+                     max_samples=args.max_samples, max_depth=args.max_depth,
+                     verbose=args.verbose, random_state=seed)
     dt_rf = dt_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
