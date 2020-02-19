@@ -20,9 +20,7 @@ from utility import data_util, exp_util, print_util
 def remove_sample(args, logger, out_dir, seed):
 
     # obtain data
-    data = data_util.get_data(args.dataset, seed, data_dir=args.data_dir, n_samples=args.n_samples,
-                              n_attributes=args.n_attributes, test_frac=args.test_frac, convert=False)
-    X_train, X_test, y_train, y_test = data
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {}'.format(X_train.shape[0]))
@@ -100,16 +98,10 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/tree/individual_removal', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
-    parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
-    parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
-    parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
     parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
-    parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
-    parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()

@@ -47,7 +47,7 @@ def remove_sample(args, logger, out_dir, seed):
     # choose instances to delete
     if args.adv:
         delete_indices = adv_util.adversarial_ordering(X_train, y_train, n_samples=args.n_remove, seed=seed,
-                                                       verbose=args.verbose, logger=logger)
+                                                       verbose=args.verbose)
     else:
         np.random.seed(seed)
         delete_indices = np.random.choice(X_train.shape[0], size=args.n_remove, replace=False)
@@ -55,12 +55,10 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('instances to delete: {}'.format(len(delete_indices)))
 
     # deterministic model - training
-    logger.info('\nd_rf')
+    logger.info('\nd_tree')
     start = time.time()
-    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                            random_state=seed)
-    d_rf = d_rf.fit(X_train, y_train)
+    d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+    d_tree = d_tree.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
 
@@ -75,10 +73,8 @@ def remove_sample(args, logger, out_dir, seed):
             y_train_new = np.delete(y_train_new, delete_ndx)
 
             start = time.time()
-            d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                                    max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                                    random_state=seed)
-            d_rf = d_rf.fit(X_train, y_train)
+            d_tree = deterministic.Tree(max_depth=args.max_depth, verbose=args.verbose)
+            d_tree = d_tree.fit(X_train, y_train)
             end_time = time.time() - start
 
             logger.info('{}. [{}] retrain time: {:.3f}s'.format(i, delete_ndx, end_time))
@@ -88,12 +84,11 @@ def remove_sample(args, logger, out_dir, seed):
         tree_delete_times = [end_time] * (args.repeats + 1)
 
     # removal-enabled model - training
-    logger.info('\ndt_rf')
+    logger.info('\ndt_tree')
     start = time.time()
-    dt_rf = detrace.RF(epsilon=args.epsilon, gamma=args.gamma, n_estimators=args.n_estimators,
-                       max_features=args.max_features, max_samples=args.max_samples,
-                       max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
-    dt_rf = dt_rf.fit(X_train, y_train)
+    dt_tree = detrace.Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth,
+                           verbose=args.verbose, random_state=seed)
+    dt_tree = dt_tree.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(end_time))
 
@@ -103,7 +98,7 @@ def remove_sample(args, logger, out_dir, seed):
     for i, delete_ndx in enumerate(delete_indices):
 
         start = time.time()
-        delete_types = dt_rf.delete(int(delete_ndx))
+        delete_types = dt_tree.delete(int(delete_ndx))
         end_time = time.time() - start
         detrace_delete_types += delete_types
 
@@ -111,7 +106,7 @@ def remove_sample(args, logger, out_dir, seed):
         detrace_delete_times.append(end_time)
 
     counter = Counter(detrace_delete_types)
-    logger.info('\n[dt_rf] delete types: {}\n'.format(counter))
+    logger.info('\n[dt_tree] delete types: {}\n'.format(counter))
 
     # amortized runtime
     logger.info('[{}] amortized: {:.3f}s'.format('d_rf', np.mean(tree_delete_times)))
@@ -119,8 +114,8 @@ def remove_sample(args, logger, out_dir, seed):
 
     # log the predictive performance
     logger.info('')
-    exp_util.performance(d_rf, X_test, y_test, logger=logger, name='d_rf')
-    exp_util.performance(dt_rf, X_test, y_test, logger=logger, name='dt_rf')
+    exp_util.performance(d_tree, X_test, y_test, logger=logger, name='d_tree')
+    exp_util.performance(dt_tree, X_test, y_test, logger=logger, name='dt_tree')
     logger.info('')
 
 
@@ -148,9 +143,12 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/forest/sequential_removal', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/tree/sequential_removal', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
+    parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
+    parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
+    parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
     parser.add_argument('--no_retrain', action='store_true', default=False, help='Do not retrain every time.')
@@ -158,9 +156,6 @@ if __name__ == '__main__':
     parser.add_argument('--adv', action='store_true', default=False, help='chooses adversarial samples to delete.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
     parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
-    parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
-    parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()

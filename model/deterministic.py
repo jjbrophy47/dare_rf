@@ -299,11 +299,7 @@ class Tree(object):
 
         # If we're at leaf => print the label
         if tree.value is not None:
-            if self.verbose > 1:
-                y_vals = [self.y_train_[ndx] for ndx in tree.node_dict['indices']]
-                print(tree.value, tree.node_dict['indices'], y_vals)
-            else:
-                print(tree.value, tree.node_dict['indices'])
+            print(tree.value)
 
         # Go deeper down the tree
         else:

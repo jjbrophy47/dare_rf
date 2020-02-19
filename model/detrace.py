@@ -14,9 +14,12 @@ class RF(object):
     Parameters:
     -----------
     epsilon: float (default=0.1)
-        Efficiency-utility tradeoff; lower for more deletion efficieny, higher for more utility.
+        Controls the level of indistinguishability; lower for stricter gaurantees,
+        higher for more deletion efficiency.
+    lmbda: float (default=0.1)
+        Controls the amount of noise injected into the learning algorithm.
     gamma: float (default=0.1)
-        Fraction of data guaranteed for certified removal.
+        Fraction of data to support for removal.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -37,9 +40,10 @@ class RF(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, gamma=0.1, n_estimators=100, max_features='sqrt', max_samples=None,
+    def __init__(self, epsilon=0.1, lmbda=0.1, gamma=0.1, n_estimators=100, max_features='sqrt', max_samples=None,
                  max_depth=4, min_samples_split=2, random_state=None, verbose=0):
         self.epsilon = epsilon
+        self.lmbda = lmbda
         self.gamma = gamma
         self.n_estimators = n_estimators
         self.max_features = max_features
@@ -52,6 +56,7 @@ class RF(object):
     def __str__(self):
         s = 'Forest:'
         s += '\nepsilon={}'.format(self.epsilon)
+        s += '\nlmbda={}'.format(self.lmbda)
         s += '\ngamma={}'.format(self.gamma)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_samples={}'.format(self.max_samples)
@@ -114,7 +119,7 @@ class RF(object):
             sample_indices = np.random.choice(self.n_samples_, size=self.max_samples_, replace=False)
 
             X_sub, y_sub = X[np.ix_(sample_indices, feature_indices)], y[sample_indices]
-            tree = Tree(epsilon=self.epsilon, gamma=self.gamma, max_depth=self.max_depth,
+            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda, gamma=self.gamma, max_depth=self.max_depth,
                         min_samples_split=self.min_samples_split, random_state=self.random_state,
                         feature_indices=feature_indices, verbose=self.verbose, get_data=self._get_numpy_data)
             tree = tree.fit(X_sub, y_sub, sample_indices)
@@ -227,9 +232,12 @@ class Tree(object):
     get_data: function (parameters: indices)
         Method to retrieve data.
     epsilon: float (default=0.1)
-        Efficiency-utility tradeoff; lower for more deletion efficieny, higher for more utility.
+        Controls the level of indistinguishability; lower for stricter gaurantees,
+        higher for more deletion efficiency.
+    lmbda: float (default=0.1)
+        Controls the amount of noise injected into the learning algorithm.
     gamma: float (default=0.1)
-        Fraction of data guaranteed for certified removal.
+        Fraction of data to support for removal.
     max_depth: int (default=4)
         The maximum depth of a tree.
     min_samples_split: int (default=2)
@@ -241,9 +249,10 @@ class Tree(object):
     feature_indices: list (default=None)
         Indices of the features present in this tree.
     """
-    def __init__(self, epsilon=0.1, gamma=0.1, max_depth=4, min_samples_split=2,
+    def __init__(self, epsilon=0.1, lmbda=0.1, gamma=0.1, max_depth=4, min_samples_split=2,
                  random_state=None, verbose=0, get_data=None, feature_indices=None):
         self.epsilon = epsilon
+        self.lmbda = lmbda
         self.gamma = gamma
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
@@ -260,6 +269,7 @@ class Tree(object):
     def __str__(self):
         s = 'Tree:'
         s += '\nepsilon={}'.format(self.epsilon)
+        s += '\nlmbda={}'.format(self.lmbda)
         s += '\ngamma={}'.format(self.gamma)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
@@ -501,8 +511,7 @@ class Tree(object):
                 return DecisionNode(value=leaf_value, node_dict=node_dict)
 
             # create probability distribution over the attributes
-            p = np.exp(-(self.epsilon * np.array(gini_indexes)) / (5 * self.gamma))
-            p = p / p.sum()
+            p = self._generate_distribution(gini_indexes)
 
             # sample from this distribution
             np.random.seed(self.random_state)
@@ -516,6 +525,26 @@ class Tree(object):
             left = self._build_tree(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1)
             right = self._build_tree(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1)
             return DecisionNode(feature_i=chosen_i, node_dict=node_dict, left_branch=left, right_branch=right)
+
+    def _generate_distribution(self, gini_indexes, invalid_indices=[]):
+        """
+        Creates a probability distribution over the attributes given
+        their gini index scores.
+        """
+        gini_indexes = np.array(gini_indexes)
+
+        # numbers are too small, go into deterministic mode
+        if np.exp(-(self.lmbda * gini_indexes.min()) / (5 * self.gamma)) == 0:
+            p = np.where(gini_indexes == gini_indexes.min(), 1, 0)
+
+        # create probability distribution over the attributes
+        else:
+            p = np.exp(-(self.lmbda * gini_indexes) / (5 * self.gamma))
+            if len(invalid_indices) > 0:
+                p[np.array(invalid_indices)] = 0
+            p = p / p.sum()
+
+        return p
 
     def _add(self, X, y, add_indices, tree=None, current_depth=0):
 
@@ -545,8 +574,6 @@ class Tree(object):
         # udpate gini_index for each attribute in this node
         old_gini_indexes = []
         gini_indexes = []
-        invalid_indices = []
-        invalid_attr_indices = []
 
         for i, attr_ndx in enumerate(tree.node_dict['attr']):
 
@@ -567,19 +594,9 @@ class Tree(object):
             gini_indexes.append(gini_index)
             attr_dict['gini_index'] = gini_index
 
-        # remove invalid attributes from the model
-        for invalid_attr_ndx in invalid_attr_indices:
-            del tree.node_dict['attr'][invalid_attr_ndx]
-
-        # recreate old probability distribution over the attributes
-        old_p = np.exp(-(self.epsilon * np.array(old_gini_indexes)) / (5 * self.gamma))
-        old_p = old_p / old_p.sum()
-
-        # create probability distribution over the updated gini indexes
-        p = np.exp(-(self.epsilon * np.array(gini_indexes)) / (5 * self.gamma))
-        if len(invalid_attr_indices) > 0:
-            p[np.array(invalid_indices)] = 0
-        p = p / p.sum()
+        # get old and updated probability distributions
+        old_p = self._generate_distribution(old_gini_indexes)
+        p = self._generate_distribution(gini_indexes)
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
         if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):
@@ -590,9 +607,7 @@ class Tree(object):
             indices = self._get_indices(tree, current_depth)
             indices = self._add_elements(indices, add_indices)
             Xa, ya, keys = self.get_data(indices)
-
-            dtype = '2a' if len(invalid_indices) > 0 else '2b'
-            self.deletion_types_.append('{}_{}'.format(dtype, current_depth))
+            self.deletion_types_.append('{}_{}'.format('2b', current_depth))
 
             return self._build_tree(Xa, ya, keys, current_depth)
 
@@ -696,7 +711,7 @@ class Tree(object):
                 invalid_attr_indices.append(attr_ndx)
                 invalid_indices.append(i)
                 old_gini_indexes.append(tree.node_dict['attr'][attr_ndx]['gini_index'])
-                gini_indexes.append(0)
+                gini_indexes.append(1)
 
             # recompute the gini index for this attribute
             else:
@@ -710,16 +725,9 @@ class Tree(object):
         for invalid_attr_ndx in invalid_attr_indices:
             del tree.node_dict['attr'][invalid_attr_ndx]
 
-        # TODO: save old_p when it is first built?
-        # recreate old probability distribution over the attributes
-        old_p = np.exp(-(self.epsilon * np.array(old_gini_indexes)) / (5 * self.gamma))
-        old_p = old_p / old_p.sum()
-
-        # create probability distribution over the updated gini indexes
-        p = np.exp(-(self.epsilon * np.array(gini_indexes)) / (5 * self.gamma))
-        if len(invalid_attr_indices) > 0:
-            p[np.array(invalid_indices)] = 0
-        p = p / p.sum()
+        # get old and updated probability distributions
+        old_p = self._generate_distribution(old_gini_indexes)
+        p = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices)
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
         if np.any(p / old_p > np.exp(self.epsilon)) or np.any(p / old_p < np.exp(-self.epsilon)):

@@ -102,7 +102,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/batch_removal', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/tree/batch_removal', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')

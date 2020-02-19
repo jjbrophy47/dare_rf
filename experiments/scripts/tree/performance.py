@@ -1,6 +1,5 @@
 """
 This experiment tests the accuracy of a single decision tree.
-BABC: Binary Attributes Binary Classification.
 """
 import os
 import sys
@@ -19,9 +18,7 @@ from utility import data_util, exp_util, print_util
 def performance(args, logger, seed):
 
     # obtain data
-    data = data_util.get_data(args.dataset, seed, data_dir=args.data_dir, n_samples=args.n_samples,
-                              n_attributes=args.n_attributes, test_frac=args.test_frac, convert=False)
-    X_train, X_test, y_train, y_test = data
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {}'.format(X_train.shape[0]))
@@ -42,8 +39,8 @@ def performance(args, logger, seed):
 
     logger.info('building dt_tree...')
     start = time.time()
-    dt_tree = detrace.Tree(epsilon=args.epsilon, gamma=args.gamma, max_depth=args.max_depth,
-                           verbose=args.verbose, random_state=seed)
+    dt_tree = detrace.Tree(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+                           max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     dt_tree = dt_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
@@ -72,12 +69,10 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--out_dir', type=str, default='output/tree/performance', help='output directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
-    parser.add_argument('--n_samples', type=int, default=10, help='number of samples to generate.')
-    parser.add_argument('--n_attributes', type=int, default=4, help='number of attributes to generate.')
-    parser.add_argument('--test_frac', type=float, default=0.2, help='fraction of data to use for testing.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
-    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to certifiably remove.')
+    parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
+    parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
+    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to support removal of.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
