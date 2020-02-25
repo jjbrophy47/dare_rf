@@ -54,7 +54,7 @@ def exact_adversary(X, y, n_samples=None, seed=None, verbose=0, logger=None):
         indices[bin_str] = indices[bin_str][indices[bin_str] != ndx]
 
     if logger:
-        logger.info('retrains: {}'.format(retrains))
+        logger.info('estimated retrains: {}'.format(retrains))
     ordering = ordering.astype(np.int64)
     return ordering
 

@@ -5,7 +5,7 @@ import numpy as np
 
 
 # TODO: make this work for addition too
-def certified_adversary(X, y, epsilon, lmbda, gamma, n_samples=None, seed=None, verbose=0, logger=None):
+def certified_adversary(X, Y, epsilon, lmbda, gamma, n_samples=None, seed=None, verbose=0, logger=None):
     """
     Given a dataset with labels, find the ordering that causes the most
     retrainings at the root node; brute-force greedy method.
@@ -14,9 +14,10 @@ def certified_adversary(X, y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
     # results
     retrains = 0
     ordering = np.empty(n_samples)
+    delete_types = {'hanging': 0, 'differing': 0}
 
     # store data as dicts
-    X, y = _numpy_to_dict(X, y)
+    X, Y = _numpy_to_dict(X, Y)
 
     # return only a fraction of the training data
     if n_samples is not None:
@@ -25,13 +26,13 @@ def certified_adversary(X, y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
         n_samples = len(X)
 
     # generate probability distribution
-    metas, gini_indices = _get_gini_indices(X, y)
+    metas, gini_indices = _get_gini_indices(X, Y)
     p, pk = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
 
     # pick a random attribute to target
     np.random.seed(seed)
     ndx = np.random.choice(list(pk.keys()))
-    counts, indices = _type_counts(X, y, ndx)
+    counts, indices = _type_counts(X, Y, ndx)
     if logger and verbose > 0:
         logger.info('chosen: x{}, gini index: {:.3f}'.format(ndx, gini_indices[ndx]))
         logger.info(counts)
@@ -40,91 +41,98 @@ def certified_adversary(X, y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
     for i in range(n_samples):
 
         # brute force check which instance type creates the biggest change in distribution
-        result = _find_instance(metas, ndx, counts, lmbda, gamma)
+        result = _find_instance(metas, ndx, X, Y, counts, indices, lmbda, gamma, seed)
 
         # hanging branch, retrain
-        if type(result) == tuple:
-            bin_str, metas = result
-            metas = _update_metas(metas, bin_str)
+        if len(result) == 3:
+            delete_ndx, bin_str, metas = result
+            metas = _update_metas(metas, X[delete_ndx], Y[delete_ndx])
             new_p, new_pk = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
             retrains += 1
+            delete_types['hanging'] += 1
             p = new_p
             if logger and verbose > 0:
                 logger.info('hanging branch, retrain')
 
         # delete instance and recheck
         else:
-            bin_str = result
-            metas = _update_metas(metas, bin_str)
+            delete_ndx, bin_str = result
+            metas = _update_metas(metas, X[delete_ndx], Y[delete_ndx])
             new_p, new_pk = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
 
             # check if retraning is necessary
             ratio = new_p / p
             if np.any(ratio > np.exp(epsilon)) or np.any(ratio < np.exp(-epsilon)):
                 retrains += 1
+                delete_types['hanging'] += 1
                 p = new_p
-                diff_ndx = np.where(ratio > np.exp(epsilon))[0]
                 if logger and verbose > 0:
-                    logger.info('differing distributions, retrain, {}, {}'.format(diff_ndx, ratio[diff_ndx]))
+                    logger.info('{} differing distributions, retrain'.format(i))
 
             # show progress
             else:
                 if logger and verbose > 0:
-                    logger.info('{}, {}, {}, {}'.format(i, bin_str, metas[ndx]['gini_index'], ratio[ndx]))
+                    logger.info('{}, {}, {}'.format(i, delete_ndx, ratio[ndx]))
 
         # put that instance in the ordering
-        np.random.seed(seed)
-        delete_ndx = np.random.choice(indices[bin_str])
         ordering[i] = delete_ndx
 
         # remove that instance from the counts, indices, and data
         counts[bin_str] -= 1
         indices[bin_str] = indices[bin_str][indices[bin_str] != delete_ndx]
         del X[delete_ndx]
-        del y[delete_ndx]
+        del Y[delete_ndx]
 
         # choose a new attribute to focus on
         if len(new_p) != len(p):
             np.random.seed(seed)
             ndx = np.random.choice(list(new_pk.keys()))
-            counts, indices = _type_counts(X, y, ndx)
+            counts, indices = _type_counts(X, Y, ndx)
             if logger and verbose > 0:
                 logger.info('new attribute: x{}'.format(ndx))
 
-    if logger and verbose > 0:
-        logger.info('retrains: {}'.format(retrains))
+    if logger:
+        logger.info('estimated retrains: {} {}'.format(retrains, delete_types))
     ordering = ordering.astype(np.int64)
     ordering = ordering[:i]
     return ordering
 
 
-def _find_instance(metas, ndx, counts, lmbda, gamma):
+def _find_instance(metas, ndx, X, Y, counts, indices, lmbda, gamma, seed):
     """
     Find which instance raises/lowers the probability gap the most.
     """
 
+    best_delete_ndx = None
     best_bin_str = None
     best_ratio = 0
 
     p, _ = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
     for bin_str in ['00', '01', '10', '11']:
-        v1, v2 = (int(i) for i in bin_str)
 
-        invalid = _check_metas(metas, v1, v2)
+        # choose instance from bin str
+        np.random.seed(seed)
+        delete_ndx = int(np.random.choice(indices[bin_str]))
+        x, y = X[delete_ndx], Y[delete_ndx]
+
+        invalid = _check_metas(metas, x, y)
         if len(invalid) > 0 and counts[bin_str] > 0:
             for i in invalid:
                 del metas[i]
-            return bin_str, metas
+            counts[bin_str] -= 1
+            return delete_ndx, bin_str, metas
 
-        temp_metas = _update_metas(metas, bin_str)
-        temp_p, temp_pk = _probability_distribution(temp_metas, lmbda=lmbda, gamma=gamma)
-        ratio = temp_p / p
+        else:
+            temp_metas = _update_metas(metas, x, y)
+            temp_p, temp_pk = _probability_distribution(temp_metas, lmbda=lmbda, gamma=gamma)
+            ratio = temp_p / p
 
-        if ratio[temp_pk[ndx]] > best_ratio and counts[bin_str] > 0:
-            best_ratio = ratio[temp_pk[ndx]]
-            best_bin_str = bin_str
+            if ratio[temp_pk[ndx]] > best_ratio and counts[bin_str] > 0:
+                best_bin_str = bin_str
+                best_ratio = ratio[temp_pk[ndx]]
+                best_delete_ndx = delete_ndx
 
-    return best_bin_str
+    return best_delete_ndx, best_bin_str
 
 
 def _get_gini_indices(Xd, yd):
@@ -193,7 +201,8 @@ def _compute_gini_index(n_pos, n_count, left_pos, left_count, right_pos, right_c
     right_neg_prob = 1 - right_pos_prob
     right_gini = 1 - (right_pos_prob ** 2) - (right_neg_prob ** 2)
 
-    return left_weight * left_gini + right_weight * right_gini
+    gini_index = left_weight * left_gini + right_weight * right_gini
+    return round(gini_index, 8)
 
 
 def _type_counts(Xd, yd, ndx):
@@ -230,7 +239,7 @@ def _check_metas(metas, x, y):
     """
     invalid = []
     for i in metas.keys():
-        if not _check(metas[i], x, y):
+        if not _check(metas[i], x[i], y):
             invalid.append(i)
     return invalid
 
@@ -259,14 +268,13 @@ def _check(meta, x, y):
     return result
 
 
-def _update_metas(metas, bin_str):
+def _update_metas(metas, x, y):
     """
     Updates all attributes' metadata given the instance type to delete.
     """
     new_metas = {}
-    v1, v2 = (int(i) for i in bin_str)
     for i in metas.keys():
-        new_metas[i] = _decrement(metas[i], v1, v2)
+        new_metas[i] = _decrement(metas[i], x[i], y)
     return new_metas
 
 

@@ -510,6 +510,7 @@ class Tree(object):
 
             # create probability distribution over the attributes
             p = self._generate_distribution(gini_indexes)
+            node_dict['p'] = p
 
             # sample from this distribution
             np.random.seed(self.random_state)
@@ -579,7 +580,7 @@ class Tree(object):
         tree.node_dict['pos_count'] += np.sum(y)
 
         # udpate gini_index for each attribute in this node
-        old_gini_indexes = []
+        # old_gini_indexes = []
         gini_indexes = []
 
         for i, attr_ndx in enumerate(tree.node_dict['attr']):
@@ -597,12 +598,11 @@ class Tree(object):
             # recompute the gini index for this attribute
             attr_dict = tree.node_dict['attr'][attr_ndx]
             gini_index = self._compute_gini_index(attr_dict)
-            old_gini_indexes.append(attr_dict['gini_index'])
             gini_indexes.append(gini_index)
             attr_dict['gini_index'] = gini_index
 
         # get old and updated probability distributions
-        old_p = self._generate_distribution(old_gini_indexes)
+        old_p = tree.node_dict['p']
         p = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
@@ -691,7 +691,6 @@ class Tree(object):
 
         # type 2: all instances are removed from the left or right branch, rebuild at this node
         # udpate gini_index for each attribute in this node
-        old_gini_indexes = []
         gini_indexes = []
         invalid_indices = []
         invalid_attr_indices = []
@@ -713,14 +712,12 @@ class Tree(object):
             if left_status is None or right_status is None:
                 invalid_attr_indices.append(attr_ndx)
                 invalid_indices.append(i)
-                old_gini_indexes.append(tree.node_dict['attr'][attr_ndx]['gini_index'])
                 gini_indexes.append(1)
 
             # recompute the gini index for this attribute
             else:
                 attr_dict = tree.node_dict['attr'][attr_ndx]
                 gini_index = self._compute_gini_index(attr_dict)
-                old_gini_indexes.append(attr_dict['gini_index'])
                 gini_indexes.append(gini_index)
                 attr_dict['gini_index'] = gini_index
 
@@ -729,7 +726,7 @@ class Tree(object):
             del tree.node_dict['attr'][invalid_attr_ndx]
 
         # get old and updated probability distributions
-        old_p = self._generate_distribution(old_gini_indexes)
+        old_p = tree.node_dict['p']
         p = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices, cur_ndx=np.argmax(old_p))
 
         # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
@@ -854,6 +851,9 @@ class Tree(object):
         return True
 
     def _compute_gini_index(self, attr_dict):
+        """
+        Compute the gini index given the weighted indexes from both branches.
+        """
         gini_index = attr_dict['left']['weighted_index'] + attr_dict['right']['weighted_index']
         return round(gini_index, 8)
 
@@ -941,7 +941,7 @@ class Tree(object):
 
     def _div1(self, a, b):
         """
-        Returns 1 if the numerator and denominator are both zero.
+        Returns 1 if the denominator is zero.
         """
         return np.divide(a, b, out=np.ones_like(a, dtype=np.float64), where=b != 0)
 
