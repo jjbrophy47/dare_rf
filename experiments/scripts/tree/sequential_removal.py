@@ -14,7 +14,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
 from model import cedar
-from utility import data_util, exp_util, print_util, adv_util
+from utility import data_util, exp_util, print_util, exact_adv_util, cert_adv_util
 
 
 def _adjust_indices(indices_to_delete):
@@ -44,12 +44,17 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
     # choose instances to delete
-    if args.adv:
-        delete_indices = adv_util.adversarial_ordering(X_train, y_train, n_samples=args.n_remove, seed=seed,
-                                                       verbose=args.verbose, logger=logger)
+    n_remove = args.n_remove if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
+    if args.adversary == 'exact':
+        delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed,
+                                                        verbose=args.verbose, logger=logger)
+    elif args.adversary == 'certified':
+        delete_indices = cert_adv_util.certified_adversary(X_train, y_train, epsilon=args.epsilon, lmbda=args.lmbda,
+                                                           gamma=args.gamma, n_samples=n_remove, seed=seed,
+                                                           verbose=args.verbose, logger=logger)
     else:
         np.random.seed(seed)
-        delete_indices = np.random.choice(X_train.shape[0], size=args.n_remove, replace=False)
+        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
     adjusted_indices = _adjust_indices(delete_indices)
     logger.info('instances to delete: {}'.format(len(delete_indices)))
 
@@ -151,7 +156,8 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
     parser.add_argument('--no_retrain', action='store_true', default=False, help='Do not retrain every time.')
     parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
-    parser.add_argument('--adv', action='store_true', default=False, help='chooses adversarial samples to delete.')
+    parser.add_argument('--frac_remove', type=float, default=None, help='fraction of instances to delete.')
+    parser.add_argument('--adversary', type=str, default=None, help='type of adversarial ordering.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
     parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
     parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to support removal of.')

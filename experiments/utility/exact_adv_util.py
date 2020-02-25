@@ -1,11 +1,11 @@
 """
-Utility methods to make epxeriments easier.
+Adversarial utilities.
 """
 import numpy as np
 
 
 # TODO: make this work for addition too
-def adversarial_ordering(X, y, n_samples=None, seed=None, verbose=0, logger=None):
+def exact_adversary(X, y, n_samples=None, seed=None, verbose=0, logger=None):
     """
     Given a dataset with labels, find the ordering that causes the most
     retrainings at the root node; brute-force greedy method.
