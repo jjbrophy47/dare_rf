@@ -18,8 +18,6 @@ class RF(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-    gamma: float (default=0.1)
-        Fraction of data to support for removal.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -40,11 +38,10 @@ class RF(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, gamma=0.1, n_estimators=100, max_features='sqrt', max_samples=None,
+    def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt', max_samples=None,
                  max_depth=4, min_samples_split=2, random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
-        self.gamma = gamma
         self.n_estimators = n_estimators
         self.max_features = max_features
         self.max_samples = max_samples
@@ -57,7 +54,6 @@ class RF(object):
         s = 'Forest:'
         s += '\nepsilon={}'.format(self.epsilon)
         s += '\nlmbda={}'.format(self.lmbda)
-        s += '\ngamma={}'.format(self.gamma)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_samples={}'.format(self.max_samples)
         s += '\nmax_depth={}'.format(self.max_depth)
@@ -119,7 +115,7 @@ class RF(object):
             sample_indices = np.random.choice(self.n_samples_, size=self.max_samples_, replace=False)
 
             X_sub, y_sub = X[np.ix_(sample_indices, feature_indices)], y[sample_indices]
-            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda, gamma=self.gamma, max_depth=self.max_depth,
+            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda, max_depth=self.max_depth,
                         min_samples_split=self.min_samples_split, random_state=self.random_state,
                         feature_indices=feature_indices, verbose=self.verbose, get_data=self._get_numpy_data)
             tree = tree.fit(X_sub, y_sub, sample_indices)
@@ -195,7 +191,7 @@ class RF(object):
         return deletion_types
 
     # private
-    def _get_numpy_data(self, indices):
+    def _get_numpy_data(self, indices, feature_indices):
         """
         Collects the data from the dicts as specified by indices,
         then puts them into numpy arrays.
@@ -209,6 +205,7 @@ class RF(object):
             X[i] = self.X_train_[ndx]
             y[i] = self.y_train_[ndx]
             keys[i] = ndx
+        X = X[:, feature_indices]
 
         return X, y, keys
 
@@ -236,8 +233,6 @@ class Tree(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-    gamma: float (default=0.1)
-        Fraction of data to support for removal.
     max_depth: int (default=4)
         The maximum depth of a tree.
     min_samples_split: int (default=2)
@@ -249,11 +244,10 @@ class Tree(object):
     feature_indices: list (default=None)
         Indices of the features present in this tree.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, gamma=0.1, max_depth=4, min_samples_split=2,
+    def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, min_samples_split=2,
                  random_state=None, verbose=0, get_data=None, feature_indices=None):
         self.epsilon = epsilon
         self.lmbda = lmbda
-        self.gamma = gamma
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.random_state = random_state
@@ -270,7 +264,6 @@ class Tree(object):
         s = 'Tree:'
         s += '\nepsilon={}'.format(self.epsilon)
         s += '\nlmbda={}'.format(self.lmbda)
-        s += '\ngamma={}'.format(self.gamma)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
         s += '\nrandom_state={}'.format(self.random_state)
@@ -381,9 +374,7 @@ class Tree(object):
             remove_indices = np.array([remove_indices], dtype=np.int32)
 
         # get data to remove
-        X, y, keys = self.get_data(remove_indices)
-        if not self.single_tree_:
-            X = X[:, self.feature_indices]
+        X, y, keys = self.get_data(remove_indices, self.feature_indices)
 
         # update model
         self.deletion_types_ = []
@@ -533,7 +524,7 @@ class Tree(object):
         gini_indexes = np.array(gini_indexes)
 
         # numbers are too small, go into deterministic mode
-        if np.exp(-(self.lmbda * gini_indexes.min()) / (5 * self.gamma)) == 0:
+        if np.exp(-(self.lmbda * gini_indexes.min()) / 5) == 0:
             p = np.where(gini_indexes == gini_indexes.min(), 1, 0)
 
             # there is a tie between 2 or more attributes
@@ -552,7 +543,7 @@ class Tree(object):
 
         # create probability distribution over the attributes
         else:
-            p = np.exp(-(self.lmbda * gini_indexes) / (5 * self.gamma))
+            p = np.exp(-(self.lmbda * gini_indexes) / 5)
             if len(invalid_indices) > 0:
                 p[np.array(invalid_indices)] = 0
             p = p / p.sum()
@@ -580,7 +571,6 @@ class Tree(object):
         tree.node_dict['pos_count'] += np.sum(y)
 
         # udpate gini_index for each attribute in this node
-        # old_gini_indexes = []
         gini_indexes = []
 
         for i, attr_ndx in enumerate(tree.node_dict['attr']):
@@ -614,7 +604,7 @@ class Tree(object):
 
             indices = self._get_indices(tree, current_depth)
             indices = self._add_elements(indices, add_indices)
-            Xa, ya, keys = self.get_data(indices)
+            Xa, ya, keys = self.get_data(indices, self.feature_indices)
             self.deletion_types_.append('{}_{}'.format('2', current_depth))
 
             return self._build_tree(Xa, ya, keys, current_depth)
@@ -738,7 +728,7 @@ class Tree(object):
 
             indices = self._get_indices(tree, current_depth)
             indices = self._remove_elements(indices, remove_indices)
-            Xa, ya, keys = self.get_data(indices)
+            Xa, ya, keys = self.get_data(indices, self.feature_indices)
 
             dtype = '2a' if len(invalid_indices) > 0 else '2b'
             self.deletion_types_.append('{}_{}'.format(dtype, current_depth))
@@ -912,7 +902,7 @@ class Tree(object):
         """
         return np.setdiff1d(arr, elements)
 
-    def _get_numpy_data(self, indices):
+    def _get_numpy_data(self, indices, feature_indices=None):
         """
         Collects the data from the dicts as specified by indices,
         then puts them into numpy arrays.

@@ -1,6 +1,5 @@
 """
-This experiment tests the accuracy of the decision trees.
-BABC: Binary Attributes Binary Classification.
+Experiment: Show how the tst accuracy changes as epsilon and lmbda vary.
 """
 import os
 import sys
@@ -13,11 +12,11 @@ from sklearn.metrics import roc_auc_score, accuracy_score
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
-from model import deterministic, detrace
+from model import cedar
 from utility import data_util, exp_util, print_util
 
 
-def vary_gamma(args, logger, out_dir, seed):
+def vary_lmbda(args, logger, out_dir, seed):
 
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
@@ -27,25 +26,37 @@ def vary_gamma(args, logger, out_dir, seed):
     logger.info('test instances: {}'.format(X_test.shape[0]))
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    logger.info('building d_rf...')
+    logger.info('building d_tree...')
     start = time.time()
-    d_rf = deterministic.RF(n_estimators=args.n_estimators, max_features=args.max_features,
-                            max_samples=args.max_samples, max_depth=args.max_depth, verbose=args.verbose,
-                            random_state=seed)
+    d_rf = cedar.RF(lmbda=100000,
+                    n_estimators=args.n_estimators, max_features=args.max_features,
+                    max_samples=args.max_samples, max_depth=args.max_depth,
+                    verbose=args.verbose, random_state=seed)
     d_rf = d_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
     exp_util.performance(d_rf, X_test, y_test, name='d_rf')
 
+    # save deterministic results
+    if args.save_results:
+        proba = d_rf.predict_proba(X_test)[:, 1]
+        pred = d_rf.predict(X_test)
+        auc = roc_auc_score(y_test, proba)
+        acc = accuracy_score(y_test, pred)
+        np.save(os.path.join(out_dir, 'd_auc.npy'), auc)
+        np.save(os.path.join(out_dir, 'd_acc.npy'), acc)
+
+    # observe change in test acuracy as lambda varies
     aucs, accs = [], []
-    gammas = np.linspace(0.01, args.max_gamma, args.n_gammas)
-    logger.info('gammas ({}): {}'.format(len(gammas), gammas))
-    for i, gamma in enumerate(gammas):
-        logger.info('[{}] epsilon: {:.2f}, gamma: {:.2f}...'.format(i, args.epsilon, gamma))
+    lmbdas = np.linspace(args.min_lmbda, args.max_lmbda, args.n_lmbda)
+    logger.info('lmbdas ({}): {}'.format(len(lmbdas), lmbdas))
+    for i, lmbda in enumerate(lmbdas):
+        logger.info('[{}] lmbda: {:.2f}...'.format(i, lmbda))
         start = time.time()
-        dt_rf = detrace.RF(epsilon=args.epsilon, gamma=gamma, n_estimators=args.n_estimators,
-                           max_features=args.max_features, max_samples=args.max_samples,
-                           max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
+        dt_rf = cedar.RF(lmbda=lmbda,
+                         n_estimators=args.n_estimators, max_features=args.max_features,
+                         max_samples=args.max_samples, max_depth=args.max_depth,
+                         verbose=args.verbose, random_state=seed)
         dt_rf = dt_rf.fit(X_train, y_train)
 
         proba = dt_rf.predict_proba(X_test)[:, 1]
@@ -59,7 +70,7 @@ def vary_gamma(args, logger, out_dir, seed):
     if args.save_results:
         np.save(os.path.join(out_dir, 'auc.npy'), aucs)
         np.save(os.path.join(out_dir, 'acc.npy'), accs)
-        np.save(os.path.join(out_dir, 'gamma.npy'), gammas)
+        np.save(os.path.join(out_dir, 'lmbda.npy'), lmbdas)
 
 
 def main(args):
@@ -68,7 +79,7 @@ def main(args):
     for i in range(args.repeats):
 
         # create output dir
-        ep_dir = os.path.join(args.out_dir, args.dataset, 'rs{}'.format(args.rs), 'ep{}'.format(args.epsilon))
+        ep_dir = os.path.join(args.out_dir, args.dataset, 'rs{}'.format(args.rs))
         os.makedirs(ep_dir, exist_ok=True)
 
         # create logger
@@ -77,7 +88,7 @@ def main(args):
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment
-        vary_gamma(args, logger, ep_dir, seed=args.rs)
+        vary_lmbda(args, logger, ep_dir, seed=args.rs)
         args.rs += 1
 
         # remove logger
@@ -86,19 +97,19 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/forest/epsilon_gamma', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/forest/lmbda', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
-    parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
-    parser.add_argument('--n_gammas', type=int, default=25, help='number of different gammas to evaluate.')
-    parser.add_argument('--max_gamma', type=float, default=0.25, help='maximum gamma value.')
-    parser.add_argument('--epsilon', type=float, default=0.1, help='efficiency parameter for tree.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
-    parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
+    parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the trees.')
+    parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
+    parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
+    parser.add_argument('--min_lmbda', type=float, default=1, help='minimum lambda.')
+    parser.add_argument('--max_lmbda', type=float, default=10000, help='maximum lambda.')
+    parser.add_argument('--n_lmbda', type=int, default=20, help='number of data points.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
     main(args)

@@ -5,7 +5,7 @@ import numpy as np
 
 
 # TODO: make this work for addition too
-def certified_adversary(X, Y, epsilon, lmbda, gamma, n_samples=None, seed=None, verbose=0, logger=None):
+def certified_adversary(X, Y, epsilon, lmbda, n_samples=None, seed=None, verbose=0, logger=None):
     """
     Given a dataset with labels, find the ordering that causes the most
     retrainings at the root node; brute-force greedy method.
@@ -27,7 +27,7 @@ def certified_adversary(X, Y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
 
     # generate probability distribution
     metas, gini_indices = _get_gini_indices(X, Y)
-    p, pk = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
+    p, pk = _probability_distribution(metas, lmbda=lmbda)
 
     # pick a random attribute to target
     np.random.seed(seed)
@@ -41,13 +41,13 @@ def certified_adversary(X, Y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
     for i in range(n_samples):
 
         # brute force check which instance type creates the biggest change in distribution
-        result = _find_instance(metas, ndx, X, Y, counts, indices, lmbda, gamma, seed)
+        result = _find_instance(metas, ndx, X, Y, counts, indices, lmbda, seed)
 
         # hanging branch, retrain
         if len(result) == 3:
             delete_ndx, bin_str, metas = result
             metas = _update_metas(metas, X[delete_ndx], Y[delete_ndx])
-            new_p, new_pk = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
+            new_p, new_pk = _probability_distribution(metas, lmbda=lmbda)
             retrains += 1
             delete_types['hanging'] += 1
             p = new_p
@@ -58,13 +58,13 @@ def certified_adversary(X, Y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
         else:
             delete_ndx, bin_str = result
             metas = _update_metas(metas, X[delete_ndx], Y[delete_ndx])
-            new_p, new_pk = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
+            new_p, new_pk = _probability_distribution(metas, lmbda=lmbda)
 
             # check if retraning is necessary
             ratio = new_p / p
             if np.any(ratio > np.exp(epsilon)) or np.any(ratio < np.exp(-epsilon)):
                 retrains += 1
-                delete_types['hanging'] += 1
+                delete_types['differing'] += 1
                 p = new_p
                 if logger and verbose > 0:
                     logger.info('{} differing distributions, retrain'.format(i))
@@ -98,7 +98,7 @@ def certified_adversary(X, Y, epsilon, lmbda, gamma, n_samples=None, seed=None, 
     return ordering
 
 
-def _find_instance(metas, ndx, X, Y, counts, indices, lmbda, gamma, seed):
+def _find_instance(metas, ndx, X, Y, counts, indices, lmbda, seed):
     """
     Find which instance raises/lowers the probability gap the most.
     """
@@ -107,8 +107,11 @@ def _find_instance(metas, ndx, X, Y, counts, indices, lmbda, gamma, seed):
     best_bin_str = None
     best_ratio = 0
 
-    p, _ = _probability_distribution(metas, lmbda=lmbda, gamma=gamma)
+    p, _ = _probability_distribution(metas, lmbda=lmbda)
     for bin_str in ['00', '01', '10', '11']:
+
+        if counts[bin_str] == 0:
+            continue
 
         # choose instance from bin str
         np.random.seed(seed)
@@ -124,7 +127,7 @@ def _find_instance(metas, ndx, X, Y, counts, indices, lmbda, gamma, seed):
 
         else:
             temp_metas = _update_metas(metas, x, y)
-            temp_p, temp_pk = _probability_distribution(temp_metas, lmbda=lmbda, gamma=gamma)
+            temp_p, temp_pk = _probability_distribution(temp_metas, lmbda=lmbda)
             ratio = temp_p / p
 
             if ratio[temp_pk[ndx]] > best_ratio and counts[bin_str] > 0:
@@ -278,13 +281,13 @@ def _update_metas(metas, x, y):
     return new_metas
 
 
-def _probability_distribution(metas, lmbda, gamma):
+def _probability_distribution(metas, lmbda):
     """
     Creates a probability distribution over the attributes given
     their gini index scores.
     """
     gini_indices = np.array([metas[i]['gini_index'] for i in metas])
-    p = np.exp(-(lmbda * gini_indices) / (5 * gamma))
+    p = np.exp(-(lmbda * gini_indices) / 5)
     p /= p.sum()
     keys = {a_ndx: i for i, a_ndx in enumerate(metas.keys())}
     return p, keys

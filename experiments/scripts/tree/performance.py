@@ -33,14 +33,14 @@ def performance(args, logger, seed):
 
     logger.info('building d_tree...')
     start = time.time()
-    d_tree = cedar.Tree(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma, max_depth=args.max_depth,
+    d_tree = cedar.Tree(epsilon=args.epsilon, lmbda=100000, max_depth=args.max_depth,
                         verbose=args.verbose, random_state=seed)
     d_tree = d_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
     logger.info('building dt_tree...')
     start = time.time()
-    dt_tree = cedar.Tree(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+    dt_tree = cedar.Tree(epsilon=args.epsilon, lmbda=args.lmbda,
                          max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     dt_tree = dt_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
@@ -72,8 +72,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
-    parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
-    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to support removal of.')
+    parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()

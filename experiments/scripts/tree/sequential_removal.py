@@ -1,6 +1,5 @@
 """
-This experiment chooses m random instances to delete.
-TODO: Add adversarial ordering against certified model.
+This experiment chooses m instances to delete.
 """
 import os
 import sys

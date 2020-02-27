@@ -36,7 +36,7 @@ def performance(args, logger, seed):
 
     logger.info('building d_rf...')
     start = time.time()
-    d_rf = cedar.RF(epsilon=args.epsilon, lmbda=10000, gamma=args.gamma,
+    d_rf = cedar.RF(epsilon=args.epsilon, lmbda=100000,
                     n_estimators=args.n_estimators, max_features=args.max_features,
                     max_samples=args.max_samples, max_depth=args.max_depth,
                     verbose=args.verbose, random_state=seed)
@@ -45,7 +45,7 @@ def performance(args, logger, seed):
 
     logger.info('building dt_rf...')
     start = time.time()
-    dt_rf = cedar.RF(epsilon=args.epsilon, lmbda=args.lmbda, gamma=args.gamma,
+    dt_rf = cedar.RF(epsilon=args.epsilon, lmbda=args.lmbda,
                      n_estimators=args.n_estimators, max_features=args.max_features,
                      max_samples=args.max_samples, max_depth=args.max_depth,
                      verbose=args.verbose, random_state=seed)
@@ -80,7 +80,6 @@ if __name__ == '__main__':
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
     parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
-    parser.add_argument('--gamma', type=float, default=0.1, help='fraction of data to support removal of.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
