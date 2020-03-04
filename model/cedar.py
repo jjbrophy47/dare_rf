@@ -54,6 +54,7 @@ class RF(object):
         s = 'Forest:'
         s += '\nepsilon={}'.format(self.epsilon)
         s += '\nlmbda={}'.format(self.lmbda)
+        s += '\nn_estimators={}'.format(self.n_estimators)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_samples={}'.format(self.max_samples)
         s += '\nmax_depth={}'.format(self.max_depth)
@@ -102,10 +103,10 @@ class RF(object):
             self.max_samples_ = int(self.max_samples * self.n_samples_)
 
         # build forest
-        self.trees = []
+        self.trees_ = []
         for i in range(self.n_estimators):
 
-            if self.verbose > 0:
+            if self.verbose > 2:
                 print('tree {}'.format(i))
 
             np.random.seed(self.random_state + i)
@@ -115,11 +116,11 @@ class RF(object):
             sample_indices = np.random.choice(self.n_samples_, size=self.max_samples_, replace=False)
 
             X_sub, y_sub = X[np.ix_(sample_indices, feature_indices)], y[sample_indices]
-            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda, max_depth=self.max_depth,
+            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators, max_depth=self.max_depth,
                         min_samples_split=self.min_samples_split, random_state=self.random_state,
                         feature_indices=feature_indices, verbose=self.verbose, get_data=self._get_numpy_data)
             tree = tree.fit(X_sub, y_sub, sample_indices)
-            self.trees.append(tree)
+            self.trees_.append(tree)
 
         return self
 
@@ -139,10 +140,10 @@ class RF(object):
 
         # sum all predictions instead of storing them
         forest_preds = np.zeros(X.shape[0])
-        for i, tree in enumerate(self.trees):
+        for i, tree in enumerate(self.trees_):
             forest_preds += tree.predict_proba(X[:, tree.feature_indices])[:, 1]
 
-        y_mean = (forest_preds / len(self.trees)).reshape(-1, 1)
+        y_mean = (forest_preds / len(self.trees_)).reshape(-1, 1)
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
@@ -166,7 +167,7 @@ class RF(object):
 
         # add instances to each tree
         addition_types = []
-        for tree in self.trees:
+        for tree in self.trees_:
             addition_types += tree.add(X, y, keys)
 
         return addition_types
@@ -180,7 +181,7 @@ class RF(object):
 
         # delete instances from each tree
         deletion_types = []
-        for tree in self.trees:
+        for tree in self.trees_:
             deletion_types += tree.delete(remove_indices)
 
         # remove the instances from the data
@@ -189,6 +190,36 @@ class RF(object):
             del self.y_train_[remove_ndx]
 
         return deletion_types
+
+    def get_params(self, deep=False):
+        """
+        Returns the parameter of this model as a dictionary.
+        """
+        d = {}
+        d['epsilon'] = self.epsilon
+        d['lmbda'] = self.lmbda
+        d['n_estimators'] = self.n_estimators
+        d['max_features'] = self.max_features
+        d['max_samples'] = self.max_samples
+        d['max_depth'] = self.max_depth
+        d['min_samples_split'] = self.min_samples_split
+        d['random_state'] = self.random_state
+        d['verbose'] = self.verbose
+
+        if deep:
+            d['trees'] = {}
+            for i, tree in enumerate(self.trees_):
+                d['trees'][i] = tree.get_params(deep=deep)
+
+        return d
+
+    def set_params(self, **params):
+        """
+        Set the parameters of this model.
+        """
+        for key, value in params.items():
+            setattr(self, key, value)
+        return self
 
     # private
     def _get_numpy_data(self, indices, feature_indices):
@@ -286,7 +317,7 @@ class Tree(object):
         else:
             assert keys is not None
 
-        self.root_ = self._build_tree(X, y, keys)
+        self.root_ = self._build(X, y, keys)
         return self
 
     def predict(self, X):
@@ -388,8 +419,32 @@ class Tree(object):
 
         return self.deletion_types_
 
+    def get_params(self, deep=False):
+        """
+        Returns the parameter of this model as a dictionary.
+        """
+        d = {}
+        d['epsilon'] = self.epsilon
+        d['lmbda'] = self.lmbda
+        d['max_depth'] = self.max_depth
+        d['min_samples_split'] = self.min_samples_split
+        d['random_state'] = self.random_state
+        d['verbose'] = self.verbose
+        d['feature_indices'] = self.feature_indices
+        d['get_data'] = self.get_data
+
+        return d
+
+    def set_params(self, **params):
+        """
+        Set the parameters of this model.
+        """
+        for key, value in params.items():
+            setattr(self, key, value)
+        return self
+
     # private
-    def _build_tree(self, X, y, keys, current_depth=0):
+    def _build(self, X, y, keys, current_depth=0, parent_p=None):
         """
         Recursive method which builds out the decision tree and splits X and respective y
         on the feature of X which (based on impurity) best separates the data.
@@ -444,7 +499,7 @@ class Tree(object):
                 right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
                 # debug
-                if self.verbose > 1:
+                if self.verbose > 2:
                     print(i, y[left_indices].shape, y[right_indices].shape, current_depth)
 
                 # make sure there is atleast 1 sample in each branch
@@ -500,20 +555,22 @@ class Tree(object):
                 return DecisionNode(value=leaf_value, node_dict=node_dict)
 
             # create probability distribution over the attributes
-            p = self._generate_distribution(gini_indexes)
-            node_dict['p'] = p
+            p_dist = self._generate_distribution(gini_indexes)
 
             # sample from this distribution
             np.random.seed(self.random_state)
-            chosen_i = np.random.choice(attr_indices, p=p)
+            p_ndx = np.random.choice(len(p_dist), p=p_dist)
+            chosen_i = attr_indices[p_ndx]
+            p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
+            node_dict['p'] = p
 
             # retrieve samples for the chosen attribute
             left_indices = np.where(X[:, chosen_i] == 1)[0]
             right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
             # build the node with the chosen attribute
-            left = self._build_tree(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1)
-            right = self._build_tree(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1)
+            left = self._build(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1, parent_p=p)
+            right = self._build(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1, parent_p=p)
             return DecisionNode(feature_i=chosen_i, node_dict=node_dict, left_branch=left, right_branch=right)
 
     def _generate_distribution(self, gini_indexes, invalid_indices=[], cur_ndx=None):
@@ -550,7 +607,7 @@ class Tree(object):
 
         return p
 
-    def _add(self, X, y, add_indices, tree=None, current_depth=0):
+    def _add(self, X, y, add_indices, tree=None, current_depth=0, parent_p=None):
 
         # get root node of the tree
         if tree is None:
@@ -560,7 +617,7 @@ class Tree(object):
         if tree.value is not None:
             self._increment_leaf_node(tree, y, add_indices)
 
-            if self.verbose > 0:
+            if self.verbose > 1:
                 print('tree check complete, ended at depth {}'.format(current_depth))
 
             self.addition_types_.append('1')
@@ -572,6 +629,7 @@ class Tree(object):
 
         # udpate gini_index for each attribute in this node
         gini_indexes = []
+        p_ndx = None
 
         for i, attr_ndx in enumerate(tree.node_dict['attr']):
 
@@ -591,15 +649,20 @@ class Tree(object):
             gini_indexes.append(gini_index)
             attr_dict['gini_index'] = gini_index
 
+            # get mapping from chosen attribute to distribution index
+            if tree.feature_i == attr_ndx:
+                p_ndx = i
+
         # get old and updated probability distributions
         old_p = tree.node_dict['p']
-        p = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
-
-        # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
+        p_dist = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
+        p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
         ratio = self._div1(p, old_p)
-        if np.any(ratio > np.exp(self.epsilon)) or np.any(ratio < np.exp(-self.epsilon)):
 
-            if self.verbose > 0:
+        # retrain if probability ratio of the chosen attribute is outside the range [e^-ep, e^ep]
+        if ratio > np.exp(self.epsilon) or ratio < np.exp(-self.epsilon):
+
+            if self.verbose > 1:
                 print('rebuilding at depth {}'.format(current_depth))
 
             indices = self._get_indices(tree, current_depth)
@@ -607,7 +670,7 @@ class Tree(object):
             Xa, ya, keys = self.get_data(indices, self.feature_indices)
             self.deletion_types_.append('{}_{}'.format('2', current_depth))
 
-            return self._build_tree(Xa, ya, keys, current_depth)
+            return self._build(Xa, ya, keys, current_depth)
 
         # continue checking the tree
         else:
@@ -618,39 +681,39 @@ class Tree(object):
 
             if len(left_indices) > 0:
 
-                if self.verbose > 0:
+                if self.verbose > 1:
                     print('check complete at depth {}, traversing left'.format(current_depth))
 
                 X_left = X[left_indices]
                 left_add_indices = add_indices[left_indices]
                 left_branch = self._add(X_left, y_left, left_add_indices, tree=tree.left_branch,
-                                        current_depth=current_depth + 1)
+                                        current_depth=current_depth + 1, parent_p=p)
                 tree.left_branch = left_branch
 
             if len(right_indices) > 0:
 
-                if self.verbose > 0:
+                if self.verbose > 1:
                     print('check complete at depth {}, traversing right'.format(current_depth))
 
                 X_right = X[right_indices]
                 right_add_indices = add_indices[right_indices]
                 right_branch = self._add(X_right, y_right, right_add_indices, tree=tree.right_branch,
-                                         current_depth=current_depth + 1)
+                                         current_depth=current_depth + 1, parent_p=p)
                 tree.right_branch = right_branch
 
             return tree
 
-    def _delete(self, X, y, remove_indices, tree=None, current_depth=0):
+    def _delete(self, X, y, remove_indices, tree=None, current_depth=0, parent_p=None):
 
         # get root node of the tree
         if tree is None:
             tree = self.root_
 
-        # type 1: leaf node, update its metadata
+        # type 1a: leaf node, update its metadata
         if tree.value is not None:
             self._decrement_leaf_node(tree, y, remove_indices)
 
-            if self.verbose > 0:
+            if self.verbose > 1:
                 print('tree check complete, ended at depth {}'.format(current_depth))
 
             self.deletion_types_.append('1a')
@@ -665,10 +728,10 @@ class Tree(object):
             if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
                 raise ValueError('Instances in the root node are all from the same class!')
 
-        # edge case: if remaining instances in this node are of the same class, make leaf
+        # type 1b: if remaining instances in this node are of the same class, make leaf
         if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
 
-            if self.verbose > 0:
+            if self.verbose > 1:
                 print('check complete, lefotvers in the same class, creating leaf at depth {}'.format(current_depth))
 
             tree.node_dict['attr'] = None
@@ -684,6 +747,8 @@ class Tree(object):
         gini_indexes = []
         invalid_indices = []
         invalid_attr_indices = []
+        n_gini_indices = 0
+        p_ndx = None
 
         for i, attr_ndx in enumerate(tree.node_dict['attr']):
             left_status, right_status = True, True
@@ -711,29 +776,47 @@ class Tree(object):
                 gini_indexes.append(gini_index)
                 attr_dict['gini_index'] = gini_index
 
+                # save distribution index of chosen attribute
+                if attr_ndx == tree.feature_i:
+                    p_ndx = n_gini_indices
+
+                n_gini_indices += 1
+
         # remove invalid attributes from the model
         for invalid_attr_ndx in invalid_attr_indices:
             del tree.node_dict['attr'][invalid_attr_ndx]
 
-        # get old and updated probability distributions
-        old_p = tree.node_dict['p']
-        p = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices, cur_ndx=np.argmax(old_p))
+        # type 2a: the chosen feature is no longer valid
+        if tree.feature_i in invalid_attr_indices:
 
-        # retrain if probability ratio over any attribute differs by more than e^ep or e^-ep
-        ratio = self._div1(p, old_p)
-        if len(invalid_indices) > 0 or np.any(ratio > np.exp(self.epsilon)) or np.any(ratio < np.exp(-self.epsilon)):
-
-            if self.verbose > 0:
+            if self.verbose > 1:
                 print('rebuilding at depth {}'.format(current_depth))
 
             indices = self._get_indices(tree, current_depth)
             indices = self._remove_elements(indices, remove_indices)
             Xa, ya, keys = self.get_data(indices, self.feature_indices)
 
-            dtype = '2a' if len(invalid_indices) > 0 else '2b'
-            self.deletion_types_.append('{}_{}'.format(dtype, current_depth))
+            self.deletion_types_.append('2a_{}'.format(current_depth))
+            return self._build(Xa, ya, keys, current_depth)
 
-            return self._build_tree(Xa, ya, keys, current_depth)
+        # get old and updated probability distributions
+        old_p = tree.node_dict['p']
+        p_dist = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices, cur_ndx=np.argmax(old_p))
+        p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
+        ratio = self._div1(p, old_p)
+
+        # type 2b: retrain if probability ratio of chosen attribute differs is outside the range [e^-ep, e^ep]
+        if ratio < np.exp(-self.epsilon) or ratio > np.exp(self.epsilon):
+
+            if self.verbose > 1:
+                print('rebuilding at depth {}'.format(current_depth))
+
+            indices = self._get_indices(tree, current_depth)
+            indices = self._remove_elements(indices, remove_indices)
+            Xa, ya, keys = self.get_data(indices, self.feature_indices)
+
+            self.deletion_types_.append('2b_{}'.format(current_depth))
+            return self._build(Xa, ya, keys, current_depth)
 
         # continue checking the tree
         else:
@@ -744,24 +827,24 @@ class Tree(object):
 
             if len(left_indices) > 0:
 
-                if self.verbose > 0:
+                if self.verbose > 1:
                     print('check complete at depth {}, traversing left'.format(current_depth))
 
                 X_left = X[left_indices]
                 left_remove_indices = remove_indices[left_indices]
                 left_branch = self._delete(X_left, y_left, left_remove_indices, tree=tree.left_branch,
-                                           current_depth=current_depth + 1)
+                                           current_depth=current_depth + 1, parent_p=p)
                 tree.left_branch = left_branch
 
             if len(right_indices) > 0:
 
-                if self.verbose > 0:
+                if self.verbose > 1:
                     print('check complete at depth {}, traversing right'.format(current_depth))
 
                 X_right = X[right_indices]
                 right_remove_indices = remove_indices[right_indices]
                 right_branch = self._delete(X_right, y_right, right_remove_indices, tree=tree.right_branch,
-                                            current_depth=current_depth + 1)
+                                            current_depth=current_depth + 1, parent_p=p)
                 tree.right_branch = right_branch
 
             return tree

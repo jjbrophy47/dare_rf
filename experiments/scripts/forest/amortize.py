@@ -65,12 +65,14 @@ def remove_sample(args, logger, out_dir, seed):
         # deterministic model - training
         logger.info('\nDeterministic')
         start = time.time()
-        tree = cedar.Tree(epsilon=0, lmbda=10**8, max_depth=args.max_depth,
-                          verbose=args.verbose, random_state=seed)
-        tree = tree.fit(X_train, y_train)
+        rf = cedar.RF(epsilon=0, lmbda=10**8,
+                      n_estimators=args.n_estimators, max_features=args.max_features,
+                      max_samples=args.max_samples, max_depth=args.max_depth,
+                      verbose=args.verbose, random_state=seed)
+        rf = rf.fit(X_train, y_train)
         end_time = time.time() - start
         logger.info('[{}] train time: {:.3f}s'.format('deterministic', end_time))
-        exp_util.performance(tree, X_test, y_test, logger=logger, name='deterministic')
+        exp_util.performance(rf, X_test, y_test, logger=logger, name='deterministic')
 
         if not args.no_retrain:
 
@@ -83,9 +85,11 @@ def remove_sample(args, logger, out_dir, seed):
                 y_train_new = np.delete(y_train_new, delete_ndx)
 
                 start = time.time()
-                tree = cedar.Tree(epsilon=0, lmbda=10**8, max_depth=args.max_depth,
-                                  verbose=args.verbose, random_state=seed)
-                tree = tree.fit(X_train_new, y_train_new)
+                rf = cedar.RF(epsilon=0, lmbda=10**8,
+                              n_estimators=args.n_estimators, max_features=args.max_features,
+                              max_samples=args.max_samples, max_depth=args.max_depth,
+                              verbose=args.verbose, random_state=seed)
+                rf = rf.fit(X_train, y_train)
                 end_time = time.time() - start
                 delete_times.append(end_time)
 
@@ -95,13 +99,15 @@ def remove_sample(args, logger, out_dir, seed):
         else:
             X_train_new = np.delete(X_train, delete_indices, axis=0)
             y_train_new = np.delete(y_train, delete_indices)
-            tree = cedar.Tree(epsilon=0, lmbda=10**8, max_depth=args.max_depth,
-                              verbose=args.verbose, random_state=seed)
-            tree = tree.fit(X_train_new, y_train_new)
+            rf = cedar.RF(epsilon=0, lmbda=10**8,
+                          n_estimators=args.n_estimators, max_features=args.max_features,
+                          max_samples=args.max_samples, max_depth=args.max_depth,
+                          verbose=args.verbose, random_state=seed)
+            rf = rf.fit(X_train, y_train)
             delete_times = [end_time] * (n_remove + 1)
 
         logger.info('[deterministic] amortized: {:.3f}s'.format(np.mean(delete_times)))
-        exp_util.performance(tree, X_test, y_test, logger=logger, name='deterministic')
+        exp_util.performance(rf, X_test, y_test, logger=logger, name='deterministic')
 
         if args.save_results:
             np.save(os.path.join(out_dir, 'retrain_time.npy'), delete_times)
@@ -112,12 +118,14 @@ def remove_sample(args, logger, out_dir, seed):
         # exact unlearning model - training
         logger.info('\nExact')
         start = time.time()
-        tree = cedar.Tree(epsilon=0, lmbda=10**8, max_depth=args.max_depth,
-                          verbose=args.verbose, random_state=seed)
-        tree = tree.fit(X_train, y_train)
+        rf = cedar.RF(epsilon=0, lmbda=10**8,
+                      n_estimators=args.n_estimators, max_features=args.max_features,
+                      max_samples=args.max_samples, max_depth=args.max_depth,
+                      verbose=args.verbose, random_state=seed)
+        rf = rf.fit(X_train, y_train)
         end_time = time.time() - start
         logger.info('[exact] train time: {:.3f}s'.format(end_time))
-        exp_util.performance(tree, X_test, y_test, logger=logger, name='exact')
+        exp_util.performance(rf, X_test, y_test, logger=logger, name='exact')
 
         # exact unlearning model - deleting
         delete_types = []
@@ -125,7 +133,7 @@ def remove_sample(args, logger, out_dir, seed):
         for i, delete_ndx in enumerate(delete_indices):
 
             start = time.time()
-            delete_types += tree.delete(int(delete_ndx))
+            delete_types += rf.delete(int(delete_ndx))
             end_time = time.time() - start
             delete_times.append(end_time)
 
@@ -135,47 +143,47 @@ def remove_sample(args, logger, out_dir, seed):
         counter = Counter(delete_types)
         logger.info('[exact] amortized: {:.3f}s'.format(np.mean(delete_times)))
         logger.info('[exact] delete types: {}'.format(counter))
-        exp_util.performance(tree, X_test, y_test, logger=logger, name='exact')
+        exp_util.performance(rf, X_test, y_test, logger=logger, name='exact')
 
         if args.save_results:
             np.save(os.path.join(out_dir, 'exact_time.npy'), delete_times)
             np.save(os.path.join(out_dir, 'exact_type.npy'), delete_types)
 
-    # CeDAR method
-    for epsilon in [0.1, 1.0, 10.0]:
+    # removal-enabled model - training
+    logger.info('\nCeDAR (ep={}, lmbda={})'.format(args.epsilon, args.lmbda))
+    start = time.time()
+    rf = cedar.RF(epsilon=args.epsilon, lmbda=args.lmbda,
+                  n_estimators=args.n_estimators, max_features=args.max_features,
+                  max_samples=args.max_samples, max_depth=args.max_depth,
+                  verbose=args.verbose, random_state=seed)
+    rf = rf.fit(X_train, y_train)
+    end_time = time.time() - start
+    logger.info('[cedar] train time: {:.3f}s'.format(end_time))
+    exp_util.performance(rf, X_test, y_test, logger=logger, name='cedar')
 
-        # removal-enabled model - training
-        logger.info('\nCeDAR (ep={}, lmbda={})'.format(epsilon, args.lmbda))
+    # removal-enabled model - deleting
+    delete_types = []
+    delete_times = [end_time]
+    for i, delete_ndx in enumerate(delete_indices):
+
         start = time.time()
-        tree = cedar.Tree(epsilon=epsilon, lmbda=args.lmbda, max_depth=args.max_depth,
-                          verbose=args.verbose, random_state=seed)
-        tree = tree.fit(X_train, y_train)
+        delete_types += rf.delete(int(delete_ndx))
         end_time = time.time() - start
-        logger.info('[cedar] train time: {:.3f}s'.format(end_time))
-        exp_util.performance(tree, X_test, y_test, logger=logger, name='cedar')
+        delete_times.append(end_time)
 
-        # removal-enabled model - deleting
-        delete_types = []
-        delete_times = [end_time]
-        for i, delete_ndx in enumerate(delete_indices):
+        if args.verbose > 0 and i % 100 == 0:
+            logger.info('  {}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
+            logger.info('    amortized: {:.3f}s, types:'.format(np.mean(delete_times), counter))
 
-            start = time.time()
-            delete_types += tree.delete(int(delete_ndx))
-            end_time = time.time() - start
-            delete_times.append(end_time)
+    # performance
+    counter = Counter(delete_types)
+    logger.info('[cedar] amortized: {:.3f}s'.format(np.mean(delete_times)))
+    logger.info('[cedar] delete types: {}'.format(counter))
+    exp_util.performance(rf, X_test, y_test, logger=logger, name='cedar')
 
-            if args.verbose > 0 and i % 100 == 0:
-                logger.info('{}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
-
-        # performance
-        counter = Counter(delete_types)
-        logger.info('[cedar] amortized: {:.3f}s'.format(np.mean(delete_times)))
-        logger.info('[cedar] delete types: {}'.format(counter))
-        exp_util.performance(tree, X_test, y_test, logger=logger, name='cedar')
-
-        if args.save_results:
-            np.save(os.path.join(out_dir, 'cedar_ep{}_time.npy'.format(epsilon)), delete_times)
-            np.save(os.path.join(out_dir, 'cedar_ep{}_type.npy'.format(epsilon)), delete_types)
+    if args.save_results:
+        np.save(os.path.join(out_dir, 'cedar_ep{}_lm{}_time.npy'.format(args.epsilon, args.lmbda)), delete_times)
+        np.save(os.path.join(out_dir, 'cedar_ep{}_lm{}_type.npy'.format(args.epsilon, args.lmbda)), delete_types)
 
 
 def main(args):
@@ -202,7 +210,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/tree/amortize', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/forest/amortize', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
@@ -215,6 +223,9 @@ if __name__ == '__main__':
     parser.add_argument('--adversary', type=str, default='random', help='type of adversarial ordering.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='setting for certified adversarial ordering.')
     parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
+    parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
+    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
+    parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     parser.add_argument('--save_results', action='store_true', default=False, help='save results.')

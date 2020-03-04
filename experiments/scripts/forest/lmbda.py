@@ -26,9 +26,9 @@ def vary_lmbda(args, logger, out_dir, seed):
     logger.info('test instances: {}'.format(X_test.shape[0]))
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    logger.info('building d_tree...')
+    logger.info('building d_rf...')
     start = time.time()
-    d_rf = cedar.RF(lmbda=100000,
+    d_rf = cedar.RF(lmbda=10**8,
                     n_estimators=args.n_estimators, max_features=args.max_features,
                     max_samples=args.max_samples, max_depth=args.max_depth,
                     verbose=args.verbose, random_state=seed)
@@ -49,7 +49,7 @@ def vary_lmbda(args, logger, out_dir, seed):
     # observe change in test acuracy as lambda varies
     aucs, accs = [], []
     lmbdas = np.linspace(args.min_lmbda, args.max_lmbda, args.n_lmbda)
-    logger.info('lmbdas ({}): {}'.format(len(lmbdas), lmbdas))
+    logger.info('lmbdas: {}'.format(len(lmbdas)))
     for i, lmbda in enumerate(lmbdas):
         logger.info('[{}] lmbda: {:.2f}...'.format(i, lmbda))
         start = time.time()
@@ -79,7 +79,8 @@ def main(args):
     for i in range(args.repeats):
 
         # create output dir
-        ep_dir = os.path.join(args.out_dir, args.dataset, 'rs{}'.format(args.rs))
+        ep_dir = os.path.join(args.out_dir, args.dataset, 't{}'.format(args.n_estimators), 'rs{}'.format(args.rs))
+        print(ep_dir)
         os.makedirs(ep_dir, exist_ok=True)
 
         # create logger
