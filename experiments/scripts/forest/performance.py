@@ -26,20 +26,22 @@ def performance(args, logger, seed):
     logger.info('test instances: {}'.format(X_test.shape[0]))
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    logger.info('building sk_rf...')
-    start = time.time()
-    sk_rf = RandomForestClassifier(n_estimators=args.n_estimators, max_depth=args.max_depth,
-                                   max_features=args.max_features, max_samples=args.max_samples,
-                                   verbose=args.verbose, random_state=seed, bootstrap=args.bootstrap)
-    if args.tune:  # default is 5-fold
-        sk_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None], 'bootstrap': [True, False]}
-        gs = GridSearchCV(sk_rf, sk_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
-        gs = gs.fit(X_train, y_train)
-        sk_rf = gs.best_estimator_
-        logger.info('best_params: {}'.format(gs.best_params_))
-    else:
-        sk_rf = sk_rf.fit(X_train, y_train)
-    logger.info('{:.3f}s'.format(time.time() - start))
+    # logger.info('building sk_rf...')
+    # start = time.time()
+    # sk_rf = RandomForestClassifier(n_estimators=args.n_estimators, max_depth=args.max_depth,
+    #                                max_features=args.max_features, max_samples=args.max_samples,
+    #                                verbose=args.verbose, random_state=seed, bootstrap=args.bootstrap)
+    # if args.tune:  # default is 5-fold
+    #     sk_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None], 'bootstrap': [True, False]}
+    #     sk_param_grid = {'n_estimators': [1000], 'max_depth': [None]}
+    #     gs = GridSearchCV(sk_rf, sk_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
+    #     gs = gs.fit(X_train, y_train)
+    #     sk_rf = gs.best_estimator_
+    #     print([estimator.get_depth() for estimator in sk_rf.estimators_])
+    #     logger.info('best_params: {}'.format(gs.best_params_))
+    # else:
+    #     sk_rf = sk_rf.fit(X_train, y_train)
+    # logger.info('{:.3f}s'.format(time.time() - start))
 
     logger.info('building d_rf...')
     start = time.time()
@@ -48,7 +50,8 @@ def performance(args, logger, seed):
                     max_samples=args.max_samples, max_depth=args.max_depth,
                     verbose=args.verbose, random_state=seed)
     if args.tune:
-        d_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None]}
+        # d_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None]}
+        d_param_grid = {'n_estimators': [20], 'max_depth': [None]}
         gs = GridSearchCV(d_rf, d_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
         gs = gs.fit(X_train, y_train)
         d_rf = gs.best_estimator_

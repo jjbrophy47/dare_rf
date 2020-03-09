@@ -33,13 +33,15 @@ class RF(object):
         The maximum depth of a tree.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
+    min_impurity_decrease: float (default=1e-8)
+        The minimum impurity decrease to be considered for a split.
     random_state: int (default=None)
         Random state for reproducibility.
     verbose: int (default=0)
         Verbosity level.
     """
     def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt', max_samples=None,
-                 max_depth=4, min_samples_split=2, random_state=None, verbose=0):
+                 max_depth=4, min_samples_split=2, min_impurity_decrease=1e-8, random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
@@ -47,6 +49,7 @@ class RF(object):
         self.max_samples = max_samples
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.min_impurity_decrease = min_impurity_decrease
         self.random_state = random_state
         self.verbose = verbose
 
@@ -59,6 +62,7 @@ class RF(object):
         s += '\nmax_samples={}'.format(self.max_samples)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
+        s += '\nmin_impurity_decrease={}'.format(self.min_impurity_decrease)
         s += '\nrandom_state={}'.format(self.random_state)
         s += '\nverbose={}'.format(self.verbose)
         return s
@@ -109,6 +113,8 @@ class RF(object):
             if self.verbose > 2:
                 print('tree {}'.format(i))
 
+            print('tree {}'.format(i))
+
             np.random.seed(self.random_state + i)
             feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
 
@@ -117,8 +123,9 @@ class RF(object):
 
             X_sub, y_sub = X[np.ix_(sample_indices, feature_indices)], y[sample_indices]
             tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators, max_depth=self.max_depth,
-                        min_samples_split=self.min_samples_split, random_state=self.random_state,
-                        feature_indices=feature_indices, verbose=self.verbose, get_data=self._get_numpy_data)
+                        min_samples_split=self.min_samples_split, min_impurity_decrease=self.min_impurity_decrease,
+                        random_state=self.random_state, feature_indices=feature_indices, verbose=self.verbose,
+                        get_data=self._get_numpy_data)
             tree = tree.fit(X_sub, y_sub, sample_indices)
             self.trees_.append(tree)
 
@@ -203,6 +210,7 @@ class RF(object):
         d['max_samples'] = self.max_samples
         d['max_depth'] = self.max_depth
         d['min_samples_split'] = self.min_samples_split
+        d['min_impurity_decrease'] = self.min_impurity_decrease
         d['random_state'] = self.random_state
         d['verbose'] = self.verbose
 
@@ -275,12 +283,13 @@ class Tree(object):
     feature_indices: list (default=None)
         Indices of the features present in this tree.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, min_samples_split=2,
+    def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, min_samples_split=2, min_impurity_decrease=1e-8,
                  random_state=None, verbose=0, get_data=None, feature_indices=None):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.min_impurity_decrease = min_impurity_decrease
         self.random_state = random_state
         self.verbose = verbose
         self.feature_indices = feature_indices
@@ -297,6 +306,7 @@ class Tree(object):
         s += '\nlmbda={}'.format(self.lmbda)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
+        s += '\nmin_impurity_decrease={}'.format(self.min_impurity_decrease)
         s += '\nrandom_state={}'.format(self.random_state)
         s += '\nverbose={}'.format(self.verbose)
         s += '\nfeature_indices={}'.format(self.feature_indices)
@@ -349,10 +359,10 @@ class Tree(object):
         # If we're at leaf => print the label
         if tree.value is not None:
             if self.verbose > 1:
-                y_vals = [self.y_train_[ndx] for ndx in tree.node_dict['indices']]
-                print(tree.value, tree.node_dict['indices'], y_vals)
+                y_vals = [self.y_train_[ndx] for ndx in tree.meta['indices']]
+                print(tree.value, tree.meta['indices'], y_vals)
             else:
-                print(tree.value, tree.node_dict['indices'])
+                print(tree.value, tree.meta['indices'])
 
         # Go deeper down the tree
         else:
@@ -361,11 +371,11 @@ class Tree(object):
             print("X%s? " % (tree.feature_i))
 
             # Print the left branch
-            print("%sT->" % (indent_str), end="")
+            print("%sT->" % (indent_str))
             self.print_tree(tree.left_branch, depth=depth + 1)
 
             # Print the right branch
-            print("%sF->" % (indent_str), end="")
+            print("%sF->" % (indent_str))
             self.print_tree(tree.right_branch, depth=depth + 1)
 
     def add(self, X, y, keys=None):
@@ -428,6 +438,7 @@ class Tree(object):
         d['lmbda'] = self.lmbda
         d['max_depth'] = self.max_depth
         d['min_samples_split'] = self.min_samples_split
+        d['min_impurity_decrease'] = self.min_impurity_decrease
         d['random_state'] = self.random_state
         d['verbose'] = self.verbose
         d['feature_indices'] = self.feature_indices
@@ -444,7 +455,155 @@ class Tree(object):
         return self
 
     # private
-    def _build(self, X, y, keys, current_depth=0, parent_p=None):
+
+    # SCRAP THIS!
+    def _build_old(self, X, y, keys, parent_p=None, features=None):
+        """
+        Builds an array-based decision tree breadth-first.
+        """
+
+        features = np.arange(X.shape[1]) if features is None else features
+        node, record = self._add_node(X, y, keys, features, parent_p, 0)
+        queue = [(0, record)]
+
+        self.nodes_ = [node]
+        node_id = 1
+        depth = 0
+
+        while len(queue) > 0:
+
+            parent_id, record = queue.pop()
+
+            # node is expandable
+            if self.nodes_[parent_id].value is None:
+                parent_p, features, depth, l_record, r_record = record
+                # print(self.nodes_[parent_id])
+
+                # build left node
+                X, y, keys = l_record
+                left, record = self._add_node(X, y, keys, features, parent_p, depth)
+                self.nodes_[parent_id].left = node_id
+                self.nodes_.append(left)
+                queue.append((node_id, record))
+                node_id += 1
+
+                # build right node
+                X, y, keys = r_record
+                right, record = self._add_node(X, y, keys, features, parent_p, depth)
+                self.nodes_[parent_id].right = node_id
+                self.nodes_.append(right)
+                queue.append((node_id, record))
+                node_id += 1
+
+        # exit(0)
+
+    def _add_node(self, X, y, keys, features, parent_p, depth):
+
+        # additional data structure to maintain attribute split info
+        n_samples = len(keys)
+        pos_count = np.sum(y)
+        meta = {'count': n_samples, 'pos_count': pos_count}
+
+        # edge cases
+        create_leaf = False
+        if n_samples < self.min_samples_split or depth == self.max_depth or len(features) == 0:
+            create_leaf = True
+
+        # all instances of the same class
+        elif n_samples > 0:
+            if pos_count == 0 or n_samples == pos_count:
+                if depth == 0:
+                    raise ValueError('root node contains only instances from the same class!')
+                else:
+                    create_leaf = True
+        else:
+            raise ValueError('Zero samples in this node!, depth: {}'.format(depth))
+
+        # filter attributes
+        if not create_leaf:
+
+            # save gini indexes from each attribute
+            gini_indexes = []
+            attr_indices = []
+
+            # compute gini index of the node
+            pos_prob = pos_count / n_samples
+            gini_node = 1 - np.square(pos_prob) - np.square(1 - pos_prob)
+
+            # iterate through each feature
+            meta['attr'] = {}
+            for i in features:
+
+                # split the binary attribute
+                left_indices = np.where(X[:, i] == 1)[0]
+
+                # make sure there is atleast 1 sample in each branch
+                if len(left_indices) > 0 and n_samples - len(left_indices) > 0:
+
+                    # gather stats about the split to compute the Gini index
+                    l_count = len(left_indices)
+                    r_count = n_samples - l_count
+                    lp_count = np.sum(y[left_indices])
+                    rp_count = pos_count - lp_count
+
+                    # save the metadata for efficient updating
+                    meta['attr'][i] = {'left': {}, 'right': {}}
+                    meta['attr'][i]['left'] = {'count': l_count, 'pos_count': lp_count}
+                    meta['attr'][i]['right'] = {'count': r_count, 'pos_count': rp_count}
+                    gini_index = self._gini_index(n_samples, l_count, lp_count, r_count, rp_count)
+
+                    # save gini_indexes for later
+                    if gini_node - gini_index > self.min_impurity_decrease:
+                        gini_indexes.append(gini_index)
+                        attr_indices.append(i)
+                        meta['attr'][i]['gini_index'] = gini_index
+
+                    # exlude this attribute from being sampled
+                    else:
+                        del meta['attr'][i]
+
+            # all attributes create hanging branches - create leaf
+            if len(gini_indexes) == 0:
+                create_leaf = True
+
+        # leaf node
+        if create_leaf:
+            leaf_value = pos_count / n_samples
+            meta['count'] = n_samples
+            meta['pos_count'] = pos_count
+            meta['leaf_value'] = 0 if pos_count == 0 else pos_count / n_samples
+            meta['indices'] = keys
+            record = None
+            node = Node(value=leaf_value, meta=meta)
+            # print('LEAF!', 1, node)
+
+        # decision node
+        else:
+            # create probability distribution over the attributes
+            p_dist = self._generate_distribution(gini_indexes)
+
+            # sample from this distribution
+            np.random.seed(self.random_state)
+            p_ndx = np.random.choice(len(p_dist), p=p_dist)
+            feature = attr_indices[p_ndx]
+            p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
+            meta['p'] = p
+
+            # retrieve samples for the chosen attribute
+            l_indices = np.where(X[:, feature] == 1)[0]
+            r_indices = np.setdiff1d(np.arange(n_samples), l_indices)
+
+            # build the node with the chosen attribute
+            l_record = X[l_indices], y[l_indices], keys[l_indices]
+            r_record = X[r_indices], y[r_indices], keys[r_indices]
+            record = (p, attr_indices, depth + 1, l_record, r_record)
+            node = Node(feature=feature, meta=meta)
+            # print('DECISION!')
+
+        return node, record
+
+    # private
+    def _build(self, X, y, keys, current_depth=0, parent_p=None, remaining=None):
         """
         Recursive method which builds out the decision tree and splits X and respective y
         on the feature of X which (based on impurity) best separates the data.
@@ -453,14 +612,14 @@ class Tree(object):
         # additional data structure to maintain attribute split info
         n_samples = len(keys)
         pos_count = np.sum(y)
-        node_dict = {'count': n_samples, 'pos_count': pos_count}
+        meta = {'count': n_samples, 'pos_count': pos_count}
 
         # handle edge cases
         create_leaf = False
-        if node_dict['count'] > 0:
+        if n_samples > 0:
 
             # all instances of the same class
-            if node_dict['pos_count'] == 0 or node_dict['pos_count'] == node_dict['count']:
+            if pos_count == 0 or n_samples == pos_count:
 
                 # the root node contains instances from the same class
                 if current_depth == 0:
@@ -477,11 +636,11 @@ class Tree(object):
         if n_samples < self.min_samples_split or current_depth == self.max_depth or \
                 self.n_features_ - current_depth == 0 or create_leaf:
             leaf_value = pos_count / n_samples
-            node_dict['count'] = n_samples
-            node_dict['pos_count'] = pos_count
-            node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
-            node_dict['indices'] = keys
-            return DecisionNode(value=leaf_value, node_dict=node_dict)
+            meta['count'] = n_samples
+            meta['pos_count'] = pos_count
+            meta['leaf_value'] = leaf_value
+            meta['indices'] = keys
+            return Node(value=leaf_value, meta=meta)
 
         # create a decision node
         else:
@@ -490,69 +649,58 @@ class Tree(object):
             gini_indexes = []
             attr_indices = []
 
+            # compute gini index of the node
+            pos_prob = pos_count / n_samples
+            gini_node = 1 - np.square(pos_prob) - np.square(1 - pos_prob)
+
+            # attribute indices
+            attributes = np.arange(self.n_features_) if remaining is None else remaining
+
             # iterate through each feature
-            node_dict['attr'] = {}
-            for i in range(self.n_features_):
+            meta['attr'] = {}
+            for i in attributes:
 
                 # split the binary attribute
                 left_indices = np.where(X[:, i] == 1)[0]
-                right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
                 # debug
                 if self.verbose > 2:
-                    print(i, y[left_indices].shape, y[right_indices].shape, current_depth)
+                    print(i, current_depth)
 
                 # make sure there is atleast 1 sample in each branch
-                if len(left_indices) > 0 and len(right_indices) > 0:
+                if len(left_indices) > 0 and n_samples - len(left_indices) > 0:
 
-                    # gather stats about the split to compute the Gini index
-                    left_count = len(left_indices)
-                    left_pos_count = np.sum(y[left_indices])
-                    right_count = n_samples - left_count
-                    right_pos_count = np.sum(y[right_indices])
+                    # # gather stats about the split to compute the Gini index
+                    # l_count = len(left_indices)
+                    # r_count = n_samples - l_count
+                    # lp_count = np.sum(y[left_indices])
+                    # rp_count = pos_count - lp_count
 
-                    # compute the weighted Gini index of this feature
-                    left_pos_prob = left_pos_count / left_count
-                    left_weight = left_count / n_samples
-                    left_index = 1 - (np.square(left_pos_prob) + np.square(1 - left_pos_prob))
-                    left_weighted_index = left_weight * left_index
-
-                    right_pos_prob = right_pos_count / right_count
-                    right_weight = right_count / n_samples
-                    right_index = 1 - (np.square(right_pos_prob) + np.square(1 - right_pos_prob))
-                    right_weighted_index = right_weight * right_index
-
-                    # save the metadata for efficient updating
-                    node_dict['attr'][i] = {'left': {}, 'right': {}}
-                    node_dict['attr'][i]['left']['count'] = left_count
-                    node_dict['attr'][i]['left']['pos_count'] = left_pos_count
-                    node_dict['attr'][i]['left']['weight'] = left_weight
-                    node_dict['attr'][i]['left']['pos_prob'] = left_pos_prob
-                    node_dict['attr'][i]['left']['index'] = left_index
-                    node_dict['attr'][i]['left']['weighted_index'] = left_weighted_index
-
-                    node_dict['attr'][i]['right']['count'] = right_count
-                    node_dict['attr'][i]['right']['pos_count'] = right_pos_count
-                    node_dict['attr'][i]['right']['weight'] = right_weight
-                    node_dict['attr'][i]['right']['pos_prob'] = right_pos_prob
-                    node_dict['attr'][i]['right']['index'] = right_index
-                    node_dict['attr'][i]['right']['weighted_index'] = right_weighted_index
-
-                    gini_index = self._compute_gini_index(node_dict['attr'][i])
-                    node_dict['attr'][i]['gini_index'] = gini_index
+                    # # save the metadata for efficient updating
+                    # meta['attr'][i] = {'left': {}, 'right': {}}
+                    # meta['attr'][i]['left'] = {'count': l_count, 'pos_count': lp_count}
+                    # meta['attr'][i]['right'] = {'count': r_count, 'pos_count': rp_count}
+                    # gini_index = self._gini_index(n_samples, l_count, lp_count, r_count, rp_count)
+                    gini_index = 0.1
 
                     # save gini_indexes for later
-                    gini_indexes.append(gini_index)
-                    attr_indices.append(i)
+                    if gini_node - gini_index > self.min_impurity_decrease:
+                        gini_indexes.append(gini_index)
+                        attr_indices.append(i)
+                        # meta['attr'][i]['gini_index'] = gini_index
+
+                    # exlude this attribute from being sampled
+                    # else:
+                    #     del meta['attr'][i]
 
             # all attributes create hanging branches - create leaf
             if len(gini_indexes) == 0:
                 leaf_value = pos_count / n_samples
-                node_dict['count'] = n_samples
-                node_dict['pos_count'] = pos_count
-                node_dict['leaf_value'] = 0 if pos_count == 0 else pos_count / n_samples
-                node_dict['indices'] = keys
-                return DecisionNode(value=leaf_value, node_dict=node_dict)
+                meta['count'] = n_samples
+                meta['pos_count'] = pos_count
+                meta['leaf_value'] = 0 if pos_count == 0 else pos_count / n_samples
+                meta['indices'] = keys
+                return Node(value=leaf_value, meta=meta)
 
             # create probability distribution over the attributes
             p_dist = self._generate_distribution(gini_indexes)
@@ -560,18 +708,20 @@ class Tree(object):
             # sample from this distribution
             np.random.seed(self.random_state)
             p_ndx = np.random.choice(len(p_dist), p=p_dist)
-            chosen_i = attr_indices[p_ndx]
+            feature = attr_indices[p_ndx]
             p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
-            node_dict['p'] = p
+            meta['p'] = p
 
             # retrieve samples for the chosen attribute
-            left_indices = np.where(X[:, chosen_i] == 1)[0]
+            left_indices = np.where(X[:, feature] == 1)[0]
             right_indices = np.setdiff1d(np.arange(n_samples), left_indices)
 
             # build the node with the chosen attribute
-            left = self._build(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1, parent_p=p)
-            right = self._build(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1, parent_p=p)
-            return DecisionNode(feature_i=chosen_i, node_dict=node_dict, left_branch=left, right_branch=right)
+            left = self._build(X[left_indices], y[left_indices], keys[left_indices], current_depth + 1,
+                               parent_p=p, remaining=attr_indices)
+            right = self._build(X[right_indices], y[right_indices], keys[right_indices], current_depth + 1,
+                                parent_p=p, remaining=attr_indices)
+            return Node(feature=feature, meta=meta, left=left, right=right)
 
     def _generate_distribution(self, gini_indexes, invalid_indices=[], cur_ndx=None):
         """
@@ -607,6 +757,7 @@ class Tree(object):
 
         return p
 
+    # TODO: revise
     def _add(self, X, y, add_indices, tree=None, current_depth=0, parent_p=None):
 
         # get root node of the tree
@@ -624,27 +775,27 @@ class Tree(object):
             return tree
 
         # decision node, update the high-level metadata
-        tree.node_dict['count'] += len(y)
-        tree.node_dict['pos_count'] += np.sum(y)
+        tree.meta['count'] += len(y)
+        tree.meta['pos_count'] += np.sum(y)
 
         # udpate gini_index for each attribute in this node
         gini_indexes = []
         p_ndx = None
 
-        for i, attr_ndx in enumerate(tree.node_dict['attr']):
+        for i, attr_ndx in enumerate(tree.meta['attr']):
 
             left_indices = np.where(X[:, attr_ndx] == 1)[0]
             right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
             y_left, y_right = y[left_indices], y[right_indices]
 
             if len(y_left) > 0:
-                self._increment_decision_node(tree.node_dict, attr_ndx, 'left', y_left)
+                self._increment_decision_node(tree.meta, attr_ndx, 'left', y_left)
 
             if len(y_right) > 0:
-                self._increment_decision_node(tree.node_dict, attr_ndx, 'right', y_right)
+                self._increment_decision_node(tree.meta, attr_ndx, 'right', y_right)
 
             # recompute the gini index for this attribute
-            attr_dict = tree.node_dict['attr'][attr_ndx]
+            attr_dict = tree.meta['attr'][attr_ndx]
             gini_index = self._compute_gini_index(attr_dict)
             gini_indexes.append(gini_index)
             attr_dict['gini_index'] = gini_index
@@ -654,7 +805,7 @@ class Tree(object):
                 p_ndx = i
 
         # get old and updated probability distributions
-        old_p = tree.node_dict['p']
+        old_p = tree.meta['p']
         p_dist = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
         p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
         ratio = self._div1(p, old_p)
@@ -720,25 +871,27 @@ class Tree(object):
             return tree
 
         # decision node, update the high-level metadata
-        tree.node_dict['count'] -= len(y)
-        tree.node_dict['pos_count'] -= np.sum(y)
+        count = len(y)
+        pos_count = np.sum(y)
+        tree.meta['count'] -= count
+        tree.meta['pos_count'] -= pos_count
 
         # raise an error if there are only instances from one class are at the root
         if current_depth == 0:
-            if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
+            if tree.meta['pos_count'] == 0 or tree.meta['pos_count'] == tree.meta['count']:
                 raise ValueError('Instances in the root node are all from the same class!')
 
         # type 1b: if remaining instances in this node are of the same class, make leaf
-        if tree.node_dict['pos_count'] == 0 or tree.node_dict['pos_count'] == tree.node_dict['count']:
+        if tree.meta['pos_count'] == 0 or tree.meta['pos_count'] == tree.meta['count']:
 
             if self.verbose > 1:
                 print('check complete, lefotvers in the same class, creating leaf at depth {}'.format(current_depth))
 
-            tree.node_dict['attr'] = None
-            tree.node_dict['leaf_value'] = tree.node_dict['pos_count'] / tree.node_dict['count']
-            tree.node_dict['indices'] = self._get_indices(tree, current_depth)
-            tree.node_dict['indices'] = self._remove_elements(tree.node_dict['indices'], remove_indices)
-            tree_branch = DecisionNode(value=tree.node_dict['leaf_value'], node_dict=tree.node_dict)
+            tree.meta['attr'] = None
+            tree.meta['leaf_value'] = tree.meta['pos_count'] / tree.meta['count']
+            tree.meta['indices'] = self._get_indices(tree, current_depth)
+            tree.meta['indices'] = self._remove_elements(tree.meta['indices'], remove_indices)
+            tree_branch = Node(value=tree.meta['leaf_value'], meta=tree.meta)
             self.deletion_types_.append('1b_{}'.format(current_depth))
             return tree_branch
 
@@ -750,31 +903,36 @@ class Tree(object):
         n_gini_indices = 0
         p_ndx = None
 
-        for i, attr_ndx in enumerate(tree.node_dict['attr']):
-            left_status, right_status = True, True
-
+        for i, attr_ndx in enumerate(tree.meta['attr']):
             left_indices = np.where(X[:, attr_ndx] == 1)[0]
-            right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
-            y_left, y_right = y[left_indices], y[right_indices]
 
-            if len(y_left) > 0:
-                left_status = self._decrement_decision_node(tree.node_dict, attr_ndx, 'left', y_left)
+            l_count = len(left_indices)
+            r_count = count - l_count
 
-            if len(y_right) > 0:
-                right_status = self._decrement_decision_node(tree.node_dict, attr_ndx, 'right', y_right)
+            lp_count = np.sum(y[left_indices])
+            rp_count = pos_count - lp_count
+
+            # right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
+            # y_left, y_right = y[left_indices], y[right_indices]
+
+            gini_index = self._decrement_decision_node(tree.meta, attr_ndx, l_count, lp_count, r_count, rp_count)
+
+            # if left_count > 0 or right_count > 0:
+            #     left_status = self._decrement_decision_node(tree.node_dict, attr_ndx, 'left', y_left)
+
+            # if len(y_right) > 0:
+            #     right_status = self._decrement_decision_node(tree.node_dict, attr_ndx, 'right', y_right)
 
             # this attribute causes a hanging branch, remove it from future tree models
-            if left_status is None or right_status is None:
+            if gini_index is None:
                 invalid_attr_indices.append(attr_ndx)
                 invalid_indices.append(i)
                 gini_indexes.append(1)
 
             # recompute the gini index for this attribute
             else:
-                attr_dict = tree.node_dict['attr'][attr_ndx]
-                gini_index = self._compute_gini_index(attr_dict)
                 gini_indexes.append(gini_index)
-                attr_dict['gini_index'] = gini_index
+                tree.meta['attr'][attr_ndx]['gini_index'] = gini_index
 
                 # save distribution index of chosen attribute
                 if attr_ndx == tree.feature_i:
@@ -784,7 +942,7 @@ class Tree(object):
 
         # remove invalid attributes from the model
         for invalid_attr_ndx in invalid_attr_indices:
-            del tree.node_dict['attr'][invalid_attr_ndx]
+            del tree.meta['attr'][invalid_attr_ndx]
 
         # type 2a: the chosen feature is no longer valid
         if tree.feature_i in invalid_attr_indices:
@@ -800,7 +958,7 @@ class Tree(object):
             return self._build(Xa, ya, keys, current_depth)
 
         # get old and updated probability distributions
-        old_p = tree.node_dict['p']
+        old_p = tree.meta['p']
         p_dist = self._generate_distribution(gini_indexes, invalid_indices=invalid_indices, cur_ndx=np.argmax(old_p))
         p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
         ratio = self._div1(p, old_p)
@@ -853,55 +1011,55 @@ class Tree(object):
         """
         Update this leaf node to effectively add the target indices.
         """
-        node_dict = tree.node_dict
-        node_dict['count'] += len(y)
-        node_dict['pos_count'] += np.sum(y)
-        node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
-        node_dict['indices'] = self._add_elements(node_dict['indices'], add_indices)
-        tree.value = node_dict['leaf_value']
+        meta = tree.meta
+        meta['count'] += len(y)
+        meta['pos_count'] += np.sum(y)
+        meta['leaf_value'] = 0 if meta['pos_count'] == 0 else meta['pos_count'] / meta['count']
+        meta['indices'] = self._add_elements(meta['indices'], add_indices)
+        tree.value = meta['leaf_value']
 
     def _decrement_leaf_node(self, tree, y, remove_indices):
         """
         Update this leaf node to effectively remove the target indices.
         """
-        node_dict = tree.node_dict
-        node_dict['count'] -= len(y)
-        node_dict['pos_count'] -= np.sum(y)
-        node_dict['leaf_value'] = 0 if node_dict['pos_count'] == 0 else node_dict['pos_count'] / node_dict['count']
-        node_dict['indices'] = self._remove_elements(node_dict['indices'], remove_indices)
-        tree.value = node_dict['leaf_value']
+        meta = tree.meta
+        meta['count'] -= len(y)
+        meta['pos_count'] -= np.sum(y)
+        meta['leaf_value'] = 0 if meta['pos_count'] == 0 else meta['pos_count'] / meta['count']
+        meta['indices'] = self._remove_elements(meta['indices'], remove_indices)
+        tree.value = meta['leaf_value']
 
-    def _increment_decision_node(self, node_dict, attr_ndx, abranch, y):
+    def _increment_decision_node(self, meta, attr_ndx, abranch, y):
         """
         Update the attribute dictionary of the node metadata of an addition operation.
         """
 
         # access the attriubute metadata
-        abranch_dict = node_dict['attr'][attr_ndx][abranch]
+        abranch_dict = meta['attr'][attr_ndx][abranch]
 
         # update the affected branch
         abranch_dict['count'] += len(y)
         abranch_dict['pos_count'] += np.sum(y)
-        abranch_dict['weight'] = abranch_dict['count'] / node_dict['count']
+        abranch_dict['weight'] = abranch_dict['count'] / meta['count']
         abranch_dict['pos_prob'] = abranch_dict['pos_count'] / abranch_dict['count']
         abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
         abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
 
         # update the non-affected branch
         nabranch = 'left' if abranch == 'right' else 'right'
-        nabranch_dict = node_dict['attr'][attr_ndx][nabranch]
+        nabranch_dict = meta['attr'][attr_ndx][nabranch]
         nabranch_dict['weight'] = 1 - abranch_dict['weight']
         nabranch_dict['weighted_index'] = nabranch_dict['weight'] * nabranch_dict['index']
 
         return True
 
-    def _decrement_decision_node(self, node_dict, attr_ndx, abranch, y):
+    def _decrement_decision_node_old(self, meta, attr_ndx, abranch, y):
         """
         Update the attribute dictionary of the node metadata from a deletion operation.
         """
 
-        # access the attriubute metadata
-        abranch_dict = node_dict['attr'][attr_ndx][abranch]
+        # access the attribute metadata
+        abranch_dict = meta['attr'][attr_ndx][abranch]
 
         # only the affected instances are in this branch
         if abranch_dict['count'] <= len(y):
@@ -910,25 +1068,88 @@ class Tree(object):
         # update the affected branch
         abranch_dict['count'] -= len(y)
         abranch_dict['pos_count'] -= np.sum(y)
-        abranch_dict['weight'] = abranch_dict['count'] / node_dict['count']
+        abranch_dict['weight'] = abranch_dict['count'] / meta['count']
         abranch_dict['pos_prob'] = abranch_dict['pos_count'] / abranch_dict['count']
         abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
         abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
 
         # update the non-affected branch
         nabranch = 'left' if abranch == 'right' else 'right'
-        nabranch_dict = node_dict['attr'][attr_ndx][nabranch]
+        nabranch_dict = meta['attr'][attr_ndx][nabranch]
         nabranch_dict['weight'] = 1 - abranch_dict['weight']
         nabranch_dict['weighted_index'] = nabranch_dict['weight'] * nabranch_dict['index']
 
         return True
 
-    def _compute_gini_index(self, attr_dict):
+    def _decrement_decision_node(self, meta, i, left_count, left_pos_count, right_count, right_pos_count):
         """
-        Compute the gini index given the weighted indexes from both branches.
+        Update the attribute dictionary of the node metadata from a deletion operation.
         """
-        gini_index = attr_dict['left']['weighted_index'] + attr_dict['right']['weighted_index']
+
+        # access metadata
+        left_meta = meta['attr'][i]['left']
+        right_meta = meta['attr'][i]['right']
+
+        # deleting causes a hanging branch
+        if left_meta['count'] <= left_count or right_meta['count'] <= right_count:
+            return None
+
+        # update metadata
+        left_meta['count'] -= left_count
+        left_meta['pos_count'] -= left_pos_count
+        right_meta['count'] -= right_count
+        right_meta['pos_count'] -= right_pos_count
+
+        # recompute gini index
+        return self._gini_index(left_meta['count'], left_meta['pos_count'],
+                                right_meta['count'], right_meta['pos_count'])
+
+        # # access the attribute metadata
+        # abranch_dict = node_dict['attr'][attr_ndx][abranch]
+
+        # # only the affected instances are in this branch
+        # if abranch_dict['count'] <= len(y):
+        #     return None
+
+        # # update the affected branch
+        # abranch_dict['count'] -= len(y)
+        # abranch_dict['pos_count'] -= np.sum(y)
+        # abranch_dict['weight'] = abranch_dict['count'] / node_dict['count']
+        # abranch_dict['pos_prob'] = abranch_dict['pos_count'] / abranch_dict['count']
+        # abranch_dict['index'] = 1 - (np.square(abranch_dict['pos_prob']) + np.square(1 - abranch_dict['pos_prob']))
+        # abranch_dict['weighted_index'] = abranch_dict['weight'] * abranch_dict['index']
+
+        # # update the non-affected branch
+        # nabranch = 'left' if abranch == 'right' else 'right'
+        # nabranch_dict = node_dict['attr'][attr_ndx][nabranch]
+        # nabranch_dict['weight'] = 1 - abranch_dict['weight']
+        # nabranch_dict['weighted_index'] = nabranch_dict['weight'] * nabranch_dict['index']
+
+        # return True
+
+    def _gini_index(self, n_samples, left_count, left_pos_count, right_count, right_pos_count):
+        """
+        Compute the gini index given the necessary information from both branches.
+        """
+        left_pos_prob = left_pos_count / left_count
+        left_weight = left_count / n_samples
+        left_index = 1 - np.square(left_pos_prob) - np.square(1 - left_pos_prob)
+        left_weighted_index = left_weight * left_index
+
+        right_pos_prob = right_pos_count / right_count
+        right_weight = right_count / n_samples
+        right_index = 1 - np.square(right_pos_prob) - np.square(1 - right_pos_prob)
+        right_weighted_index = right_weight * right_index
+
+        gini_index = left_weighted_index + right_weighted_index
         return round(gini_index, 8)
+
+    # def _gini_index(self, attr_dict):
+    #     """
+    #     Compute the gini index given the weighted indexes from both branches.
+    #     """
+    #     gini_index = attr_dict['left']['weighted_index'] + attr_dict['right']['weighted_index']
+    #     return round(gini_index, 8)
 
     def _get_indices(self, tree=None, depth=0):
         """
@@ -939,7 +1160,7 @@ class Tree(object):
 
         # made it to a leaf node, return the indices
         if tree.value is not None:
-            return tree.node_dict['indices']
+            return tree.meta['indices']
 
         else:
             left_indices = self._get_indices(tree.left_branch, depth + 1)
@@ -1019,37 +1240,34 @@ class Tree(object):
         return np.divide(a, b, out=np.ones_like(a, dtype=np.float64), where=b != 0)
 
 
-class DecisionNode():
-    """Class that represents a decision node or leaf in the decision tree
+class Node():
+    """
+    Class that represents a decision node or leaf in the decision tree
 
     Parameters:
     -----------
-    feature_i: int
+    feature: int
         Feature index which we want to use as the threshold measure.
-    threshold: float
-        The value that we will compare feature values at feature_i against to determine the prediction.
     value: float
         The class prediction if classification tree, or float value if regression tree.
-    left_branch: DecisionNode
-        Next decision node for samples where features value met the threshold.
-    right_branch: DecisionNode
-        Next decision node for samples where features value did not meet the threshold.
-    node_dict: dict
+    left: Node
+        Next node for samples where features value met the threshold.
+    right: Node
+        Next node for samples where features value did not meet the threshold.
+    meta: dict
         Dictionary to store metatadata for easy updating.
     """
-    def __init__(self, feature_i=None, threshold=None, value=None, left_branch=None, right_branch=None,
-                 node_dict=None):
-        self.feature_i = feature_i          # Index for the feature that is tested
-        self.threshold = threshold          # Threshold value for feature
-        self.value = value                  # Value if the node is a leaf in the tree
-        self.left_branch = left_branch      # 'Left' subtree
-        self.right_branch = right_branch    # 'Right' subtree
-        self.node_dict = node_dict          # Attribute split / leaf metadata
+    def __init__(self, feature=None, value=None, left=None, right=None, meta=None):
+        self.feature = feature
+        self.value = value
+        self.left = left
+        self.right = right
+        self.meta = meta
 
-    def copy(self):
-        left_node = self.left_branch.copy() if self.left_branch is not None else None
-        right_node = self.right_branch.copy() if self.right_branch is not None else None
-        node_dict = self.node_dict.copy()
-        node = DecisionNode(feature_i=self.feature_i, threshold=self.threshold, value=self.value,
-                            left_branch=left_node, right_branch=right_node, node_dict=node_dict)
-        return node
+    def __str__(self):
+        s = 'feature={}'.format(self.feature)
+        s += '\nvalue={}'.format(self.value)
+        s += '\nleft={}'.format(self.left)
+        s += '\nright={}'.format(self.right)
+        s += '\nmeta={}'.format(self.meta)
+        return s

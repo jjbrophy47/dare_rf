@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--epsilon', type=float, default=0.1, help='idistinguishability parameter.')
     parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add.')
-    parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
+    parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
     args = exp_util.check_args(args)
