@@ -4,6 +4,9 @@ Represenation is a number of parllel arrays.
 Adapted from: https://github.com/scikit-learn/scikit-learn/blob/b194674c42d54b26137a456c510c5fdba1ba23e0/sklearn/tree/_tree.pyx
 """
 
+# TODO: make getter for leaf samples
+# TODO: implement deterministic mode if lambda is super high, or other switch
+
 # imports
 cimport cython
 
@@ -37,16 +40,19 @@ cdef SIZE_t INITIAL_STACK_SIZE = 10
 # TreeBuilder
 # =====================================
 
-cdef class TreeBuilder:
+cdef class _TreeBuilder:
     """
-    Interface for different tree building strategies.
+    Build a decision tree in depth-first fashion.
     """
 
-    cpdef void build(self, Tree tree, object X, np.ndarray y, np.ndarray f):
-        """
-        Build a decision tree from the training set (X, y).
-        """
-        pass
+    def __cinit__(self, _Splitter splitter, int min_samples_split,
+                  int min_samples_leaf, int max_depth):
+        self.splitter = splitter
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        if max_depth == -1:
+            max_depth = 1000
+        self.max_depth = max_depth
 
     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f):
         """
@@ -64,27 +70,7 @@ cdef class TreeBuilder:
 
         return X, y, f
 
-    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:
-        """
-        Compute the leaf value according to the lables of the samples in the node.
-        """
-        pass
-
-cdef class DepthFirstTreeBuilder(TreeBuilder):
-    """
-    Build a decision tree in depth-first fashion.
-    """
-
-    def __cinit__(self, Splitter splitter, int min_samples_split,
-                  int min_samples_leaf, int max_depth):
-        self.splitter = splitter
-        self.min_samples_split = min_samples_split
-        self.min_samples_leaf = min_samples_leaf
-        if max_depth == -1:
-            max_depth = 1000
-        self.max_depth = max_depth
-
-    cpdef void build(self, Tree tree, object X, np.ndarray y, np.ndarray f):
+    cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f):
         """
         Build a decision tree from the training set (X, y).
         """
@@ -103,7 +89,7 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
         tree._resize(init_capacity)
 
         # Parameters
-        cdef Splitter splitter = self.splitter
+        cdef _Splitter splitter = self.splitter
         cdef int max_depth = self.max_depth
         cdef int min_samples_leaf = self.min_samples_leaf
         cdef int min_samples_split = self.min_samples_split
@@ -161,7 +147,7 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
 
             meta.count = n_samples
 
-            printf("\npopping (%d, %d, %d, %d, %d)\n", depth, parent, is_left, n_samples, n_features)
+            # printf("\npopping (%d, %d, %d, %d, %d)\n", depth, parent, is_left, n_samples, n_features)
 
             is_leaf = (depth >= max_depth or
                        n_samples < min_samples_split or
@@ -229,7 +215,7 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
 # Tree
 # =====================================
 
-cdef class Tree:
+cdef class _Tree:
 
     property n_nodes:
         def __get__(self):
@@ -279,11 +265,13 @@ cdef class Tree:
     cpdef np.ndarray _get_features(self, node_id):
         return self._get_int_ndarray(self.features[node_id])[:self.feature_count[node_id]]
 
-    def __cinit__(self, int n_features):
+    cpdef np.ndarray _get_leaf_samples(self, node_id):
+        return self._get_int_ndarray(self.leaf_samples[node_id])[:self.count[node_id]]
+
+    def __cinit__(self):
         """
         Constructor.
         """
-        self.n_features = n_features
 
         # internal data structures
         self.max_depth = 0

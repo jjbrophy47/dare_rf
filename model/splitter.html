@@ -323,14 +323,14 @@ body.cython { font-family: courier; font-size: 12; }
 </pre><pre class="cython line score-0">&#xA0;<span class="">017</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">018</span>: from utils cimport get_random</pre>
 <pre class="cython line score-0">&#xA0;<span class="">019</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">020</span>: cdef class Splitter:</pre>
-<pre class='cython code score-0 '>struct __pyx_vtabstruct_8splitter_Splitter {
-  int (*node_split)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *);
-  double (*_compute_gini)(struct __pyx_obj_8splitter_Splitter *, double, double, double, int, int);
-  int (*_generate_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, double *, int);
-  int (*_sample_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, int);
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">020</span>: cdef class _Splitter:</pre>
+<pre class='cython code score-0 '>struct __pyx_vtabstruct_8splitter__Splitter {
+  int (*node_split)(struct __pyx_obj_8splitter__Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *);
+  double (*_compute_gini)(struct __pyx_obj_8splitter__Splitter *, double, double, double, int, int);
+  int (*_generate_distribution)(struct __pyx_obj_8splitter__Splitter *, double *, double *, int);
+  int (*_sample_distribution)(struct __pyx_obj_8splitter__Splitter *, double *, int);
 };
-static struct __pyx_vtabstruct_8splitter_Splitter *__pyx_vtabptr_8splitter_Splitter;
+static struct __pyx_vtabstruct_8splitter__Splitter *__pyx_vtabptr_8splitter__Splitter;
 
 </pre><pre class="cython line score-0">&#xA0;<span class="">021</span>:     """</pre>
 <pre class="cython line score-0">&#xA0;<span class="">022</span>:     Splitter class.</pre>
@@ -339,8 +339,8 @@ static struct __pyx_vtabstruct_8splitter_Splitter *__pyx_vtabptr_8splitter_Split
 <pre class="cython line score-0">&#xA0;<span class="">025</span>: </pre>
 <pre class="cython line score-52" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">026</span>:     def __cinit__(self, int min_samples_leaf, double lmbda, UINT32_t random_state):</pre>
 <pre class='cython code score-52 '>/* Python wrapper */
-static int __pyx_pw_8splitter_8Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_8splitter_8Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static int __pyx_pw_8splitter_9_Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_8splitter_9_Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_v_min_samples_leaf;
   double __pyx_v_lmbda;
   __pyx_t_4tree_UINT32_t __pyx_v_random_state;
@@ -399,18 +399,18 @@ static int __pyx_pw_8splitter_8Splitter_1__cinit__(PyObject *__pyx_v_self, PyObj
   __pyx_L5_argtuple_error:;
   <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("__cinit__", 1, 3, 3, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); <span class='error_goto'>__PYX_ERR(0, 26, __pyx_L3_error)</span>
   __pyx_L3_error:;
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("splitter.Splitter.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("splitter._Splitter.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8splitter_8Splitter___cinit__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self), __pyx_v_min_samples_leaf, __pyx_v_lmbda, __pyx_v_random_state);
+  __pyx_r = __pyx_pf_8splitter_9_Splitter___cinit__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self), __pyx_v_min_samples_leaf, __pyx_v_lmbda, __pyx_v_random_state);
 
   /* function exit code */
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
 
-static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, int __pyx_v_min_samples_leaf, double __pyx_v_lmbda, __pyx_t_4tree_UINT32_t __pyx_v_random_state) {
+static int __pyx_pf_8splitter_9_Splitter___cinit__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, int __pyx_v_min_samples_leaf, double __pyx_v_lmbda, __pyx_t_4tree_UINT32_t __pyx_v_random_state) {
   int __pyx_r;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("__cinit__", 0);
@@ -442,17 +442,17 @@ static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Spl
 </pre><pre class="cython line score-0">&#xA0;<span class="">043</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">044</span>:     def __dealloc__(self):</pre>
 <pre class='cython code score-0 '>/* Python wrapper */
-static void __pyx_pw_8splitter_8Splitter_3__dealloc__(PyObject *__pyx_v_self); /*proto*/
-static void __pyx_pw_8splitter_8Splitter_3__dealloc__(PyObject *__pyx_v_self) {
+static void __pyx_pw_8splitter_9_Splitter_3__dealloc__(PyObject *__pyx_v_self); /*proto*/
+static void __pyx_pw_8splitter_9_Splitter_3__dealloc__(PyObject *__pyx_v_self) {
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("__dealloc__ (wrapper)", 0);
-  __pyx_pf_8splitter_8Splitter_2__dealloc__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self));
+  __pyx_pf_8splitter_9_Splitter_2__dealloc__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self));
 
   /* function exit code */
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
 }
 
-static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self) {
+static void __pyx_pf_8splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self) {
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("__dealloc__", 0);
 
@@ -465,7 +465,7 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
 <pre class="cython line score-0">&#xA0;<span class="">048</span>:     @cython.boundscheck(False)</pre>
 <pre class="cython line score-0">&#xA0;<span class="">049</span>:     @cython.wraparound(False)</pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">050</span>:     cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,</pre>
-<pre class='cython code score-0 '>static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta) {
+<pre class='cython code score-0 '>static int __pyx_f_8splitter_9_Splitter_node_split(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta) {
   int __pyx_v_min_samples_leaf;
   int __pyx_v_i;
   int __pyx_v_j;
@@ -620,7 +620,7 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">110</span>:                 valid_features[feature_count] = features[j]</pre>
 <pre class='cython code score-0 '>      (__pyx_v_valid_features[__pyx_v_feature_count]) = (__pyx_v_features[__pyx_v_j]);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">111</span>:                 gini_indices[feature_count] = self._compute_gini(count, left_count, right_count,</pre>
-<pre class='cython code score-0 '>      (__pyx_v_gini_indices[__pyx_v_feature_count]) = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_compute_gini(__pyx_v_self, __pyx_v_count, __pyx_v_left_count, __pyx_v_right_count, __pyx_v_left_pos_count, __pyx_v_right_pos_count);
+<pre class='cython code score-0 '>      (__pyx_v_gini_indices[__pyx_v_feature_count]) = ((struct __pyx_vtabstruct_8splitter__Splitter *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_compute_gini(__pyx_v_self, __pyx_v_count, __pyx_v_left_count, __pyx_v_right_count, __pyx_v_left_pos_count, __pyx_v_right_pos_count);
 </pre><pre class="cython line score-0">&#xA0;<span class="">112</span>:                                                                  left_pos_count, right_pos_count)</pre>
 <pre class="cython line score-0">&#xA0;<span class="">113</span>:                 # printf('gini_indices[%d]: %.7f\n', feature_count, gini_indices[feature_count])</pre>
 <pre class="cython line score-0">&#xA0;<span class="">114</span>: </pre>
@@ -663,9 +663,9 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
 </pre><pre class="cython line score-0">&#xA0;<span class="">134</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">135</span>:             # generate and sample from the distribution</pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">136</span>:             self._generate_distribution(distribution, gini_indices, feature_count)</pre>
-<pre class='cython code score-0 '>    (void)(((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_generate_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
+<pre class='cython code score-0 '>    (void)(((struct __pyx_vtabstruct_8splitter__Splitter *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_generate_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">137</span>:             chosen_ndx = self._sample_distribution(distribution, feature_count)</pre>
-<pre class='cython code score-0 '>    __pyx_v_chosen_ndx = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_sample_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_feature_count);
+<pre class='cython code score-0 '>    __pyx_v_chosen_ndx = ((struct __pyx_vtabstruct_8splitter__Splitter *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_sample_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_feature_count);
 </pre><pre class="cython line score-0">&#xA0;<span class="">138</span>:             # printf('chosen feature: %d\n', valid_features[chosen_ndx])</pre>
 <pre class="cython line score-0">&#xA0;<span class="">139</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">140</span>:             # assign results from chosen feature</pre>
@@ -748,7 +748,7 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
 </pre><pre class="cython line score-0">&#xA0;<span class="">174</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">175</span>:     @cython.cdivision(True)</pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">176</span>:     cdef double _compute_gini(self, double count, double left_count, double right_count,</pre>
-<pre class='cython code score-0 '>static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count) {
+<pre class='cython code score-0 '>static double __pyx_f_8splitter_9_Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count) {
   double __pyx_v_weight;
   double __pyx_v_pos_prob;
   double __pyx_v_neg_prob;
@@ -801,7 +801,7 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
 </pre><pre class="cython line score-0">&#xA0;<span class="">202</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">203</span>:     @cython.cdivision(True)</pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">204</span>:     cdef int _generate_distribution(self, double* distribution, double* gini_indices,</pre>
-<pre class='cython code score-0 '>static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices) {
+<pre class='cython code score-0 '>static int __pyx_f_8splitter_9_Splitter__generate_distribution(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices) {
   int __pyx_v_i;
   double __pyx_v_lmbda;
   double __pyx_v_normalizing_constant;
@@ -850,7 +850,7 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
 </pre><pre class="cython line score-0">&#xA0;<span class="">222</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">223</span>:     # TODO: use random_state in get_random() function</pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">224</span>:     cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:</pre>
-<pre class='cython code score-0 '>static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution) {
+<pre class='cython code score-0 '>static int __pyx_f_8splitter_9_Splitter__sample_distribution(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution) {
   int __pyx_v_i;
   double __pyx_v_weight;
   int __pyx_r;

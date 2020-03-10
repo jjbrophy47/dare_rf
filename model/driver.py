@@ -1,9 +1,9 @@
 import time
 import numpy as np
 
-from splitter import Splitter
-from tree import Tree
-from tree import DepthFirstTreeBuilder
+from splitter import _Splitter
+from tree import _Tree
+from tree import _TreeBuilder
 
 
 n_samples = 10
@@ -21,6 +21,8 @@ y_test = np.random.randint(2, size=10, dtype=np.int32)
 
 data = np.hstack([X_train, y_train.reshape(-1, 1)])
 
+print(data)
+
 X_train = np.asfortranarray(X_train, dtype=np.int32)
 y_train = np.ascontiguousarray(y_train, dtype=np.int32)
 f = np.ascontiguousarray(np.arange(X_train.shape[1]), dtype=np.int32)
@@ -28,9 +30,9 @@ f = np.ascontiguousarray(np.arange(X_train.shape[1]), dtype=np.int32)
 print('data assembled')
 
 t1 = time.time()
-tree = Tree(2)
-splitter = Splitter(2, 10, 1)
-builder = DepthFirstTreeBuilder(splitter, 2, 1, -1)
+tree = _Tree(2)
+splitter = _Splitter(1, 10, 1)
+builder = _TreeBuilder(splitter, 2, 1, -1)
 builder.build(tree, X_train, y_train, f)
 print('time: {:.7f}s'.format(time.time() - t1))
 
@@ -50,10 +52,8 @@ for i in range(tree.n_nodes):
 
 print('feature counts: {}'.format(tree.feature_counts))
 print('chosen features: {}'.format(tree.chosen_features))
-# print('left_children: {}'.format(tree.left_children))
-# print('right_children: {}'.format(tree.right_children))
 print('max depth: {}'.format(tree.max_depth))
 
-# preds = tree.predict(X_test)
-# print(preds)
-# print(y_test)
+preds = tree.predict(X_test)
+print(preds)
+print(y_test)

@@ -1220,10 +1220,10 @@ static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(do
 
 
 /*--- Type declarations ---*/
-struct __pyx_obj_4tree_Tree;
-struct __pyx_obj_4tree_TreeBuilder;
+struct __pyx_obj_4tree__Tree;
+struct __pyx_obj_4tree__TreeBuilder;
 struct __pyx_obj_5utils_Stack;
-struct __pyx_obj_8splitter_Splitter;
+struct __pyx_obj_8splitter__Splitter;
 struct __pyx_array_obj;
 struct __pyx_MemviewEnum_obj;
 struct __pyx_memoryview_obj;
@@ -1264,16 +1264,16 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  * cdef inline object PyArray_MultiIterNew1(a):
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
-struct __pyx_opt_args_4tree_4Tree__resize;
+struct __pyx_opt_args_4tree_5_Tree__resize;
 
-/* "tree.pxd":57
+/* "tree.pxd":55
  *     cdef np.ndarray _get_double_ndarray(self, double *data)
  *     cdef np.ndarray _get_int_ndarray(self, int *data)
  *     cdef int _resize(self, int capacity=*) nogil except -1             # <<<<<<<<<<<<<<
  * 
- * cdef class TreeBuilder:
+ * cdef class _TreeBuilder:
  */
-struct __pyx_opt_args_4tree_4Tree__resize {
+struct __pyx_opt_args_4tree_5_Tree__resize {
   int __pyx_n;
   int capacity;
 };
@@ -1334,16 +1334,15 @@ struct __pyx_t_8splitter_SplitRecord {
 };
 
 /* "tree.pxd":14
- * from splitter cimport Splitter
+ * from splitter cimport _Splitter
  * 
- * cdef class Tree:             # <<<<<<<<<<<<<<
+ * cdef class _Tree:             # <<<<<<<<<<<<<<
  *     """
  *     The Tree object is a binary tree structure constructed by the
  */
-struct __pyx_obj_4tree_Tree {
+struct __pyx_obj_4tree__Tree {
   PyObject_HEAD
-  struct __pyx_vtabstruct_4tree_Tree *__pyx_vtab;
-  __pyx_t_4tree_SIZE_t n_features;
+  struct __pyx_vtabstruct_4tree__Tree *__pyx_vtab;
   int max_depth;
   int node_count;
   int capacity;
@@ -1363,17 +1362,17 @@ struct __pyx_obj_4tree_Tree {
 };
 
 
-/* "tree.pxd":59
+/* "tree.pxd":57
  *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
- * cdef class TreeBuilder:             # <<<<<<<<<<<<<<
+ * cdef class _TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
  *     The TreeBuilder recursively builds a Tree object from training samples,
  */
-struct __pyx_obj_4tree_TreeBuilder {
+struct __pyx_obj_4tree__TreeBuilder {
   PyObject_HEAD
-  struct __pyx_vtabstruct_4tree_TreeBuilder *__pyx_vtab;
-  struct __pyx_obj_8splitter_Splitter *splitter;
+  struct __pyx_vtabstruct_4tree__TreeBuilder *__pyx_vtab;
+  struct __pyx_obj_8splitter__Splitter *splitter;
   int min_samples_split;
   int min_samples_leaf;
   int max_depth;
@@ -1399,13 +1398,13 @@ struct __pyx_obj_5utils_Stack {
 /* "splitter.pxd":29
  *     int  n_features           # Number of valid features after split.
  * 
- * cdef class Splitter:             # <<<<<<<<<<<<<<
+ * cdef class _Splitter:             # <<<<<<<<<<<<<<
  *     """
  *     The splitter searches in the input space for a feature and a threshold
  */
-struct __pyx_obj_8splitter_Splitter {
+struct __pyx_obj_8splitter__Splitter {
   PyObject_HEAD
-  struct __pyx_vtabstruct_8splitter_Splitter *__pyx_vtab;
+  struct __pyx_vtabstruct_8splitter__Splitter *__pyx_vtab;
   int min_samples_leaf;
   double lmbda;
   __pyx_t_4tree_UINT32_t random_state;
@@ -1491,42 +1490,43 @@ struct __pyx_memoryviewslice_obj {
 
 
 /* "tree.pxd":14
- * from splitter cimport Splitter
+ * from splitter cimport _Splitter
  * 
- * cdef class Tree:             # <<<<<<<<<<<<<<
+ * cdef class _Tree:             # <<<<<<<<<<<<<<
  *     """
  *     The Tree object is a binary tree structure constructed by the
  */
 
-struct __pyx_vtabstruct_4tree_Tree {
-  PyArrayObject *(*predict)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
-  PyArrayObject *(*_get_left_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
-  PyArrayObject *(*_get_left_pos_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
-  PyArrayObject *(*_get_right_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
-  PyArrayObject *(*_get_right_pos_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
-  PyArrayObject *(*_get_features)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
-  int (*add_node)(struct __pyx_obj_4tree_Tree *, int, int, int, int, double, int *, struct __pyx_t_8splitter_Meta *);
-  PyArrayObject *(*_get_double_ndarray)(struct __pyx_obj_4tree_Tree *, double *);
-  PyArrayObject *(*_get_int_ndarray)(struct __pyx_obj_4tree_Tree *, int *);
-  int (*_resize)(struct __pyx_obj_4tree_Tree *, struct __pyx_opt_args_4tree_4Tree__resize *__pyx_optional_args);
+struct __pyx_vtabstruct_4tree__Tree {
+  PyArrayObject *(*predict)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_left_counts)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_left_pos_counts)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_right_counts)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_right_pos_counts)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_features)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_leaf_samples)(struct __pyx_obj_4tree__Tree *, PyObject *, int __pyx_skip_dispatch);
+  int (*add_node)(struct __pyx_obj_4tree__Tree *, int, int, int, int, double, int *, struct __pyx_t_8splitter_Meta *);
+  PyArrayObject *(*_get_double_ndarray)(struct __pyx_obj_4tree__Tree *, double *);
+  PyArrayObject *(*_get_int_ndarray)(struct __pyx_obj_4tree__Tree *, int *);
+  int (*_resize)(struct __pyx_obj_4tree__Tree *, struct __pyx_opt_args_4tree_5_Tree__resize *__pyx_optional_args);
 };
-static struct __pyx_vtabstruct_4tree_Tree *__pyx_vtabptr_4tree_Tree;
+static struct __pyx_vtabstruct_4tree__Tree *__pyx_vtabptr_4tree__Tree;
 
 
-/* "tree.pxd":59
+/* "tree.pxd":57
  *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
- * cdef class TreeBuilder:             # <<<<<<<<<<<<<<
+ * cdef class _TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
  *     The TreeBuilder recursively builds a Tree object from training samples,
  */
 
-struct __pyx_vtabstruct_4tree_TreeBuilder {
-  void (*build)(struct __pyx_obj_4tree_TreeBuilder *, struct __pyx_obj_4tree_Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
-  PyObject *(*_check_input)(struct __pyx_obj_4tree_TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *);
-  double (*_leaf_value)(struct __pyx_obj_4tree_TreeBuilder *, __Pyx_memviewslice, int *, int, struct __pyx_t_8splitter_Meta *);
+struct __pyx_vtabstruct_4tree__TreeBuilder {
+  void (*build)(struct __pyx_obj_4tree__TreeBuilder *, struct __pyx_obj_4tree__Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
+  PyObject *(*_check_input)(struct __pyx_obj_4tree__TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *);
+  double (*_leaf_value)(struct __pyx_obj_4tree__TreeBuilder *, __Pyx_memviewslice, int *, int, struct __pyx_t_8splitter_Meta *);
 };
-static struct __pyx_vtabstruct_4tree_TreeBuilder *__pyx_vtabptr_4tree_TreeBuilder;
+static struct __pyx_vtabstruct_4tree__TreeBuilder *__pyx_vtabptr_4tree__TreeBuilder;
 
 
 /* "utils.pxd":48
@@ -1548,18 +1548,18 @@ static struct __pyx_vtabstruct_5utils_Stack *__pyx_vtabptr_5utils_Stack;
 /* "splitter.pyx":20
  * from utils cimport get_random
  * 
- * cdef class Splitter:             # <<<<<<<<<<<<<<
+ * cdef class _Splitter:             # <<<<<<<<<<<<<<
  *     """
  *     Splitter class.
  */
 
-struct __pyx_vtabstruct_8splitter_Splitter {
-  int (*node_split)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *);
-  double (*_compute_gini)(struct __pyx_obj_8splitter_Splitter *, double, double, double, int, int);
-  int (*_generate_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, double *, int);
-  int (*_sample_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, int);
+struct __pyx_vtabstruct_8splitter__Splitter {
+  int (*node_split)(struct __pyx_obj_8splitter__Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *);
+  double (*_compute_gini)(struct __pyx_obj_8splitter__Splitter *, double, double, double, int, int);
+  int (*_generate_distribution)(struct __pyx_obj_8splitter__Splitter *, double *, double *, int);
+  int (*_sample_distribution)(struct __pyx_obj_8splitter__Splitter *, double *, int);
 };
-static struct __pyx_vtabstruct_8splitter_Splitter *__pyx_vtabptr_8splitter_Splitter;
+static struct __pyx_vtabstruct_8splitter__Splitter *__pyx_vtabptr_8splitter__Splitter;
 
 
 /* "View.MemoryView":105
@@ -2317,10 +2317,10 @@ static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
-static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta); /* proto*/
-static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count); /* proto*/
-static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices); /* proto*/
-static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution); /* proto*/
+static int __pyx_f_8splitter_9_Splitter_node_split(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta); /* proto*/
+static double __pyx_f_8splitter_9_Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count); /* proto*/
+static int __pyx_f_8splitter_9_Splitter__generate_distribution(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices); /* proto*/
+static int __pyx_f_8splitter_9_Splitter__sample_distribution(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution); /* proto*/
 static PyObject *__pyx_array_get_memview(struct __pyx_array_obj *__pyx_v_self); /* proto*/
 static char *__pyx_memoryview_get_item_pointer(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_index); /* proto*/
 static PyObject *__pyx_memoryview_is_slice(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_obj); /* proto*/
@@ -2363,8 +2363,8 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 static CYTHON_INLINE int __pyx_f_5numpy_import_array(void); /*proto*/
 
 /* Module declarations from 'tree' */
-static PyTypeObject *__pyx_ptype_4tree_Tree = 0;
-static PyTypeObject *__pyx_ptype_4tree_TreeBuilder = 0;
+static PyTypeObject *__pyx_ptype_4tree__Tree = 0;
+static PyTypeObject *__pyx_ptype_4tree__TreeBuilder = 0;
 
 /* Module declarations from 'libc.stdlib' */
 
@@ -2379,7 +2379,7 @@ static PyTypeObject *__pyx_ptype_5utils_Stack = 0;
 static double (*__pyx_f_5utils_get_random)(int); /*proto*/
 
 /* Module declarations from 'splitter' */
-static PyTypeObject *__pyx_ptype_8splitter_Splitter = 0;
+static PyTypeObject *__pyx_ptype_8splitter__Splitter = 0;
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -2477,7 +2477,7 @@ static const char __pyx_k_update[] = "update";
 static const char __pyx_k_fortran[] = "fortran";
 static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
-static const char __pyx_k_Splitter[] = "Splitter";
+static const char __pyx_k_Splitter[] = "_Splitter";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_itemsize[] = "itemsize";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
@@ -2641,12 +2641,12 @@ static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
-static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, int __pyx_v_min_samples_leaf, double __pyx_v_lmbda, __pyx_t_4tree_UINT32_t __pyx_v_random_state); /* proto */
-static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_8splitter_8Splitter_16min_samples_leaf___get__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self); /* proto */
-static int __pyx_pf_8splitter_8Splitter_16min_samples_leaf_2__set__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
-static PyObject *__pyx_pf_8splitter_8Splitter_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_8splitter_8Splitter_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static int __pyx_pf_8splitter_9_Splitter___cinit__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, int __pyx_v_min_samples_leaf, double __pyx_v_lmbda, __pyx_t_4tree_UINT32_t __pyx_v_random_state); /* proto */
+static void __pyx_pf_8splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8splitter_9_Splitter_16min_samples_leaf___get__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self); /* proto */
+static int __pyx_pf_8splitter_9_Splitter_16min_samples_leaf_2__set__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_8splitter_9_Splitter_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8splitter_9_Splitter_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -2691,7 +2691,7 @@ static PyObject *__pyx_pf_15View_dot_MemoryView_16_memoryviewslice_4base___get__
 static PyObject *__pyx_pf___pyx_memoryviewslice___reduce_cython__(CYTHON_UNUSED struct __pyx_memoryviewslice_obj *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf___pyx_memoryviewslice_2__setstate_cython__(CYTHON_UNUSED struct __pyx_memoryviewslice_obj *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_15View_dot_MemoryView___pyx_unpickle_Enum(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_tp_new_8splitter_Splitter(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_8splitter__Splitter(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -2745,8 +2745,8 @@ static PyObject *__pyx_codeobj__34;
  */
 
 /* Python wrapper */
-static int __pyx_pw_8splitter_8Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_8splitter_8Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static int __pyx_pw_8splitter_9_Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_8splitter_9_Splitter_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_v_min_samples_leaf;
   double __pyx_v_lmbda;
   __pyx_t_4tree_UINT32_t __pyx_v_random_state;
@@ -2805,18 +2805,18 @@ static int __pyx_pw_8splitter_8Splitter_1__cinit__(PyObject *__pyx_v_self, PyObj
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 26, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("splitter.Splitter.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("splitter._Splitter.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8splitter_8Splitter___cinit__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self), __pyx_v_min_samples_leaf, __pyx_v_lmbda, __pyx_v_random_state);
+  __pyx_r = __pyx_pf_8splitter_9_Splitter___cinit__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self), __pyx_v_min_samples_leaf, __pyx_v_lmbda, __pyx_v_random_state);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, int __pyx_v_min_samples_leaf, double __pyx_v_lmbda, __pyx_t_4tree_UINT32_t __pyx_v_random_state) {
+static int __pyx_pf_8splitter_9_Splitter___cinit__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, int __pyx_v_min_samples_leaf, double __pyx_v_lmbda, __pyx_t_4tree_UINT32_t __pyx_v_random_state) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
@@ -2871,17 +2871,17 @@ static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Spl
  */
 
 /* Python wrapper */
-static void __pyx_pw_8splitter_8Splitter_3__dealloc__(PyObject *__pyx_v_self); /*proto*/
-static void __pyx_pw_8splitter_8Splitter_3__dealloc__(PyObject *__pyx_v_self) {
+static void __pyx_pw_8splitter_9_Splitter_3__dealloc__(PyObject *__pyx_v_self); /*proto*/
+static void __pyx_pw_8splitter_9_Splitter_3__dealloc__(PyObject *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__ (wrapper)", 0);
-  __pyx_pf_8splitter_8Splitter_2__dealloc__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self));
+  __pyx_pf_8splitter_9_Splitter_2__dealloc__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
 }
 
-static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self) {
+static void __pyx_pf_8splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
@@ -2897,7 +2897,7 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
  *                         SplitRecord* split, Meta* meta):
  */
 
-static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta) {
+static int __pyx_f_8splitter_9_Splitter_node_split(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta) {
   int __pyx_v_min_samples_leaf;
   int __pyx_v_i;
   int __pyx_v_j;
@@ -3234,7 +3234,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  *                                                                  left_pos_count, right_pos_count)
  *                 # printf('gini_indices[%d]: %.7f\n', feature_count, gini_indices[feature_count])
  */
-      (__pyx_v_gini_indices[__pyx_v_feature_count]) = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_compute_gini(__pyx_v_self, __pyx_v_count, __pyx_v_left_count, __pyx_v_right_count, __pyx_v_left_pos_count, __pyx_v_right_pos_count);
+      (__pyx_v_gini_indices[__pyx_v_feature_count]) = ((struct __pyx_vtabstruct_8splitter__Splitter *)__pyx_v_self->__pyx_vtab)->_compute_gini(__pyx_v_self, __pyx_v_count, __pyx_v_left_count, __pyx_v_right_count, __pyx_v_left_pos_count, __pyx_v_right_pos_count);
 
       /* "splitter.pyx":116
  * 
@@ -3371,7 +3371,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  *             chosen_ndx = self._sample_distribution(distribution, feature_count)
  *             # printf('chosen feature: %d\n', valid_features[chosen_ndx])
  */
-    (void)(((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_generate_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
+    (void)(((struct __pyx_vtabstruct_8splitter__Splitter *)__pyx_v_self->__pyx_vtab)->_generate_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
 
     /* "splitter.pyx":137
  *             # generate and sample from the distribution
@@ -3380,7 +3380,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  *             # printf('chosen feature: %d\n', valid_features[chosen_ndx])
  * 
  */
-    __pyx_v_chosen_ndx = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_sample_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_feature_count);
+    __pyx_v_chosen_ndx = ((struct __pyx_vtabstruct_8splitter__Splitter *)__pyx_v_self->__pyx_vtab)->_sample_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_feature_count);
 
     /* "splitter.pyx":141
  * 
@@ -3672,7 +3672,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  *         """
  */
 
-static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count) {
+static double __pyx_f_8splitter_9_Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count) {
   double __pyx_v_weight;
   double __pyx_v_pos_prob;
   double __pyx_v_neg_prob;
@@ -3802,7 +3802,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  *         """
  */
 
-static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices) {
+static int __pyx_f_8splitter_9_Splitter__generate_distribution(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices) {
   int __pyx_v_i;
   double __pyx_v_lmbda;
   double __pyx_v_normalizing_constant;
@@ -3917,7 +3917,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
  *         Randomly sample a feature from the probability distribution.
  */
 
-static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution) {
+static int __pyx_f_8splitter_9_Splitter__sample_distribution(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution) {
   int __pyx_v_i;
   double __pyx_v_weight;
   int __pyx_r;
@@ -4025,19 +4025,19 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8splitter_8Splitter_16min_samples_leaf_1__get__(PyObject *__pyx_v_self); /*proto*/
-static PyObject *__pyx_pw_8splitter_8Splitter_16min_samples_leaf_1__get__(PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_8splitter_9_Splitter_16min_samples_leaf_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_8splitter_9_Splitter_16min_samples_leaf_1__get__(PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_8splitter_8Splitter_16min_samples_leaf___get__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self));
+  __pyx_r = __pyx_pf_8splitter_9_Splitter_16min_samples_leaf___get__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8splitter_8Splitter_16min_samples_leaf___get__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self) {
+static PyObject *__pyx_pf_8splitter_9_Splitter_16min_samples_leaf___get__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4052,7 +4052,7 @@ static PyObject *__pyx_pf_8splitter_8Splitter_16min_samples_leaf___get__(struct 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("splitter.Splitter.min_samples_leaf.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("splitter._Splitter.min_samples_leaf.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -4061,19 +4061,19 @@ static PyObject *__pyx_pf_8splitter_8Splitter_16min_samples_leaf___get__(struct 
 }
 
 /* Python wrapper */
-static int __pyx_pw_8splitter_8Splitter_16min_samples_leaf_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
-static int __pyx_pw_8splitter_8Splitter_16min_samples_leaf_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+static int __pyx_pw_8splitter_9_Splitter_16min_samples_leaf_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_8splitter_9_Splitter_16min_samples_leaf_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_8splitter_8Splitter_16min_samples_leaf_2__set__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+  __pyx_r = __pyx_pf_8splitter_9_Splitter_16min_samples_leaf_2__set__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self), ((PyObject *)__pyx_v_value));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_8splitter_8Splitter_16min_samples_leaf_2__set__(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, PyObject *__pyx_v_value) {
+static int __pyx_pf_8splitter_9_Splitter_16min_samples_leaf_2__set__(struct __pyx_obj_8splitter__Splitter *__pyx_v_self, PyObject *__pyx_v_value) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -4085,7 +4085,7 @@ static int __pyx_pf_8splitter_8Splitter_16min_samples_leaf_2__set__(struct __pyx
   __pyx_r = 0;
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_AddTraceback("splitter.Splitter.min_samples_leaf.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("splitter._Splitter.min_samples_leaf.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
@@ -4099,19 +4099,19 @@ static int __pyx_pf_8splitter_8Splitter_16min_samples_leaf_2__set__(struct __pyx
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8splitter_8Splitter_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_8splitter_8Splitter_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_8splitter_9_Splitter_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_8splitter_9_Splitter_5__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_8splitter_8Splitter_4__reduce_cython__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self));
+  __pyx_r = __pyx_pf_8splitter_9_Splitter_4__reduce_cython__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8splitter_8Splitter_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self) {
+static PyObject *__pyx_pf_8splitter_9_Splitter_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4138,7 +4138,7 @@ static PyObject *__pyx_pf_8splitter_8Splitter_4__reduce_cython__(CYTHON_UNUSED s
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("splitter.Splitter.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("splitter._Splitter.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -4153,19 +4153,19 @@ static PyObject *__pyx_pf_8splitter_8Splitter_4__reduce_cython__(CYTHON_UNUSED s
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8splitter_8Splitter_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_8splitter_8Splitter_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_8splitter_9_Splitter_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_8splitter_9_Splitter_7__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_8splitter_8Splitter_6__setstate_cython__(((struct __pyx_obj_8splitter_Splitter *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_8splitter_9_Splitter_6__setstate_cython__(((struct __pyx_obj_8splitter__Splitter *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8splitter_8Splitter_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_8splitter_9_Splitter_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_8splitter__Splitter *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4192,7 +4192,7 @@ static PyObject *__pyx_pf_8splitter_8Splitter_6__setstate_cython__(CYTHON_UNUSED
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("splitter.Splitter.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("splitter._Splitter.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -19439,10 +19439,10 @@ static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *__
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static struct __pyx_vtabstruct_8splitter_Splitter __pyx_vtable_8splitter_Splitter;
+static struct __pyx_vtabstruct_8splitter__Splitter __pyx_vtable_8splitter__Splitter;
 
-static PyObject *__pyx_tp_new_8splitter_Splitter(PyTypeObject *t, PyObject *a, PyObject *k) {
-  struct __pyx_obj_8splitter_Splitter *p;
+static PyObject *__pyx_tp_new_8splitter__Splitter(PyTypeObject *t, PyObject *a, PyObject *k) {
+  struct __pyx_obj_8splitter__Splitter *p;
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -19450,16 +19450,16 @@ static PyObject *__pyx_tp_new_8splitter_Splitter(PyTypeObject *t, PyObject *a, P
     o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
   }
   if (unlikely(!o)) return 0;
-  p = ((struct __pyx_obj_8splitter_Splitter *)o);
-  p->__pyx_vtab = __pyx_vtabptr_8splitter_Splitter;
-  if (unlikely(__pyx_pw_8splitter_8Splitter_1__cinit__(o, a, k) < 0)) goto bad;
+  p = ((struct __pyx_obj_8splitter__Splitter *)o);
+  p->__pyx_vtab = __pyx_vtabptr_8splitter__Splitter;
+  if (unlikely(__pyx_pw_8splitter_9_Splitter_1__cinit__(o, a, k) < 0)) goto bad;
   return o;
   bad:
   Py_DECREF(o); o = 0;
   return NULL;
 }
 
-static void __pyx_tp_dealloc_8splitter_Splitter(PyObject *o) {
+static void __pyx_tp_dealloc_8splitter__Splitter(PyObject *o) {
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
@@ -19469,20 +19469,20 @@ static void __pyx_tp_dealloc_8splitter_Splitter(PyObject *o) {
     PyObject *etype, *eval, *etb;
     PyErr_Fetch(&etype, &eval, &etb);
     ++Py_REFCNT(o);
-    __pyx_pw_8splitter_8Splitter_3__dealloc__(o);
+    __pyx_pw_8splitter_9_Splitter_3__dealloc__(o);
     --Py_REFCNT(o);
     PyErr_Restore(etype, eval, etb);
   }
   (*Py_TYPE(o)->tp_free)(o);
 }
 
-static PyObject *__pyx_getprop_8splitter_8Splitter_min_samples_leaf(PyObject *o, CYTHON_UNUSED void *x) {
-  return __pyx_pw_8splitter_8Splitter_16min_samples_leaf_1__get__(o);
+static PyObject *__pyx_getprop_8splitter_9_Splitter_min_samples_leaf(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_8splitter_9_Splitter_16min_samples_leaf_1__get__(o);
 }
 
-static int __pyx_setprop_8splitter_8Splitter_min_samples_leaf(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+static int __pyx_setprop_8splitter_9_Splitter_min_samples_leaf(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
   if (v) {
-    return __pyx_pw_8splitter_8Splitter_16min_samples_leaf_3__set__(o, v);
+    return __pyx_pw_8splitter_9_Splitter_16min_samples_leaf_3__set__(o, v);
   }
   else {
     PyErr_SetString(PyExc_NotImplementedError, "__del__");
@@ -19490,23 +19490,23 @@ static int __pyx_setprop_8splitter_8Splitter_min_samples_leaf(PyObject *o, PyObj
   }
 }
 
-static PyMethodDef __pyx_methods_8splitter_Splitter[] = {
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_8splitter_8Splitter_5__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_8splitter_8Splitter_7__setstate_cython__, METH_O, 0},
+static PyMethodDef __pyx_methods_8splitter__Splitter[] = {
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_8splitter_9_Splitter_5__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_8splitter_9_Splitter_7__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
-static struct PyGetSetDef __pyx_getsets_8splitter_Splitter[] = {
-  {(char *)"min_samples_leaf", __pyx_getprop_8splitter_8Splitter_min_samples_leaf, __pyx_setprop_8splitter_8Splitter_min_samples_leaf, (char *)0, 0},
+static struct PyGetSetDef __pyx_getsets_8splitter__Splitter[] = {
+  {(char *)"min_samples_leaf", __pyx_getprop_8splitter_9_Splitter_min_samples_leaf, __pyx_setprop_8splitter_9_Splitter_min_samples_leaf, (char *)0, 0},
   {0, 0, 0, 0, 0}
 };
 
-static PyTypeObject __pyx_type_8splitter_Splitter = {
+static PyTypeObject __pyx_type_8splitter__Splitter = {
   PyVarObject_HEAD_INIT(0, 0)
-  "splitter.Splitter", /*tp_name*/
-  sizeof(struct __pyx_obj_8splitter_Splitter), /*tp_basicsize*/
+  "splitter._Splitter", /*tp_name*/
+  sizeof(struct __pyx_obj_8splitter__Splitter), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_8splitter_Splitter, /*tp_dealloc*/
+  __pyx_tp_dealloc_8splitter__Splitter, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -19539,9 +19539,9 @@ static PyTypeObject __pyx_type_8splitter_Splitter = {
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
   0, /*tp_iternext*/
-  __pyx_methods_8splitter_Splitter, /*tp_methods*/
+  __pyx_methods_8splitter__Splitter, /*tp_methods*/
   0, /*tp_members*/
-  __pyx_getsets_8splitter_Splitter, /*tp_getset*/
+  __pyx_getsets_8splitter__Splitter, /*tp_getset*/
   0, /*tp_base*/
   0, /*tp_dict*/
   0, /*tp_descr_get*/
@@ -19549,7 +19549,7 @@ static PyTypeObject __pyx_type_8splitter_Splitter = {
   0, /*tp_dictoffset*/
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_8splitter_Splitter, /*tp_new*/
+  __pyx_tp_new_8splitter__Splitter, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -20866,22 +20866,22 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  __pyx_vtabptr_8splitter_Splitter = &__pyx_vtable_8splitter_Splitter;
-  __pyx_vtable_8splitter_Splitter.node_split = (int (*)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *))__pyx_f_8splitter_8Splitter_node_split;
-  __pyx_vtable_8splitter_Splitter._compute_gini = (double (*)(struct __pyx_obj_8splitter_Splitter *, double, double, double, int, int))__pyx_f_8splitter_8Splitter__compute_gini;
-  __pyx_vtable_8splitter_Splitter._generate_distribution = (int (*)(struct __pyx_obj_8splitter_Splitter *, double *, double *, int))__pyx_f_8splitter_8Splitter__generate_distribution;
-  __pyx_vtable_8splitter_Splitter._sample_distribution = (int (*)(struct __pyx_obj_8splitter_Splitter *, double *, int))__pyx_f_8splitter_8Splitter__sample_distribution;
-  if (PyType_Ready(&__pyx_type_8splitter_Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_vtabptr_8splitter__Splitter = &__pyx_vtable_8splitter__Splitter;
+  __pyx_vtable_8splitter__Splitter.node_split = (int (*)(struct __pyx_obj_8splitter__Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *))__pyx_f_8splitter_9_Splitter_node_split;
+  __pyx_vtable_8splitter__Splitter._compute_gini = (double (*)(struct __pyx_obj_8splitter__Splitter *, double, double, double, int, int))__pyx_f_8splitter_9_Splitter__compute_gini;
+  __pyx_vtable_8splitter__Splitter._generate_distribution = (int (*)(struct __pyx_obj_8splitter__Splitter *, double *, double *, int))__pyx_f_8splitter_9_Splitter__generate_distribution;
+  __pyx_vtable_8splitter__Splitter._sample_distribution = (int (*)(struct __pyx_obj_8splitter__Splitter *, double *, int))__pyx_f_8splitter_9_Splitter__sample_distribution;
+  if (PyType_Ready(&__pyx_type_8splitter__Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_8splitter_Splitter.tp_print = 0;
+  __pyx_type_8splitter__Splitter.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_8splitter_Splitter.tp_dictoffset && __pyx_type_8splitter_Splitter.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_8splitter_Splitter.tp_getattro = __Pyx_PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_8splitter__Splitter.tp_dictoffset && __pyx_type_8splitter__Splitter.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_8splitter__Splitter.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_8splitter_Splitter.tp_dict, __pyx_vtabptr_8splitter_Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Splitter, (PyObject *)&__pyx_type_8splitter_Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_8splitter_Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
-  __pyx_ptype_8splitter_Splitter = &__pyx_type_8splitter_Splitter;
+  if (__Pyx_SetVtable(__pyx_type_8splitter__Splitter.tp_dict, __pyx_vtabptr_8splitter__Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Splitter, (PyObject *)&__pyx_type_8splitter__Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_8splitter__Splitter) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_ptype_8splitter__Splitter = &__pyx_type_8splitter__Splitter;
   __pyx_vtabptr_array = &__pyx_vtable_array;
   __pyx_vtable_array.get_memview = (PyObject *(*)(struct __pyx_array_obj *))__pyx_array_get_memview;
   if (PyType_Ready(&__pyx_type___pyx_array) < 0) __PYX_ERR(1, 105, __pyx_L1_error)
@@ -20971,12 +20971,12 @@ static int __Pyx_modinit_type_import_code(void) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_ptype_4tree_Tree = __Pyx_ImportType(__pyx_t_1, "tree", "Tree", sizeof(struct __pyx_obj_4tree_Tree), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_4tree_Tree) __PYX_ERR(5, 14, __pyx_L1_error)
-  __pyx_vtabptr_4tree_Tree = (struct __pyx_vtabstruct_4tree_Tree*)__Pyx_GetVtable(__pyx_ptype_4tree_Tree->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_Tree)) __PYX_ERR(5, 14, __pyx_L1_error)
-  __pyx_ptype_4tree_TreeBuilder = __Pyx_ImportType(__pyx_t_1, "tree", "TreeBuilder", sizeof(struct __pyx_obj_4tree_TreeBuilder), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_4tree_TreeBuilder) __PYX_ERR(5, 59, __pyx_L1_error)
-  __pyx_vtabptr_4tree_TreeBuilder = (struct __pyx_vtabstruct_4tree_TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_4tree_TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_TreeBuilder)) __PYX_ERR(5, 59, __pyx_L1_error)
+  __pyx_ptype_4tree__Tree = __Pyx_ImportType(__pyx_t_1, "tree", "_Tree", sizeof(struct __pyx_obj_4tree__Tree), __Pyx_ImportType_CheckSize_Warn);
+   if (!__pyx_ptype_4tree__Tree) __PYX_ERR(5, 14, __pyx_L1_error)
+  __pyx_vtabptr_4tree__Tree = (struct __pyx_vtabstruct_4tree__Tree*)__Pyx_GetVtable(__pyx_ptype_4tree__Tree->tp_dict); if (unlikely(!__pyx_vtabptr_4tree__Tree)) __PYX_ERR(5, 14, __pyx_L1_error)
+  __pyx_ptype_4tree__TreeBuilder = __Pyx_ImportType(__pyx_t_1, "tree", "_TreeBuilder", sizeof(struct __pyx_obj_4tree__TreeBuilder), __Pyx_ImportType_CheckSize_Warn);
+   if (!__pyx_ptype_4tree__TreeBuilder) __PYX_ERR(5, 57, __pyx_L1_error)
+  __pyx_vtabptr_4tree__TreeBuilder = (struct __pyx_vtabstruct_4tree__TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_4tree__TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_4tree__TreeBuilder)) __PYX_ERR(5, 57, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(6, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);

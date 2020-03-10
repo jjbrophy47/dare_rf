@@ -17,7 +17,7 @@ np.import_array()
 
 from utils cimport get_random
 
-cdef class Splitter:
+cdef class _Splitter:
     """
     Splitter class.
     Finds the best splits on dense data, one split at a time.

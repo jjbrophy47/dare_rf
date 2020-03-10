@@ -9,16 +9,13 @@ ctypedef np.npy_uint32 UINT32_t          # Unsigned 32 bit integer
 
 from splitter cimport Meta
 from splitter cimport SplitRecord
-from splitter cimport Splitter
+from splitter cimport _Splitter
 
-cdef class Tree:
+cdef class _Tree:
     """
     The Tree object is a binary tree structure constructed by the
     TreeBuilder. The tree structure is used for predictions.
     """
-
-    # Input/Output layout
-    cdef public SIZE_t n_features        # Number of features in X
 
     # Inner structures: values are stored separately from node structure,
     # since size is determined at runtime.
@@ -48,6 +45,7 @@ cdef class Tree:
     cpdef np.ndarray _get_right_counts(self, node_id)
     cpdef np.ndarray _get_right_pos_counts(self, node_id)
     cpdef np.ndarray _get_features(self, node_id)
+    cpdef np.ndarray _get_leaf_samples(self, node_id)
 
     # C API
     cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,
@@ -56,7 +54,7 @@ cdef class Tree:
     cdef np.ndarray _get_int_ndarray(self, int *data)
     cdef int _resize(self, int capacity=*) nogil except -1
 
-cdef class TreeBuilder:
+cdef class _TreeBuilder:
     """
     The TreeBuilder recursively builds a Tree object from training samples,
     using a Splitter object for splitting internal nodes and assigning values to leaves.
@@ -65,11 +63,11 @@ cdef class TreeBuilder:
     evaluation order, e.g. depth-first or breadth-first.
     """
 
-    cdef Splitter splitter           # Splitter object that chooses the attribute to split on
+    cdef _Splitter splitter           # Splitter object that chooses the attribute to split on
     cdef int min_samples_split       # Minimum number of samples in an internal node
     cdef int min_samples_leaf        # Minimum number of samples in a leaf
     cdef int max_depth               # Maximal tree depth
 
-    cpdef void build(self, Tree tree, object X, np.ndarray y, np.ndarray f)
+    cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f)
     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f)
     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil

@@ -26,7 +26,7 @@ cdef struct SplitRecord:
     int* features             # Valid features to consider for descendants.
     int  n_features           # Number of valid features after split.
 
-cdef class Splitter:
+cdef class _Splitter:
     """
     The splitter searches in the input space for a feature and a threshold
     to split the samples samples[start:end].
