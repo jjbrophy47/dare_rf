@@ -1,5 +1,5 @@
 """
-CeDAR binary tree implementation; only support binary attributes and a binary label.
+CeDAR binary tree implementation; only supports binary attributes and a binary label.
 Represenation is a number of parllel arrays.
 Adapted from: https://github.com/scikit-learn/scikit-learn/blob/b194674c42d54b26137a456c510c5fdba1ba23e0/sklearn/tree/_tree.pyx
 """
@@ -23,33 +23,15 @@ np.import_array()
 
 from utils cimport Stack
 from utils cimport StackRecord
-# from utils cimport safe_realloc
-# from utils cimport sizet_ptr_to_ndarray
 
 # constants
 from numpy import int32 as INT
 from numpy import float32 as FLOAT
 from numpy import float64 as DOUBLE
 
-# cdef double INFINITY = np.inf
-# cdef double EPSILON = np.finfo('double').eps
-
 cdef SIZE_t _TREE_LEAF = -1
 cdef SIZE_t _TREE_UNDEFINED = -2
 cdef SIZE_t INITIAL_STACK_SIZE = 10
-
-# # Repeat struct definition for numpy
-# NODE_DTYPE = np.dtype({
-#     'names': ['left_child', 'right_child', 'feature', 'impurity', 'n_node_samples'],
-#     'formats': [np.intp, np.intp, np.intp, np.float64, np.intp],
-#     'offsets': [
-#         <Py_ssize_t> &(<Node*> NULL).left_child,
-#         <Py_ssize_t> &(<Node*> NULL).right_child,
-#         <Py_ssize_t> &(<Node*> NULL).feature,
-#         <Py_ssize_t> &(<Node*> NULL).impurity,
-#         <Py_ssize_t> &(<Node*> NULL).n_node_samples,
-#     ]
-# })
 
 # =====================================
 # TreeBuilder
@@ -82,7 +64,7 @@ cdef class TreeBuilder:
 
         return X, y, f
 
-    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples) nogil:
+    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:
         """
         Compute the leaf value according to the lables of the samples in the node.
         """
@@ -98,6 +80,8 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
+        if max_depth == -1:
+            max_depth = 1000
         self.max_depth = max_depth
 
     cpdef void build(self, Tree tree, object X, np.ndarray y, np.ndarray f):
@@ -145,6 +129,8 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
         cdef int i
         cdef max_depth_seen = 0
 
+        cdef Meta meta
+
         # fill in samples and features arrays
         samples = <int *>malloc(n_samples * sizeof(int))
         features = <int *>malloc(n_features * sizeof(int))
@@ -173,7 +159,9 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
             features = stack_record.features
             n_features = stack_record.n_features
 
-            # printf("\npopping (%d, %d, %d, %d, %d)\n", depth, parent, is_left, n_samples, n_features)
+            meta.count = n_samples
+
+            printf("\npopping (%d, %d, %d, %d, %d)\n", depth, parent, is_left, n_samples, n_features)
 
             is_leaf = (depth >= max_depth or
                        n_samples < min_samples_split or
@@ -181,24 +169,18 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
                        n_features <= 1)
 
             if not is_leaf:
-                # printf("splitting node\n")
-                rc = splitter.node_split(X, y, f, samples, n_samples, features, n_features, &split)
+                rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)
                 if rc == -2:
-                    # printf("failed to split node, creating leaf\n")
                     is_leaf = 1
                 else:
                     feature = split.feature
                     value = _TREE_UNDEFINED
             
             if is_leaf:
-                # printf("creating leaf\n")
-                # printf("n_samples: %d\n", n_samples)
-                # printf("n_features: %d\n", n_features)
-                value = self._leaf_value(y, samples, n_samples)
+                value = self._leaf_value(y, samples, n_samples, &meta)
+                meta.feature_count = _TREE_UNDEFINED
 
-            # printf("value: %.7f\n", value)
-            node_id = tree.add_node(parent, is_left, is_leaf, feature, n_samples, value)
-            # printf("done adding node\n")
+            node_id = tree.add_node(parent, is_left, is_leaf, feature, value, samples, &meta)
 
             if not is_leaf:
 
@@ -223,24 +205,23 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
                 max_depth_seen = depth
 
             # clean up
-            # printf('freeing samples\n')
-            free(samples)
-            if not is_left:
-                # printf('freeing features\n')
-                free(features)
+            if not is_leaf:
+                free(samples)
 
         if rc == -1:
-            # printf("memory error\n")
             raise MemoryError()
 
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples) nogil:
+    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:
         cdef int pos_count = 0
         cdef int i
 
         for i in range(n_samples):
             pos_count += y[samples[i]]
 
+        meta.pos_count = pos_count
         return pos_count / <double> n_samples
 
 
@@ -250,17 +231,17 @@ cdef class DepthFirstTreeBuilder(TreeBuilder):
 
 cdef class Tree:
 
+    property n_nodes:
+        def __get__(self):
+            return self.node_count
+
     property values:
         def __get__(self):
             return self._get_double_ndarray(self.values)[:self.node_count]
 
-    property n_samples:
+    property chosen_features:
         def __get__(self):
-            return self._get_int_ndarray(self.n_samples)[:self.node_count]
-
-    property features:
-        def __get__(self):
-            return self._get_int_ndarray(self.features)[:self.node_count]
+            return self._get_int_ndarray(self.chosen_features)[:self.node_count]
 
     property left_children:
         def __get__(self):
@@ -269,6 +250,34 @@ cdef class Tree:
     property right_children:
         def __get__(self):
             return self._get_int_ndarray(self.right_children)[:self.node_count]
+
+    # metadata
+    property counts:
+        def __get__(self):
+            return self._get_int_ndarray(self.count)[:self.node_count]
+
+    property pos_counts:
+        def __get__(self):
+            return self._get_int_ndarray(self.pos_count)[:self.node_count]
+
+    property feature_counts:
+        def __get__(self):
+            return self._get_int_ndarray(self.feature_count)[:self.node_count]
+
+    cpdef np.ndarray _get_left_counts(self, node_id):
+        return self._get_int_ndarray(self.left_counts[node_id])[:self.feature_count[node_id]]
+
+    cpdef np.ndarray _get_left_pos_counts(self, node_id):
+        return self._get_int_ndarray(self.left_pos_counts[node_id])[:self.feature_count[node_id]]
+
+    cpdef np.ndarray _get_right_counts(self, node_id):
+        return self._get_int_ndarray(self.right_counts[node_id])[:self.feature_count[node_id]]
+
+    cpdef np.ndarray _get_right_pos_counts(self, node_id):
+        return self._get_int_ndarray(self.right_pos_counts[node_id])[:self.feature_count[node_id]]
+
+    cpdef np.ndarray _get_features(self, node_id):
+        return self._get_int_ndarray(self.features[node_id])[:self.feature_count[node_id]]
 
     def __cinit__(self, int n_features):
         """
@@ -281,23 +290,41 @@ cdef class Tree:
         self.node_count = 0
         self.capacity = 3
         self.values = <double *>malloc(self.capacity * sizeof(double))
-        self.n_samples = <int *>malloc(self.capacity * sizeof(int))
-        self.features = <int *>malloc(self.capacity * sizeof(int))
+        self.chosen_features = <int *>malloc(self.capacity * sizeof(int))
         self.left_children = <int *>malloc(self.capacity * sizeof(int))
         self.right_children = <int *>malloc(self.capacity * sizeof(int))
 
+        # internal metadata
+        self.count = <int *>malloc(self.capacity * sizeof(int))
+        self.pos_count = <int *>malloc(self.capacity * sizeof(int))
+        self.feature_count = <int *>malloc(self.capacity * sizeof(int))
+        self.left_counts = <int **>malloc(self.capacity * sizeof(int *))
+        self.left_pos_counts = <int **>malloc(self.capacity * sizeof(int *))
+        self.right_counts = <int **>malloc(self.capacity * sizeof(int *))
+        self.right_pos_counts = <int **>malloc(self.capacity * sizeof(int *))
+        self.features = <int **>malloc(self.capacity * sizeof(int *))
+        self.leaf_samples = <int **>malloc(self.capacity * sizeof(int *))
 
     def __dealloc__(self):
         """
         Destructor.
         """
         free(self.values)
-        free(self.features)
+        free(self.chosen_features)
         free(self.left_children)
         free(self.right_children)
 
+        free(self.count)
+        free(self.pos_count)
+        free(self.feature_count)
+        free(self.left_counts)
+        free(self.left_pos_counts)
+        free(self.right_counts)
+        free(self.right_pos_counts)
+        free(self.features)
+
     cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,
-                      int n_samples, double value) nogil except -1:
+                      double value, int* samples, Meta* meta) nogil except -1:
 
         cdef int node_id = self.node_count
 
@@ -306,7 +333,8 @@ cdef class Tree:
             self._resize()
             # printf("done resizing\n")
 
-        self.n_samples[node_id] = n_samples
+        self.count[node_id] = meta.count
+        self.pos_count[node_id] = meta.pos_count
 
         if parent != _TREE_UNDEFINED:
             if is_left:
@@ -316,17 +344,67 @@ cdef class Tree:
 
         if is_leaf:
             self.values[node_id] = value
-            self.features[node_id] = _TREE_UNDEFINED
+            self.chosen_features[node_id] = _TREE_UNDEFINED
             self.left_children[node_id] = _TREE_LEAF
             self.right_children[node_id] = _TREE_LEAF
+
+            self.leaf_samples[node_id] = samples
+            self.feature_count[node_id] = _TREE_UNDEFINED
         else:
             # children will be set later
             self.values[node_id] = _TREE_UNDEFINED
-            self.features[node_id] = feature
+            self.chosen_features[node_id] = feature
+
+            self.left_counts[node_id] = meta.left_counts
+            self.left_pos_counts[node_id] = meta.left_pos_counts
+            self.right_counts[node_id] = meta.right_counts
+            self.right_pos_counts[node_id] = meta.right_pos_counts
+            self.feature_count[node_id] = meta.feature_count
+            self.features[node_id] = meta.features
 
         self.node_count += 1
 
         return node_id
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef np.ndarray predict(self, object X):
+        """
+        Predict probability of positive label for X.
+        """
+
+        # Check input
+        if not isinstance(X, np.ndarray):
+            raise ValueError("X should be in np.ndarray format, got %s" % type(X))
+
+        if X.dtype != INT:
+            raise ValueError("X.dtype should be np.int32, got %s" % X.dtype)
+
+        # Extract input
+        cdef int[:, :] X_ndarray = X
+        cdef int n_samples = X.shape[0]
+
+        # Initialize output
+        cdef np.ndarray[double] out = np.zeros((n_samples,), dtype=np.double)
+
+        # incrementers
+        cdef int i = 0
+        cdef int j
+
+        with nogil:
+
+            for i in range(n_samples):
+                j = 0
+
+                while self.values[j] == _TREE_UNDEFINED:
+                    if X_ndarray[i, self.chosen_features[j]] == 1:
+                        j = self.left_children[j]
+                    else:
+                        j = self.right_children[j]
+
+                out[i] = self.values[j]
+
+        return out
 
     # private
     cdef int _resize(self, int capacity=0) nogil except -1:
@@ -337,13 +415,22 @@ cdef class Tree:
         if capacity <= 0 and self.node_count == self.capacity:
             self.capacity *= 2
 
-        # printf("capacity: %d\n", self.capacity)
-
+        # tree info
         self.values = <double *>realloc(self.values, self.capacity * sizeof(double))
-        self.n_samples = <int *>realloc(self.n_samples, self.capacity * sizeof(int))
-        self.features = <int *>realloc(self.features, self.capacity * sizeof(int))
+        self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))
         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
         self.right_children = <int *>realloc(self.right_children, self.capacity * sizeof(int))
+
+        # metadata
+        self.count = <int *>realloc(self.count, self.capacity * sizeof(int))
+        self.pos_count = <int *>realloc(self.pos_count, self.capacity * sizeof(int))
+        self.feature_count = <int *>realloc(self.feature_count, self.capacity * sizeof(int))
+        self.left_counts = <int **>realloc(self.left_counts, self.capacity * sizeof(int *))
+        self.left_pos_counts = <int **>realloc(self.left_pos_counts, self.capacity * sizeof(int *))
+        self.right_counts = <int **>realloc(self.right_counts, self.capacity * sizeof(int *))
+        self.right_pos_counts = <int **>realloc(self.right_pos_counts, self.capacity * sizeof(int *))
+        self.features = <int **>realloc(self.features, self.capacity * sizeof(int *))
+        self.leaf_samples = <int **>realloc(self.leaf_samples, self.capacity * sizeof(int *))
 
         return 0
 

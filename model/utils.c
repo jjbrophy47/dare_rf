@@ -1191,7 +1191,7 @@ typedef npy_int32 __pyx_t_4tree_INT32_t;
  * ctypedef np.npy_int32 INT32_t            # Signed 32 bit integer
  * ctypedef np.npy_uint32 UINT32_t          # Unsigned 32 bit integer             # <<<<<<<<<<<<<<
  * 
- * from splitter cimport SplitRecord
+ * from splitter cimport Meta
  */
 typedef npy_uint32 __pyx_t_4tree_UINT32_t;
 /* Declarations.proto */
@@ -1264,10 +1264,29 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  * cdef inline object PyArray_MultiIterNew1(a):
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
+struct __pyx_t_8splitter_Meta;
 struct __pyx_t_8splitter_SplitRecord;
 
-/* "splitter.pxd":12
- * # from criterion cimport Criterion
+/* "splitter.pxd":7
+ * from tree cimport UINT32_t
+ * 
+ * cdef struct Meta:             # <<<<<<<<<<<<<<
+ *     # Sufficient statistics to save for each attribute
+ *     int  count               # Number of samples in the node
+ */
+struct __pyx_t_8splitter_Meta {
+  int count;
+  int pos_count;
+  int feature_count;
+  int *left_counts;
+  int *left_pos_counts;
+  int *right_counts;
+  int *right_pos_counts;
+  int *features;
+};
+
+/* "splitter.pxd":19
+ * 
  * 
  * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
  *     # Data to track sample split
@@ -1284,12 +1303,12 @@ struct __pyx_t_8splitter_SplitRecord {
 };
 struct __pyx_opt_args_4tree_4Tree__resize;
 
-/* "tree.pxd":63
+/* "tree.pxd":57
+ *     cdef np.ndarray _get_double_ndarray(self, double *data)
  *     cdef np.ndarray _get_int_ndarray(self, int *data)
- *     # cdef np.ndarray _get_node_ndarray(self)
  *     cdef int _resize(self, int capacity=*) nogil except -1             # <<<<<<<<<<<<<<
- *     # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
  * 
+ * cdef class TreeBuilder:
  */
 struct __pyx_opt_args_4tree_4Tree__resize {
   int __pyx_n;
@@ -1297,7 +1316,7 @@ struct __pyx_opt_args_4tree_4Tree__resize {
 };
 struct __pyx_t_5utils_StackRecord;
 
-/* "utils.pxd":46
+/* "utils.pxd":39
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct StackRecord:             # <<<<<<<<<<<<<<
@@ -1325,8 +1344,8 @@ enum  {
   __pyx_e_5utils_RAND_R_MAX = 0x7FFFFFFF
 };
 
-/* "splitter.pxd":28
- *     # double impurity_right  # Impurity of the right split.
+/* "splitter.pxd":29
+ *     int  n_features           # Number of valid features after split.
  * 
  * cdef class Splitter:             # <<<<<<<<<<<<<<
  *     """
@@ -1341,8 +1360,8 @@ struct __pyx_obj_8splitter_Splitter {
 };
 
 
-/* "tree.pxd":30
- * #     cdef Meta* meta                                  # Metadata of for each attribute split
+/* "tree.pxd":14
+ * from splitter cimport Splitter
  * 
  * cdef class Tree:             # <<<<<<<<<<<<<<
  *     """
@@ -1356,15 +1375,23 @@ struct __pyx_obj_4tree_Tree {
   int node_count;
   int capacity;
   double *values;
-  int *n_samples;
-  int *features;
+  int *chosen_features;
   int *left_children;
   int *right_children;
+  int *count;
+  int *pos_count;
+  int *feature_count;
+  int **left_counts;
+  int **left_pos_counts;
+  int **right_counts;
+  int **right_pos_counts;
+  int **features;
+  int **leaf_samples;
 };
 
 
-/* "tree.pxd":66
- *     # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
+/* "tree.pxd":59
+ *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
  * cdef class TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
@@ -1380,7 +1407,7 @@ struct __pyx_obj_4tree_TreeBuilder {
 };
 
 
-/* "utils.pxd":55
+/* "utils.pxd":48
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1474,8 +1501,8 @@ struct __pyx_memoryviewslice_obj {
 
 
 
-/* "splitter.pxd":28
- *     # double impurity_right  # Impurity of the right split.
+/* "splitter.pxd":29
+ *     int  n_features           # Number of valid features after split.
  * 
  * cdef class Splitter:             # <<<<<<<<<<<<<<
  *     """
@@ -1483,8 +1510,7 @@ struct __pyx_memoryviewslice_obj {
  */
 
 struct __pyx_vtabstruct_8splitter_Splitter {
-  int (*init)(struct __pyx_obj_8splitter_Splitter *);
-  int (*node_split)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int, int *, int, struct __pyx_t_8splitter_SplitRecord *);
+  int (*node_split)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *);
   double (*_compute_gini)(struct __pyx_obj_8splitter_Splitter *, double, double, double, int, int);
   int (*_generate_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, double *, int);
   int (*_sample_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, int);
@@ -1492,8 +1518,8 @@ struct __pyx_vtabstruct_8splitter_Splitter {
 static struct __pyx_vtabstruct_8splitter_Splitter *__pyx_vtabptr_8splitter_Splitter;
 
 
-/* "tree.pxd":30
- * #     cdef Meta* meta                                  # Metadata of for each attribute split
+/* "tree.pxd":14
+ * from splitter cimport Splitter
  * 
  * cdef class Tree:             # <<<<<<<<<<<<<<
  *     """
@@ -1501,7 +1527,13 @@ static struct __pyx_vtabstruct_8splitter_Splitter *__pyx_vtabptr_8splitter_Split
  */
 
 struct __pyx_vtabstruct_4tree_Tree {
-  int (*add_node)(struct __pyx_obj_4tree_Tree *, int, int, int, int, int, double);
+  PyArrayObject *(*predict)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_left_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_left_pos_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_right_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_right_pos_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_features)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  int (*add_node)(struct __pyx_obj_4tree_Tree *, int, int, int, int, double, int *, struct __pyx_t_8splitter_Meta *);
   PyArrayObject *(*_get_double_ndarray)(struct __pyx_obj_4tree_Tree *, double *);
   PyArrayObject *(*_get_int_ndarray)(struct __pyx_obj_4tree_Tree *, int *);
   int (*_resize)(struct __pyx_obj_4tree_Tree *, struct __pyx_opt_args_4tree_4Tree__resize *__pyx_optional_args);
@@ -1509,8 +1541,8 @@ struct __pyx_vtabstruct_4tree_Tree {
 static struct __pyx_vtabstruct_4tree_Tree *__pyx_vtabptr_4tree_Tree;
 
 
-/* "tree.pxd":66
- *     # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
+/* "tree.pxd":59
+ *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
  * cdef class TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
@@ -1520,7 +1552,7 @@ static struct __pyx_vtabstruct_4tree_Tree *__pyx_vtabptr_4tree_Tree;
 struct __pyx_vtabstruct_4tree_TreeBuilder {
   void (*build)(struct __pyx_obj_4tree_TreeBuilder *, struct __pyx_obj_4tree_Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
   PyObject *(*_check_input)(struct __pyx_obj_4tree_TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *);
-  double (*_leaf_value)(struct __pyx_obj_4tree_TreeBuilder *, __Pyx_memviewslice, int *, int);
+  double (*_leaf_value)(struct __pyx_obj_4tree_TreeBuilder *, __Pyx_memviewslice, int *, int, struct __pyx_t_8splitter_Meta *);
 };
 static struct __pyx_vtabstruct_4tree_TreeBuilder *__pyx_vtabptr_4tree_TreeBuilder;
 
@@ -20232,20 +20264,20 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5numpy_ufunc = __Pyx_ImportType(__pyx_t_1, "numpy", "ufunc", sizeof(PyUFuncObject), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5numpy_ufunc) __PYX_ERR(2, 918, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 28, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_8splitter_Splitter = __Pyx_ImportType(__pyx_t_1, "splitter", "Splitter", sizeof(struct __pyx_obj_8splitter_Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_8splitter_Splitter) __PYX_ERR(4, 28, __pyx_L1_error)
-  __pyx_vtabptr_8splitter_Splitter = (struct __pyx_vtabstruct_8splitter_Splitter*)__Pyx_GetVtable(__pyx_ptype_8splitter_Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_8splitter_Splitter)) __PYX_ERR(4, 28, __pyx_L1_error)
+   if (!__pyx_ptype_8splitter_Splitter) __PYX_ERR(4, 29, __pyx_L1_error)
+  __pyx_vtabptr_8splitter_Splitter = (struct __pyx_vtabstruct_8splitter_Splitter*)__Pyx_GetVtable(__pyx_ptype_8splitter_Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_8splitter_Splitter)) __PYX_ERR(4, 29, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 30, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_4tree_Tree = __Pyx_ImportType(__pyx_t_1, "tree", "Tree", sizeof(struct __pyx_obj_4tree_Tree), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_4tree_Tree) __PYX_ERR(5, 30, __pyx_L1_error)
-  __pyx_vtabptr_4tree_Tree = (struct __pyx_vtabstruct_4tree_Tree*)__Pyx_GetVtable(__pyx_ptype_4tree_Tree->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_Tree)) __PYX_ERR(5, 30, __pyx_L1_error)
+   if (!__pyx_ptype_4tree_Tree) __PYX_ERR(5, 14, __pyx_L1_error)
+  __pyx_vtabptr_4tree_Tree = (struct __pyx_vtabstruct_4tree_Tree*)__Pyx_GetVtable(__pyx_ptype_4tree_Tree->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_Tree)) __PYX_ERR(5, 14, __pyx_L1_error)
   __pyx_ptype_4tree_TreeBuilder = __Pyx_ImportType(__pyx_t_1, "tree", "TreeBuilder", sizeof(struct __pyx_obj_4tree_TreeBuilder), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_4tree_TreeBuilder) __PYX_ERR(5, 66, __pyx_L1_error)
-  __pyx_vtabptr_4tree_TreeBuilder = (struct __pyx_vtabstruct_4tree_TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_4tree_TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_TreeBuilder)) __PYX_ERR(5, 66, __pyx_L1_error)
+   if (!__pyx_ptype_4tree_TreeBuilder) __PYX_ERR(5, 59, __pyx_L1_error)
+  __pyx_vtabptr_4tree_TreeBuilder = (struct __pyx_vtabstruct_4tree_TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_4tree_TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_TreeBuilder)) __PYX_ERR(5, 59, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

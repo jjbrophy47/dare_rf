@@ -1191,7 +1191,7 @@ typedef npy_int32 __pyx_t_4tree_INT32_t;
  * ctypedef np.npy_int32 INT32_t            # Signed 32 bit integer
  * ctypedef np.npy_uint32 UINT32_t          # Unsigned 32 bit integer             # <<<<<<<<<<<<<<
  * 
- * from splitter cimport SplitRecord
+ * from splitter cimport Meta
  */
 typedef npy_uint32 __pyx_t_4tree_UINT32_t;
 /* Declarations.proto */
@@ -1266,12 +1266,12 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_opt_args_4tree_4Tree__resize;
 
-/* "tree.pxd":63
+/* "tree.pxd":57
+ *     cdef np.ndarray _get_double_ndarray(self, double *data)
  *     cdef np.ndarray _get_int_ndarray(self, int *data)
- *     # cdef np.ndarray _get_node_ndarray(self)
  *     cdef int _resize(self, int capacity=*) nogil except -1             # <<<<<<<<<<<<<<
- *     # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
  * 
+ * cdef class TreeBuilder:
  */
 struct __pyx_opt_args_4tree_4Tree__resize {
   int __pyx_n;
@@ -1279,7 +1279,7 @@ struct __pyx_opt_args_4tree_4Tree__resize {
 };
 struct __pyx_t_5utils_StackRecord;
 
-/* "utils.pxd":46
+/* "utils.pxd":39
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct StackRecord:             # <<<<<<<<<<<<<<
@@ -1295,10 +1295,29 @@ struct __pyx_t_5utils_StackRecord {
   int *features;
   int n_features;
 };
+struct __pyx_t_8splitter_Meta;
 struct __pyx_t_8splitter_SplitRecord;
 
-/* "splitter.pxd":12
- * # from criterion cimport Criterion
+/* "splitter.pxd":7
+ * from tree cimport UINT32_t
+ * 
+ * cdef struct Meta:             # <<<<<<<<<<<<<<
+ *     # Sufficient statistics to save for each attribute
+ *     int  count               # Number of samples in the node
+ */
+struct __pyx_t_8splitter_Meta {
+  int count;
+  int pos_count;
+  int feature_count;
+  int *left_counts;
+  int *left_pos_counts;
+  int *right_counts;
+  int *right_pos_counts;
+  int *features;
+};
+
+/* "splitter.pxd":19
+ * 
  * 
  * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
  *     # Data to track sample split
@@ -1314,8 +1333,8 @@ struct __pyx_t_8splitter_SplitRecord {
   int n_features;
 };
 
-/* "tree.pxd":30
- * #     cdef Meta* meta                                  # Metadata of for each attribute split
+/* "tree.pxd":14
+ * from splitter cimport Splitter
  * 
  * cdef class Tree:             # <<<<<<<<<<<<<<
  *     """
@@ -1329,15 +1348,23 @@ struct __pyx_obj_4tree_Tree {
   int node_count;
   int capacity;
   double *values;
-  int *n_samples;
-  int *features;
+  int *chosen_features;
   int *left_children;
   int *right_children;
+  int *count;
+  int *pos_count;
+  int *feature_count;
+  int **left_counts;
+  int **left_pos_counts;
+  int **right_counts;
+  int **right_pos_counts;
+  int **features;
+  int **leaf_samples;
 };
 
 
-/* "tree.pxd":66
- *     # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
+/* "tree.pxd":59
+ *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
  * cdef class TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
@@ -1353,7 +1380,7 @@ struct __pyx_obj_4tree_TreeBuilder {
 };
 
 
-/* "utils.pxd":55
+/* "utils.pxd":48
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1369,8 +1396,8 @@ struct __pyx_obj_5utils_Stack {
 };
 
 
-/* "splitter.pxd":28
- *     # double impurity_right  # Impurity of the right split.
+/* "splitter.pxd":29
+ *     int  n_features           # Number of valid features after split.
  * 
  * cdef class Splitter:             # <<<<<<<<<<<<<<
  *     """
@@ -1463,8 +1490,8 @@ struct __pyx_memoryviewslice_obj {
 
 
 
-/* "tree.pxd":30
- * #     cdef Meta* meta                                  # Metadata of for each attribute split
+/* "tree.pxd":14
+ * from splitter cimport Splitter
  * 
  * cdef class Tree:             # <<<<<<<<<<<<<<
  *     """
@@ -1472,7 +1499,13 @@ struct __pyx_memoryviewslice_obj {
  */
 
 struct __pyx_vtabstruct_4tree_Tree {
-  int (*add_node)(struct __pyx_obj_4tree_Tree *, int, int, int, int, int, double);
+  PyArrayObject *(*predict)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_left_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_left_pos_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_right_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_right_pos_counts)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  PyArrayObject *(*_get_features)(struct __pyx_obj_4tree_Tree *, PyObject *, int __pyx_skip_dispatch);
+  int (*add_node)(struct __pyx_obj_4tree_Tree *, int, int, int, int, double, int *, struct __pyx_t_8splitter_Meta *);
   PyArrayObject *(*_get_double_ndarray)(struct __pyx_obj_4tree_Tree *, double *);
   PyArrayObject *(*_get_int_ndarray)(struct __pyx_obj_4tree_Tree *, int *);
   int (*_resize)(struct __pyx_obj_4tree_Tree *, struct __pyx_opt_args_4tree_4Tree__resize *__pyx_optional_args);
@@ -1480,8 +1513,8 @@ struct __pyx_vtabstruct_4tree_Tree {
 static struct __pyx_vtabstruct_4tree_Tree *__pyx_vtabptr_4tree_Tree;
 
 
-/* "tree.pxd":66
- *     # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
+/* "tree.pxd":59
+ *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
  * cdef class TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
@@ -1491,12 +1524,12 @@ static struct __pyx_vtabstruct_4tree_Tree *__pyx_vtabptr_4tree_Tree;
 struct __pyx_vtabstruct_4tree_TreeBuilder {
   void (*build)(struct __pyx_obj_4tree_TreeBuilder *, struct __pyx_obj_4tree_Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
   PyObject *(*_check_input)(struct __pyx_obj_4tree_TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *);
-  double (*_leaf_value)(struct __pyx_obj_4tree_TreeBuilder *, __Pyx_memviewslice, int *, int);
+  double (*_leaf_value)(struct __pyx_obj_4tree_TreeBuilder *, __Pyx_memviewslice, int *, int, struct __pyx_t_8splitter_Meta *);
 };
 static struct __pyx_vtabstruct_4tree_TreeBuilder *__pyx_vtabptr_4tree_TreeBuilder;
 
 
-/* "utils.pxd":55
+/* "utils.pxd":48
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1521,8 +1554,7 @@ static struct __pyx_vtabstruct_5utils_Stack *__pyx_vtabptr_5utils_Stack;
  */
 
 struct __pyx_vtabstruct_8splitter_Splitter {
-  int (*init)(struct __pyx_obj_8splitter_Splitter *);
-  int (*node_split)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int, int *, int, struct __pyx_t_8splitter_SplitRecord *);
+  int (*node_split)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *);
   double (*_compute_gini)(struct __pyx_obj_8splitter_Splitter *, double, double, double, int, int);
   int (*_generate_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, double *, int);
   int (*_sample_distribution)(struct __pyx_obj_8splitter_Splitter *, double *, int);
@@ -2285,8 +2317,7 @@ static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
-static int __pyx_f_8splitter_8Splitter_init(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self); /* proto*/
-static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split); /* proto*/
+static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta); /* proto*/
 static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double __pyx_v_count, double __pyx_v_left_count, double __pyx_v_right_count, int __pyx_v_left_pos_count, int __pyx_v_right_pos_count); /* proto*/
 static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, double *__pyx_v_gini_indices, int __pyx_v_n_gini_indices); /* proto*/
 static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, double *__pyx_v_distribution, int __pyx_v_n_distribution); /* proto*/
@@ -2790,17 +2821,17 @@ static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Spl
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "splitter.pyx":42
- *         # self.n_features = 0
- * 
+  /* "splitter.pyx":40
+ *             Random state.
+ *         """
  *         self.min_samples_leaf = min_samples_leaf             # <<<<<<<<<<<<<<
  *         self.lmbda = lmbda
  *         self.random_state = random_state
  */
   __pyx_v_self->min_samples_leaf = __pyx_v_min_samples_leaf;
 
-  /* "splitter.pyx":43
- * 
+  /* "splitter.pyx":41
+ *         """
  *         self.min_samples_leaf = min_samples_leaf
  *         self.lmbda = lmbda             # <<<<<<<<<<<<<<
  *         self.random_state = random_state
@@ -2808,7 +2839,7 @@ static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_self->lmbda = __pyx_v_lmbda;
 
-  /* "splitter.pyx":44
+  /* "splitter.pyx":42
  *         self.min_samples_leaf = min_samples_leaf
  *         self.lmbda = lmbda
  *         self.random_state = random_state             # <<<<<<<<<<<<<<
@@ -2831,7 +2862,7 @@ static int __pyx_pf_8splitter_8Splitter___cinit__(struct __pyx_obj_8splitter_Spl
   return __pyx_r;
 }
 
-/* "splitter.pyx":46
+/* "splitter.pyx":44
  *         self.random_state = random_state
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2858,57 +2889,21 @@ static void __pyx_pf_8splitter_8Splitter_2__dealloc__(CYTHON_UNUSED struct __pyx
   __Pyx_RefNannyFinishContext();
 }
 
-/* "splitter.pyx":52
- *         # free(self.features)
- * 
- *     cdef int init(self):             # <<<<<<<<<<<<<<
- *         """
- *         Initialize the splitter.
- */
-
-static int __pyx_f_8splitter_8Splitter_init(CYTHON_UNUSED struct __pyx_obj_8splitter_Splitter *__pyx_v_self) {
-  int __pyx_r;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("init", 0);
-
-  /* "splitter.pyx":79
- *         # for i in range(n_features):
- *         #     features[i] = i
- *         return 0             # <<<<<<<<<<<<<<
- * 
- *     # cdef int node_reset(self, SIZE_t start, SIZE_t end) nogil except -1:
- */
-  __pyx_r = 0;
-  goto __pyx_L0;
-
-  /* "splitter.pyx":52
- *         # free(self.features)
- * 
- *     cdef int init(self):             # <<<<<<<<<<<<<<
- *         """
- *         Initialize the splitter.
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "splitter.pyx":103
+/* "splitter.pyx":50
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,             # <<<<<<<<<<<<<<
- *                         int* samples, int n_samples, int* features, int n_features,
- *                         SplitRecord* split):
+ *                         int* samples, int* features, int n_features,
+ *                         SplitRecord* split, Meta* meta):
  */
 
-static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split) {
+static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Splitter *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_f, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features, struct __pyx_t_8splitter_SplitRecord *__pyx_v_split, struct __pyx_t_8splitter_Meta *__pyx_v_meta) {
   int __pyx_v_min_samples_leaf;
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_k;
   int __pyx_v_chosen_ndx;
+  int __pyx_v_n_samples;
   int __pyx_v_count;
   int __pyx_v_pos_count;
   int __pyx_v_left_count;
@@ -2916,6 +2911,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
   int __pyx_v_right_count;
   int __pyx_v_right_pos_count;
   int __pyx_v_feature_count;
+  int __pyx_v_result;
   double *__pyx_v_gini_indices;
   double *__pyx_v_distribution;
   int *__pyx_v_valid_features;
@@ -2941,8 +2937,8 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
   Py_ssize_t __pyx_t_14;
   __Pyx_RefNannySetupContext("node_split", 0);
 
-  /* "splitter.pyx":118
- *         # cdef int n_features = X.shape[1]
+  /* "splitter.pyx":59
+ *         """
  * 
  *         cdef int min_samples_leaf = self.min_samples_leaf             # <<<<<<<<<<<<<<
  * 
@@ -2951,35 +2947,55 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
   __pyx_t_1 = __pyx_v_self->min_samples_leaf;
   __pyx_v_min_samples_leaf = __pyx_t_1;
 
-  /* "splitter.pyx":126
+  /* "splitter.pyx":67
  *         cdef int chosen_feature
  * 
- *         cdef int count = n_samples             # <<<<<<<<<<<<<<
+ *         cdef int n_samples = meta.count             # <<<<<<<<<<<<<<
+ *         cdef int count = meta.count
+ *         cdef int pos_count = 0
+ */
+  __pyx_t_1 = __pyx_v_meta->count;
+  __pyx_v_n_samples = __pyx_t_1;
+
+  /* "splitter.pyx":68
+ * 
+ *         cdef int n_samples = meta.count
+ *         cdef int count = meta.count             # <<<<<<<<<<<<<<
  *         cdef int pos_count = 0
  *         cdef int left_count
  */
-  __pyx_v_count = __pyx_v_n_samples;
+  __pyx_t_1 = __pyx_v_meta->count;
+  __pyx_v_count = __pyx_t_1;
 
-  /* "splitter.pyx":127
- * 
- *         cdef int count = n_samples
+  /* "splitter.pyx":69
+ *         cdef int n_samples = meta.count
+ *         cdef int count = meta.count
  *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
  *         cdef int left_count
  *         cdef int left_pos_count
  */
   __pyx_v_pos_count = 0;
 
-  /* "splitter.pyx":133
+  /* "splitter.pyx":75
  *         cdef int right_pos_count
  * 
  *         cdef int feature_count = 0             # <<<<<<<<<<<<<<
+ *         cdef int result = 0
  * 
- *         # printf("heyooooo\n")
  */
   __pyx_v_feature_count = 0;
 
-  /* "splitter.pyx":137
- *         # printf("heyooooo\n")
+  /* "splitter.pyx":76
+ * 
+ *         cdef int feature_count = 0
+ *         cdef int result = 0             # <<<<<<<<<<<<<<
+ * 
+ *         cdef double* gini_indices = <double *>malloc(n_features * sizeof(double))
+ */
+  __pyx_v_result = 0;
+
+  /* "splitter.pyx":78
+ *         cdef int result = 0
  * 
  *         cdef double* gini_indices = <double *>malloc(n_features * sizeof(double))             # <<<<<<<<<<<<<<
  *         cdef double* distribution = <double *>malloc(n_features * sizeof(double))
@@ -2987,7 +3003,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_gini_indices = ((double *)malloc((__pyx_v_n_features * (sizeof(double)))));
 
-  /* "splitter.pyx":138
+  /* "splitter.pyx":79
  * 
  *         cdef double* gini_indices = <double *>malloc(n_features * sizeof(double))
  *         cdef double* distribution = <double *>malloc(n_features * sizeof(double))             # <<<<<<<<<<<<<<
@@ -2996,7 +3012,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_distribution = ((double *)malloc((__pyx_v_n_features * (sizeof(double)))));
 
-  /* "splitter.pyx":139
+  /* "splitter.pyx":80
  *         cdef double* gini_indices = <double *>malloc(n_features * sizeof(double))
  *         cdef double* distribution = <double *>malloc(n_features * sizeof(double))
  *         cdef int* valid_features = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3005,7 +3021,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_valid_features = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "splitter.pyx":141
+  /* "splitter.pyx":82
  *         cdef int* valid_features = <int *>malloc(n_features * sizeof(int))
  * 
  *         cdef int* left_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3014,7 +3030,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_left_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "splitter.pyx":142
+  /* "splitter.pyx":83
  * 
  *         cdef int* left_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3023,7 +3039,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_left_pos_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "splitter.pyx":143
+  /* "splitter.pyx":84
  *         cdef int* left_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* right_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3032,16 +3048,16 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   __pyx_v_right_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "splitter.pyx":144
+  /* "splitter.pyx":85
  *         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* right_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* right_pos_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
  * 
- *         # printf("finished allocating\n")
+ *         # count number of pos labels
  */
   __pyx_v_right_pos_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "splitter.pyx":149
+  /* "splitter.pyx":88
  * 
  *         # count number of pos labels
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3053,7 +3069,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "splitter.pyx":151
+    /* "splitter.pyx":90
  *         for i in range(n_samples):
  *             # printf("sample[%d]: %d\n", i, samples[i])
  *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
@@ -3064,7 +3080,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
     __pyx_t_5 = (((*((int *) ( /* dim=0 */ ((char *) (((int *) __pyx_v_y.data) + __pyx_t_4)) ))) == 1) != 0);
     if (__pyx_t_5) {
 
-      /* "splitter.pyx":152
+      /* "splitter.pyx":91
  *             # printf("sample[%d]: %d\n", i, samples[i])
  *             if y[samples[i]] == 1:
  *                 pos_count += 1             # <<<<<<<<<<<<<<
@@ -3073,7 +3089,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       __pyx_v_pos_count = (__pyx_v_pos_count + 1);
 
-      /* "splitter.pyx":151
+      /* "splitter.pyx":90
  *         for i in range(n_samples):
  *             # printf("sample[%d]: %d\n", i, samples[i])
  *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
@@ -3083,7 +3099,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
     }
   }
 
-  /* "splitter.pyx":155
+  /* "splitter.pyx":94
  * 
  *         # compute statistics for each attribute
  *         for j in range(n_features):             # <<<<<<<<<<<<<<
@@ -3095,7 +3111,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_j = __pyx_t_3;
 
-    /* "splitter.pyx":157
+    /* "splitter.pyx":96
  *         for j in range(n_features):
  * 
  *             left_count = 0             # <<<<<<<<<<<<<<
@@ -3104,7 +3120,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
     __pyx_v_left_count = 0;
 
-    /* "splitter.pyx":158
+    /* "splitter.pyx":97
  * 
  *             left_count = 0
  *             left_pos_count = 0             # <<<<<<<<<<<<<<
@@ -3113,7 +3129,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
     __pyx_v_left_pos_count = 0;
 
-    /* "splitter.pyx":160
+    /* "splitter.pyx":99
  *             left_pos_count = 0
  * 
  *             for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3125,7 +3141,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_i = __pyx_t_8;
 
-      /* "splitter.pyx":162
+      /* "splitter.pyx":101
  *             for i in range(n_samples):
  * 
  *                 if X[samples[i], features[j]] == 1:             # <<<<<<<<<<<<<<
@@ -3137,26 +3153,26 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
       __pyx_t_5 = (((*((int *) ( /* dim=1 */ (( /* dim=0 */ ((char *) (((int *) __pyx_v_X.data) + __pyx_t_9)) ) + __pyx_t_10 * __pyx_v_X.strides[1]) ))) == 1) != 0);
       if (__pyx_t_5) {
 
-        /* "splitter.pyx":163
+        /* "splitter.pyx":102
  * 
  *                 if X[samples[i], features[j]] == 1:
  *                     left_count += 1             # <<<<<<<<<<<<<<
  *                     left_pos_count += y[samples[i]]
- *                     # if y[samples[i]] == 1:
+ * 
  */
         __pyx_v_left_count = (__pyx_v_left_count + 1);
 
-        /* "splitter.pyx":164
+        /* "splitter.pyx":103
  *                 if X[samples[i], features[j]] == 1:
  *                     left_count += 1
  *                     left_pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
- *                     # if y[samples[i]] == 1:
- *                     #     left_pos_count += 1
+ * 
+ *             right_count = count - left_count
  */
         __pyx_t_11 = (__pyx_v_samples[__pyx_v_i]);
         __pyx_v_left_pos_count = (__pyx_v_left_pos_count + (*((int *) ( /* dim=0 */ ((char *) (((int *) __pyx_v_y.data) + __pyx_t_11)) ))));
 
-        /* "splitter.pyx":162
+        /* "splitter.pyx":101
  *             for i in range(n_samples):
  * 
  *                 if X[samples[i], features[j]] == 1:             # <<<<<<<<<<<<<<
@@ -3166,8 +3182,8 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
       }
     }
 
-    /* "splitter.pyx":168
- *                     #     left_pos_count += 1
+    /* "splitter.pyx":105
+ *                     left_pos_count += y[samples[i]]
  * 
  *             right_count = count - left_count             # <<<<<<<<<<<<<<
  *             right_pos_count = pos_count - left_pos_count
@@ -3175,7 +3191,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
     __pyx_v_right_count = (__pyx_v_count - __pyx_v_left_count);
 
-    /* "splitter.pyx":169
+    /* "splitter.pyx":106
  * 
  *             right_count = count - left_count
  *             right_pos_count = pos_count - left_pos_count             # <<<<<<<<<<<<<<
@@ -3184,7 +3200,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
     __pyx_v_right_pos_count = (__pyx_v_pos_count - __pyx_v_left_pos_count);
 
-    /* "splitter.pyx":172
+    /* "splitter.pyx":109
  * 
  *             # validate split
  *             if left_count >= min_samples_leaf and right_count >= min_samples_leaf:             # <<<<<<<<<<<<<<
@@ -3202,7 +3218,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
     __pyx_L12_bool_binop_done:;
     if (__pyx_t_5) {
 
-      /* "splitter.pyx":173
+      /* "splitter.pyx":110
  *             # validate split
  *             if left_count >= min_samples_leaf and right_count >= min_samples_leaf:
  *                 valid_features[feature_count] = features[j]             # <<<<<<<<<<<<<<
@@ -3211,7 +3227,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       (__pyx_v_valid_features[__pyx_v_feature_count]) = (__pyx_v_features[__pyx_v_j]);
 
-      /* "splitter.pyx":174
+      /* "splitter.pyx":111
  *             if left_count >= min_samples_leaf and right_count >= min_samples_leaf:
  *                 valid_features[feature_count] = features[j]
  *                 gini_indices[feature_count] = self._compute_gini(count, left_count, right_count,             # <<<<<<<<<<<<<<
@@ -3220,7 +3236,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       (__pyx_v_gini_indices[__pyx_v_feature_count]) = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_compute_gini(__pyx_v_self, __pyx_v_count, __pyx_v_left_count, __pyx_v_right_count, __pyx_v_left_pos_count, __pyx_v_right_pos_count);
 
-      /* "splitter.pyx":179
+      /* "splitter.pyx":116
  * 
  *                 # save metadata
  *                 left_counts[feature_count] = left_count             # <<<<<<<<<<<<<<
@@ -3229,7 +3245,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       (__pyx_v_left_counts[__pyx_v_feature_count]) = __pyx_v_left_count;
 
-      /* "splitter.pyx":180
+      /* "splitter.pyx":117
  *                 # save metadata
  *                 left_counts[feature_count] = left_count
  *                 left_pos_counts[feature_count] = left_pos_count             # <<<<<<<<<<<<<<
@@ -3238,7 +3254,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       (__pyx_v_left_pos_counts[__pyx_v_feature_count]) = __pyx_v_left_pos_count;
 
-      /* "splitter.pyx":181
+      /* "splitter.pyx":118
  *                 left_counts[feature_count] = left_count
  *                 left_pos_counts[feature_count] = left_pos_count
  *                 right_counts[feature_count] = right_count             # <<<<<<<<<<<<<<
@@ -3247,7 +3263,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       (__pyx_v_right_counts[__pyx_v_feature_count]) = __pyx_v_right_count;
 
-      /* "splitter.pyx":182
+      /* "splitter.pyx":119
  *                 left_pos_counts[feature_count] = left_pos_count
  *                 right_counts[feature_count] = right_count
  *                 right_pos_counts[feature_count] = right_pos_count             # <<<<<<<<<<<<<<
@@ -3256,16 +3272,16 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
       (__pyx_v_right_pos_counts[__pyx_v_feature_count]) = __pyx_v_right_pos_count;
 
-      /* "splitter.pyx":184
+      /* "splitter.pyx":121
  *                 right_pos_counts[feature_count] = right_pos_count
  * 
  *                 feature_count += 1             # <<<<<<<<<<<<<<
  * 
- *         # TODO: handle feature_count of 0
+ *         if feature_count > 0:
  */
       __pyx_v_feature_count = (__pyx_v_feature_count + 1);
 
-      /* "splitter.pyx":172
+      /* "splitter.pyx":109
  * 
  *             # validate split
  *             if left_count >= min_samples_leaf and right_count >= min_samples_leaf:             # <<<<<<<<<<<<<<
@@ -3275,326 +3291,338 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
     }
   }
 
-  /* "splitter.pyx":187
+  /* "splitter.pyx":123
+ *                 feature_count += 1
  * 
- *         # TODO: handle feature_count of 0
- *         if feature_count == 0:             # <<<<<<<<<<<<<<
- *         # clean up
- *             free(gini_indices)
+ *         if feature_count > 0:             # <<<<<<<<<<<<<<
+ * 
+ *             # remove invalid features
  */
-  __pyx_t_5 = ((__pyx_v_feature_count == 0) != 0);
+  __pyx_t_5 = ((__pyx_v_feature_count > 0) != 0);
   if (__pyx_t_5) {
 
-    /* "splitter.pyx":189
- *         if feature_count == 0:
- *         # clean up
- *             free(gini_indices)             # <<<<<<<<<<<<<<
- *             free(distribution)
+    /* "splitter.pyx":126
+ * 
+ *             # remove invalid features
+ *             gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))             # <<<<<<<<<<<<<<
+ *             distribution = <double *>realloc(distribution, feature_count * sizeof(double))
+ *             valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
+ */
+    __pyx_v_gini_indices = ((double *)realloc(__pyx_v_gini_indices, (__pyx_v_feature_count * (sizeof(double)))));
+
+    /* "splitter.pyx":127
+ *             # remove invalid features
+ *             gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
+ *             distribution = <double *>realloc(distribution, feature_count * sizeof(double))             # <<<<<<<<<<<<<<
+ *             valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
  * 
  */
-    free(__pyx_v_gini_indices);
+    __pyx_v_distribution = ((double *)realloc(__pyx_v_distribution, (__pyx_v_feature_count * (sizeof(double)))));
 
-    /* "splitter.pyx":190
- *         # clean up
- *             free(gini_indices)
- *             free(distribution)             # <<<<<<<<<<<<<<
+    /* "splitter.pyx":128
+ *             gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
+ *             distribution = <double *>realloc(distribution, feature_count * sizeof(double))
+ *             valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
  * 
- *             free(left_counts)
+ *             left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
  */
-    free(__pyx_v_distribution);
+    __pyx_v_valid_features = ((int *)realloc(__pyx_v_valid_features, (__pyx_v_feature_count * (sizeof(int)))));
 
-    /* "splitter.pyx":192
- *             free(distribution)
+    /* "splitter.pyx":130
+ *             valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
  * 
- *             free(left_counts)             # <<<<<<<<<<<<<<
- *             free(left_pos_counts)
- *             free(right_counts)
+ *             left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
+ *             left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
+ *             right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
  */
-    free(__pyx_v_left_counts);
+    __pyx_v_left_counts = ((int *)realloc(__pyx_v_left_counts, (__pyx_v_feature_count * (sizeof(int)))));
 
-    /* "splitter.pyx":193
+    /* "splitter.pyx":131
  * 
- *             free(left_counts)
- *             free(left_pos_counts)             # <<<<<<<<<<<<<<
- *             free(right_counts)
- *             free(right_pos_counts)
+ *             left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
+ *             left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
+ *             right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
+ *             right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
  */
-    free(__pyx_v_left_pos_counts);
+    __pyx_v_left_pos_counts = ((int *)realloc(__pyx_v_left_pos_counts, (__pyx_v_feature_count * (sizeof(int)))));
 
-    /* "splitter.pyx":194
- *             free(left_counts)
- *             free(left_pos_counts)
- *             free(right_counts)             # <<<<<<<<<<<<<<
- *             free(right_pos_counts)
- *             return -2
- */
-    free(__pyx_v_right_counts);
-
-    /* "splitter.pyx":195
- *             free(left_pos_counts)
- *             free(right_counts)
- *             free(right_pos_counts)             # <<<<<<<<<<<<<<
- *             return -2
+    /* "splitter.pyx":132
+ *             left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
+ *             left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
+ *             right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
+ *             right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
  * 
  */
-    free(__pyx_v_right_pos_counts);
+    __pyx_v_right_counts = ((int *)realloc(__pyx_v_right_counts, (__pyx_v_feature_count * (sizeof(int)))));
 
-    /* "splitter.pyx":196
- *             free(right_counts)
- *             free(right_pos_counts)
- *             return -2             # <<<<<<<<<<<<<<
+    /* "splitter.pyx":133
+ *             left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
+ *             right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
+ *             right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
  * 
- *         # remove invalid features
+ *             # generate and sample from the distribution
  */
-    __pyx_r = -2;
-    goto __pyx_L0;
+    __pyx_v_right_pos_counts = ((int *)realloc(__pyx_v_right_pos_counts, (__pyx_v_feature_count * (sizeof(int)))));
 
-    /* "splitter.pyx":187
+    /* "splitter.pyx":136
  * 
- *         # TODO: handle feature_count of 0
- *         if feature_count == 0:             # <<<<<<<<<<<<<<
- *         # clean up
- *             free(gini_indices)
+ *             # generate and sample from the distribution
+ *             self._generate_distribution(distribution, gini_indices, feature_count)             # <<<<<<<<<<<<<<
+ *             chosen_ndx = self._sample_distribution(distribution, feature_count)
+ *             # printf('chosen feature: %d\n', valid_features[chosen_ndx])
  */
-  }
+    (void)(((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_generate_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
 
-  /* "splitter.pyx":199
- * 
- *         # remove invalid features
- *         gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))             # <<<<<<<<<<<<<<
- *         distribution = <double *>realloc(distribution, feature_count * sizeof(double))
- *         valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
- */
-  __pyx_v_gini_indices = ((double *)realloc(__pyx_v_gini_indices, (__pyx_v_feature_count * (sizeof(double)))));
-
-  /* "splitter.pyx":200
- *         # remove invalid features
- *         gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
- *         distribution = <double *>realloc(distribution, feature_count * sizeof(double))             # <<<<<<<<<<<<<<
- *         valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
+    /* "splitter.pyx":137
+ *             # generate and sample from the distribution
+ *             self._generate_distribution(distribution, gini_indices, feature_count)
+ *             chosen_ndx = self._sample_distribution(distribution, feature_count)             # <<<<<<<<<<<<<<
+ *             # printf('chosen feature: %d\n', valid_features[chosen_ndx])
  * 
  */
-  __pyx_v_distribution = ((double *)realloc(__pyx_v_distribution, (__pyx_v_feature_count * (sizeof(double)))));
+    __pyx_v_chosen_ndx = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_sample_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_feature_count);
 
-  /* "splitter.pyx":201
- *         gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
- *         distribution = <double *>realloc(distribution, feature_count * sizeof(double))
- *         valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
+    /* "splitter.pyx":141
  * 
- *         left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
+ *             # assign results from chosen feature
+ *             split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))             # <<<<<<<<<<<<<<
+ *             split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+ *             j = 0
  */
-  __pyx_v_valid_features = ((int *)realloc(__pyx_v_valid_features, (__pyx_v_feature_count * (sizeof(int)))));
+    __pyx_v_split->left_indices = ((int *)malloc(((__pyx_v_left_counts[__pyx_v_chosen_ndx]) * (sizeof(int)))));
 
-  /* "splitter.pyx":203
- *         valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
- * 
- *         left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *         left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
- *         right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
+    /* "splitter.pyx":142
+ *             # assign results from chosen feature
+ *             split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
+ *             split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))             # <<<<<<<<<<<<<<
+ *             j = 0
+ *             k = 0
  */
-  __pyx_v_left_counts = ((int *)realloc(__pyx_v_left_counts, (__pyx_v_feature_count * (sizeof(int)))));
+    __pyx_v_split->right_indices = ((int *)malloc(((__pyx_v_right_counts[__pyx_v_chosen_ndx]) * (sizeof(int)))));
 
-  /* "splitter.pyx":204
- * 
- *         left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
- *         left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *         right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
- *         right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
+    /* "splitter.pyx":143
+ *             split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
+ *             split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+ *             j = 0             # <<<<<<<<<<<<<<
+ *             k = 0
+ *             for i in range(n_samples):
  */
-  __pyx_v_left_pos_counts = ((int *)realloc(__pyx_v_left_pos_counts, (__pyx_v_feature_count * (sizeof(int)))));
+    __pyx_v_j = 0;
 
-  /* "splitter.pyx":205
- *         left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
- *         left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
- *         right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *         right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
- * 
+    /* "splitter.pyx":144
+ *             split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+ *             j = 0
+ *             k = 0             # <<<<<<<<<<<<<<
+ *             for i in range(n_samples):
+ *                 if X[samples[i], valid_features[chosen_ndx]] == 1:
  */
-  __pyx_v_right_counts = ((int *)realloc(__pyx_v_right_counts, (__pyx_v_feature_count * (sizeof(int)))));
+    __pyx_v_k = 0;
 
-  /* "splitter.pyx":206
- *         left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
- *         right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
- *         right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- * 
- *         # generate and sample from the distribution
+    /* "splitter.pyx":145
+ *             j = 0
+ *             k = 0
+ *             for i in range(n_samples):             # <<<<<<<<<<<<<<
+ *                 if X[samples[i], valid_features[chosen_ndx]] == 1:
+ *                     split.left_indices[j] = samples[i]
  */
-  __pyx_v_right_pos_counts = ((int *)realloc(__pyx_v_right_pos_counts, (__pyx_v_feature_count * (sizeof(int)))));
+    __pyx_t_1 = __pyx_v_n_samples;
+    __pyx_t_2 = __pyx_t_1;
+    for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+      __pyx_v_i = __pyx_t_3;
 
-  /* "splitter.pyx":209
- * 
- *         # generate and sample from the distribution
- *         self._generate_distribution(distribution, gini_indices, feature_count)             # <<<<<<<<<<<<<<
- *         chosen_ndx = self._sample_distribution(distribution, feature_count)
- *         # printf('chosen feature: %d\n', valid_features[chosen_ndx])
+      /* "splitter.pyx":146
+ *             k = 0
+ *             for i in range(n_samples):
+ *                 if X[samples[i], valid_features[chosen_ndx]] == 1:             # <<<<<<<<<<<<<<
+ *                     split.left_indices[j] = samples[i]
+ *                     j += 1
  */
-  (void)(((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_generate_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
+      __pyx_t_13 = (__pyx_v_samples[__pyx_v_i]);
+      __pyx_t_14 = (__pyx_v_valid_features[__pyx_v_chosen_ndx]);
+      __pyx_t_5 = (((*((int *) ( /* dim=1 */ (( /* dim=0 */ ((char *) (((int *) __pyx_v_X.data) + __pyx_t_13)) ) + __pyx_t_14 * __pyx_v_X.strides[1]) ))) == 1) != 0);
+      if (__pyx_t_5) {
 
-  /* "splitter.pyx":210
- *         # generate and sample from the distribution
- *         self._generate_distribution(distribution, gini_indices, feature_count)
- *         chosen_ndx = self._sample_distribution(distribution, feature_count)             # <<<<<<<<<<<<<<
- *         # printf('chosen feature: %d\n', valid_features[chosen_ndx])
- * 
+        /* "splitter.pyx":147
+ *             for i in range(n_samples):
+ *                 if X[samples[i], valid_features[chosen_ndx]] == 1:
+ *                     split.left_indices[j] = samples[i]             # <<<<<<<<<<<<<<
+ *                     j += 1
+ *                 else:
  */
-  __pyx_v_chosen_ndx = ((struct __pyx_vtabstruct_8splitter_Splitter *)__pyx_v_self->__pyx_vtab)->_sample_distribution(__pyx_v_self, __pyx_v_distribution, __pyx_v_feature_count);
+        (__pyx_v_split->left_indices[__pyx_v_j]) = (__pyx_v_samples[__pyx_v_i]);
 
-  /* "splitter.pyx":217
- * 
- *         # assign results from chosen feature
- *         split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))             # <<<<<<<<<<<<<<
- *         split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
- *         j = 0
+        /* "splitter.pyx":148
+ *                 if X[samples[i], valid_features[chosen_ndx]] == 1:
+ *                     split.left_indices[j] = samples[i]
+ *                     j += 1             # <<<<<<<<<<<<<<
+ *                 else:
+ *                     split.right_indices[k] = samples[i]
  */
-  __pyx_v_split->left_indices = ((int *)malloc(((__pyx_v_left_counts[__pyx_v_chosen_ndx]) * (sizeof(int)))));
+        __pyx_v_j = (__pyx_v_j + 1);
 
-  /* "splitter.pyx":218
- *         # assign results from chosen feature
- *         split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
- *         split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))             # <<<<<<<<<<<<<<
- *         j = 0
- *         k = 0
+        /* "splitter.pyx":146
+ *             k = 0
+ *             for i in range(n_samples):
+ *                 if X[samples[i], valid_features[chosen_ndx]] == 1:             # <<<<<<<<<<<<<<
+ *                     split.left_indices[j] = samples[i]
+ *                     j += 1
  */
-  __pyx_v_split->right_indices = ((int *)malloc(((__pyx_v_right_counts[__pyx_v_chosen_ndx]) * (sizeof(int)))));
+        goto __pyx_L17;
+      }
 
-  /* "splitter.pyx":219
- *         split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
- *         split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
- *         j = 0             # <<<<<<<<<<<<<<
- *         k = 0
- *         for i in range(n_samples):
+      /* "splitter.pyx":150
+ *                     j += 1
+ *                 else:
+ *                     split.right_indices[k] = samples[i]             # <<<<<<<<<<<<<<
+ *                     k += 1
+ *             split.left_count = j
  */
-  __pyx_v_j = 0;
+      /*else*/ {
+        (__pyx_v_split->right_indices[__pyx_v_k]) = (__pyx_v_samples[__pyx_v_i]);
 
-  /* "splitter.pyx":220
- *         split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
- *         j = 0
- *         k = 0             # <<<<<<<<<<<<<<
- *         for i in range(n_samples):
- *             if X[samples[i], valid_features[chosen_ndx]] == 1:
+        /* "splitter.pyx":151
+ *                 else:
+ *                     split.right_indices[k] = samples[i]
+ *                     k += 1             # <<<<<<<<<<<<<<
+ *             split.left_count = j
+ *             split.right_count = k
  */
-  __pyx_v_k = 0;
-
-  /* "splitter.pyx":221
- *         j = 0
- *         k = 0
- *         for i in range(n_samples):             # <<<<<<<<<<<<<<
- *             if X[samples[i], valid_features[chosen_ndx]] == 1:
- *                 split.left_indices[j] = samples[i]
- */
-  __pyx_t_1 = __pyx_v_n_samples;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "splitter.pyx":222
- *         k = 0
- *         for i in range(n_samples):
- *             if X[samples[i], valid_features[chosen_ndx]] == 1:             # <<<<<<<<<<<<<<
- *                 split.left_indices[j] = samples[i]
- *                 # printf('left_indices[%d]: %d\n', j, split.left_indices[j])
- */
-    __pyx_t_13 = (__pyx_v_samples[__pyx_v_i]);
-    __pyx_t_14 = (__pyx_v_valid_features[__pyx_v_chosen_ndx]);
-    __pyx_t_5 = (((*((int *) ( /* dim=1 */ (( /* dim=0 */ ((char *) (((int *) __pyx_v_X.data) + __pyx_t_13)) ) + __pyx_t_14 * __pyx_v_X.strides[1]) ))) == 1) != 0);
-    if (__pyx_t_5) {
-
-      /* "splitter.pyx":223
- *         for i in range(n_samples):
- *             if X[samples[i], valid_features[chosen_ndx]] == 1:
- *                 split.left_indices[j] = samples[i]             # <<<<<<<<<<<<<<
- *                 # printf('left_indices[%d]: %d\n', j, split.left_indices[j])
- *                 j += 1
- */
-      (__pyx_v_split->left_indices[__pyx_v_j]) = (__pyx_v_samples[__pyx_v_i]);
-
-      /* "splitter.pyx":225
- *                 split.left_indices[j] = samples[i]
- *                 # printf('left_indices[%d]: %d\n', j, split.left_indices[j])
- *                 j += 1             # <<<<<<<<<<<<<<
- *             else:
- *                 split.right_indices[k] = samples[i]
- */
-      __pyx_v_j = (__pyx_v_j + 1);
-
-      /* "splitter.pyx":222
- *         k = 0
- *         for i in range(n_samples):
- *             if X[samples[i], valid_features[chosen_ndx]] == 1:             # <<<<<<<<<<<<<<
- *                 split.left_indices[j] = samples[i]
- *                 # printf('left_indices[%d]: %d\n', j, split.left_indices[j])
- */
-      goto __pyx_L17;
+        __pyx_v_k = (__pyx_v_k + 1);
+      }
+      __pyx_L17:;
     }
 
-    /* "splitter.pyx":227
- *                 j += 1
- *             else:
- *                 split.right_indices[k] = samples[i]             # <<<<<<<<<<<<<<
- *                 # printf('right_indices[%d]: %d\n', k, split.right_indices[k])
- *                 k += 1
+    /* "splitter.pyx":152
+ *                     split.right_indices[k] = samples[i]
+ *                     k += 1
+ *             split.left_count = j             # <<<<<<<<<<<<<<
+ *             split.right_count = k
+ *             split.feature = valid_features[chosen_ndx]
  */
-    /*else*/ {
-      (__pyx_v_split->right_indices[__pyx_v_k]) = (__pyx_v_samples[__pyx_v_i]);
+    __pyx_v_split->left_count = __pyx_v_j;
 
-      /* "splitter.pyx":229
- *                 split.right_indices[k] = samples[i]
- *                 # printf('right_indices[%d]: %d\n', k, split.right_indices[k])
- *                 k += 1             # <<<<<<<<<<<<<<
- *         split.left_count = j
- *         split.right_count = k
+    /* "splitter.pyx":153
+ *                     k += 1
+ *             split.left_count = j
+ *             split.right_count = k             # <<<<<<<<<<<<<<
+ *             split.feature = valid_features[chosen_ndx]
+ *             split.features = valid_features
  */
-      __pyx_v_k = (__pyx_v_k + 1);
-    }
-    __pyx_L17:;
-  }
+    __pyx_v_split->right_count = __pyx_v_k;
 
-  /* "splitter.pyx":230
- *                 # printf('right_indices[%d]: %d\n', k, split.right_indices[k])
- *                 k += 1
- *         split.left_count = j             # <<<<<<<<<<<<<<
- *         split.right_count = k
- *         split.feature = valid_features[chosen_ndx]
+    /* "splitter.pyx":154
+ *             split.left_count = j
+ *             split.right_count = k
+ *             split.feature = valid_features[chosen_ndx]             # <<<<<<<<<<<<<<
+ *             split.features = valid_features
+ *             split.n_features = feature_count
  */
-  __pyx_v_split->left_count = __pyx_v_j;
+    __pyx_v_split->feature = (__pyx_v_valid_features[__pyx_v_chosen_ndx]);
 
-  /* "splitter.pyx":231
- *                 k += 1
- *         split.left_count = j
- *         split.right_count = k             # <<<<<<<<<<<<<<
- *         split.feature = valid_features[chosen_ndx]
- *         split.features = valid_features
- */
-  __pyx_v_split->right_count = __pyx_v_k;
-
-  /* "splitter.pyx":232
- *         split.left_count = j
- *         split.right_count = k
- *         split.feature = valid_features[chosen_ndx]             # <<<<<<<<<<<<<<
- *         split.features = valid_features
- *         split.n_features = feature_count
- */
-  __pyx_v_split->feature = (__pyx_v_valid_features[__pyx_v_chosen_ndx]);
-
-  /* "splitter.pyx":233
- *         split.right_count = k
- *         split.feature = valid_features[chosen_ndx]
- *         split.features = valid_features             # <<<<<<<<<<<<<<
- *         split.n_features = feature_count
+    /* "splitter.pyx":155
+ *             split.right_count = k
+ *             split.feature = valid_features[chosen_ndx]
+ *             split.features = valid_features             # <<<<<<<<<<<<<<
+ *             split.n_features = feature_count
  * 
  */
-  __pyx_v_split->features = __pyx_v_valid_features;
+    __pyx_v_split->features = __pyx_v_valid_features;
 
-  /* "splitter.pyx":234
- *         split.feature = valid_features[chosen_ndx]
- *         split.features = valid_features
- *         split.n_features = feature_count             # <<<<<<<<<<<<<<
+    /* "splitter.pyx":156
+ *             split.feature = valid_features[chosen_ndx]
+ *             split.features = valid_features
+ *             split.n_features = feature_count             # <<<<<<<<<<<<<<
+ * 
+ *             meta.pos_count = pos_count
+ */
+    __pyx_v_split->n_features = __pyx_v_feature_count;
+
+    /* "splitter.pyx":158
+ *             split.n_features = feature_count
+ * 
+ *             meta.pos_count = pos_count             # <<<<<<<<<<<<<<
+ *             meta.feature_count = feature_count
+ *             meta.left_counts = left_counts
+ */
+    __pyx_v_meta->pos_count = __pyx_v_pos_count;
+
+    /* "splitter.pyx":159
+ * 
+ *             meta.pos_count = pos_count
+ *             meta.feature_count = feature_count             # <<<<<<<<<<<<<<
+ *             meta.left_counts = left_counts
+ *             meta.left_pos_counts = left_pos_counts
+ */
+    __pyx_v_meta->feature_count = __pyx_v_feature_count;
+
+    /* "splitter.pyx":160
+ *             meta.pos_count = pos_count
+ *             meta.feature_count = feature_count
+ *             meta.left_counts = left_counts             # <<<<<<<<<<<<<<
+ *             meta.left_pos_counts = left_pos_counts
+ *             meta.right_counts = right_counts
+ */
+    __pyx_v_meta->left_counts = __pyx_v_left_counts;
+
+    /* "splitter.pyx":161
+ *             meta.feature_count = feature_count
+ *             meta.left_counts = left_counts
+ *             meta.left_pos_counts = left_pos_counts             # <<<<<<<<<<<<<<
+ *             meta.right_counts = right_counts
+ *             meta.right_pos_counts = right_pos_counts
+ */
+    __pyx_v_meta->left_pos_counts = __pyx_v_left_pos_counts;
+
+    /* "splitter.pyx":162
+ *             meta.left_counts = left_counts
+ *             meta.left_pos_counts = left_pos_counts
+ *             meta.right_counts = right_counts             # <<<<<<<<<<<<<<
+ *             meta.right_pos_counts = right_pos_counts
+ *             meta.features = valid_features
+ */
+    __pyx_v_meta->right_counts = __pyx_v_right_counts;
+
+    /* "splitter.pyx":163
+ *             meta.left_pos_counts = left_pos_counts
+ *             meta.right_counts = right_counts
+ *             meta.right_pos_counts = right_pos_counts             # <<<<<<<<<<<<<<
+ *             meta.features = valid_features
+ * 
+ */
+    __pyx_v_meta->right_pos_counts = __pyx_v_right_pos_counts;
+
+    /* "splitter.pyx":164
+ *             meta.right_counts = right_counts
+ *             meta.right_pos_counts = right_pos_counts
+ *             meta.features = valid_features             # <<<<<<<<<<<<<<
+ * 
+ *         else:
+ */
+    __pyx_v_meta->features = __pyx_v_valid_features;
+
+    /* "splitter.pyx":123
+ *                 feature_count += 1
+ * 
+ *         if feature_count > 0:             # <<<<<<<<<<<<<<
+ * 
+ *             # remove invalid features
+ */
+    goto __pyx_L14;
+  }
+
+  /* "splitter.pyx":167
+ * 
+ *         else:
+ *             result = -2             # <<<<<<<<<<<<<<
  * 
  *         # clean up
  */
-  __pyx_v_split->n_features = __pyx_v_feature_count;
+  /*else*/ {
+    __pyx_v_result = -2;
+  }
+  __pyx_L14:;
 
-  /* "splitter.pyx":237
+  /* "splitter.pyx":170
  * 
  *         # clean up
  *         free(gini_indices)             # <<<<<<<<<<<<<<
@@ -3603,67 +3631,31 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
  */
   free(__pyx_v_gini_indices);
 
-  /* "splitter.pyx":238
+  /* "splitter.pyx":171
  *         # clean up
  *         free(gini_indices)
  *         free(distribution)             # <<<<<<<<<<<<<<
  * 
- *         free(left_counts)
+ *         return result
  */
   free(__pyx_v_distribution);
 
-  /* "splitter.pyx":240
+  /* "splitter.pyx":173
  *         free(distribution)
  * 
- *         free(left_counts)             # <<<<<<<<<<<<<<
- *         free(left_pos_counts)
- *         free(right_counts)
- */
-  free(__pyx_v_left_counts);
-
-  /* "splitter.pyx":241
- * 
- *         free(left_counts)
- *         free(left_pos_counts)             # <<<<<<<<<<<<<<
- *         free(right_counts)
- *         free(right_pos_counts)
- */
-  free(__pyx_v_left_pos_counts);
-
-  /* "splitter.pyx":242
- *         free(left_counts)
- *         free(left_pos_counts)
- *         free(right_counts)             # <<<<<<<<<<<<<<
- *         free(right_pos_counts)
- * 
- */
-  free(__pyx_v_right_counts);
-
-  /* "splitter.pyx":243
- *         free(left_pos_counts)
- *         free(right_counts)
- *         free(right_pos_counts)             # <<<<<<<<<<<<<<
- * 
- *         return 0
- */
-  free(__pyx_v_right_pos_counts);
-
-  /* "splitter.pyx":245
- *         free(right_pos_counts)
- * 
- *         return 0             # <<<<<<<<<<<<<<
+ *         return result             # <<<<<<<<<<<<<<
  * 
  *     @cython.cdivision(True)
  */
-  __pyx_r = 0;
+  __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "splitter.pyx":103
+  /* "splitter.pyx":50
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,             # <<<<<<<<<<<<<<
- *                         int* samples, int n_samples, int* features, int n_features,
- *                         SplitRecord* split):
+ *                         int* samples, int* features, int n_features,
+ *                         SplitRecord* split, Meta* meta):
  */
 
   /* function exit code */
@@ -3672,7 +3664,7 @@ static int __pyx_f_8splitter_8Splitter_node_split(struct __pyx_obj_8splitter_Spl
   return __pyx_r;
 }
 
-/* "splitter.pyx":248
+/* "splitter.pyx":176
  * 
  *     @cython.cdivision(True)
  *     cdef double _compute_gini(self, double count, double left_count, double right_count,             # <<<<<<<<<<<<<<
@@ -3689,7 +3681,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
   double __pyx_v_right_weighted_index;
   double __pyx_r;
 
-  /* "splitter.pyx":261
+  /* "splitter.pyx":189
  *         cdef double right_weighted_index
  * 
  *         weight = left_count / count             # <<<<<<<<<<<<<<
@@ -3698,7 +3690,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_weight = (__pyx_v_left_count / __pyx_v_count);
 
-  /* "splitter.pyx":262
+  /* "splitter.pyx":190
  * 
  *         weight = left_count / count
  *         pos_prob = left_pos_count / left_count             # <<<<<<<<<<<<<<
@@ -3707,7 +3699,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_pos_prob = (((double)__pyx_v_left_pos_count) / __pyx_v_left_count);
 
-  /* "splitter.pyx":263
+  /* "splitter.pyx":191
  *         weight = left_count / count
  *         pos_prob = left_pos_count / left_count
  *         neg_prob = 1 - pos_prob             # <<<<<<<<<<<<<<
@@ -3716,7 +3708,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_neg_prob = (1.0 - __pyx_v_pos_prob);
 
-  /* "splitter.pyx":264
+  /* "splitter.pyx":192
  *         pos_prob = left_pos_count / left_count
  *         neg_prob = 1 - pos_prob
  *         index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)             # <<<<<<<<<<<<<<
@@ -3725,7 +3717,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_index = ((1.0 - (__pyx_v_pos_prob * __pyx_v_pos_prob)) - (__pyx_v_neg_prob * __pyx_v_neg_prob));
 
-  /* "splitter.pyx":265
+  /* "splitter.pyx":193
  *         neg_prob = 1 - pos_prob
  *         index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)
  *         left_weighted_index = weight * index             # <<<<<<<<<<<<<<
@@ -3734,7 +3726,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_left_weighted_index = (__pyx_v_weight * __pyx_v_index);
 
-  /* "splitter.pyx":267
+  /* "splitter.pyx":195
  *         left_weighted_index = weight * index
  * 
  *         weight = right_count / count             # <<<<<<<<<<<<<<
@@ -3743,7 +3735,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_weight = (__pyx_v_right_count / __pyx_v_count);
 
-  /* "splitter.pyx":268
+  /* "splitter.pyx":196
  * 
  *         weight = right_count / count
  *         pos_prob = right_pos_count / right_count             # <<<<<<<<<<<<<<
@@ -3752,7 +3744,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_pos_prob = (((double)__pyx_v_right_pos_count) / __pyx_v_right_count);
 
-  /* "splitter.pyx":269
+  /* "splitter.pyx":197
  *         weight = right_count / count
  *         pos_prob = right_pos_count / right_count
  *         neg_prob = 1 - pos_prob             # <<<<<<<<<<<<<<
@@ -3761,7 +3753,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_neg_prob = (1.0 - __pyx_v_pos_prob);
 
-  /* "splitter.pyx":270
+  /* "splitter.pyx":198
  *         pos_prob = right_pos_count / right_count
  *         neg_prob = 1 - pos_prob
  *         index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)             # <<<<<<<<<<<<<<
@@ -3770,7 +3762,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_index = ((1.0 - (__pyx_v_pos_prob * __pyx_v_pos_prob)) - (__pyx_v_neg_prob * __pyx_v_neg_prob));
 
-  /* "splitter.pyx":271
+  /* "splitter.pyx":199
  *         neg_prob = 1 - pos_prob
  *         index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)
  *         right_weighted_index = weight * index             # <<<<<<<<<<<<<<
@@ -3779,7 +3771,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
  */
   __pyx_v_right_weighted_index = (__pyx_v_weight * __pyx_v_index);
 
-  /* "splitter.pyx":273
+  /* "splitter.pyx":201
  *         right_weighted_index = weight * index
  * 
  *         return left_weighted_index + right_weighted_index             # <<<<<<<<<<<<<<
@@ -3789,7 +3781,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
   __pyx_r = (__pyx_v_left_weighted_index + __pyx_v_right_weighted_index);
   goto __pyx_L0;
 
-  /* "splitter.pyx":248
+  /* "splitter.pyx":176
  * 
  *     @cython.cdivision(True)
  *     cdef double _compute_gini(self, double count, double left_count, double right_count,             # <<<<<<<<<<<<<<
@@ -3802,7 +3794,7 @@ static double __pyx_f_8splitter_8Splitter__compute_gini(CYTHON_UNUSED struct __p
   return __pyx_r;
 }
 
-/* "splitter.pyx":276
+/* "splitter.pyx":204
  * 
  *     @cython.cdivision(True)
  *     cdef int _generate_distribution(self, double* distribution, double* gini_indices,             # <<<<<<<<<<<<<<
@@ -3821,7 +3813,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
   int __pyx_t_4;
   int __pyx_t_5;
 
-  /* "splitter.pyx":282
+  /* "splitter.pyx":210
  *         """
  *         cdef int i
  *         cdef double lmbda = self.lmbda             # <<<<<<<<<<<<<<
@@ -3831,7 +3823,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
   __pyx_t_1 = __pyx_v_self->lmbda;
   __pyx_v_lmbda = __pyx_t_1;
 
-  /* "splitter.pyx":283
+  /* "splitter.pyx":211
  *         cdef int i
  *         cdef double lmbda = self.lmbda
  *         cdef double normalizing_constant = 0             # <<<<<<<<<<<<<<
@@ -3840,7 +3832,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
  */
   __pyx_v_normalizing_constant = 0.0;
 
-  /* "splitter.pyx":285
+  /* "splitter.pyx":213
  *         cdef double normalizing_constant = 0
  * 
  *         for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
@@ -3852,7 +3844,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "splitter.pyx":286
+    /* "splitter.pyx":214
  * 
  *         for i in range(n_gini_indices):
  *             distribution[i] = exp(- lmbda * gini_indices[i] / 5)             # <<<<<<<<<<<<<<
@@ -3861,7 +3853,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
  */
     (__pyx_v_distribution[__pyx_v_i]) = exp((((-__pyx_v_lmbda) * (__pyx_v_gini_indices[__pyx_v_i])) / 5.0));
 
-    /* "splitter.pyx":287
+    /* "splitter.pyx":215
  *         for i in range(n_gini_indices):
  *             distribution[i] = exp(- lmbda * gini_indices[i] / 5)
  *             normalizing_constant += distribution[i]             # <<<<<<<<<<<<<<
@@ -3871,7 +3863,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
     __pyx_v_normalizing_constant = (__pyx_v_normalizing_constant + (__pyx_v_distribution[__pyx_v_i]));
   }
 
-  /* "splitter.pyx":289
+  /* "splitter.pyx":217
  *             normalizing_constant += distribution[i]
  * 
  *         for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
@@ -3883,7 +3875,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "splitter.pyx":290
+    /* "splitter.pyx":218
  * 
  *         for i in range(n_gini_indices):
  *             distribution[i] /= normalizing_constant             # <<<<<<<<<<<<<<
@@ -3894,7 +3886,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
     (__pyx_v_distribution[__pyx_t_5]) = ((__pyx_v_distribution[__pyx_t_5]) / __pyx_v_normalizing_constant);
   }
 
-  /* "splitter.pyx":293
+  /* "splitter.pyx":221
  *             # printf('distribution[%d]: %.7f\n', i, distribution[i])
  * 
  *         return 0             # <<<<<<<<<<<<<<
@@ -3904,7 +3896,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "splitter.pyx":276
+  /* "splitter.pyx":204
  * 
  *     @cython.cdivision(True)
  *     cdef int _generate_distribution(self, double* distribution, double* gini_indices,             # <<<<<<<<<<<<<<
@@ -3917,7 +3909,7 @@ static int __pyx_f_8splitter_8Splitter__generate_distribution(struct __pyx_obj_8
   return __pyx_r;
 }
 
-/* "splitter.pyx":296
+/* "splitter.pyx":224
  * 
  *     # TODO: use random_state in get_random() function
  *     cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:             # <<<<<<<<<<<<<<
@@ -3934,7 +3926,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
   int __pyx_t_3;
   int __pyx_t_4;
 
-  /* "splitter.pyx":301
+  /* "splitter.pyx":229
  *         """
  *         cdef int i
  *         cdef double weight = 0             # <<<<<<<<<<<<<<
@@ -3943,7 +3935,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
  */
   __pyx_v_weight = 0.0;
 
-  /* "splitter.pyx":303
+  /* "splitter.pyx":231
  *         cdef double weight = 0
  * 
  *         weight = get_random(self.random_state)             # <<<<<<<<<<<<<<
@@ -3952,7 +3944,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
  */
   __pyx_v_weight = __pyx_f_5utils_get_random(__pyx_v_self->random_state);
 
-  /* "splitter.pyx":306
+  /* "splitter.pyx":234
  *         # printf('initial weight: %.7f\n', weight)
  * 
  *         for i in range(n_distribution):             # <<<<<<<<<<<<<<
@@ -3964,7 +3956,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "splitter.pyx":307
+    /* "splitter.pyx":235
  * 
  *         for i in range(n_distribution):
  *             if weight < distribution[i]:             # <<<<<<<<<<<<<<
@@ -3974,7 +3966,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
     __pyx_t_4 = ((__pyx_v_weight < (__pyx_v_distribution[__pyx_v_i])) != 0);
     if (__pyx_t_4) {
 
-      /* "splitter.pyx":308
+      /* "splitter.pyx":236
  *         for i in range(n_distribution):
  *             if weight < distribution[i]:
  *                 break             # <<<<<<<<<<<<<<
@@ -3983,7 +3975,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
  */
       goto __pyx_L4_break;
 
-      /* "splitter.pyx":307
+      /* "splitter.pyx":235
  * 
  *         for i in range(n_distribution):
  *             if weight < distribution[i]:             # <<<<<<<<<<<<<<
@@ -3992,7 +3984,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
  */
     }
 
-    /* "splitter.pyx":309
+    /* "splitter.pyx":237
  *             if weight < distribution[i]:
  *                 break
  *             weight -= distribution[i]             # <<<<<<<<<<<<<<
@@ -4003,7 +3995,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
   }
   __pyx_L4_break:;
 
-  /* "splitter.pyx":311
+  /* "splitter.pyx":239
  *             weight -= distribution[i]
  * 
  *         return i             # <<<<<<<<<<<<<<
@@ -4011,7 +4003,7 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
   __pyx_r = __pyx_v_i;
   goto __pyx_L0;
 
-  /* "splitter.pyx":296
+  /* "splitter.pyx":224
  * 
  *     # TODO: use random_state in get_random() function
  *     cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:             # <<<<<<<<<<<<<<
@@ -4024,12 +4016,12 @@ static int __pyx_f_8splitter_8Splitter__sample_distribution(struct __pyx_obj_8sp
   return __pyx_r;
 }
 
-/* "splitter.pxd":38
- *     # cdef public Criterion criterion      # Impurity criterion
- *     # cdef public SIZE_t max_features      # Number of features to test
+/* "splitter.pxd":36
+ *     """
+ *     # Internal structures
  *     cdef public int min_samples_leaf       # Min samples in a leaf             # <<<<<<<<<<<<<<
  *     cdef double lmbda                      # Noise control parameter
- *     cdef UINT32_t random_state                  # Random state reference
+ *     cdef UINT32_t random_state             # Random state reference
  */
 
 /* Python wrapper */
@@ -4051,7 +4043,7 @@ static PyObject *__pyx_pf_8splitter_8Splitter_16min_samples_leaf___get__(struct 
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->min_samples_leaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 38, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->min_samples_leaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4086,7 +4078,7 @@ static int __pyx_pf_8splitter_8Splitter_16min_samples_leaf_2__set__(struct __pyx
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 38, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 36, __pyx_L1_error)
   __pyx_v_self->min_samples_leaf = __pyx_t_1;
 
   /* function exit code */
@@ -20444,7 +20436,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 88, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(3, 272, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(3, 856, __pyx_L1_error)
@@ -20875,8 +20867,7 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
   __pyx_vtabptr_8splitter_Splitter = &__pyx_vtable_8splitter_Splitter;
-  __pyx_vtable_8splitter_Splitter.init = (int (*)(struct __pyx_obj_8splitter_Splitter *))__pyx_f_8splitter_8Splitter_init;
-  __pyx_vtable_8splitter_Splitter.node_split = (int (*)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int, int *, int, struct __pyx_t_8splitter_SplitRecord *))__pyx_f_8splitter_8Splitter_node_split;
+  __pyx_vtable_8splitter_Splitter.node_split = (int (*)(struct __pyx_obj_8splitter_Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_8splitter_SplitRecord *, struct __pyx_t_8splitter_Meta *))__pyx_f_8splitter_8Splitter_node_split;
   __pyx_vtable_8splitter_Splitter._compute_gini = (double (*)(struct __pyx_obj_8splitter_Splitter *, double, double, double, int, int))__pyx_f_8splitter_8Splitter__compute_gini;
   __pyx_vtable_8splitter_Splitter._generate_distribution = (int (*)(struct __pyx_obj_8splitter_Splitter *, double *, double *, int))__pyx_f_8splitter_8Splitter__generate_distribution;
   __pyx_vtable_8splitter_Splitter._sample_distribution = (int (*)(struct __pyx_obj_8splitter_Splitter *, double *, int))__pyx_f_8splitter_8Splitter__sample_distribution;
@@ -20978,20 +20969,20 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5numpy_ufunc = __Pyx_ImportType(__pyx_t_1, "numpy", "ufunc", sizeof(PyUFuncObject), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5numpy_ufunc) __PYX_ERR(3, 918, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 30, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_4tree_Tree = __Pyx_ImportType(__pyx_t_1, "tree", "Tree", sizeof(struct __pyx_obj_4tree_Tree), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_4tree_Tree) __PYX_ERR(5, 30, __pyx_L1_error)
-  __pyx_vtabptr_4tree_Tree = (struct __pyx_vtabstruct_4tree_Tree*)__Pyx_GetVtable(__pyx_ptype_4tree_Tree->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_Tree)) __PYX_ERR(5, 30, __pyx_L1_error)
+   if (!__pyx_ptype_4tree_Tree) __PYX_ERR(5, 14, __pyx_L1_error)
+  __pyx_vtabptr_4tree_Tree = (struct __pyx_vtabstruct_4tree_Tree*)__Pyx_GetVtable(__pyx_ptype_4tree_Tree->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_Tree)) __PYX_ERR(5, 14, __pyx_L1_error)
   __pyx_ptype_4tree_TreeBuilder = __Pyx_ImportType(__pyx_t_1, "tree", "TreeBuilder", sizeof(struct __pyx_obj_4tree_TreeBuilder), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_4tree_TreeBuilder) __PYX_ERR(5, 66, __pyx_L1_error)
-  __pyx_vtabptr_4tree_TreeBuilder = (struct __pyx_vtabstruct_4tree_TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_4tree_TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_TreeBuilder)) __PYX_ERR(5, 66, __pyx_L1_error)
+   if (!__pyx_ptype_4tree_TreeBuilder) __PYX_ERR(5, 59, __pyx_L1_error)
+  __pyx_vtabptr_4tree_TreeBuilder = (struct __pyx_vtabstruct_4tree_TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_4tree_TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_4tree_TreeBuilder)) __PYX_ERR(5, 59, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(6, 55, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(6, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5utils_Stack = __Pyx_ImportType(__pyx_t_1, "utils", "Stack", sizeof(struct __pyx_obj_5utils_Stack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5utils_Stack) __PYX_ERR(6, 55, __pyx_L1_error)
-  __pyx_vtabptr_5utils_Stack = (struct __pyx_vtabstruct_5utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5utils_Stack)) __PYX_ERR(6, 55, __pyx_L1_error)
+   if (!__pyx_ptype_5utils_Stack) __PYX_ERR(6, 48, __pyx_L1_error)
+  __pyx_vtabptr_5utils_Stack = (struct __pyx_vtabstruct_5utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5utils_Stack)) __PYX_ERR(6, 48, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

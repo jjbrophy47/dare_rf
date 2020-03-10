@@ -6,73 +6,54 @@ from tree import Tree
 from tree import DepthFirstTreeBuilder
 
 
-# def split_np(X, y):
-
-#     count = 0
-#     pos_count = 0
-
-#     l_total, lp_total = 0, 0
-#     r_total, rp_total = 0, 0
-
-#     count = len(y)
-#     pos_count = np.sum(y)
-
-#     # compute statistics for each attribute
-#     for j in range(n_features):
-
-#         left_count = 0
-#         left_pos_count = 0
-
-#         left_indices = np.where(X[:, j] == 1)[0]
-#         left_count = len(left_indices)
-#         left_pos_count = y[left_indices].sum()
-
-#         right_count = count - left_count
-#         right_pos_count = pos_count - left_pos_count
-
-#         l_total += left_count
-#         lp_total += left_pos_count
-#         r_total += right_count
-#         rp_total += right_pos_count
-
-#     print('left total: {}, right total: {}'.format(left_count, right_count))
-#     print('left pos total: {}, right pos total: {}'.format(left_pos_count, right_pos_count))
-
-
-n_samples = 10000000
-n_features = 20
-
-# X = np.random.randint(2, size=(n_samples, n_features), dtype=np.int32)
-# y = np.random.randint(2, size=n_samples, dtype=np.int32)
+n_samples = 10
+n_features = 2
 
 np.random.seed(1)
-X = np.random.randint(2, size=(n_samples, n_features), dtype=np.int32)
+X_train = np.random.randint(2, size=(n_samples, n_features), dtype=np.int32)
 np.random.seed(1)
-y = np.random.randint(2, size=n_samples, dtype=np.int32)
+y_train = np.random.randint(2, size=n_samples, dtype=np.int32)
 
-data = np.hstack([X, y.reshape(-1, 1)])
-print(data)
+np.random.seed(2)
+X_test = np.random.randint(2, size=(10, n_features), dtype=np.int32)
+np.random.seed(2)
+y_test = np.random.randint(2, size=10, dtype=np.int32)
 
-X = np.asfortranarray(X, dtype=np.int32)
-y = np.ascontiguousarray(y, dtype=np.int32)
-f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
+data = np.hstack([X_train, y_train.reshape(-1, 1)])
+
+X_train = np.asfortranarray(X_train, dtype=np.int32)
+y_train = np.ascontiguousarray(y_train, dtype=np.int32)
+f = np.ascontiguousarray(np.arange(X_train.shape[1]), dtype=np.int32)
 
 print('data assembled')
-
-# n_features = X.shape[1]
-# X = np.asfortranarray(X, dtype=np.int32)
-# y = np.ascontiguousarray(y, dtype=np.int32)
 
 t1 = time.time()
 tree = Tree(2)
 splitter = Splitter(2, 10, 1)
-builder = DepthFirstTreeBuilder(splitter, 2, 1, 10)
-builder.build(tree, X, y, f)
+builder = DepthFirstTreeBuilder(splitter, 2, 1, -1)
+builder.build(tree, X_train, y_train, f)
 print('time: {:.7f}s'.format(time.time() - t1))
 
-# print(tree.values)
-# print(tree.n_samples)
-# print(tree.features)
-# print(tree.left_children)
-# print(tree.right_children)
-print(tree.max_depth)
+print('nodes: {}'.format(tree.n_nodes))
+print('leaf values: {}'.format(tree.values))
+print('counts: {}'.format(tree.counts))
+print('pos counts: {}'.format(tree.pos_counts))
+
+for i in range(tree.n_nodes):
+    if tree.chosen_features[i] != -2:
+        print('node {}:'.format(i))
+        print('  left counts: {}'.format(tree._get_left_counts(i)))
+        print('  left pos counts: {}'.format(tree._get_left_pos_counts(i)))
+        print('  right counts: {}'.format(tree._get_right_counts(i)))
+        print('  right pos counts: {}'.format(tree._get_right_pos_counts(i)))
+        print('  features: {}'.format(tree._get_features(i)))
+
+print('feature counts: {}'.format(tree.feature_counts))
+print('chosen features: {}'.format(tree.chosen_features))
+# print('left_children: {}'.format(tree.left_children))
+# print('right_children: {}'.format(tree.right_children))
+print('max depth: {}'.format(tree.max_depth))
+
+# preds = tree.predict(X_test)
+# print(preds)
+# print(y_test)

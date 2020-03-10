@@ -7,25 +7,9 @@ ctypedef np.npy_intp SIZE_t              # Type for indices and counters
 ctypedef np.npy_int32 INT32_t            # Signed 32 bit integer
 ctypedef np.npy_uint32 UINT32_t          # Unsigned 32 bit integer
 
+from splitter cimport Meta
 from splitter cimport SplitRecord
 from splitter cimport Splitter
-
-# cdef struct Meta:
-#     # Storage structure of metadata at each node.
-#     SIZE_t n_left                        # Number of left branch samples
-#     SIZE_t n_left_pos                    # Number of left branch positive samples
-#     SIZE_t n_right                       # Number of right branch samples
-#     SIZE_t n_right_pos                   # Number of right branch positive samples
-
-# cdef class Node:
-#     """
-#     Base storage unit of the binary tree.
-#     """
-#     cdef public SIZE_t left_child                    # id of the left child of the node
-#     cdef public SIZE_t right_child                   # id of the right child of the node
-#     cdef public SIZE_t feature                       # Feature used for splitting the node
-#     cdef public SIZE_t n_node_samples                # Number of samples at the node
-#     cdef Meta* meta                                  # Metadata of for each attribute split
 
 cdef class Tree:
     """
@@ -42,26 +26,35 @@ cdef class Tree:
     cdef public int node_count           # Counter for node IDs
     cdef public int capacity             # Capacity of tree, in terms of nodes
     cdef double* values                  # Array of values, shape=[capacity]
-    cdef int* n_samples                  # Array of sample counts, shape=[capacity]
-    cdef int* features                   # Array of chosen features, shape=[capacity]
+    cdef int* chosen_features            # Array of chosen features, shape=[capacity]
     cdef int* left_children              # Array of left children indices, shape=[capacity]
     cdef int* right_children             # Array of right children indices, shape=[capacity]
 
-    # Methods
-    cdef int add_node(self, int parent, bint is_left, bint is_leaf,
-                      int feature, int n_node_samples,
-                      double value) nogil except -1
+    # Internal metadata, stored for efficient updating
+    cdef int* count                # Array of sample counts, shape=[capacity]
+    cdef int* pos_count            # Array of positive sample counts, shape=[capacity]
+    cdef int* feature_count        # Array of feature counts, shape=[capacity]
+    cdef int** left_counts         # Array of arrays of left counts, shape=[capacity, n_features]
+    cdef int** left_pos_counts     # Array of arrays of left positive counts, shape=[capacity, n_features]
+    cdef int** right_counts        # Array of arrays of right counts, shape=[capacity, n_features]
+    cdef int** right_pos_counts    # Array of arrays of right positive counts, shape=[capacity, n_features]
+    cdef int** features            # Array of arrays of feature indices for decision nodes, shape[capacity, n_features]
+    cdef int** leaf_samples        # Array of arrays of sample indices for leaf nodes, shape[capacity, count]
 
-    # # python/C API
-    # cpdef np.ndarray predict(self, object X)
-    # cpdef np.ndarray apply(self, object X)
+    # Python/C API
+    cpdef np.ndarray predict(self, object X)
+    cpdef np.ndarray _get_left_counts(self, node_id)
+    cpdef np.ndarray _get_left_pos_counts(self, node_id)
+    cpdef np.ndarray _get_right_counts(self, node_id)
+    cpdef np.ndarray _get_right_pos_counts(self, node_id)
+    cpdef np.ndarray _get_features(self, node_id)
 
-    # # C API
+    # C API
+    cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,
+                      double value, int* samples, Meta* meta) nogil except -1
     cdef np.ndarray _get_double_ndarray(self, double *data)
     cdef np.ndarray _get_int_ndarray(self, int *data)
-    # cdef np.ndarray _get_node_ndarray(self)
     cdef int _resize(self, int capacity=*) nogil except -1
-    # cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
 
 cdef class TreeBuilder:
     """
@@ -79,4 +72,4 @@ cdef class TreeBuilder:
 
     cpdef void build(self, Tree tree, object X, np.ndarray y, np.ndarray f)
     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f)
-    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples) nogil
+    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil

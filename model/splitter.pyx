@@ -27,18 +27,16 @@ cdef class Splitter:
         """
         Parameters
         ----------
-        min_samples_leaf : SIZE_t
+        min_samples_leaf : int
             The minimal number of samples each leaf can have, where splits
             which would result in having less samples in a leaf are not
             considered.
+        lmbda : double
+            Noise control when generating distribution; higher values mean a
+            more deterministic algorithm.
+        random_state : int
+            Random state.
         """
-        # self.criterion = criterion
-
-        # self.samples = NULL
-        # self.n_samples = 0
-        # self.features = NULL
-        # self.n_features = 0
-
         self.min_samples_leaf = min_samples_leaf
         self.lmbda = lmbda
         self.random_state = random_state
@@ -46,74 +44,17 @@ cdef class Splitter:
     def __dealloc__(self):
         """Destructor."""
         pass
-        # free(self.samples)
-        # free(self.features)
 
-    cdef int init(self):
-        """
-        Initialize the splitter.
-        Take in the input data X and the target Y.
-        Returns -1 in case of failure to allocate memory (and raise MemoryError)
-        or 0 otherwise.
-
-        Parameters
-        ----------
-        X : object
-            This contains the inputs. Usually it is a 2d numpy array.
-        y : ndarray, dtype=int
-            This is the vector of targets, or true labels, for the samples
-        """
-        # self.rand_r_state = self.random_state.randint(0, RAND_R_MAX)
-        # cdef int n_samples = X.shape[0]
-
-        # Create a new array which will be used to store nonzero
-        # samples from the feature of interest
-        # cdef int* samples = <int *>malloc(n_samples * sizeof(int))
-
-        # cdef int i
-        # cdef int n_features = X.shape[1]
-        # cdef int* features = <int *>malloc(n_features * sizeof(int))
-
-        # for i in range(n_features):
-        #     features[i] = i
-        return 0
-
-    # cdef int node_reset(self, SIZE_t start, SIZE_t end) nogil except -1:
-    #     """
-    #     Reset splitter on node samples[start:end].
-    #     Returns -1 in case of failure to allocate memory (and raise MemoryError)
-    #     or 0 otherwise.
-
-    #     Parameters
-    #     ----------
-    #     start : SIZE_t
-    #         The index of the first sample to consider
-    #     end : SIZE_t
-    #         The index of the last sample to consider
-    #     """
-    #     self.start = start
-    #     self.end = end
-    #     self.criterion.init(self.y, self.samples, start, end)
-    #     return 0
-
-    # TODO: remove chosen attribute from leftovers if easy to do, otherwise it'll
-    #       get removed at the next node.
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,
-                        int* samples, int n_samples, int* features, int n_features,
-                        SplitRecord* split):
-    # cpdef int node_split(self, np.ndarray[INT32_t, ndim=2] X,
-    #                            np.ndarray[INT32_t, ndim=1] y):
+                        int* samples, int* features, int n_features,
+                        SplitRecord* split, Meta* meta):
         """
         Find the best split in the node data.
         This is a placeholder method. The majority of computation will be done here.
         It should return -1 upon errors.
         """
-
-        # Find the best split
-        # cdef int n_samples = X.shape[0]
-        # cdef int n_features = X.shape[1]
 
         cdef int min_samples_leaf = self.min_samples_leaf
 
@@ -123,7 +64,8 @@ cdef class Splitter:
         cdef int chosen_ndx
         cdef int chosen_feature
 
-        cdef int count = n_samples
+        cdef int n_samples = meta.count
+        cdef int count = meta.count
         cdef int pos_count = 0
         cdef int left_count
         cdef int left_pos_count
@@ -131,8 +73,7 @@ cdef class Splitter:
         cdef int right_pos_count
 
         cdef int feature_count = 0
-
-        # printf("heyooooo\n")
+        cdef int result = 0
 
         cdef double* gini_indices = <double *>malloc(n_features * sizeof(double))
         cdef double* distribution = <double *>malloc(n_features * sizeof(double))
@@ -142,8 +83,6 @@ cdef class Splitter:
         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
         cdef int* right_counts = <int *>malloc(n_features * sizeof(int))
         cdef int* right_pos_counts = <int *>malloc(n_features * sizeof(int))
-
-        # printf("finished allocating\n")
 
         # count number of pos labels
         for i in range(n_samples):
@@ -162,8 +101,6 @@ cdef class Splitter:
                 if X[samples[i], features[j]] == 1:
                     left_count += 1
                     left_pos_count += y[samples[i]]
-                    # if y[samples[i]] == 1:
-                    #     left_pos_count += 1
 
             right_count = count - left_count
             right_pos_count = pos_count - left_pos_count
@@ -183,66 +120,57 @@ cdef class Splitter:
 
                 feature_count += 1
 
-        # TODO: handle feature_count of 0
-        if feature_count == 0:
-        # clean up
-            free(gini_indices)
-            free(distribution)
+        if feature_count > 0:
 
-            free(left_counts)
-            free(left_pos_counts)
-            free(right_counts)
-            free(right_pos_counts)
-            return -2
+            # remove invalid features
+            gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
+            distribution = <double *>realloc(distribution, feature_count * sizeof(double))
+            valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
 
-        # remove invalid features
-        gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
-        distribution = <double *>realloc(distribution, feature_count * sizeof(double))
-        valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
+            left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
+            left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
+            right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
+            right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
 
-        left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
-        left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
-        right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
-        right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
+            # generate and sample from the distribution
+            self._generate_distribution(distribution, gini_indices, feature_count)
+            chosen_ndx = self._sample_distribution(distribution, feature_count)
+            # printf('chosen feature: %d\n', valid_features[chosen_ndx])
 
-        # generate and sample from the distribution
-        self._generate_distribution(distribution, gini_indices, feature_count)
-        chosen_ndx = self._sample_distribution(distribution, feature_count)
-        # printf('chosen feature: %d\n', valid_features[chosen_ndx])
+            # assign results from chosen feature
+            split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
+            split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+            j = 0
+            k = 0
+            for i in range(n_samples):
+                if X[samples[i], valid_features[chosen_ndx]] == 1:
+                    split.left_indices[j] = samples[i]
+                    j += 1
+                else:
+                    split.right_indices[k] = samples[i]
+                    k += 1
+            split.left_count = j
+            split.right_count = k
+            split.feature = valid_features[chosen_ndx]
+            split.features = valid_features
+            split.n_features = feature_count
 
-        # printf('left count: %d\n', left_counts[chosen_ndx])
-        # printf('right_count: %d\n', right_counts[chosen_ndx])
+            meta.pos_count = pos_count
+            meta.feature_count = feature_count
+            meta.left_counts = left_counts
+            meta.left_pos_counts = left_pos_counts
+            meta.right_counts = right_counts
+            meta.right_pos_counts = right_pos_counts
+            meta.features = valid_features
 
-        # assign results from chosen feature
-        split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
-        split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
-        j = 0
-        k = 0
-        for i in range(n_samples):
-            if X[samples[i], valid_features[chosen_ndx]] == 1:
-                split.left_indices[j] = samples[i]
-                # printf('left_indices[%d]: %d\n', j, split.left_indices[j])
-                j += 1
-            else:
-                split.right_indices[k] = samples[i]
-                # printf('right_indices[%d]: %d\n', k, split.right_indices[k])
-                k += 1
-        split.left_count = j
-        split.right_count = k
-        split.feature = valid_features[chosen_ndx]
-        split.features = valid_features
-        split.n_features = feature_count
+        else:
+            result = -2
 
         # clean up
         free(gini_indices)
         free(distribution)
 
-        free(left_counts)
-        free(left_pos_counts)
-        free(right_counts)
-        free(right_pos_counts)
-
-        return 0
+        return result
 
     @cython.cdivision(True)
     cdef double _compute_gini(self, double count, double left_count, double right_count, 
