@@ -4,7 +4,6 @@ Represenation is a number of parllel arrays.
 Adapted from: https://github.com/scikit-learn/scikit-learn/blob/b194674c42d54b26137a456c510c5fdba1ba23e0/sklearn/tree/_tree.pyx
 """
 
-# TODO: make getter for leaf samples
 # TODO: implement deterministic mode if lambda is super high, or other switch
 
 # imports

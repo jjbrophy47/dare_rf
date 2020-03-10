@@ -4,6 +4,7 @@ from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdio cimport printf
 from libc.math cimport exp
+from libc.math cimport isnan
 
 from libc.stdlib cimport rand
 from libc.stdlib cimport srand
@@ -210,13 +211,38 @@ cdef class _Splitter:
         cdef double lmbda = self.lmbda
         cdef double normalizing_constant = 0
 
-        for i in range(n_gini_indices):
-            distribution[i] = exp(- lmbda * gini_indices[i] / 5)
-            normalizing_constant += distribution[i]
+        cdef double min_gini = 1
+        cdef double max_gini = -1
+        cdef int n_max = 0
+        cdef int first_max
 
+        # find min and max Gini values
         for i in range(n_gini_indices):
-            distribution[i] /= normalizing_constant
-            # printf('distribution[%d]: %.7f\n', i, distribution[i])
+            if gini_indices[i] < min_gini:
+                min_gini = gini_indices[i]
+            if gini_indices[i] > max_gini:
+                n_max = 1
+                max_gini = gini_indices[i]
+                first_max = i
+            elif gini_indices[i] == max_gini:
+                n_max += 1
+
+        # lambda too high, go into deterministic mode
+        if exp(- lmbda * min_gini / 5) == 0:
+            for i in range(n_gini_indices):
+                distribution[i] = 0
+            distribution[first_max] = 1
+            normalizing_constant = 1
+
+        # generate probability distribution over the features
+        else:
+            for i in range(n_gini_indices):
+                distribution[i] = exp(- lmbda * gini_indices[i] / 5)
+                normalizing_constant += distribution[i]
+
+            for i in range(n_gini_indices):
+                distribution[i] /= normalizing_constant
+                # printf('distribution[%d]: %.7f\n', i, distribution[i])
 
         return 0
 
