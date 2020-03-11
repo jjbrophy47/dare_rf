@@ -12,7 +12,7 @@ from sklearn.model_selection import GridSearchCV
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../../')
 sys.path.insert(0, here + '/../../')
-from model import cedar
+import cedar
 from utility import data_util, exp_util, print_util
 
 
@@ -26,29 +26,28 @@ def performance(args, logger, seed):
     logger.info('test instances: {}'.format(X_test.shape[0]))
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    # logger.info('building sk_rf...')
-    # start = time.time()
-    # sk_rf = RandomForestClassifier(n_estimators=args.n_estimators, max_depth=args.max_depth,
-    #                                max_features=args.max_features, max_samples=args.max_samples,
-    #                                verbose=args.verbose, random_state=seed, bootstrap=args.bootstrap)
-    # if args.tune:  # default is 5-fold
-    #     sk_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None], 'bootstrap': [True, False]}
-    #     sk_param_grid = {'n_estimators': [1000], 'max_depth': [None]}
-    #     gs = GridSearchCV(sk_rf, sk_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
-    #     gs = gs.fit(X_train, y_train)
-    #     sk_rf = gs.best_estimator_
-    #     print([estimator.get_depth() for estimator in sk_rf.estimators_])
-    #     logger.info('best_params: {}'.format(gs.best_params_))
-    # else:
-    #     sk_rf = sk_rf.fit(X_train, y_train)
-    # logger.info('{:.3f}s'.format(time.time() - start))
+    logger.info('building sk_rf...')
+    start = time.time()
+    sk_rf = RandomForestClassifier(n_estimators=args.n_estimators, max_depth=args.max_depth,
+                                   max_features=args.max_features, max_samples=args.max_samples,
+                                   verbose=args.verbose, random_state=seed, bootstrap=args.bootstrap)
+    if args.tune:  # default is 5-fold
+        sk_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None], 'bootstrap': [True, False]}
+        sk_param_grid = {'n_estimators': [1000], 'max_depth': [None]}
+        gs = GridSearchCV(sk_rf, sk_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
+        gs = gs.fit(X_train, y_train)
+        sk_rf = gs.best_estimator_
+        print([estimator.get_depth() for estimator in sk_rf.estimators_])
+        logger.info('best_params: {}'.format(gs.best_params_))
+    else:
+        sk_rf = sk_rf.fit(X_train, y_train)
+    logger.info('{:.3f}s'.format(time.time() - start))
 
     logger.info('building d_rf...')
     start = time.time()
-    d_rf = cedar.RF(lmbda=10**8,
-                    n_estimators=args.n_estimators, max_features=args.max_features,
-                    max_samples=args.max_samples, max_depth=args.max_depth,
-                    verbose=args.verbose, random_state=seed)
+    d_rf = cedar.Forest(lmbda=10**8, n_estimators=args.n_estimators,
+                        max_features=args.max_features, max_depth=args.max_depth,
+                        verbose=args.verbose, random_state=seed)
     if args.tune:
         # d_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None]}
         d_param_grid = {'n_estimators': [20], 'max_depth': [None]}
@@ -60,21 +59,25 @@ def performance(args, logger, seed):
         d_rf = d_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
+    # d_rf.print(show_nodes=True)
+
     logger.info('building cedar_rf...')
     start = time.time()
-    cedar_rf = cedar.RF(lmbda=args.lmbda,
-                        n_estimators=args.n_estimators, max_features=args.max_features,
-                        max_samples=args.max_samples, max_depth=args.max_depth,
-                        verbose=args.verbose, random_state=seed)
+    cedar_rf = cedar.Forest(lmbda=args.lmbda, n_estimators=args.n_estimators,
+                            max_features=args.max_features, max_depth=args.max_depth,
+                            verbose=args.verbose, random_state=seed)
     if args.tune:
         cedar_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None]}
-        gs = GridSearchCV(cedar_rf, cedar_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
+        gs = GridSearchCV(cedar_rf, cedar_param_grid, scoring=args.scoring, cv=args.cv,
+                          verbose=args.verbose)
         gs = gs.fit(X_train, y_train)
         cedar_rf = gs.best_estimator_
         logger.info('best_params: {}'.format(gs.best_params_))
     else:
         cedar_rf = cedar_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
+
+    # cedar_rf.print(show_nodes=True)
 
     # display performance
     exp_util.performance(sk_rf, X_test, y_test, name='sk_rf', logger=logger)
@@ -106,7 +109,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
-    parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
+    parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
     parser.add_argument('--tune', action='store_true', default=False, help='tune models.')
     parser.add_argument('--cv', type=int, default=3, help='number of cross-validation folds for tuning.')

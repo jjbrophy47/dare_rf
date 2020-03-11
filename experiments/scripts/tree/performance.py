@@ -31,6 +31,9 @@ def performance(args, logger, seed):
     sk_tree = sk_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
+    print(sk_tree.tree_.node_count)
+    print(sk_tree.tree_.max_depth)
+
     logger.info('building d_tree...')
     start = time.time()
     d_tree = cedar.Tree(epsilon=args.epsilon, lmbda=1000000000, max_depth=args.max_depth,
@@ -44,6 +47,8 @@ def performance(args, logger, seed):
                          max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     dt_tree = dt_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
+
+    dt_tree.print_tree()
 
     # display performance
     exp_util.performance(sk_tree, X_test, y_test, name='sk_tree', logger=logger)

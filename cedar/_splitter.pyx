@@ -24,7 +24,7 @@ cdef class _Splitter:
     Finds the best splits on dense data, one split at a time.
     """
 
-    def __cinit__(self, int min_samples_leaf, double lmbda, int random_state):
+    def __cinit__(self, int min_samples_leaf, double lmbda):
         """
         Parameters
         ----------
@@ -35,12 +35,9 @@ cdef class _Splitter:
         lmbda : double
             Noise control when generating distribution; higher values mean a
             more deterministic algorithm.
-        random_state : int
-            Random state.
         """
         self.min_samples_leaf = min_samples_leaf
         self.lmbda = lmbda
-        self.random_state = random_state
 
     def __dealloc__(self):
         """Destructor."""
@@ -87,7 +84,6 @@ cdef class _Splitter:
 
         # count number of pos labels
         for i in range(n_samples):
-            # printf("sample[%d]: %d\n", i, samples[i])
             if y[samples[i]] == 1:
                 pos_count += 1
 
@@ -136,7 +132,6 @@ cdef class _Splitter:
             # generate and sample from the distribution
             self._generate_distribution(distribution, gini_indices, feature_count)
             chosen_ndx = self._sample_distribution(distribution, feature_count)
-            # printf('chosen feature: %d\n', valid_features[chosen_ndx])
 
             # assign results from chosen feature
             split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
@@ -212,26 +207,23 @@ cdef class _Splitter:
         cdef double normalizing_constant = 0
 
         cdef double min_gini = 1
-        cdef double max_gini = -1
-        cdef int n_max = 0
-        cdef int first_max
+        cdef int n_min = 0
+        cdef int first_min = -1
 
         # find min and max Gini values
         for i in range(n_gini_indices):
             if gini_indices[i] < min_gini:
+                n_min = 1
+                first_min = i
                 min_gini = gini_indices[i]
-            if gini_indices[i] > max_gini:
-                n_max = 1
-                max_gini = gini_indices[i]
-                first_max = i
-            elif gini_indices[i] == max_gini:
-                n_max += 1
+            elif gini_indices[i] == min_gini:
+                n_min += 1
 
         # lambda too high, go into deterministic mode
         if exp(- lmbda * min_gini / 5) == 0:
             for i in range(n_gini_indices):
                 distribution[i] = 0
-            distribution[first_max] = 1
+            distribution[first_min] = 1
             normalizing_constant = 1
 
         # generate probability distribution over the features
@@ -246,7 +238,6 @@ cdef class _Splitter:
 
         return 0
 
-    # TODO: use random_state in get_random() function
     cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:
         """
         Randomly sample a feature from the probability distribution.
@@ -254,7 +245,7 @@ cdef class _Splitter:
         cdef int i
         cdef double weight = 0
 
-        weight = get_random(self.random_state)
+        weight = get_random()
         # printf('initial weight: %.7f\n', weight)
 
         for i in range(n_distribution):

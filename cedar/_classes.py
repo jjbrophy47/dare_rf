@@ -33,10 +33,12 @@ class Forest(object):
         If None, draw n_samples samples.
         If int, draw max_samples samples.
         If float, draw int(max_samples * n_samples) samples.
-    max_depth: int (default=4)
+    max_depth: int (default=None)
         The maximum depth of a tree.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
+    min_samples_leaf: int (default=1)
+        The minimum number of samples needed to make a leaf.
     min_impurity_decrease: float (default=1e-8)
         The minimum impurity decrease to be considered for a split.
     random_state: int (default=None)
@@ -44,8 +46,9 @@ class Forest(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt', max_samples=None,
-                 max_depth=4, min_samples_split=2, min_impurity_decrease=1e-8, random_state=None, verbose=0):
+    def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt',
+                 max_samples=None, max_depth=4, min_samples_split=2, min_samples_leaf=1,
+                 min_impurity_decrease=1e-8, random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
@@ -53,6 +56,7 @@ class Forest(object):
         self.max_samples = max_samples
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
         self.min_impurity_decrease = min_impurity_decrease
         self.random_state = random_state
         self.verbose = verbose
@@ -63,10 +67,11 @@ class Forest(object):
         s += '\nlmbda={}'.format(self.lmbda)
         s += '\nn_estimators={}'.format(self.n_estimators)
         s += '\nmax_features={}'.format(self.max_features)
-        s += '\nmax_samples={}'.format(self.max_samples)
+        # s += '\nmax_samples={}'.format(self.max_samples)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
-        s += '\nmin_impurity_decrease={}'.format(self.min_impurity_decrease)
+        s += '\nmin_samples_leaf={}'.format(self.min_samples_leaf)
+        # s += '\nmin_impurity_decrease={}'.format(self.min_impurity_decrease)
         s += '\nrandom_state={}'.format(self.random_state)
         s += '\nverbose={}'.format(self.verbose)
         return s
@@ -98,17 +103,17 @@ class Forest(object):
             assert self.max_features > 0 and self.max_features <= 1.0
             self.max_features_ = int(self.max_features * self.n_features_)
 
-        # set max_samples
-        if not self.max_samples:
-            self.max_samples_ = self.n_samples_
+        # # set max_samples
+        # if not self.max_samples:
+        #     self.max_samples_ = self.n_samples_
 
-        elif isinstance(self.max_samples, int):
-            assert self.max_samples > 0
-            self.max_samples_ = min(self.n_samples_, self.max_samples)
+        # elif isinstance(self.max_samples, int):
+        #     assert self.max_samples > 0
+        #     self.max_samples_ = min(self.n_samples_, self.max_samples)
 
-        elif isinstance(self.max_samples, float):
-            assert self.max_samples > 0 and self.max_samples <= 1.0
-            self.max_samples_ = int(self.max_samples * self.n_samples_)
+        # elif isinstance(self.max_samples, float):
+        #     assert self.max_samples > 0 and self.max_samples <= 1.0
+        #     self.max_samples_ = int(self.max_samples * self.n_samples_)
 
         # build forest
         self.trees_ = []
@@ -117,20 +122,20 @@ class Forest(object):
             if self.verbose > 2:
                 print('tree {}'.format(i))
 
-            print('tree {}'.format(i))
-
             np.random.seed(self.random_state + i)
             feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
 
-            np.random.seed(self.random_state + i)
-            sample_indices = np.random.choice(self.n_samples_, size=self.max_samples_, replace=False)
+            # np.random.seed(self.random_state + i)
+            # sample_indices = np.random.choice(self.n_samples_, size=self.n_samples, replace=False)
 
-            X_sub, y_sub = X[np.ix_(sample_indices, feature_indices)], y[sample_indices]
-            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators, max_depth=self.max_depth,
-                        min_samples_split=self.min_samples_split, min_impurity_decrease=self.min_impurity_decrease,
-                        random_state=self.random_state, feature_indices=feature_indices, verbose=self.verbose,
+            X_sub, y_sub = X[:, feature_indices], y
+            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators,
+                        max_depth=self.max_depth, min_samples_split=self.min_samples_split,
+                        min_samples_leaf=self.min_samples_leaf, random_state=self.random_state + i,
+                        feature_indices=feature_indices, verbose=self.verbose,
                         get_data=self._get_numpy_data)
-            tree = tree.fit(X_sub, y_sub, sample_indices)
+            # tree = tree.fit(X_sub, y_sub, sample_indices)
+            tree = tree.fit(X_sub, y_sub)
             self.trees_.append(tree)
 
         return self
@@ -158,49 +163,57 @@ class Forest(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
-    def add(self, X, y):
+    # TODO: adding samples can turn a leaf into a decision node
+    # def add(self, X, y):
+    #     """
+    #     Adds instances to the training data and updates the model.
+    #     """
+    #     assert X.ndim == 2 and y.ndim == 1
+
+    #     # assign index numbers to the new instances
+    #     current_keys = np.fromiter(self.X_train_.keys(), dtype=np.int64)
+    #     gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
+    #     if len(X) > len(gaps):
+    #         extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
+    #     keys = np.concatenate([gaps, extra])
+
+    #     # add instances to the data
+    #     for i, key in enumerate(keys):
+    #         self.X_train_[key] = X[i]
+    #         self.y_train_[key] = y[i]
+
+    #     # add instances to each tree
+    #     addition_types = []
+    #     for tree in self.trees_:
+    #         addition_types += tree.add(X, y, keys)
+
+    #     return addition_types
+
+    # def delete(self, remove_indices):
+    #     """
+    #     Removes instances from the training data and updates the model.
+    #     """
+    #     if isinstance(remove_indices, int):
+    #         remove_indices = np.array([remove_indices], dtype=np.int32)
+
+    #     # delete instances from each tree
+    #     deletion_types = []
+    #     for tree in self.trees_:
+    #         deletion_types += tree.delete(remove_indices)
+
+    #     # remove the instances from the data
+    #     for remove_ndx in remove_indices:
+    #         del self.X_train_[remove_ndx]
+    #         del self.y_train_[remove_ndx]
+
+    #     return deletion_types
+
+    def print(self, show_nodes=False, show_metadata=False):
         """
-        Adds instances to the training data and updates the model.
+        Show representation of forest by showing each tree.
         """
-        assert X.ndim == 2 and y.ndim == 1
-
-        # assign index numbers to the new instances
-        current_keys = np.fromiter(self.X_train_.keys(), dtype=np.int64)
-        gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
-        if len(X) > len(gaps):
-            extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
-        keys = np.concatenate([gaps, extra])
-
-        # add instances to the data
-        for i, key in enumerate(keys):
-            self.X_train_[key] = X[i]
-            self.y_train_[key] = y[i]
-
-        # add instances to each tree
-        addition_types = []
         for tree in self.trees_:
-            addition_types += tree.add(X, y, keys)
-
-        return addition_types
-
-    def delete(self, remove_indices):
-        """
-        Removes instances from the training data and updates the model.
-        """
-        if isinstance(remove_indices, int):
-            remove_indices = np.array([remove_indices], dtype=np.int32)
-
-        # delete instances from each tree
-        deletion_types = []
-        for tree in self.trees_:
-            deletion_types += tree.delete(remove_indices)
-
-        # remove the instances from the data
-        for remove_ndx in remove_indices:
-            del self.X_train_[remove_ndx]
-            del self.y_train_[remove_ndx]
-
-        return deletion_types
+            tree.print_tree(show_nodes=show_nodes, show_metadata=show_metadata)
 
     def get_params(self, deep=False):
         """
@@ -214,7 +227,7 @@ class Forest(object):
         d['max_samples'] = self.max_samples
         d['max_depth'] = self.max_depth
         d['min_samples_split'] = self.min_samples_split
-        d['min_impurity_decrease'] = self.min_impurity_decrease
+        d['min_samples_leaf'] = self.min_samples_leaf
         d['random_state'] = self.random_state
         d['verbose'] = self.verbose
 
@@ -332,17 +345,18 @@ class Tree(object):
         y = np.ascontiguousarray(y, dtype=np.int32)
         f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
 
-        # save the data for easy deletion
-        if self.single_tree_:
-            self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
-            keys = np.arange(X.shape[0])
-        else:
-            assert keys is not None
+        # # save the data for easy deletion
+        # if self.single_tree_:
+        #     self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
+        #     keys = np.arange(X.shape[0])
+        # else:
+        #     assert keys is not None
 
         self.tree_ = _Tree()
-        self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda, self.random_state)
+        self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
         self.tree_builder_ = _TreeBuilder(self.splitter_, self.min_samples_leaf,
-                                          self.min_samples_split, self.max_depth)
+                                          self.min_samples_split, self.max_depth,
+                                          self.random_state)
         self.tree_builder_.build(self.tree_, X, y, f)
 
         return self

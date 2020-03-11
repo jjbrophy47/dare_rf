@@ -11,9 +11,12 @@ from cpython.ref cimport PyObject
 from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
+from libc.stdlib cimport rand
+from libc.stdlib cimport srand
 from libc.string cimport memset
 from libc.stdint cimport SIZE_MAX
 from libc.stdio cimport printf
+from libc.time cimport time
 
 import numpy as np
 cimport numpy as np
@@ -41,13 +44,16 @@ cdef class _TreeBuilder:
     """
 
     def __cinit__(self, _Splitter splitter, int min_samples_split,
-                  int min_samples_leaf, int max_depth):
+                  int min_samples_leaf, int max_depth, int random_state):
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
-        if max_depth == -1:
-            max_depth = 1000
-        self.max_depth = max_depth
+        self.max_depth = 1000 if max_depth == -1 else max_depth
+        self.random_state = random_state
+        srand(random_state)  # do once? yes, once per tree
+        # get rid of garbage first value:
+        # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
+        rand()
 
     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f):
         """

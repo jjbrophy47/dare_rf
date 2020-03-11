@@ -1,28 +1,3 @@
-# from distutils.core import setup
-# from Cython.Build import cythonize
-# import numpy
-
-# setup(
-#     ext_modules=cythonize(['tree.pyx', 'utils.pyx', 'splitter.pyx'],
-#                           compiler_directives={'language_level': '3'},
-#                           annotate=True),
-#     include_dirs=numpy.get_include()
-# )
-
-# from distutils.core import setup, Extension
-# from Cython.Build import cythonize
-
-# extensions = [Extension(name="tree", sources=["src/tree.pyx"], include_dirs=['.', '', 'src']),
-#               Extension(name="splitter", sources=["src/splitter.pyx"], include_dirs=['.', '', 'src']),
-#               Extension(name="utils", sources=["src/util/utils.pyx"], include_dirs=['.', '', 'src'])]
-
-# setup(
-#     name='cedar',
-#     ext_modules=cythonize(extensions, compiler_directives={'language_level': '3'},
-#                           annotate=True),
-#     include_dirs=[numpy.get_include(), '.', 'src']
-# )
-
 import os
 
 import numpy
@@ -65,4 +40,3 @@ def configuration(parent_package='', top_path=None):
 
 if __name__ == "__main__":
     setup(**configuration(top_path='').todict())
-    # setup(configuration)
