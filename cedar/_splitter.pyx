@@ -210,6 +210,8 @@ cdef class _Splitter:
         cdef int n_min = 0
         cdef int first_min = -1
 
+        cdef bint deterministic = 0
+
         # find min and max Gini values
         for i in range(n_gini_indices):
             if gini_indices[i] < min_gini:
@@ -219,12 +221,11 @@ cdef class _Splitter:
             elif gini_indices[i] == min_gini:
                 n_min += 1
 
-        # lambda too high, go into deterministic mode
-        if exp(- lmbda * min_gini / 5) == 0:
+        # determine if tree is in deterministic mode
+        if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:
             for i in range(n_gini_indices):
                 distribution[i] = 0
             distribution[first_min] = 1
-            normalizing_constant = 1
 
         # generate probability distribution over the features
         else:

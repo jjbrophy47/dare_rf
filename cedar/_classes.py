@@ -22,6 +22,7 @@ class Forest(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
+        Set to -1 for detemrinistic trees; equivalent to setting it to infty.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -287,6 +288,7 @@ class Tree(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
+        Set to -1 for a detrminisic tree; equivalent to setting it to infty.
     max_depth: int (default=None)
         The maximum depth of a tree.
     min_samples_split: int (default=2)

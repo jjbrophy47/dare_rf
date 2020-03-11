@@ -45,7 +45,7 @@ def performance(args, logger, seed):
 
     logger.info('building d_rf...')
     start = time.time()
-    d_rf = cedar.Forest(lmbda=10**8, n_estimators=args.n_estimators,
+    d_rf = cedar.Forest(lmbda=-1, n_estimators=args.n_estimators,
                         max_features=args.max_features, max_depth=args.max_depth,
                         verbose=args.verbose, random_state=seed)
     if args.tune:

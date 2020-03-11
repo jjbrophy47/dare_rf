@@ -3797,6 +3797,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
   double __pyx_v_min_gini;
   int __pyx_v_n_min;
   int __pyx_v_first_min;
+  CYTHON_UNUSED int __pyx_v_deterministic;
   int __pyx_r;
   double __pyx_t_1;
   int __pyx_t_2;
@@ -3804,6 +3805,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
   int __pyx_t_4;
   int __pyx_t_5;
   int __pyx_t_6;
+  int __pyx_t_7;
 
   /* "cedar/_splitter.pyx":206
  *         """
@@ -3847,11 +3849,20 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
  *         cdef int n_min = 0
  *         cdef int first_min = -1             # <<<<<<<<<<<<<<
  * 
- *         # find min and max Gini values
+ *         cdef bint deterministic = 0
  */
   __pyx_v_first_min = -1;
 
-  /* "cedar/_splitter.pyx":214
+  /* "cedar/_splitter.pyx":213
+ *         cdef int first_min = -1
+ * 
+ *         cdef bint deterministic = 0             # <<<<<<<<<<<<<<
+ * 
+ *         # find min and max Gini values
+ */
+  __pyx_v_deterministic = 0;
+
+  /* "cedar/_splitter.pyx":216
  * 
  *         # find min and max Gini values
  *         for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
@@ -3863,7 +3874,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "cedar/_splitter.pyx":215
+    /* "cedar/_splitter.pyx":217
  *         # find min and max Gini values
  *         for i in range(n_gini_indices):
  *             if gini_indices[i] < min_gini:             # <<<<<<<<<<<<<<
@@ -3873,7 +3884,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
     __pyx_t_5 = (((__pyx_v_gini_indices[__pyx_v_i]) < __pyx_v_min_gini) != 0);
     if (__pyx_t_5) {
 
-      /* "cedar/_splitter.pyx":216
+      /* "cedar/_splitter.pyx":218
  *         for i in range(n_gini_indices):
  *             if gini_indices[i] < min_gini:
  *                 n_min = 1             # <<<<<<<<<<<<<<
@@ -3882,7 +3893,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
  */
       __pyx_v_n_min = 1;
 
-      /* "cedar/_splitter.pyx":217
+      /* "cedar/_splitter.pyx":219
  *             if gini_indices[i] < min_gini:
  *                 n_min = 1
  *                 first_min = i             # <<<<<<<<<<<<<<
@@ -3891,7 +3902,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
  */
       __pyx_v_first_min = __pyx_v_i;
 
-      /* "cedar/_splitter.pyx":218
+      /* "cedar/_splitter.pyx":220
  *                 n_min = 1
  *                 first_min = i
  *                 min_gini = gini_indices[i]             # <<<<<<<<<<<<<<
@@ -3900,7 +3911,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
  */
       __pyx_v_min_gini = (__pyx_v_gini_indices[__pyx_v_i]);
 
-      /* "cedar/_splitter.pyx":215
+      /* "cedar/_splitter.pyx":217
  *         # find min and max Gini values
  *         for i in range(n_gini_indices):
  *             if gini_indices[i] < min_gini:             # <<<<<<<<<<<<<<
@@ -3910,7 +3921,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
       goto __pyx_L5;
     }
 
-    /* "cedar/_splitter.pyx":219
+    /* "cedar/_splitter.pyx":221
  *                 first_min = i
  *                 min_gini = gini_indices[i]
  *             elif gini_indices[i] == min_gini:             # <<<<<<<<<<<<<<
@@ -3920,16 +3931,16 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
     __pyx_t_5 = (((__pyx_v_gini_indices[__pyx_v_i]) == __pyx_v_min_gini) != 0);
     if (__pyx_t_5) {
 
-      /* "cedar/_splitter.pyx":220
+      /* "cedar/_splitter.pyx":222
  *                 min_gini = gini_indices[i]
  *             elif gini_indices[i] == min_gini:
  *                 n_min += 1             # <<<<<<<<<<<<<<
  * 
- *         # lambda too high, go into deterministic mode
+ *         # determine if tree is in deterministic mode
  */
       __pyx_v_n_min = (__pyx_v_n_min + 1);
 
-      /* "cedar/_splitter.pyx":219
+      /* "cedar/_splitter.pyx":221
  *                 first_min = i
  *                 min_gini = gini_indices[i]
  *             elif gini_indices[i] == min_gini:             # <<<<<<<<<<<<<<
@@ -3940,19 +3951,27 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
     __pyx_L5:;
   }
 
-  /* "cedar/_splitter.pyx":223
+  /* "cedar/_splitter.pyx":225
  * 
- *         # lambda too high, go into deterministic mode
- *         if exp(- lmbda * min_gini / 5) == 0:             # <<<<<<<<<<<<<<
+ *         # determine if tree is in deterministic mode
+ *         if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:             # <<<<<<<<<<<<<<
  *             for i in range(n_gini_indices):
  *                 distribution[i] = 0
  */
-  __pyx_t_5 = ((exp((((-__pyx_v_lmbda) * __pyx_v_min_gini) / 5.0)) == 0.0) != 0);
+  __pyx_t_6 = ((__pyx_v_lmbda < 0.0) != 0);
+  if (!__pyx_t_6) {
+  } else {
+    __pyx_t_5 = __pyx_t_6;
+    goto __pyx_L7_bool_binop_done;
+  }
+  __pyx_t_6 = ((exp((((-__pyx_v_lmbda) * __pyx_v_min_gini) / 5.0)) == 0.0) != 0);
+  __pyx_t_5 = __pyx_t_6;
+  __pyx_L7_bool_binop_done:;
   if (__pyx_t_5) {
 
-    /* "cedar/_splitter.pyx":224
- *         # lambda too high, go into deterministic mode
- *         if exp(- lmbda * min_gini / 5) == 0:
+    /* "cedar/_splitter.pyx":226
+ *         # determine if tree is in deterministic mode
+ *         if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:
  *             for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
  *                 distribution[i] = 0
  *             distribution[first_min] = 1
@@ -3962,45 +3981,36 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_i = __pyx_t_4;
 
-      /* "cedar/_splitter.pyx":225
- *         if exp(- lmbda * min_gini / 5) == 0:
+      /* "cedar/_splitter.pyx":227
+ *         if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:
  *             for i in range(n_gini_indices):
  *                 distribution[i] = 0             # <<<<<<<<<<<<<<
  *             distribution[first_min] = 1
- *             normalizing_constant = 1
+ * 
  */
       (__pyx_v_distribution[__pyx_v_i]) = 0.0;
     }
 
-    /* "cedar/_splitter.pyx":226
+    /* "cedar/_splitter.pyx":228
  *             for i in range(n_gini_indices):
  *                 distribution[i] = 0
  *             distribution[first_min] = 1             # <<<<<<<<<<<<<<
- *             normalizing_constant = 1
- * 
- */
-    (__pyx_v_distribution[__pyx_v_first_min]) = 1.0;
-
-    /* "cedar/_splitter.pyx":227
- *                 distribution[i] = 0
- *             distribution[first_min] = 1
- *             normalizing_constant = 1             # <<<<<<<<<<<<<<
  * 
  *         # generate probability distribution over the features
  */
-    __pyx_v_normalizing_constant = 1.0;
+    (__pyx_v_distribution[__pyx_v_first_min]) = 1.0;
 
-    /* "cedar/_splitter.pyx":223
+    /* "cedar/_splitter.pyx":225
  * 
- *         # lambda too high, go into deterministic mode
- *         if exp(- lmbda * min_gini / 5) == 0:             # <<<<<<<<<<<<<<
+ *         # determine if tree is in deterministic mode
+ *         if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:             # <<<<<<<<<<<<<<
  *             for i in range(n_gini_indices):
  *                 distribution[i] = 0
  */
     goto __pyx_L6;
   }
 
-  /* "cedar/_splitter.pyx":231
+  /* "cedar/_splitter.pyx":232
  *         # generate probability distribution over the features
  *         else:
  *             for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
@@ -4013,7 +4023,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_i = __pyx_t_4;
 
-      /* "cedar/_splitter.pyx":232
+      /* "cedar/_splitter.pyx":233
  *         else:
  *             for i in range(n_gini_indices):
  *                 distribution[i] = exp(- lmbda * gini_indices[i] / 5)             # <<<<<<<<<<<<<<
@@ -4022,7 +4032,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
  */
       (__pyx_v_distribution[__pyx_v_i]) = exp((((-__pyx_v_lmbda) * (__pyx_v_gini_indices[__pyx_v_i])) / 5.0));
 
-      /* "cedar/_splitter.pyx":233
+      /* "cedar/_splitter.pyx":234
  *             for i in range(n_gini_indices):
  *                 distribution[i] = exp(- lmbda * gini_indices[i] / 5)
  *                 normalizing_constant += distribution[i]             # <<<<<<<<<<<<<<
@@ -4032,7 +4042,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
       __pyx_v_normalizing_constant = (__pyx_v_normalizing_constant + (__pyx_v_distribution[__pyx_v_i]));
     }
 
-    /* "cedar/_splitter.pyx":235
+    /* "cedar/_splitter.pyx":236
  *                 normalizing_constant += distribution[i]
  * 
  *             for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
@@ -4044,20 +4054,20 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_i = __pyx_t_4;
 
-      /* "cedar/_splitter.pyx":236
+      /* "cedar/_splitter.pyx":237
  * 
  *             for i in range(n_gini_indices):
  *                 distribution[i] /= normalizing_constant             # <<<<<<<<<<<<<<
  *                 # printf('distribution[%d]: %.7f\n', i, distribution[i])
  * 
  */
-      __pyx_t_6 = __pyx_v_i;
-      (__pyx_v_distribution[__pyx_t_6]) = ((__pyx_v_distribution[__pyx_t_6]) / __pyx_v_normalizing_constant);
+      __pyx_t_7 = __pyx_v_i;
+      (__pyx_v_distribution[__pyx_t_7]) = ((__pyx_v_distribution[__pyx_t_7]) / __pyx_v_normalizing_constant);
     }
   }
   __pyx_L6:;
 
-  /* "cedar/_splitter.pyx":239
+  /* "cedar/_splitter.pyx":240
  *                 # printf('distribution[%d]: %.7f\n', i, distribution[i])
  * 
  *         return 0             # <<<<<<<<<<<<<<
@@ -4080,7 +4090,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__generate_distribution(struct __
   return __pyx_r;
 }
 
-/* "cedar/_splitter.pyx":241
+/* "cedar/_splitter.pyx":242
  *         return 0
  * 
  *     cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:             # <<<<<<<<<<<<<<
@@ -4097,7 +4107,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
   int __pyx_t_3;
   int __pyx_t_4;
 
-  /* "cedar/_splitter.pyx":246
+  /* "cedar/_splitter.pyx":247
  *         """
  *         cdef int i
  *         cdef double weight = 0             # <<<<<<<<<<<<<<
@@ -4106,7 +4116,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
  */
   __pyx_v_weight = 0.0;
 
-  /* "cedar/_splitter.pyx":248
+  /* "cedar/_splitter.pyx":249
  *         cdef double weight = 0
  * 
  *         weight = get_random()             # <<<<<<<<<<<<<<
@@ -4115,7 +4125,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
  */
   __pyx_v_weight = __pyx_f_5cedar_6_utils_get_random();
 
-  /* "cedar/_splitter.pyx":251
+  /* "cedar/_splitter.pyx":252
  *         # printf('initial weight: %.7f\n', weight)
  * 
  *         for i in range(n_distribution):             # <<<<<<<<<<<<<<
@@ -4127,7 +4137,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cedar/_splitter.pyx":252
+    /* "cedar/_splitter.pyx":253
  * 
  *         for i in range(n_distribution):
  *             if weight < distribution[i]:             # <<<<<<<<<<<<<<
@@ -4137,7 +4147,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
     __pyx_t_4 = ((__pyx_v_weight < (__pyx_v_distribution[__pyx_v_i])) != 0);
     if (__pyx_t_4) {
 
-      /* "cedar/_splitter.pyx":253
+      /* "cedar/_splitter.pyx":254
  *         for i in range(n_distribution):
  *             if weight < distribution[i]:
  *                 break             # <<<<<<<<<<<<<<
@@ -4146,7 +4156,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
  */
       goto __pyx_L4_break;
 
-      /* "cedar/_splitter.pyx":252
+      /* "cedar/_splitter.pyx":253
  * 
  *         for i in range(n_distribution):
  *             if weight < distribution[i]:             # <<<<<<<<<<<<<<
@@ -4155,7 +4165,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
  */
     }
 
-    /* "cedar/_splitter.pyx":254
+    /* "cedar/_splitter.pyx":255
  *             if weight < distribution[i]:
  *                 break
  *             weight -= distribution[i]             # <<<<<<<<<<<<<<
@@ -4166,7 +4176,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
   }
   __pyx_L4_break:;
 
-  /* "cedar/_splitter.pyx":256
+  /* "cedar/_splitter.pyx":257
  *             weight -= distribution[i]
  * 
  *         return i             # <<<<<<<<<<<<<<
@@ -4174,7 +4184,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter__sample_distribution(CYTHON_UNUS
   __pyx_r = __pyx_v_i;
   goto __pyx_L0;
 
-  /* "cedar/_splitter.pyx":241
+  /* "cedar/_splitter.pyx":242
  *         return 0
  * 
  *     cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:             # <<<<<<<<<<<<<<
