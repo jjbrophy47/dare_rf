@@ -19,7 +19,6 @@ cdef class _Tree:
 
     # Inner structures: values are stored separately from node structure,
     # since size is determined at runtime.
-    cdef public int max_depth            # Max depth of the tree
     cdef public int node_count           # Counter for node IDs
     cdef public int capacity             # Capacity of tree, in terms of nodes
     cdef double* values                  # Array of values, shape=[capacity]
@@ -69,6 +68,8 @@ cdef class _TreeBuilder:
     cdef int max_depth               # Maximal tree depth
     cdef int random_state            # Random state
 
-    cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f)
     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f)
+    cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f)
+    cpdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,
+                             int node_id, int depth, int parent, bint is_left, int* samples)
     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil

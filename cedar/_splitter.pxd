@@ -1,10 +1,9 @@
 import numpy as np
 cimport numpy as np
 
-from ._tree cimport UINT32_t
-
 cdef struct Meta:
     # Sufficient statistics to save for each attribute
+    double p                 # Total probability of chosen feature
     int  count               # Number of samples in the node
     int  pos_count           # Number of pos samples in the node
     int  feature_count       # Number of features in the node

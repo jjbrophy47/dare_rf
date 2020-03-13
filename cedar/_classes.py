@@ -7,6 +7,7 @@ Uses certified removal to improve deletion efficiency.
 import numpy as np
 
 from ._splitter import _Splitter
+from ._splitter import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -347,15 +348,13 @@ class Tree(object):
         y = np.ascontiguousarray(y, dtype=np.int32)
         f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
 
-        # # save the data for easy deletion
-        # if self.single_tree_:
-        #     self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
-        #     keys = np.arange(X.shape[0])
-        # else:
-        #     assert keys is not None
+        # save the data for easy deletion
+        if self.single_tree_:
+            self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
 
         self.tree_ = _Tree()
         self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
+        self.remover_ = _Remover(self.epsilon)
         self.tree_builder_ = _TreeBuilder(self.splitter_, self.min_samples_leaf,
                                           self.min_samples_split, self.max_depth,
                                           self.random_state)
@@ -436,27 +435,26 @@ class Tree(object):
 
     #     return self.addition_types_
 
-    # def delete(self, remove_indices):
-    #     """
-    #     Removes instance remove_ndx from the training data and updates the model.
-    #     """
-    #     if isinstance(remove_indices, int):
-    #         remove_indices = np.array([remove_indices], dtype=np.int32)
+    def delete(self, remove_indices):
+        """
+        Removes instance remove_ndx from the training data and updates the model.
+        """
+        if isinstance(remove_indices, int):
+            remove_indices = np.array([remove_indices], dtype=np.int32)
 
-    #     # get data to remove
-    #     X, y, keys = self.get_data(remove_indices, self.feature_indices)
+        # get data to remove
+        X, y, keys = self.get_data(remove_indices, self.feature_indices)
 
-    #     # update model
-    #     self.deletion_types_ = []
-    #     self.root_ = self._delete(X, y, remove_indices)
+        # update model
+        self.remover_.remove(self.tree_, self.tree_builder_, X, y, remove_indices)
 
-    #     # remove the instances from the data
-    #     if self.single_tree_:
-    #         for remove_ndx in remove_indices:
-    #             del self.X_train_[remove_ndx]
-    #             del self.y_train_[remove_ndx]
+        # remove the instances from the data
+        if self.single_tree_:
+            for remove_ndx in remove_indices:
+                del self.X_train_[remove_ndx]
+                del self.y_train_[remove_ndx]
 
-    #     return self.deletion_types_
+        return 0
 
     def get_params(self, deep=False):
         """
