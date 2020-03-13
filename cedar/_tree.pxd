@@ -22,9 +22,11 @@ cdef class _Tree:
     cdef public int node_count           # Counter for node IDs
     cdef public int capacity             # Capacity of tree, in terms of nodes
     cdef double* values                  # Array of values, shape=[capacity]
+    cdef double* p                       # Array of probabilities, shape=[capacity]
     cdef int* chosen_features            # Array of chosen features, shape=[capacity]
     cdef int* left_children              # Array of left children indices, shape=[capacity]
     cdef int* right_children             # Array of right children indices, shape=[capacity]
+    cdef int* depth                      # Array of depths, shape=[capacity]
 
     # Internal metadata, stored for efficient updating
     cdef int* count                # Array of sample counts, shape=[capacity]
@@ -48,7 +50,7 @@ cdef class _Tree:
 
     # C API
     cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,
-                      double value, int* samples, Meta* meta) nogil except -1
+                      double value, int depth, int* samples, Meta* meta) nogil except -1
     cdef np.ndarray _get_double_ndarray(self, double *data)
     cdef np.ndarray _get_int_ndarray(self, int *data)
     cdef int _resize(self, int capacity=*) nogil except -1
@@ -68,8 +70,11 @@ cdef class _TreeBuilder:
     cdef int max_depth               # Maximal tree depth
     cdef int random_state            # Random state
 
-    cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f)
+    # Python API
     cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f)
-    cpdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,
-                             int node_id, int depth, int parent, bint is_left, int* samples)
+
+    # C API
+    cdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,
+                            int node_id, int depth, int parent, double parent_p,
+                            bint is_left, int* samples, int* features, int n_features)
     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil

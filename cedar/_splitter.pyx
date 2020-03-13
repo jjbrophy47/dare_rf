@@ -3,12 +3,6 @@ from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdio cimport printf
-from libc.math cimport exp
-from libc.math cimport isnan
-
-from libc.stdlib cimport rand
-from libc.stdlib cimport srand
-from libc.stdlib cimport RAND_MAX
 
 cimport cython
 
@@ -49,7 +43,8 @@ cdef class _Splitter:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,
-                        int* samples, int* features, int n_features,
+                        double parent_p, int* samples,
+                        int* features, int n_features,
                         SplitRecord* split, Meta* meta):
         """
         Find the best split in the node data.
@@ -78,6 +73,15 @@ cdef class _Splitter:
         cdef int feature_count = 0
         cdef int result = 0
 
+        cdef double* gini_indices
+        cdef double* distribution
+        cdef int* valid_features
+
+        cdef int* left_counts
+        cdef int* left_pos_counts
+        cdef int* right_counts
+        cdef int* right_pos_counts
+
         # count number of pos labels
         for i in range(n_samples):
             if y[samples[i]] == 1:
@@ -85,14 +89,14 @@ cdef class _Splitter:
 
         if pos_count < count:
 
-            cdef double* gini_indices = <double *>malloc(n_features * sizeof(double))
-            cdef double* distribution = <double *>malloc(n_features * sizeof(double))
-            cdef int* valid_features = <int *>malloc(n_features * sizeof(int))
+            gini_indices = <double *>malloc(n_features * sizeof(double))
+            distribution = <double *>malloc(n_features * sizeof(double))
+            valid_features = <int *>malloc(n_features * sizeof(int))
 
-            cdef int* left_counts = <int *>malloc(n_features * sizeof(int))
-            cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
-            cdef int* right_counts = <int *>malloc(n_features * sizeof(int))
-            cdef int* right_pos_counts = <int *>malloc(n_features * sizeof(int))
+            left_counts = <int *>malloc(n_features * sizeof(int))
+            left_pos_counts = <int *>malloc(n_features * sizeof(int))
+            right_counts = <int *>malloc(n_features * sizeof(int))
+            right_pos_counts = <int *>malloc(n_features * sizeof(int))
 
             # compute statistics for each attribute
             for j in range(n_features):

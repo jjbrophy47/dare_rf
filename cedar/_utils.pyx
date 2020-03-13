@@ -3,12 +3,16 @@ from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdlib cimport free
 from libc.stdlib cimport rand
-from libc.stdlib cimport srand
 from libc.stdlib cimport RAND_MAX
-from libc.time cimport time
+from libc.math cimport exp
+
+cimport cython
 
 import numpy as np
 cimport numpy as np
+
+# constants
+from numpy import int32 as INT
 
 cdef inline double get_random() nogil:
     """
@@ -90,7 +94,7 @@ cdef int _generate_distribution(double lmbda, double* distribution,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil:
+cdef int _sample_distribution(double* distribution, int n_distribution) nogil:
     """
     Randomly sample a feature from the probability distribution.
     """
@@ -106,6 +110,30 @@ cdef int _sample_distribution(self, double* distribution, int n_distribution) no
         weight -= distribution[i]
 
     return i
+
+# TODO: check for int dtype and if it's a contiguous array
+cdef inline _check_samples(object X, np.ndarray y):
+    """
+    Check input dtype, layout and format.
+    """
+    if X.dtype != INT:
+        # since we have to copy we will make it fortran for efficiency
+        X = np.asfortranarray(X, dtype=np.int32)
+
+    if y.dtype != INT or not y.flags.contiguous:
+        y = np.ascontiguousarray(y, dtype=np.int32)
+
+    return X, y
+
+# TODO: check for int dtype and if it's a contiguous array
+cdef inline _check_features(np.ndarray f):
+    """
+    Check input dtype, layout and format.
+    """
+    if f.dtype != INT or not f.flags.contiguous:
+        f = np.ascontiguousarray(f, dtype=np.int32)
+
+    return f
 
 # =============================================================================
 # Stack data structure
@@ -136,8 +164,8 @@ cdef class Stack:
     cdef bint is_empty(self) nogil:
         return self.top <= 0
 
-    cdef int push(self, int depth, int parent, bint is_left, int* samples,
-                  int n_samples, int* features, int n_features) nogil:
+    cdef int push(self, int depth, int parent, double parent_p, bint is_left,
+                  int* samples, int n_samples, int* features, int n_features) nogil:
         """
         Push a new element onto the stack.
         """
@@ -152,6 +180,7 @@ cdef class Stack:
         stack = self.stack_
         stack[top].depth = depth
         stack[top].parent = parent
+        stack[top].parent_p = parent_p
         stack[top].is_left = is_left
         stack[top].samples = samples
         stack[top].n_samples = n_samples
@@ -207,13 +236,14 @@ cdef class RemovalStack:
     cdef bint is_empty(self) nogil:
         return self.top <= 0
 
-    cdef int push(self, int depth, int node_id, double parent_p, int* samples,
+    cdef int push(self, int depth, int node_id, bint is_left, int parent,
+                  double parent_p, int* samples, int* remove_samples,
                   int n_samples) nogil:
         """
         Push a new element onto the stack.
         """
         cdef int top = self.top
-        cdef StackRecord* stack = NULL
+        cdef RemovalStackRecord* stack = NULL
         cdef int num_bytes
 
         # Resize if capacity not sufficient
@@ -225,6 +255,8 @@ cdef class RemovalStack:
         stack = self.stack_
         stack[top].depth = depth
         stack[top].node_id = node_id
+        stack[top].is_left = is_left
+        stack[top].parent = parent
         stack[top].parent_p = parent_p
         stack[top].samples = samples
         stack[top].remove_samples = remove_samples
@@ -234,12 +266,12 @@ cdef class RemovalStack:
         self.top = top + 1
         return 0
 
-    cdef int pop(self, StackRecord* res) nogil:
+    cdef int pop(self, RemovalStackRecord* res) nogil:
         """
         Remove the top element from the stack and copy to ``res``.
         """
         cdef int top = self.top
-        cdef StackRecord* stack = self.stack_
+        cdef RemovalStackRecord* stack = self.stack_
 
         if top <= 0:
             return -1
@@ -268,6 +300,7 @@ cdef class IntStack:
     """
 
     def __cinit__(self, int capacity):
+        self.stack_ = <int *>malloc(self.capacity * sizeof(int))
         self.capacity = capacity
         self.top = 0
 
@@ -289,23 +322,24 @@ cdef class IntStack:
             self.stack_ = <int *>realloc(self.stack_, self.capacity * sizeof(int))
 
         stack = self.stack_
-        stack[top].node_id = node_id
+        stack[top] = node_id
 
         # Increment stack pointer
         self.top = top + 1
         return 0
 
-    cdef int pop(self, StackRecord* res) nogil:
+    cdef int pop(self) nogil:
         """
         Remove the top element from the stack and copy to ``res``.
         """
         cdef int top = self.top
-        cdef StackRecord* stack = self.stack_
+        cdef int* stack = self.stack_
+        cdef int result
 
         if top <= 0:
             return -1
 
-        res[0] = stack[top - 1]
+        result = stack[top - 1]
         self.top = top - 1
 
-        return 0
+        return result

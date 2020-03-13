@@ -443,7 +443,7 @@ class Tree(object):
             remove_indices = np.array([remove_indices], dtype=np.int32)
 
         # get data to remove
-        X, y, keys = self.get_data(remove_indices, self.feature_indices)
+        X, y = self.get_data(remove_indices, self.feature_indices)
 
         # update model
         self.remover_.remove(self.tree_, self.tree_builder_, X, y, remove_indices)
@@ -973,14 +973,14 @@ class Tree(object):
         n_samples = len(indices)
         X = np.zeros((n_samples, self.n_features_), np.int32)
         y = np.zeros(n_samples, np.int32)
-        keys = np.zeros(n_samples, np.int32)
+        # keys = np.zeros(n_samples, np.int32)
 
         for i, ndx in enumerate(indices):
             X[i] = self.X_train_[ndx]
             y[i] = self.y_train_[ndx]
-            keys[i] = ndx
+            # keys[i] = ndx
 
-        return X, y, keys
+        return X, y
 
     def _numpy_to_dict(self, X, y):
         """

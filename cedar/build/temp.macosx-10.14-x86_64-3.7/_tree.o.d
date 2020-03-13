@@ -71,22 +71,22 @@ build/temp.macosx-10.14-x86_64-3.7/_tree.o: _tree.c \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/dtoa.h \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/fileutils.h \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/pyfpe.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/arrayobject.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/ndarrayobject.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/ndarraytypes.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/npy_common.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/numpyconfig.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/_numpyconfig.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/npy_endian.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/npy_cpu.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/utils.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/_neighborhood_iterator_imp.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/old_defines.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/__multiarray_api.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/npy_interrupt.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/ufuncobject.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/npy_math.h \
-  /usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/__ufunc_api.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/arrayobject.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/ndarrayobject.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/ndarraytypes.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/npy_common.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/numpyconfig.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/_numpyconfig.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/npy_endian.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/npy_cpu.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/utils.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/_neighborhood_iterator_imp.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/old_defines.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/__multiarray_api.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/npy_interrupt.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/ufuncobject.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/npy_math.h \
+  /Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/__ufunc_api.h \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/frameobject.h
-commandline: -I/usr/local/lib/python3.7/site-packages/numpy/core/include -I/usr/local/lib/python3.7/site-packages/numpy/core/include -I/usr/local/include -I/usr/local/opt/openssl/include -I/usr/local/opt/sqlite/include -I/usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m -c-O3-I/usr/local/lib/python3.7/site-packages/numpy/core/include -I/usr/local/lib/python3.7/site-packages/numpy/core/include -I/usr/local/include -I/usr/local/opt/openssl/include -I/usr/local/opt/sqlite/include -I/usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m
+commandline: -I/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include -I/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include -I/usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m -c-O3-I/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include -I/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include -I/usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m

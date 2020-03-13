@@ -37,10 +37,6 @@ cdef class _Splitter:
 
     # Methods
     cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,
-                        int* samples, int* features, int n_features,
+                        double parent_p, int* samples,
+                        int* features, int n_features,
                         SplitRecord* split, Meta* meta)
-    cdef double _compute_gini(self, double count, double left_count, double right_count, 
-                              int left_pos_count, int right_pos_count) nogil
-    cdef int _generate_distribution(self, double* distribution, double* gini_indices,
-                                    int n_gini_indices) nogil
-    cdef int _sample_distribution(self, double* distribution, int n_distribution) nogil

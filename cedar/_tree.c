@@ -4,14 +4,14 @@
 {
     "distutils": {
         "depends": [
-            "/usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/arrayobject.h",
-            "/usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/ufuncobject.h"
+            "/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/arrayobject.h",
+            "/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include/numpy/ufuncobject.h"
         ],
         "extra_compile_args": [
             "-O3"
         ],
         "include_dirs": [
-            "/usr/local/lib/python3.7/site-packages/numpy/core/include"
+            "/Users/Jonny/Documents/research/deletion/trees/myenv/lib/python3.7/site-packages/numpy/core/include"
         ],
         "libraries": [
             "m"
@@ -624,9 +624,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "numpy/ufuncobject.h"
 #include "pythread.h"
 #include <stdlib.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <time.h>
 #include "pystate.h"
 #ifdef _OPENMP
 #include <omp.h>
@@ -977,7 +974,7 @@ typedef struct {
 } __Pyx_BufFmt_Context;
 
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":776
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":776
  * # in Cython to enable them only on the right systems.
  * 
  * ctypedef npy_int8       int8_t             # <<<<<<<<<<<<<<
@@ -986,7 +983,7 @@ typedef struct {
  */
 typedef npy_int8 __pyx_t_5numpy_int8_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":777
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":777
  * 
  * ctypedef npy_int8       int8_t
  * ctypedef npy_int16      int16_t             # <<<<<<<<<<<<<<
@@ -995,7 +992,7 @@ typedef npy_int8 __pyx_t_5numpy_int8_t;
  */
 typedef npy_int16 __pyx_t_5numpy_int16_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":778
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":778
  * ctypedef npy_int8       int8_t
  * ctypedef npy_int16      int16_t
  * ctypedef npy_int32      int32_t             # <<<<<<<<<<<<<<
@@ -1004,7 +1001,7 @@ typedef npy_int16 __pyx_t_5numpy_int16_t;
  */
 typedef npy_int32 __pyx_t_5numpy_int32_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":779
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":779
  * ctypedef npy_int16      int16_t
  * ctypedef npy_int32      int32_t
  * ctypedef npy_int64      int64_t             # <<<<<<<<<<<<<<
@@ -1013,7 +1010,7 @@ typedef npy_int32 __pyx_t_5numpy_int32_t;
  */
 typedef npy_int64 __pyx_t_5numpy_int64_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":783
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":783
  * #ctypedef npy_int128     int128_t
  * 
  * ctypedef npy_uint8      uint8_t             # <<<<<<<<<<<<<<
@@ -1022,7 +1019,7 @@ typedef npy_int64 __pyx_t_5numpy_int64_t;
  */
 typedef npy_uint8 __pyx_t_5numpy_uint8_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":784
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":784
  * 
  * ctypedef npy_uint8      uint8_t
  * ctypedef npy_uint16     uint16_t             # <<<<<<<<<<<<<<
@@ -1031,7 +1028,7 @@ typedef npy_uint8 __pyx_t_5numpy_uint8_t;
  */
 typedef npy_uint16 __pyx_t_5numpy_uint16_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":785
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":785
  * ctypedef npy_uint8      uint8_t
  * ctypedef npy_uint16     uint16_t
  * ctypedef npy_uint32     uint32_t             # <<<<<<<<<<<<<<
@@ -1040,7 +1037,7 @@ typedef npy_uint16 __pyx_t_5numpy_uint16_t;
  */
 typedef npy_uint32 __pyx_t_5numpy_uint32_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":786
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":786
  * ctypedef npy_uint16     uint16_t
  * ctypedef npy_uint32     uint32_t
  * ctypedef npy_uint64     uint64_t             # <<<<<<<<<<<<<<
@@ -1049,7 +1046,7 @@ typedef npy_uint32 __pyx_t_5numpy_uint32_t;
  */
 typedef npy_uint64 __pyx_t_5numpy_uint64_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":790
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":790
  * #ctypedef npy_uint128    uint128_t
  * 
  * ctypedef npy_float32    float32_t             # <<<<<<<<<<<<<<
@@ -1058,7 +1055,7 @@ typedef npy_uint64 __pyx_t_5numpy_uint64_t;
  */
 typedef npy_float32 __pyx_t_5numpy_float32_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":791
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":791
  * 
  * ctypedef npy_float32    float32_t
  * ctypedef npy_float64    float64_t             # <<<<<<<<<<<<<<
@@ -1067,7 +1064,7 @@ typedef npy_float32 __pyx_t_5numpy_float32_t;
  */
 typedef npy_float64 __pyx_t_5numpy_float64_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":800
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":800
  * # The int types are mapped a bit surprising --
  * # numpy.int corresponds to 'l' and numpy.long to 'q'
  * ctypedef npy_long       int_t             # <<<<<<<<<<<<<<
@@ -1076,7 +1073,7 @@ typedef npy_float64 __pyx_t_5numpy_float64_t;
  */
 typedef npy_long __pyx_t_5numpy_int_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":801
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":801
  * # numpy.int corresponds to 'l' and numpy.long to 'q'
  * ctypedef npy_long       int_t
  * ctypedef npy_longlong   long_t             # <<<<<<<<<<<<<<
@@ -1085,7 +1082,7 @@ typedef npy_long __pyx_t_5numpy_int_t;
  */
 typedef npy_longlong __pyx_t_5numpy_long_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":802
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":802
  * ctypedef npy_long       int_t
  * ctypedef npy_longlong   long_t
  * ctypedef npy_longlong   longlong_t             # <<<<<<<<<<<<<<
@@ -1094,7 +1091,7 @@ typedef npy_longlong __pyx_t_5numpy_long_t;
  */
 typedef npy_longlong __pyx_t_5numpy_longlong_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":804
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":804
  * ctypedef npy_longlong   longlong_t
  * 
  * ctypedef npy_ulong      uint_t             # <<<<<<<<<<<<<<
@@ -1103,7 +1100,7 @@ typedef npy_longlong __pyx_t_5numpy_longlong_t;
  */
 typedef npy_ulong __pyx_t_5numpy_uint_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":805
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":805
  * 
  * ctypedef npy_ulong      uint_t
  * ctypedef npy_ulonglong  ulong_t             # <<<<<<<<<<<<<<
@@ -1112,7 +1109,7 @@ typedef npy_ulong __pyx_t_5numpy_uint_t;
  */
 typedef npy_ulonglong __pyx_t_5numpy_ulong_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":806
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":806
  * ctypedef npy_ulong      uint_t
  * ctypedef npy_ulonglong  ulong_t
  * ctypedef npy_ulonglong  ulonglong_t             # <<<<<<<<<<<<<<
@@ -1121,7 +1118,7 @@ typedef npy_ulonglong __pyx_t_5numpy_ulong_t;
  */
 typedef npy_ulonglong __pyx_t_5numpy_ulonglong_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":808
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":808
  * ctypedef npy_ulonglong  ulonglong_t
  * 
  * ctypedef npy_intp       intp_t             # <<<<<<<<<<<<<<
@@ -1130,7 +1127,7 @@ typedef npy_ulonglong __pyx_t_5numpy_ulonglong_t;
  */
 typedef npy_intp __pyx_t_5numpy_intp_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":809
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":809
  * 
  * ctypedef npy_intp       intp_t
  * ctypedef npy_uintp      uintp_t             # <<<<<<<<<<<<<<
@@ -1139,7 +1136,7 @@ typedef npy_intp __pyx_t_5numpy_intp_t;
  */
 typedef npy_uintp __pyx_t_5numpy_uintp_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":811
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":811
  * ctypedef npy_uintp      uintp_t
  * 
  * ctypedef npy_double     float_t             # <<<<<<<<<<<<<<
@@ -1148,7 +1145,7 @@ typedef npy_uintp __pyx_t_5numpy_uintp_t;
  */
 typedef npy_double __pyx_t_5numpy_float_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":812
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":812
  * 
  * ctypedef npy_double     float_t
  * ctypedef npy_double     double_t             # <<<<<<<<<<<<<<
@@ -1157,7 +1154,7 @@ typedef npy_double __pyx_t_5numpy_float_t;
  */
 typedef npy_double __pyx_t_5numpy_double_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":813
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":813
  * ctypedef npy_double     float_t
  * ctypedef npy_double     double_t
  * ctypedef npy_longdouble longdouble_t             # <<<<<<<<<<<<<<
@@ -1238,6 +1235,8 @@ static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(do
 /*--- Type declarations ---*/
 struct __pyx_obj_5cedar_9_splitter__Splitter;
 struct __pyx_obj_5cedar_6_utils_Stack;
+struct __pyx_obj_5cedar_6_utils_RemovalStack;
+struct __pyx_obj_5cedar_6_utils_IntStack;
 struct __pyx_obj_5cedar_5_tree__Tree;
 struct __pyx_obj_5cedar_5_tree__TreeBuilder;
 struct __pyx_array_obj;
@@ -1245,7 +1244,7 @@ struct __pyx_MemviewEnum_obj;
 struct __pyx_memoryview_obj;
 struct __pyx_memoryviewslice_obj;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":815
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":815
  * ctypedef npy_longdouble longdouble_t
  * 
  * ctypedef npy_cfloat      cfloat_t             # <<<<<<<<<<<<<<
@@ -1254,7 +1253,7 @@ struct __pyx_memoryviewslice_obj;
  */
 typedef npy_cfloat __pyx_t_5numpy_cfloat_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":816
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":816
  * 
  * ctypedef npy_cfloat      cfloat_t
  * ctypedef npy_cdouble     cdouble_t             # <<<<<<<<<<<<<<
@@ -1263,7 +1262,7 @@ typedef npy_cfloat __pyx_t_5numpy_cfloat_t;
  */
 typedef npy_cdouble __pyx_t_5numpy_cdouble_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":817
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":817
  * ctypedef npy_cfloat      cfloat_t
  * ctypedef npy_cdouble     cdouble_t
  * ctypedef npy_clongdouble clongdouble_t             # <<<<<<<<<<<<<<
@@ -1272,7 +1271,7 @@ typedef npy_cdouble __pyx_t_5numpy_cdouble_t;
  */
 typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":819
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":819
  * ctypedef npy_clongdouble clongdouble_t
  * 
  * ctypedef npy_cdouble     complex_t             # <<<<<<<<<<<<<<
@@ -1283,14 +1282,15 @@ typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_t_5cedar_9_splitter_Meta;
 struct __pyx_t_5cedar_9_splitter_SplitRecord;
 
-/* "_splitter.pxd":6
- * from ._tree cimport UINT32_t
+/* "_splitter.pxd":4
+ * cimport numpy as np
  * 
  * cdef struct Meta:             # <<<<<<<<<<<<<<
  *     # Sufficient statistics to save for each attribute
- *     int  count               # Number of samples in the node
+ *     double p                 # Total probability of chosen feature
  */
 struct __pyx_t_5cedar_9_splitter_Meta {
+  double p;
   int count;
   int pos_count;
   int feature_count;
@@ -1301,7 +1301,7 @@ struct __pyx_t_5cedar_9_splitter_Meta {
   int *features;
 };
 
-/* "_splitter.pxd":18
+/* "_splitter.pxd":17
  * 
  * 
  * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
@@ -1318,8 +1318,9 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int n_features;
 };
 struct __pyx_t_5cedar_6_utils_StackRecord;
+struct __pyx_t_5cedar_6_utils_RemovalStackRecord;
 
-/* "_utils.pxd":11
+/* "_utils.pxd":18
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct StackRecord:             # <<<<<<<<<<<<<<
@@ -1329,15 +1330,32 @@ struct __pyx_t_5cedar_6_utils_StackRecord;
 struct __pyx_t_5cedar_6_utils_StackRecord {
   int depth;
   int parent;
+  double parent_p;
   int is_left;
   int *samples;
   int n_samples;
   int *features;
   int n_features;
 };
+
+/* "_utils.pxd":43
+ * 
+ * # A record on the stack for depth-first tree growing
+ * cdef struct RemovalStackRecord:             # <<<<<<<<<<<<<<
+ *     int depth
+ *     int node_id
+ */
+struct __pyx_t_5cedar_6_utils_RemovalStackRecord {
+  int depth;
+  int node_id;
+  double parent_p;
+  int *samples;
+  int *remove_samples;
+  int n_samples;
+};
 struct __pyx_opt_args_5cedar_5_tree_5_Tree__resize;
 
-/* "cedar/_tree.pxd":55
+/* "cedar/_tree.pxd":56
  *     cdef np.ndarray _get_double_ndarray(self, double *data)
  *     cdef np.ndarray _get_int_ndarray(self, int *data)
  *     cdef int _resize(self, int capacity=*) nogil except -1             # <<<<<<<<<<<<<<
@@ -1349,7 +1367,7 @@ struct __pyx_opt_args_5cedar_5_tree_5_Tree__resize {
   int capacity;
 };
 
-/* "_splitter.pxd":28
+/* "_splitter.pxd":27
  *     int  n_features           # Number of valid features after split.
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1365,7 +1383,7 @@ struct __pyx_obj_5cedar_9_splitter__Splitter {
 };
 
 
-/* "_utils.pxd":20
+/* "_utils.pxd":28
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1381,6 +1399,37 @@ struct __pyx_obj_5cedar_6_utils_Stack {
 };
 
 
+/* "_utils.pxd":51
+ *     int n_samples
+ * 
+ * cdef class RemovalStack:             # <<<<<<<<<<<<<<
+ *     cdef int capacity
+ *     cdef int top
+ */
+struct __pyx_obj_5cedar_6_utils_RemovalStack {
+  PyObject_HEAD
+  struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack *__pyx_vtab;
+  int capacity;
+  int top;
+  struct __pyx_t_5cedar_6_utils_StackRecord *stack_;
+};
+
+
+/* "_utils.pxd":65
+ * # =============================================================================
+ * 
+ * cdef class IntStack:             # <<<<<<<<<<<<<<
+ *     cdef int capacity
+ *     cdef int top
+ */
+struct __pyx_obj_5cedar_6_utils_IntStack {
+  PyObject_HEAD
+  struct __pyx_vtabstruct_5cedar_6_utils_IntStack *__pyx_vtab;
+  int capacity;
+  int top;
+};
+
+
 /* "cedar/_tree.pxd":14
  * from ._splitter cimport _Splitter
  * 
@@ -1391,13 +1440,14 @@ struct __pyx_obj_5cedar_6_utils_Stack {
 struct __pyx_obj_5cedar_5_tree__Tree {
   PyObject_HEAD
   struct __pyx_vtabstruct_5cedar_5_tree__Tree *__pyx_vtab;
-  int max_depth;
   int node_count;
   int capacity;
   double *values;
+  double *p;
   int *chosen_features;
   int *left_children;
   int *right_children;
+  int *depth;
   int *count;
   int *pos_count;
   int *feature_count;
@@ -1410,7 +1460,7 @@ struct __pyx_obj_5cedar_5_tree__Tree {
 };
 
 
-/* "cedar/_tree.pxd":57
+/* "cedar/_tree.pxd":58
  *     cdef int _resize(self, int capacity=*) nogil except -1
  * 
  * cdef class _TreeBuilder:             # <<<<<<<<<<<<<<
@@ -1506,7 +1556,7 @@ struct __pyx_memoryviewslice_obj {
 
 
 
-/* "_splitter.pxd":28
+/* "_splitter.pxd":27
  *     int  n_features           # Number of valid features after split.
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1515,15 +1565,12 @@ struct __pyx_memoryviewslice_obj {
  */
 
 struct __pyx_vtabstruct_5cedar_9_splitter__Splitter {
-  int (*node_split)(struct __pyx_obj_5cedar_9_splitter__Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, int *, int *, int, struct __pyx_t_5cedar_9_splitter_SplitRecord *, struct __pyx_t_5cedar_9_splitter_Meta *);
-  double (*_compute_gini)(struct __pyx_obj_5cedar_9_splitter__Splitter *, double, double, double, int, int);
-  int (*_generate_distribution)(struct __pyx_obj_5cedar_9_splitter__Splitter *, double *, double *, int);
-  int (*_sample_distribution)(struct __pyx_obj_5cedar_9_splitter__Splitter *, double *, int);
+  int (*node_split)(struct __pyx_obj_5cedar_9_splitter__Splitter *, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, double, int *, int *, int, struct __pyx_t_5cedar_9_splitter_SplitRecord *, struct __pyx_t_5cedar_9_splitter_Meta *);
 };
 static struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtabptr_5cedar_9_splitter__Splitter;
 
 
-/* "_utils.pxd":20
+/* "_utils.pxd":28
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1533,13 +1580,45 @@ static struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtabptr_5cedar
 
 struct __pyx_vtabstruct_5cedar_6_utils_Stack {
   int (*is_empty)(struct __pyx_obj_5cedar_6_utils_Stack *);
-  int (*push)(struct __pyx_obj_5cedar_6_utils_Stack *, int, int, int, int *, int, int *, int);
+  int (*push)(struct __pyx_obj_5cedar_6_utils_Stack *, int, int, double, int, int *, int, int *, int);
   int (*pop)(struct __pyx_obj_5cedar_6_utils_Stack *, struct __pyx_t_5cedar_6_utils_StackRecord *);
 };
 static struct __pyx_vtabstruct_5cedar_6_utils_Stack *__pyx_vtabptr_5cedar_6_utils_Stack;
 
 
-/* "cedar/_tree.pyx":221
+/* "_utils.pxd":51
+ *     int n_samples
+ * 
+ * cdef class RemovalStack:             # <<<<<<<<<<<<<<
+ *     cdef int capacity
+ *     cdef int top
+ */
+
+struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack {
+  int (*is_empty)(struct __pyx_obj_5cedar_6_utils_RemovalStack *);
+  int (*push)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, int, int, double, int *, int);
+  int (*pop)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, struct __pyx_t_5cedar_6_utils_StackRecord *);
+};
+static struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack *__pyx_vtabptr_5cedar_6_utils_RemovalStack;
+
+
+/* "_utils.pxd":65
+ * # =============================================================================
+ * 
+ * cdef class IntStack:             # <<<<<<<<<<<<<<
+ *     cdef int capacity
+ *     cdef int top
+ */
+
+struct __pyx_vtabstruct_5cedar_6_utils_IntStack {
+  int (*is_empty)(struct __pyx_obj_5cedar_6_utils_IntStack *);
+  int (*push)(struct __pyx_obj_5cedar_6_utils_IntStack *, int);
+  int (*pop)(struct __pyx_obj_5cedar_6_utils_IntStack *, struct __pyx_t_5cedar_6_utils_StackRecord *);
+};
+static struct __pyx_vtabstruct_5cedar_6_utils_IntStack *__pyx_vtabptr_5cedar_6_utils_IntStack;
+
+
+/* "cedar/_tree.pyx":294
  * # =====================================
  * 
  * cdef class _Tree:             # <<<<<<<<<<<<<<
@@ -1555,7 +1634,7 @@ struct __pyx_vtabstruct_5cedar_5_tree__Tree {
   PyArrayObject *(*_get_right_pos_counts)(struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, int __pyx_skip_dispatch);
   PyArrayObject *(*_get_features)(struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, int __pyx_skip_dispatch);
   PyArrayObject *(*_get_leaf_samples)(struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, int __pyx_skip_dispatch);
-  int (*add_node)(struct __pyx_obj_5cedar_5_tree__Tree *, int, int, int, int, double, int *, struct __pyx_t_5cedar_9_splitter_Meta *);
+  int (*add_node)(struct __pyx_obj_5cedar_5_tree__Tree *, int, int, int, int, double, int, int *, struct __pyx_t_5cedar_9_splitter_Meta *);
   PyArrayObject *(*_get_double_ndarray)(struct __pyx_obj_5cedar_5_tree__Tree *, double *);
   PyArrayObject *(*_get_int_ndarray)(struct __pyx_obj_5cedar_5_tree__Tree *, int *);
   int (*_resize)(struct __pyx_obj_5cedar_5_tree__Tree *, struct __pyx_opt_args_5cedar_5_tree_5_Tree__resize *__pyx_optional_args);
@@ -1563,7 +1642,7 @@ struct __pyx_vtabstruct_5cedar_5_tree__Tree {
 static struct __pyx_vtabstruct_5cedar_5_tree__Tree *__pyx_vtabptr_5cedar_5_tree__Tree;
 
 
-/* "cedar/_tree.pyx":41
+/* "cedar/_tree.pyx":38
  * # =====================================
  * 
  * cdef class _TreeBuilder:             # <<<<<<<<<<<<<<
@@ -1573,11 +1652,10 @@ static struct __pyx_vtabstruct_5cedar_5_tree__Tree *__pyx_vtabptr_5cedar_5_tree_
 
 struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder {
   void (*build)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
-  PyObject *(*_check_input)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *);
+  void (*build_at_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int, int, int, double, int, int *, int *, int);
   double (*_leaf_value)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, __Pyx_memviewslice, int *, int, struct __pyx_t_5cedar_9_splitter_Meta *);
 };
 static struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *__pyx_vtabptr_5cedar_5_tree__TreeBuilder;
-static CYTHON_INLINE PyObject *__pyx_f_5cedar_5_tree_12_TreeBuilder__check_input(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *);
 
 
 /* "View.MemoryView":105
@@ -1745,37 +1823,6 @@ static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UIN
 #define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP)  (VAR) = (LOOKUP);
 #endif
 
-/* GetModuleGlobalName.proto */
-#if CYTHON_USE_DICT_VERSIONS
-#define __Pyx_GetModuleGlobalName(var, name)  {\
-    static PY_UINT64_T __pyx_dict_version = 0;\
-    static PyObject *__pyx_dict_cached_value = NULL;\
-    (var) = (likely(__pyx_dict_version == __PYX_GET_DICT_VERSION(__pyx_d))) ?\
-        (likely(__pyx_dict_cached_value) ? __Pyx_NewRef(__pyx_dict_cached_value) : __Pyx_GetBuiltinName(name)) :\
-        __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
-}
-#define __Pyx_GetModuleGlobalNameUncached(var, name)  {\
-    PY_UINT64_T __pyx_dict_version;\
-    PyObject *__pyx_dict_cached_value;\
-    (var) = __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
-}
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value);
-#else
-#define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
-#define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
-#endif
-
-/* PyObjectCall.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
-#else
-#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
-#endif
-
-/* ExtTypeTest.proto */
-static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
-
 /* PyFunctionFastCall.proto */
 #if CYTHON_FAST_PYCALL
 #define __Pyx_PyFunction_FastCall(func, args, nargs)\
@@ -1806,6 +1853,13 @@ static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObje
 #define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
 #endif
 
+/* PyObjectCall.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
+#else
+#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
+#endif
+
 /* RaiseTooManyValuesToUnpack.proto */
 static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
 
@@ -1817,6 +1871,30 @@ static CYTHON_INLINE int __Pyx_IterFinish(void);
 
 /* UnpackItemEndCheck.proto */
 static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
+
+/* ExtTypeTest.proto */
+static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_SubtractObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_SubtractObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceSubtract(op1, op2) : PyNumber_Subtract(op1, op2))
+#endif
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
+#endif
+
+/* PyNumberPow2.proto */
+#define __Pyx_PyNumber_InPlacePowerOf2(a, b, c) __Pyx__PyNumber_PowerOf2(a, b, c, 1)
+#define __Pyx_PyNumber_PowerOf2(a, b, c) __Pyx__PyNumber_PowerOf2(a, b, c, 0)
+static PyObject* __Pyx__PyNumber_PowerOf2(PyObject *two, PyObject *exp, PyObject *none, int inplace);
 
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
@@ -1929,6 +2007,36 @@ static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyOb
 
 /* KeywordStringCheck.proto */
 static int __Pyx_CheckKeywordStrings(PyObject *kwdict, const char* function_name, int kw_allowed);
+
+/* PyObjectSetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
+#else
+#define __Pyx_PyObject_DelAttrStr(o,n)   PyObject_DelAttr(o,n)
+#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
+#endif
+
+/* GetModuleGlobalName.proto */
+#if CYTHON_USE_DICT_VERSIONS
+#define __Pyx_GetModuleGlobalName(var, name)  {\
+    static PY_UINT64_T __pyx_dict_version = 0;\
+    static PyObject *__pyx_dict_cached_value = NULL;\
+    (var) = (likely(__pyx_dict_version == __PYX_GET_DICT_VERSION(__pyx_d))) ?\
+        (likely(__pyx_dict_cached_value) ? __Pyx_NewRef(__pyx_dict_cached_value) : __Pyx_GetBuiltinName(name)) :\
+        __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
+}
+#define __Pyx_GetModuleGlobalNameUncached(var, name)  {\
+    PY_UINT64_T __pyx_dict_version;\
+    PyObject *__pyx_dict_cached_value;\
+    (var) = __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
+}
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value);
+#else
+#define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
+#define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
+#endif
 
 /* IsLittleEndian.proto */
 static CYTHON_INLINE int __Pyx_Is_Little_Endian(void);
@@ -2098,14 +2206,6 @@ static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
 #define __Pyx_ListComp_Append(L,x) PyList_Append(L,x)
 #endif
 
-/* PyIntBinop.proto */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
-#else
-#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
-    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
-#endif
-
 /* ListExtend.proto */
 static CYTHON_INLINE int __Pyx_PyList_Extend(PyObject* L, PyObject* v) {
 #if CYTHON_COMPILING_IN_CPYTHON
@@ -2242,14 +2342,8 @@ static int __pyx_slices_overlap(__Pyx_memviewslice *slice1,
 /* Capsule.proto */
 static CYTHON_INLINE PyObject *__pyx_capsule_create(void *p, const char *sig);
 
-/* None.proto */
-static CYTHON_INLINE long __Pyx_pow_long(long, long);
-
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
-
-/* CIntToPy.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_Py_intptr_t(Py_intptr_t value);
 
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
@@ -2397,11 +2491,14 @@ static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_i
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(void);
 
+/* FunctionImport.proto */
+static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig);
+
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
-static CYTHON_INLINE PyObject *__pyx_f_5cedar_5_tree_12_TreeBuilder__check_input(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, PyObject *__pyx_v_X, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_f); /* proto*/
 static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, PyObject *__pyx_v_X, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_f, int __pyx_skip_dispatch); /* proto*/
+static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build_at_node(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, PyObject *__pyx_v_X, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_f, int __pyx_v_node_id, int __pyx_v_depth, int __pyx_v_parent, double __pyx_v_parent_p, int __pyx_v_is_left, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features); /* proto*/
 static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, __Pyx_memviewslice __pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, struct __pyx_t_5cedar_9_splitter_Meta *__pyx_v_meta); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_node_id, int __pyx_skip_dispatch); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_node_id, int __pyx_skip_dispatch); /* proto*/
@@ -2409,7 +2506,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(struct __py
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_node_id, int __pyx_skip_dispatch); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_features(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_node_id, int __pyx_skip_dispatch); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_node_id, int __pyx_skip_dispatch); /* proto*/
-static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_v_parent, int __pyx_v_is_left, int __pyx_v_is_leaf, int __pyx_v_feature, double __pyx_v_value, int *__pyx_v_samples, struct __pyx_t_5cedar_9_splitter_Meta *__pyx_v_meta); /* proto*/
+static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_v_parent, int __pyx_v_is_left, int __pyx_v_is_leaf, int __pyx_v_feature, double __pyx_v_value, int __pyx_v_depth, int *__pyx_v_samples, struct __pyx_t_5cedar_9_splitter_Meta *__pyx_v_meta); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_X, int __pyx_skip_dispatch); /* proto*/
 static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, struct __pyx_opt_args_5cedar_5_tree_5_Tree__resize *__pyx_optional_args); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, double *__pyx_v_data); /* proto*/
@@ -2528,14 +2625,12 @@ static PyTypeObject *__pyx_ptype_5cedar_9_splitter__Splitter = 0;
 
 /* Module declarations from 'libc.stdlib' */
 
-/* Module declarations from 'libc.stdint' */
-
-/* Module declarations from 'libc.stddef' */
-
-/* Module declarations from 'libc.time' */
-
 /* Module declarations from 'cedar._utils' */
 static PyTypeObject *__pyx_ptype_5cedar_6_utils_Stack = 0;
+static PyTypeObject *__pyx_ptype_5cedar_6_utils_RemovalStack = 0;
+static PyTypeObject *__pyx_ptype_5cedar_6_utils_IntStack = 0;
+static PyObject *(*__pyx_f_5cedar_6_utils__check_samples)(PyObject *, PyArrayObject *); /*proto*/
+static PyObject *(*__pyx_f_5cedar_6_utils__check_features)(PyArrayObject *); /*proto*/
 
 /* Module declarations from 'cedar._tree' */
 static PyTypeObject *__pyx_ptype_5cedar_5_tree__Tree = 0;
@@ -2544,9 +2639,9 @@ static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
 static PyTypeObject *__pyx_memoryviewslice_type = 0;
-static __pyx_t_5cedar_5_tree_SIZE_t __pyx_v_5cedar_5_tree__TREE_LEAF;
-static __pyx_t_5cedar_5_tree_SIZE_t __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
-static __pyx_t_5cedar_5_tree_SIZE_t __pyx_v_5cedar_5_tree_INITIAL_STACK_SIZE;
+static int __pyx_v_5cedar_5_tree__TREE_LEAF;
+static int __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
+static int __pyx_v_5cedar_5_tree_INITIAL_STACK_SIZE;
 static PyObject *generic = 0;
 static PyObject *strided = 0;
 static PyObject *indirect = 0;
@@ -2628,7 +2723,6 @@ static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_tree[] = "tree";
 static const char __pyx_k_ASCII[] = "ASCII";
-static const char __pyx_k_FLOAT[] = "FLOAT";
 static const char __pyx_k_build[] = "build";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_dtype[] = "dtype";
@@ -2640,7 +2734,6 @@ static const char __pyx_k_range[] = "range";
 static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_start[] = "start";
 static const char __pyx_k_zeros[] = "zeros";
-static const char __pyx_k_DOUBLE[] = "DOUBLE";
 static const char __pyx_k_double[] = "double";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
@@ -2651,8 +2744,6 @@ static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
-static const char __pyx_k_float32[] = "float32";
-static const char __pyx_k_float64[] = "float64";
 static const char __pyx_k_fortran[] = "fortran";
 static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_predict[] = "predict";
@@ -2669,7 +2760,6 @@ static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
-static const char __pyx_k_contiguous[] = "contiguous";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_ImportError[] = "ImportError";
@@ -2683,7 +2773,6 @@ static const char __pyx_k_random_state[] = "random_state";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_asfortranarray[] = "asfortranarray";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
@@ -2693,7 +2782,6 @@ static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_get_leaf_samples[] = "_get_leaf_samples";
 static const char __pyx_k_get_right_counts[] = "_get_right_counts";
 static const char __pyx_k_min_samples_leaf[] = "min_samples_leaf";
-static const char __pyx_k_ascontiguousarray[] = "ascontiguousarray";
 static const char __pyx_k_min_samples_split[] = "min_samples_split";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
@@ -2740,10 +2828,8 @@ static PyObject *__pyx_kp_s_Can_only_create_a_buffer_that_is;
 static PyObject *__pyx_kp_s_Cannot_assign_to_read_only_memor;
 static PyObject *__pyx_kp_s_Cannot_create_writable_memory_vi;
 static PyObject *__pyx_kp_s_Cannot_index_with_type_s;
-static PyObject *__pyx_n_s_DOUBLE;
 static PyObject *__pyx_n_s_Ellipsis;
 static PyObject *__pyx_kp_s_Empty_shape_tuple_for_cython_arr;
-static PyObject *__pyx_n_s_FLOAT;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_n_s_INT;
@@ -2771,15 +2857,12 @@ static PyObject *__pyx_n_s_X;
 static PyObject *__pyx_kp_u_X_dtype_should_be_np_int32_got_s;
 static PyObject *__pyx_kp_u_X_should_be_in_np_ndarray_format;
 static PyObject *__pyx_n_s_allocate_buffer;
-static PyObject *__pyx_n_s_ascontiguousarray;
-static PyObject *__pyx_n_s_asfortranarray;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_build;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
 static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
-static PyObject *__pyx_n_s_contiguous;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_dict;
@@ -2791,8 +2874,6 @@ static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_error;
 static PyObject *__pyx_n_s_f;
 static PyObject *__pyx_n_s_flags;
-static PyObject *__pyx_n_s_float32;
-static PyObject *__pyx_n_s_float64;
 static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_fortran;
 static PyObject *__pyx_n_u_fortran;
@@ -2871,9 +2952,11 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_4__reduce_cython__(CYTHON
 static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_7n_nodes___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6values___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_1p___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_15chosen_features___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_13left_children___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14right_children___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_5depth___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6counts___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10pos_counts___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14feature_counts___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
@@ -2886,8 +2969,6 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10_get_leaf_samples(struct __pyx_
 static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_16predict(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_X); /* proto */
-static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_9max_depth___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
-static int __pyx_pf_5cedar_5_tree_5_Tree_9max_depth_2__set__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10node_count___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
 static int __pyx_pf_5cedar_5_tree_5_Tree_10node_count_2__set__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8capacity___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self); /* proto */
@@ -2946,6 +3027,8 @@ static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject 
 static PyObject *__pyx_tp_new__memoryviewslice(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
+static PyObject *__pyx_int_2;
+static PyObject *__pyx_int_10;
 static PyObject *__pyx_int_184977713;
 static PyObject *__pyx_int_neg_1;
 static PyObject *__pyx_tuple_;
@@ -2986,7 +3069,7 @@ static PyObject *__pyx_tuple__35;
 static PyObject *__pyx_codeobj__36;
 /* Late includes */
 
-/* "cedar/_tree.pyx":46
+/* "cedar/_tree.pyx":43
  *     """
  * 
  *     def __cinit__(self, _Splitter splitter, int min_samples_split,             # <<<<<<<<<<<<<<
@@ -3034,29 +3117,29 @@ static int __pyx_pw_5cedar_5_tree_12_TreeBuilder_1__cinit__(PyObject *__pyx_v_se
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_min_samples_split)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 1); __PYX_ERR(0, 46, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 1); __PYX_ERR(0, 43, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_min_samples_leaf)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 2); __PYX_ERR(0, 46, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 2); __PYX_ERR(0, 43, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_max_depth)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 3); __PYX_ERR(0, 46, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 3); __PYX_ERR(0, 43, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_random_state)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 4); __PYX_ERR(0, 46, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 4); __PYX_ERR(0, 43, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 46, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 43, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -3068,20 +3151,20 @@ static int __pyx_pw_5cedar_5_tree_12_TreeBuilder_1__cinit__(PyObject *__pyx_v_se
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
     __pyx_v_splitter = ((struct __pyx_obj_5cedar_9_splitter__Splitter *)values[0]);
-    __pyx_v_min_samples_split = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_samples_split == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L3_error)
-    __pyx_v_min_samples_leaf = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_samples_leaf == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L3_error)
-    __pyx_v_max_depth = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_max_depth == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L3_error)
-    __pyx_v_random_state = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_random_state == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L3_error)
+    __pyx_v_min_samples_split = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_samples_split == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
+    __pyx_v_min_samples_leaf = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_samples_leaf == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L3_error)
+    __pyx_v_max_depth = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_max_depth == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L3_error)
+    __pyx_v_random_state = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_random_state == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 46, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 43, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._tree._TreeBuilder.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_splitter), __pyx_ptype_5cedar_9_splitter__Splitter, 1, "splitter", 0))) __PYX_ERR(0, 46, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_splitter), __pyx_ptype_5cedar_9_splitter__Splitter, 1, "splitter", 0))) __PYX_ERR(0, 43, __pyx_L1_error)
   __pyx_r = __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(((struct __pyx_obj_5cedar_5_tree__TreeBuilder *)__pyx_v_self), __pyx_v_splitter, __pyx_v_min_samples_split, __pyx_v_min_samples_leaf, __pyx_v_max_depth, __pyx_v_random_state);
 
   /* function exit code */
@@ -3099,7 +3182,7 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cedar/_tree.pyx":48
+  /* "cedar/_tree.pyx":45
  *     def __cinit__(self, _Splitter splitter, int min_samples_split,
  *                   int min_samples_leaf, int max_depth, int random_state):
  *         self.splitter = splitter             # <<<<<<<<<<<<<<
@@ -3112,7 +3195,7 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
   __Pyx_DECREF(((PyObject *)__pyx_v_self->splitter));
   __pyx_v_self->splitter = __pyx_v_splitter;
 
-  /* "cedar/_tree.pyx":49
+  /* "cedar/_tree.pyx":46
  *                   int min_samples_leaf, int max_depth, int random_state):
  *         self.splitter = splitter
  *         self.min_samples_split = min_samples_split             # <<<<<<<<<<<<<<
@@ -3121,7 +3204,7 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
  */
   __pyx_v_self->min_samples_split = __pyx_v_min_samples_split;
 
-  /* "cedar/_tree.pyx":50
+  /* "cedar/_tree.pyx":47
  *         self.splitter = splitter
  *         self.min_samples_split = min_samples_split
  *         self.min_samples_leaf = min_samples_leaf             # <<<<<<<<<<<<<<
@@ -3130,7 +3213,7 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
  */
   __pyx_v_self->min_samples_leaf = __pyx_v_min_samples_leaf;
 
-  /* "cedar/_tree.pyx":51
+  /* "cedar/_tree.pyx":48
  *         self.min_samples_split = min_samples_split
  *         self.min_samples_leaf = min_samples_leaf
  *         self.max_depth = 1000 if max_depth == -1 else max_depth             # <<<<<<<<<<<<<<
@@ -3144,7 +3227,7 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
   }
   __pyx_v_self->max_depth = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":52
+  /* "cedar/_tree.pyx":49
  *         self.min_samples_leaf = min_samples_leaf
  *         self.max_depth = 1000 if max_depth == -1 else max_depth
  *         self.random_state = random_state             # <<<<<<<<<<<<<<
@@ -3153,7 +3236,7 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
  */
   __pyx_v_self->random_state = __pyx_v_random_state;
 
-  /* "cedar/_tree.pyx":53
+  /* "cedar/_tree.pyx":50
  *         self.max_depth = 1000 if max_depth == -1 else max_depth
  *         self.random_state = random_state
  *         srand(random_state)  # do once? yes, once per tree             # <<<<<<<<<<<<<<
@@ -3162,16 +3245,16 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
  */
   srand(__pyx_v_random_state);
 
-  /* "cedar/_tree.pyx":56
+  /* "cedar/_tree.pyx":53
  *         # get rid of garbage first value:
  *         # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
  *         rand()             # <<<<<<<<<<<<<<
  * 
- *     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f):
+ *     cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f):
  */
   (void)(rand());
 
-  /* "cedar/_tree.pyx":46
+  /* "cedar/_tree.pyx":43
  *     """
  * 
  *     def __cinit__(self, _Splitter splitter, int min_samples_split,             # <<<<<<<<<<<<<<
@@ -3185,296 +3268,8 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":58
+/* "cedar/_tree.pyx":55
  *         rand()
- * 
- *     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f):             # <<<<<<<<<<<<<<
- *         """
- *         Check input dtype, layout and format.
- */
-
-static CYTHON_INLINE PyObject *__pyx_f_5cedar_5_tree_12_TreeBuilder__check_input(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, PyObject *__pyx_v_X, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_f) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  int __pyx_t_4;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  int __pyx_t_7;
-  int __pyx_t_8;
-  __Pyx_RefNannySetupContext("_check_input", 0);
-  __Pyx_INCREF(__pyx_v_X);
-  __Pyx_INCREF((PyObject *)__pyx_v_y);
-  __Pyx_INCREF((PyObject *)__pyx_v_f);
-
-  /* "cedar/_tree.pyx":64
- * 
- *         # TODO: check for int dtype and if it's a contiguous array
- *         if X.dtype != INT:             # <<<<<<<<<<<<<<
- *             # since we have to copy we will make it fortran for efficiency
- *             X = np.asfortranarray(X, dtype=np.int32)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_dtype); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_INT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__pyx_t_4) {
-
-    /* "cedar/_tree.pyx":66
- *         if X.dtype != INT:
- *             # since we have to copy we will make it fortran for efficiency
- *             X = np.asfortranarray(X, dtype=np.int32)             # <<<<<<<<<<<<<<
- * 
- *         if y.dtype != INT or not y.flags.contiguous:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_asfortranarray); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx_v_X);
-    __Pyx_GIVEREF(__pyx_v_X);
-    PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_X);
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_int32); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF_SET(__pyx_v_X, __pyx_t_6);
-    __pyx_t_6 = 0;
-
-    /* "cedar/_tree.pyx":64
- * 
- *         # TODO: check for int dtype and if it's a contiguous array
- *         if X.dtype != INT:             # <<<<<<<<<<<<<<
- *             # since we have to copy we will make it fortran for efficiency
- *             X = np.asfortranarray(X, dtype=np.int32)
- */
-  }
-
-  /* "cedar/_tree.pyx":68
- *             X = np.asfortranarray(X, dtype=np.int32)
- * 
- *         if y.dtype != INT or not y.flags.contiguous:             # <<<<<<<<<<<<<<
- *             y = np.ascontiguousarray(y, dtype=np.int32)
- * 
- */
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_y), __pyx_n_s_dtype); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_INT); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_6, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!__pyx_t_7) {
-  } else {
-    __pyx_t_4 = __pyx_t_7;
-    goto __pyx_L5_bool_binop_done;
-  }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_y), __pyx_n_s_flags); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_contiguous); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = ((!__pyx_t_7) != 0);
-  __pyx_t_4 = __pyx_t_8;
-  __pyx_L5_bool_binop_done:;
-  if (__pyx_t_4) {
-
-    /* "cedar/_tree.pyx":69
- * 
- *         if y.dtype != INT or not y.flags.contiguous:
- *             y = np.ascontiguousarray(y, dtype=np.int32)             # <<<<<<<<<<<<<<
- * 
- *         if f.dtype != INT or not f.flags.contiguous:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ascontiguousarray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_INCREF(((PyObject *)__pyx_v_y));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_y));
-    PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject *)__pyx_v_y));
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_int32); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_DECREF_SET(__pyx_v_y, ((PyArrayObject *)__pyx_t_5));
-    __pyx_t_5 = 0;
-
-    /* "cedar/_tree.pyx":68
- *             X = np.asfortranarray(X, dtype=np.int32)
- * 
- *         if y.dtype != INT or not y.flags.contiguous:             # <<<<<<<<<<<<<<
- *             y = np.ascontiguousarray(y, dtype=np.int32)
- * 
- */
-  }
-
-  /* "cedar/_tree.pyx":71
- *             y = np.ascontiguousarray(y, dtype=np.int32)
- * 
- *         if f.dtype != INT or not f.flags.contiguous:             # <<<<<<<<<<<<<<
- *             f = np.ascontiguousarray(f, dtype=np.int32)
- * 
- */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_f), __pyx_n_s_dtype); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_INT); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!__pyx_t_8) {
-  } else {
-    __pyx_t_4 = __pyx_t_8;
-    goto __pyx_L8_bool_binop_done;
-  }
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_f), __pyx_n_s_flags); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_contiguous); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_7 = ((!__pyx_t_8) != 0);
-  __pyx_t_4 = __pyx_t_7;
-  __pyx_L8_bool_binop_done:;
-  if (__pyx_t_4) {
-
-    /* "cedar/_tree.pyx":72
- * 
- *         if f.dtype != INT or not f.flags.contiguous:
- *             f = np.ascontiguousarray(f, dtype=np.int32)             # <<<<<<<<<<<<<<
- * 
- *         return X, y, f
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_ascontiguousarray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_INCREF(((PyObject *)__pyx_v_f));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_f));
-    PyTuple_SET_ITEM(__pyx_t_6, 0, ((PyObject *)__pyx_v_f));
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_int32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_DECREF_SET(__pyx_v_f, ((PyArrayObject *)__pyx_t_2));
-    __pyx_t_2 = 0;
-
-    /* "cedar/_tree.pyx":71
- *             y = np.ascontiguousarray(y, dtype=np.int32)
- * 
- *         if f.dtype != INT or not f.flags.contiguous:             # <<<<<<<<<<<<<<
- *             f = np.ascontiguousarray(f, dtype=np.int32)
- * 
- */
-  }
-
-  /* "cedar/_tree.pyx":74
- *             f = np.ascontiguousarray(f, dtype=np.int32)
- * 
- *         return X, y, f             # <<<<<<<<<<<<<<
- * 
- *     cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f):
- */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_v_X);
-  __Pyx_GIVEREF(__pyx_v_X);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_X);
-  __Pyx_INCREF(((PyObject *)__pyx_v_y));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_y));
-  PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_y));
-  __Pyx_INCREF(((PyObject *)__pyx_v_f));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_f));
-  PyTuple_SET_ITEM(__pyx_t_2, 2, ((PyObject *)__pyx_v_f));
-  __pyx_r = __pyx_t_2;
-  __pyx_t_2 = 0;
-  goto __pyx_L0;
-
-  /* "cedar/_tree.pyx":58
- *         rand()
- * 
- *     cdef inline _check_input(self, object X, np.ndarray y, np.ndarray f):             # <<<<<<<<<<<<<<
- *         """
- *         Check input dtype, layout and format.
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("cedar._tree._TreeBuilder._check_input", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = 0;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_X);
-  __Pyx_XDECREF((PyObject *)__pyx_v_y);
-  __Pyx_XDECREF((PyObject *)__pyx_v_f);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "cedar/_tree.pyx":76
- *         return X, y, f
  * 
  *     cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f):             # <<<<<<<<<<<<<<
  *         """
@@ -3503,9 +3298,10 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   double __pyx_v_value;
   int __pyx_v_node_id;
   int __pyx_v_i;
-  PyObject *__pyx_v_max_depth_seen = 0;
+  CYTHON_UNUSED PyObject *__pyx_v_max_depth_seen = 0;
   struct __pyx_t_5cedar_9_splitter_Meta __pyx_v_meta;
   int __pyx_v_rc;
+  double __pyx_v_parent_p;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -3518,11 +3314,12 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   struct __pyx_opt_args_5cedar_5_tree_5_Tree__resize __pyx_t_9;
   int __pyx_t_10;
   int __pyx_t_11;
-  int *__pyx_t_12;
-  int __pyx_t_13;
-  __Pyx_memviewslice __pyx_t_14 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_t_12;
+  int *__pyx_t_13;
+  int __pyx_t_14;
   __Pyx_memviewslice __pyx_t_15 = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_t_16 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_t_17 = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_RefNannySetupContext("build", 0);
   __Pyx_INCREF(__pyx_v_X);
   __Pyx_INCREF((PyObject *)__pyx_v_y);
@@ -3536,7 +3333,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_12_TreeBuilder_3build)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -3555,7 +3352,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[5] = {__pyx_t_4, ((PyObject *)__pyx_v_tree), __pyx_v_X, ((PyObject *)__pyx_v_y), ((PyObject *)__pyx_v_f)};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 4+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 4+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_GOTREF(__pyx_t_2);
         } else
@@ -3563,13 +3360,13 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[5] = {__pyx_t_4, ((PyObject *)__pyx_v_tree), __pyx_v_X, ((PyObject *)__pyx_v_y), ((PyObject *)__pyx_v_f)};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 4+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 4+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_GOTREF(__pyx_t_2);
         } else
         #endif
         {
-          __pyx_t_6 = PyTuple_New(4+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 76, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(4+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 55, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           if (__pyx_t_4) {
             __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -3586,7 +3383,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
           __Pyx_INCREF(((PyObject *)__pyx_v_f));
           __Pyx_GIVEREF(((PyObject *)__pyx_v_f));
           PyTuple_SET_ITEM(__pyx_t_6, 3+__pyx_t_5, ((PyObject *)__pyx_v_f));
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         }
@@ -3608,97 +3405,118 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     #endif
   }
 
-  /* "cedar/_tree.pyx":82
+  /* "cedar/_tree.pyx":61
  * 
  *         # check input
- *         X, y, f = self._check_input(X, y, f)             # <<<<<<<<<<<<<<
+ *         X, y = _check_samples(X, y)             # <<<<<<<<<<<<<<
+ *         f = _check_features(f)
  * 
- *         # Initial capacity
  */
-  __pyx_t_1 = __pyx_f_5cedar_5_tree_12_TreeBuilder__check_input(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5cedar_6_utils__check_samples(__pyx_v_X, __pyx_v_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
     PyObject* sequence = __pyx_t_1;
     Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 3)) {
-      if (size > 3) __Pyx_RaiseTooManyValuesError(3);
+    if (unlikely(size != 2)) {
+      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 82, __pyx_L1_error)
+      __PYX_ERR(0, 61, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
       __pyx_t_2 = PyTuple_GET_ITEM(sequence, 0); 
       __pyx_t_3 = PyTuple_GET_ITEM(sequence, 1); 
-      __pyx_t_6 = PyTuple_GET_ITEM(sequence, 2); 
     } else {
       __pyx_t_2 = PyList_GET_ITEM(sequence, 0); 
       __pyx_t_3 = PyList_GET_ITEM(sequence, 1); 
-      __pyx_t_6 = PyList_GET_ITEM(sequence, 2); 
     }
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_6);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 82, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 82, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 82, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_7 = Py_TYPE(__pyx_t_4)->tp_iternext;
-    index = 0; __pyx_t_2 = __pyx_t_7(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    index = 1; __pyx_t_3 = __pyx_t_7(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_3);
-    index = 2; __pyx_t_6 = __pyx_t_7(__pyx_t_4); if (unlikely(!__pyx_t_6)) goto __pyx_L3_unpacking_failed;
+    __pyx_t_6 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 61, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_4), 3) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
+    index = 0; __pyx_t_2 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_2);
+    index = 1; __pyx_t_3 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_3);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 61, __pyx_L1_error)
     __pyx_t_7 = NULL;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     goto __pyx_L4_unpacking_done;
     __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 82, __pyx_L1_error)
+    __PYX_ERR(0, 61, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
-  if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 82, __pyx_L1_error)
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 82, __pyx_L1_error)
+  if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_DECREF_SET(__pyx_v_X, __pyx_t_2);
   __pyx_t_2 = 0;
   __Pyx_DECREF_SET(__pyx_v_y, ((PyArrayObject *)__pyx_t_3));
   __pyx_t_3 = 0;
-  __Pyx_DECREF_SET(__pyx_v_f, ((PyArrayObject *)__pyx_t_6));
-  __pyx_t_6 = 0;
 
-  /* "cedar/_tree.pyx":87
+  /* "cedar/_tree.pyx":62
+ *         # check input
+ *         X, y = _check_samples(X, y)
+ *         f = _check_features(f)             # <<<<<<<<<<<<<<
+ * 
+ *         # Initial capacity
+ */
+  __pyx_t_1 = __pyx_f_5cedar_6_utils__check_features(__pyx_v_f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 62, __pyx_L1_error)
+  __Pyx_DECREF_SET(__pyx_v_f, ((PyArrayObject *)__pyx_t_1));
+  __pyx_t_1 = 0;
+
+  /* "cedar/_tree.pyx":67
  *         cdef int init_capacity
  * 
  *         if tree.max_depth <= 10:             # <<<<<<<<<<<<<<
  *             init_capacity = (2 ** (tree.max_depth + 1)) - 1
  *         else:
  */
-  __pyx_t_8 = ((__pyx_v_tree->max_depth <= 10) != 0);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_tree), __pyx_n_s_max_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_int_10, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_8) {
 
-    /* "cedar/_tree.pyx":88
+    /* "cedar/_tree.pyx":68
  * 
  *         if tree.max_depth <= 10:
  *             init_capacity = (2 ** (tree.max_depth + 1)) - 1             # <<<<<<<<<<<<<<
  *         else:
  *             init_capacity = 2047
  */
-    __pyx_v_init_capacity = (__Pyx_pow_long(2, (__pyx_v_tree->max_depth + 1)) - 1);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_tree), __pyx_n_s_max_depth); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyNumber_PowerOf2(__pyx_int_2, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_v_init_capacity = __pyx_t_5;
 
-    /* "cedar/_tree.pyx":87
+    /* "cedar/_tree.pyx":67
  *         cdef int init_capacity
  * 
  *         if tree.max_depth <= 10:             # <<<<<<<<<<<<<<
@@ -3708,7 +3526,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     goto __pyx_L5;
   }
 
-  /* "cedar/_tree.pyx":90
+  /* "cedar/_tree.pyx":70
  *             init_capacity = (2 ** (tree.max_depth + 1)) - 1
  *         else:
  *             init_capacity = 2047             # <<<<<<<<<<<<<<
@@ -3720,7 +3538,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   }
   __pyx_L5:;
 
-  /* "cedar/_tree.pyx":92
+  /* "cedar/_tree.pyx":72
  *             init_capacity = 2047
  * 
  *         tree._resize(init_capacity)             # <<<<<<<<<<<<<<
@@ -3729,9 +3547,9 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
   __pyx_t_9.__pyx_n = 1;
   __pyx_t_9.capacity = __pyx_v_init_capacity;
-  __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_tree->__pyx_vtab)->_resize(__pyx_v_tree, &__pyx_t_9); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 92, __pyx_L1_error)
+  __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_tree->__pyx_vtab)->_resize(__pyx_v_tree, &__pyx_t_9); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 72, __pyx_L1_error)
 
-  /* "cedar/_tree.pyx":95
+  /* "cedar/_tree.pyx":75
  * 
  *         # Parameters
  *         cdef _Splitter splitter = self.splitter             # <<<<<<<<<<<<<<
@@ -3743,7 +3561,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __pyx_v_splitter = ((struct __pyx_obj_5cedar_9_splitter__Splitter *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cedar/_tree.pyx":96
+  /* "cedar/_tree.pyx":76
  *         # Parameters
  *         cdef _Splitter splitter = self.splitter
  *         cdef int max_depth = self.max_depth             # <<<<<<<<<<<<<<
@@ -3753,7 +3571,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __pyx_t_5 = __pyx_v_self->max_depth;
   __pyx_v_max_depth = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":97
+  /* "cedar/_tree.pyx":77
  *         cdef _Splitter splitter = self.splitter
  *         cdef int max_depth = self.max_depth
  *         cdef int min_samples_leaf = self.min_samples_leaf             # <<<<<<<<<<<<<<
@@ -3763,7 +3581,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __pyx_t_5 = __pyx_v_self->min_samples_leaf;
   __pyx_v_min_samples_leaf = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":98
+  /* "cedar/_tree.pyx":78
  *         cdef int max_depth = self.max_depth
  *         cdef int min_samples_leaf = self.min_samples_leaf
  *         cdef int min_samples_split = self.min_samples_split             # <<<<<<<<<<<<<<
@@ -3773,54 +3591,54 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __pyx_t_5 = __pyx_v_self->min_samples_split;
   __pyx_v_min_samples_split = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":106
+  /* "cedar/_tree.pyx":86
  *         cdef bint is_left
  *         cdef int* samples
  *         cdef int n_samples = X.shape[0]             # <<<<<<<<<<<<<<
  *         cdef int* features
  *         cdef int n_features = X.shape[1]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_6); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_n_samples = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":108
+  /* "cedar/_tree.pyx":88
  *         cdef int n_samples = X.shape[0]
  *         cdef int* features
  *         cdef int n_features = X.shape[1]             # <<<<<<<<<<<<<<
  *         cdef Stack stack = Stack(INITIAL_STACK_SIZE)
  * 
  */
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 108, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 108, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n_features = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":109
+  /* "cedar/_tree.pyx":89
  *         cdef int* features
  *         cdef int n_features = X.shape[1]
  *         cdef Stack stack = Stack(INITIAL_STACK_SIZE)             # <<<<<<<<<<<<<<
  * 
  *         # compute variables
  */
-  __pyx_t_1 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_5cedar_5_tree_INITIAL_STACK_SIZE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_5cedar_5_tree_INITIAL_STACK_SIZE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5cedar_6_utils_Stack), __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 109, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5cedar_6_utils_Stack), __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_stack = ((struct __pyx_obj_5cedar_6_utils_Stack *)__pyx_t_6);
-  __pyx_t_6 = 0;
+  __pyx_v_stack = ((struct __pyx_obj_5cedar_6_utils_Stack *)__pyx_t_3);
+  __pyx_t_3 = 0;
 
-  /* "cedar/_tree.pyx":119
+  /* "cedar/_tree.pyx":99
  * 
  *         cdef int i
  *         cdef max_depth_seen = 0             # <<<<<<<<<<<<<<
@@ -3830,7 +3648,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_max_depth_seen = __pyx_int_0;
 
-  /* "cedar/_tree.pyx":124
+  /* "cedar/_tree.pyx":104
  * 
  *         # fill in samples and features arrays
  *         samples = <int *>malloc(n_samples * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3839,7 +3657,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
   __pyx_v_samples = ((int *)malloc((__pyx_v_n_samples * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":125
+  /* "cedar/_tree.pyx":105
  *         # fill in samples and features arrays
  *         samples = <int *>malloc(n_samples * sizeof(int))
  *         features = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3848,7 +3666,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
   __pyx_v_features = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":127
+  /* "cedar/_tree.pyx":107
  *         features = <int *>malloc(n_features * sizeof(int))
  * 
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3860,7 +3678,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "cedar/_tree.pyx":128
+    /* "cedar/_tree.pyx":108
  * 
  *         for i in range(n_samples):
  *             samples[i] = i             # <<<<<<<<<<<<<<
@@ -3870,7 +3688,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     (__pyx_v_samples[__pyx_v_i]) = __pyx_v_i;
   }
 
-  /* "cedar/_tree.pyx":130
+  /* "cedar/_tree.pyx":110
  *             samples[i] = i
  * 
  *         for i in range(n_features):             # <<<<<<<<<<<<<<
@@ -3882,7 +3700,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "cedar/_tree.pyx":131
+    /* "cedar/_tree.pyx":111
  * 
  *         for i in range(n_features):
  *             features[i] = i             # <<<<<<<<<<<<<<
@@ -3892,59 +3710,68 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     (__pyx_v_features[__pyx_v_i]) = __pyx_v_i;
   }
 
-  /* "cedar/_tree.pyx":139
+  /* "cedar/_tree.pyx":119
  *         # push root node onto stack
  *         # TODO: add checks for out-of-memory
- *         rc = stack.push(0, _TREE_UNDEFINED, 0, samples, n_samples, features, n_features)             # <<<<<<<<<<<<<<
+ *         rc = stack.push(0, _TREE_UNDEFINED, 1, 0, samples, n_samples, features, n_features)             # <<<<<<<<<<<<<<
  * 
  *         while not stack.is_empty():
  */
-  __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, 0, __pyx_v_5cedar_5_tree__TREE_UNDEFINED, 0, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_features, __pyx_v_n_features); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 139, __pyx_L1_error)
-  __pyx_v_rc = __pyx_t_5;
+  __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, 0, __pyx_v_5cedar_5_tree__TREE_UNDEFINED, 1.0, 0, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_features, __pyx_v_n_features);
 
-  /* "cedar/_tree.pyx":141
- *         rc = stack.push(0, _TREE_UNDEFINED, 0, samples, n_samples, features, n_features)
+  /* "cedar/_tree.pyx":121
+ *         rc = stack.push(0, _TREE_UNDEFINED, 1, 0, samples, n_samples, features, n_features)
  * 
  *         while not stack.is_empty():             # <<<<<<<<<<<<<<
- *             stack.pop(&stack_record)
- *             depth = stack_record.depth
+ * 
+ *             # populate stack record
  */
   while (1) {
     __pyx_t_8 = ((!(((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->is_empty(__pyx_v_stack) != 0)) != 0);
     if (!__pyx_t_8) break;
 
-    /* "cedar/_tree.pyx":142
+    /* "cedar/_tree.pyx":124
  * 
- *         while not stack.is_empty():
+ *             # populate stack record
  *             stack.pop(&stack_record)             # <<<<<<<<<<<<<<
  *             depth = stack_record.depth
  *             parent = stack_record.parent
  */
     (void)(((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->pop(__pyx_v_stack, (&__pyx_v_stack_record)));
 
-    /* "cedar/_tree.pyx":143
- *         while not stack.is_empty():
+    /* "cedar/_tree.pyx":125
+ *             # populate stack record
  *             stack.pop(&stack_record)
  *             depth = stack_record.depth             # <<<<<<<<<<<<<<
  *             parent = stack_record.parent
- *             is_left = stack_record.is_left
+ *             parent_p = stack_record.parent_p
  */
     __pyx_t_5 = __pyx_v_stack_record.depth;
     __pyx_v_depth = __pyx_t_5;
 
-    /* "cedar/_tree.pyx":144
+    /* "cedar/_tree.pyx":126
  *             stack.pop(&stack_record)
  *             depth = stack_record.depth
  *             parent = stack_record.parent             # <<<<<<<<<<<<<<
+ *             parent_p = stack_record.parent_p
  *             is_left = stack_record.is_left
- *             samples = stack_record.samples
  */
     __pyx_t_5 = __pyx_v_stack_record.parent;
     __pyx_v_parent = __pyx_t_5;
 
-    /* "cedar/_tree.pyx":145
+    /* "cedar/_tree.pyx":127
  *             depth = stack_record.depth
  *             parent = stack_record.parent
+ *             parent_p = stack_record.parent_p             # <<<<<<<<<<<<<<
+ *             is_left = stack_record.is_left
+ *             samples = stack_record.samples
+ */
+    __pyx_t_12 = __pyx_v_stack_record.parent_p;
+    __pyx_v_parent_p = __pyx_t_12;
+
+    /* "cedar/_tree.pyx":128
+ *             parent = stack_record.parent
+ *             parent_p = stack_record.parent_p
  *             is_left = stack_record.is_left             # <<<<<<<<<<<<<<
  *             samples = stack_record.samples
  *             n_samples = stack_record.n_samples
@@ -3952,17 +3779,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     __pyx_t_8 = __pyx_v_stack_record.is_left;
     __pyx_v_is_left = __pyx_t_8;
 
-    /* "cedar/_tree.pyx":146
- *             parent = stack_record.parent
+    /* "cedar/_tree.pyx":129
+ *             parent_p = stack_record.parent_p
  *             is_left = stack_record.is_left
  *             samples = stack_record.samples             # <<<<<<<<<<<<<<
  *             n_samples = stack_record.n_samples
  *             features = stack_record.features
  */
-    __pyx_t_12 = __pyx_v_stack_record.samples;
-    __pyx_v_samples = __pyx_t_12;
+    __pyx_t_13 = __pyx_v_stack_record.samples;
+    __pyx_v_samples = __pyx_t_13;
 
-    /* "cedar/_tree.pyx":147
+    /* "cedar/_tree.pyx":130
  *             is_left = stack_record.is_left
  *             samples = stack_record.samples
  *             n_samples = stack_record.n_samples             # <<<<<<<<<<<<<<
@@ -3972,17 +3799,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     __pyx_t_5 = __pyx_v_stack_record.n_samples;
     __pyx_v_n_samples = __pyx_t_5;
 
-    /* "cedar/_tree.pyx":148
+    /* "cedar/_tree.pyx":131
  *             samples = stack_record.samples
  *             n_samples = stack_record.n_samples
  *             features = stack_record.features             # <<<<<<<<<<<<<<
  *             n_features = stack_record.n_features
  * 
  */
-    __pyx_t_12 = __pyx_v_stack_record.features;
-    __pyx_v_features = __pyx_t_12;
+    __pyx_t_13 = __pyx_v_stack_record.features;
+    __pyx_v_features = __pyx_t_13;
 
-    /* "cedar/_tree.pyx":149
+    /* "cedar/_tree.pyx":132
  *             n_samples = stack_record.n_samples
  *             features = stack_record.features
  *             n_features = stack_record.n_features             # <<<<<<<<<<<<<<
@@ -3992,7 +3819,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     __pyx_t_5 = __pyx_v_stack_record.n_features;
     __pyx_v_n_features = __pyx_t_5;
 
-    /* "cedar/_tree.pyx":151
+    /* "cedar/_tree.pyx":134
  *             n_features = stack_record.n_features
  * 
  *             meta.count = n_samples             # <<<<<<<<<<<<<<
@@ -4001,94 +3828,94 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
     __pyx_v_meta.count = __pyx_v_n_samples;
 
-    /* "cedar/_tree.pyx":155
+    /* "cedar/_tree.pyx":138
  *             # printf("\npopping (%d, %d, %d, %d, %d)\n", depth, parent, is_left, n_samples, n_features)
  * 
  *             is_leaf = (depth >= max_depth or             # <<<<<<<<<<<<<<
  *                        n_samples < min_samples_split or
  *                        n_samples < 2 * min_samples_leaf or
  */
-    __pyx_t_13 = ((__pyx_v_depth >= __pyx_v_max_depth) != 0);
-    if (!__pyx_t_13) {
+    __pyx_t_14 = ((__pyx_v_depth >= __pyx_v_max_depth) != 0);
+    if (!__pyx_t_14) {
     } else {
-      __pyx_t_8 = __pyx_t_13;
+      __pyx_t_8 = __pyx_t_14;
       goto __pyx_L12_bool_binop_done;
     }
 
-    /* "cedar/_tree.pyx":156
+    /* "cedar/_tree.pyx":139
  * 
  *             is_leaf = (depth >= max_depth or
  *                        n_samples < min_samples_split or             # <<<<<<<<<<<<<<
  *                        n_samples < 2 * min_samples_leaf or
  *                        n_features <= 1)
  */
-    __pyx_t_13 = ((__pyx_v_n_samples < __pyx_v_min_samples_split) != 0);
-    if (!__pyx_t_13) {
+    __pyx_t_14 = ((__pyx_v_n_samples < __pyx_v_min_samples_split) != 0);
+    if (!__pyx_t_14) {
     } else {
-      __pyx_t_8 = __pyx_t_13;
+      __pyx_t_8 = __pyx_t_14;
       goto __pyx_L12_bool_binop_done;
     }
 
-    /* "cedar/_tree.pyx":157
+    /* "cedar/_tree.pyx":140
  *             is_leaf = (depth >= max_depth or
  *                        n_samples < min_samples_split or
  *                        n_samples < 2 * min_samples_leaf or             # <<<<<<<<<<<<<<
  *                        n_features <= 1)
  * 
  */
-    __pyx_t_13 = ((__pyx_v_n_samples < (2 * __pyx_v_min_samples_leaf)) != 0);
-    if (!__pyx_t_13) {
+    __pyx_t_14 = ((__pyx_v_n_samples < (2 * __pyx_v_min_samples_leaf)) != 0);
+    if (!__pyx_t_14) {
     } else {
-      __pyx_t_8 = __pyx_t_13;
+      __pyx_t_8 = __pyx_t_14;
       goto __pyx_L12_bool_binop_done;
     }
 
-    /* "cedar/_tree.pyx":158
+    /* "cedar/_tree.pyx":141
  *                        n_samples < min_samples_split or
  *                        n_samples < 2 * min_samples_leaf or
  *                        n_features <= 1)             # <<<<<<<<<<<<<<
  * 
  *             if not is_leaf:
  */
-    __pyx_t_13 = ((__pyx_v_n_features <= 1) != 0);
-    __pyx_t_8 = __pyx_t_13;
+    __pyx_t_14 = ((__pyx_v_n_features <= 1) != 0);
+    __pyx_t_8 = __pyx_t_14;
     __pyx_L12_bool_binop_done:;
     __pyx_v_is_leaf = __pyx_t_8;
 
-    /* "cedar/_tree.pyx":160
+    /* "cedar/_tree.pyx":143
  *                        n_features <= 1)
  * 
  *             if not is_leaf:             # <<<<<<<<<<<<<<
- *                 rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
  *                 if rc == -2:
  */
     __pyx_t_8 = ((!(__pyx_v_is_leaf != 0)) != 0);
     if (__pyx_t_8) {
 
-      /* "cedar/_tree.pyx":161
+      /* "cedar/_tree.pyx":144
  * 
  *             if not is_leaf:
- *                 rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)             # <<<<<<<<<<<<<<
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)             # <<<<<<<<<<<<<<
  *                 if rc == -2:
  *                     is_leaf = 1
  */
-      __pyx_t_14 = __Pyx_PyObject_to_MemoryviewSlice_dcd__int(__pyx_v_X, PyBUF_WRITABLE); if (unlikely(!__pyx_t_14.memview)) __PYX_ERR(0, 161, __pyx_L1_error)
-      __pyx_t_15 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_y), PyBUF_WRITABLE); if (unlikely(!__pyx_t_15.memview)) __PYX_ERR(0, 161, __pyx_L1_error)
-      __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_f), PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 161, __pyx_L1_error)
-      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *)__pyx_v_splitter->__pyx_vtab)->node_split(__pyx_v_splitter, __pyx_t_14, __pyx_t_15, __pyx_t_16, __pyx_v_samples, __pyx_v_features, __pyx_v_n_features, (&__pyx_v_split), (&__pyx_v_meta));
-      __PYX_XDEC_MEMVIEW(&__pyx_t_14, 1);
-      __pyx_t_14.memview = NULL;
-      __pyx_t_14.data = NULL;
+      __pyx_t_15 = __Pyx_PyObject_to_MemoryviewSlice_dcd__int(__pyx_v_X, PyBUF_WRITABLE); if (unlikely(!__pyx_t_15.memview)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_y), PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_f), PyBUF_WRITABLE); if (unlikely(!__pyx_t_17.memview)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *)__pyx_v_splitter->__pyx_vtab)->node_split(__pyx_v_splitter, __pyx_t_15, __pyx_t_16, __pyx_t_17, __pyx_v_parent_p, __pyx_v_samples, __pyx_v_features, __pyx_v_n_features, (&__pyx_v_split), (&__pyx_v_meta));
       __PYX_XDEC_MEMVIEW(&__pyx_t_15, 1);
       __pyx_t_15.memview = NULL;
       __pyx_t_15.data = NULL;
       __PYX_XDEC_MEMVIEW(&__pyx_t_16, 1);
       __pyx_t_16.memview = NULL;
       __pyx_t_16.data = NULL;
+      __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
+      __pyx_t_17.memview = NULL;
+      __pyx_t_17.data = NULL;
 
-      /* "cedar/_tree.pyx":162
+      /* "cedar/_tree.pyx":145
  *             if not is_leaf:
- *                 rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
  *                 if rc == -2:             # <<<<<<<<<<<<<<
  *                     is_leaf = 1
  *                 else:
@@ -4096,8 +3923,8 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
       __pyx_t_8 = ((__pyx_v_rc == -2L) != 0);
       if (__pyx_t_8) {
 
-        /* "cedar/_tree.pyx":163
- *                 rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)
+        /* "cedar/_tree.pyx":146
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
  *                 if rc == -2:
  *                     is_leaf = 1             # <<<<<<<<<<<<<<
  *                 else:
@@ -4105,9 +3932,9 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
         __pyx_v_is_leaf = 1;
 
-        /* "cedar/_tree.pyx":162
+        /* "cedar/_tree.pyx":145
  *             if not is_leaf:
- *                 rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
  *                 if rc == -2:             # <<<<<<<<<<<<<<
  *                     is_leaf = 1
  *                 else:
@@ -4115,7 +3942,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
         goto __pyx_L17;
       }
 
-      /* "cedar/_tree.pyx":165
+      /* "cedar/_tree.pyx":148
  *                     is_leaf = 1
  *                 else:
  *                     feature = split.feature             # <<<<<<<<<<<<<<
@@ -4126,7 +3953,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
         __pyx_t_5 = __pyx_v_split.feature;
         __pyx_v_feature = __pyx_t_5;
 
-        /* "cedar/_tree.pyx":166
+        /* "cedar/_tree.pyx":149
  *                 else:
  *                     feature = split.feature
  *                     value = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
@@ -4137,16 +3964,16 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
       }
       __pyx_L17:;
 
-      /* "cedar/_tree.pyx":160
+      /* "cedar/_tree.pyx":143
  *                        n_features <= 1)
  * 
  *             if not is_leaf:             # <<<<<<<<<<<<<<
- *                 rc = splitter.node_split(X, y, f, samples, features, n_features, &split, &meta)
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
  *                 if rc == -2:
  */
     }
 
-    /* "cedar/_tree.pyx":168
+    /* "cedar/_tree.pyx":151
  *                     value = _TREE_UNDEFINED
  * 
  *             if is_leaf:             # <<<<<<<<<<<<<<
@@ -4156,29 +3983,29 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     __pyx_t_8 = (__pyx_v_is_leaf != 0);
     if (__pyx_t_8) {
 
-      /* "cedar/_tree.pyx":169
+      /* "cedar/_tree.pyx":152
  * 
  *             if is_leaf:
  *                 value = self._leaf_value(y, samples, n_samples, &meta)             # <<<<<<<<<<<<<<
  *                 meta.feature_count = _TREE_UNDEFINED
  * 
  */
-      __pyx_t_16 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_y), PyBUF_WRITABLE); if (unlikely(!__pyx_t_16.memview)) __PYX_ERR(0, 169, __pyx_L1_error)
-      __pyx_v_value = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_leaf_value(__pyx_v_self, __pyx_t_16, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_meta));
-      __PYX_XDEC_MEMVIEW(&__pyx_t_16, 1);
-      __pyx_t_16.memview = NULL;
-      __pyx_t_16.data = NULL;
+      __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_y), PyBUF_WRITABLE); if (unlikely(!__pyx_t_17.memview)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __pyx_v_value = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_leaf_value(__pyx_v_self, __pyx_t_17, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_meta));
+      __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
+      __pyx_t_17.memview = NULL;
+      __pyx_t_17.data = NULL;
 
-      /* "cedar/_tree.pyx":170
+      /* "cedar/_tree.pyx":153
  *             if is_leaf:
  *                 value = self._leaf_value(y, samples, n_samples, &meta)
  *                 meta.feature_count = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
  * 
- *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, samples, &meta)
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
  */
       __pyx_v_meta.feature_count = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
 
-      /* "cedar/_tree.pyx":168
+      /* "cedar/_tree.pyx":151
  *                     value = _TREE_UNDEFINED
  * 
  *             if is_leaf:             # <<<<<<<<<<<<<<
@@ -4187,18 +4014,18 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
     }
 
-    /* "cedar/_tree.pyx":172
+    /* "cedar/_tree.pyx":155
  *                 meta.feature_count = _TREE_UNDEFINED
  * 
- *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, samples, &meta)             # <<<<<<<<<<<<<<
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)             # <<<<<<<<<<<<<<
  * 
  *             if not is_leaf:
  */
-    __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_tree->__pyx_vtab)->add_node(__pyx_v_tree, __pyx_v_parent, __pyx_v_is_left, __pyx_v_is_leaf, __pyx_v_feature, __pyx_v_value, __pyx_v_samples, (&__pyx_v_meta)); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 172, __pyx_L1_error)
+    __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_tree->__pyx_vtab)->add_node(__pyx_v_tree, __pyx_v_parent, __pyx_v_is_left, __pyx_v_is_leaf, __pyx_v_feature, __pyx_v_value, __pyx_v_depth, __pyx_v_samples, (&__pyx_v_meta)); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 155, __pyx_L1_error)
     __pyx_v_node_id = __pyx_t_5;
 
-    /* "cedar/_tree.pyx":174
- *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, samples, &meta)
+    /* "cedar/_tree.pyx":157
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
  * 
  *             if not is_leaf:             # <<<<<<<<<<<<<<
  * 
@@ -4207,18 +4034,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     __pyx_t_8 = ((!(__pyx_v_is_leaf != 0)) != 0);
     if (__pyx_t_8) {
 
-      /* "cedar/_tree.pyx":179
+      /* "cedar/_tree.pyx":162
  *                 # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
  *                 #        split.right_count, split.n_features)
- *                 rc = stack.push(depth + 1, node_id, 0, split.right_indices, split.right_count,             # <<<<<<<<<<<<<<
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,             # <<<<<<<<<<<<<<
  *                                 split.features, split.n_features)
  *                 if rc == -1:
  */
-      __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, (__pyx_v_depth + 1), __pyx_v_node_id, 0, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.features, __pyx_v_split.n_features); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 179, __pyx_L1_error)
-      __pyx_v_rc = __pyx_t_5;
+      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, (__pyx_v_depth + 1), __pyx_v_node_id, __pyx_v_meta.p, 0, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.features, __pyx_v_split.n_features);
 
-      /* "cedar/_tree.pyx":181
- *                 rc = stack.push(depth + 1, node_id, 0, split.right_indices, split.right_count,
+      /* "cedar/_tree.pyx":164
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,
  *                                 split.features, split.n_features)
  *                 if rc == -1:             # <<<<<<<<<<<<<<
  *                     break
@@ -4227,7 +4053,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
       __pyx_t_8 = ((__pyx_v_rc == -1L) != 0);
       if (__pyx_t_8) {
 
-        /* "cedar/_tree.pyx":182
+        /* "cedar/_tree.pyx":165
  *                                 split.features, split.n_features)
  *                 if rc == -1:
  *                     break             # <<<<<<<<<<<<<<
@@ -4236,8 +4062,8 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
         goto __pyx_L11_break;
 
-        /* "cedar/_tree.pyx":181
- *                 rc = stack.push(depth + 1, node_id, 0, split.right_indices, split.right_count,
+        /* "cedar/_tree.pyx":164
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,
  *                                 split.features, split.n_features)
  *                 if rc == -1:             # <<<<<<<<<<<<<<
  *                     break
@@ -4245,18 +4071,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
       }
 
-      /* "cedar/_tree.pyx":187
+      /* "cedar/_tree.pyx":170
  *                 # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
  *                 #        split.left_count, split.n_features)
- *                 rc = stack.push(depth + 1, node_id, 1, split.left_indices, split.left_count,             # <<<<<<<<<<<<<<
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,             # <<<<<<<<<<<<<<
  *                                 split.features, split.n_features)
  *                 if rc == -1:
  */
-      __pyx_t_5 = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, (__pyx_v_depth + 1), __pyx_v_node_id, 1, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.features, __pyx_v_split.n_features); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 187, __pyx_L1_error)
-      __pyx_v_rc = __pyx_t_5;
+      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, (__pyx_v_depth + 1), __pyx_v_node_id, __pyx_v_meta.p, 1, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.features, __pyx_v_split.n_features);
 
-      /* "cedar/_tree.pyx":189
- *                 rc = stack.push(depth + 1, node_id, 1, split.left_indices, split.left_count,
+      /* "cedar/_tree.pyx":172
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,
  *                                 split.features, split.n_features)
  *                 if rc == -1:             # <<<<<<<<<<<<<<
  *                     break
@@ -4265,17 +4090,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
       __pyx_t_8 = ((__pyx_v_rc == -1L) != 0);
       if (__pyx_t_8) {
 
-        /* "cedar/_tree.pyx":190
+        /* "cedar/_tree.pyx":173
  *                                 split.features, split.n_features)
  *                 if rc == -1:
  *                     break             # <<<<<<<<<<<<<<
  * 
- *             if depth > max_depth_seen:
+ *             # clean up
  */
         goto __pyx_L11_break;
 
-        /* "cedar/_tree.pyx":189
- *                 rc = stack.push(depth + 1, node_id, 1, split.left_indices, split.left_count,
+        /* "cedar/_tree.pyx":172
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,
  *                                 split.features, split.n_features)
  *                 if rc == -1:             # <<<<<<<<<<<<<<
  *                     break
@@ -4283,8 +4108,8 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
       }
 
-      /* "cedar/_tree.pyx":174
- *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, samples, &meta)
+      /* "cedar/_tree.pyx":157
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
  * 
  *             if not is_leaf:             # <<<<<<<<<<<<<<
  * 
@@ -4292,52 +4117,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
     }
 
-    /* "cedar/_tree.pyx":192
- *                     break
- * 
- *             if depth > max_depth_seen:             # <<<<<<<<<<<<<<
- *                 tree.max_depth = depth
- *                 max_depth_seen = depth
- */
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_depth); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 192, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_1 = PyObject_RichCompare(__pyx_t_6, __pyx_v_max_depth_seen, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 192, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (__pyx_t_8) {
-
-      /* "cedar/_tree.pyx":193
- * 
- *             if depth > max_depth_seen:
- *                 tree.max_depth = depth             # <<<<<<<<<<<<<<
- *                 max_depth_seen = depth
- * 
- */
-      __pyx_v_tree->max_depth = __pyx_v_depth;
-
-      /* "cedar/_tree.pyx":194
- *             if depth > max_depth_seen:
- *                 tree.max_depth = depth
- *                 max_depth_seen = depth             # <<<<<<<<<<<<<<
- * 
- *             # clean up
- */
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF_SET(__pyx_v_max_depth_seen, __pyx_t_1);
-      __pyx_t_1 = 0;
-
-      /* "cedar/_tree.pyx":192
- *                     break
- * 
- *             if depth > max_depth_seen:             # <<<<<<<<<<<<<<
- *                 tree.max_depth = depth
- *                 max_depth_seen = depth
- */
-    }
-
-    /* "cedar/_tree.pyx":197
+    /* "cedar/_tree.pyx":176
  * 
  *             # clean up
  *             if not is_leaf:             # <<<<<<<<<<<<<<
@@ -4347,7 +4127,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     __pyx_t_8 = ((!(__pyx_v_is_leaf != 0)) != 0);
     if (__pyx_t_8) {
 
-      /* "cedar/_tree.pyx":198
+      /* "cedar/_tree.pyx":177
  *             # clean up
  *             if not is_leaf:
  *                 free(samples)             # <<<<<<<<<<<<<<
@@ -4356,7 +4136,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
       free(__pyx_v_samples);
 
-      /* "cedar/_tree.pyx":197
+      /* "cedar/_tree.pyx":176
  * 
  *             # clean up
  *             if not is_leaf:             # <<<<<<<<<<<<<<
@@ -4367,7 +4147,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   }
   __pyx_L11_break:;
 
-  /* "cedar/_tree.pyx":200
+  /* "cedar/_tree.pyx":179
  *                 free(samples)
  * 
  *         if rc == -1:             # <<<<<<<<<<<<<<
@@ -4377,16 +4157,16 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __pyx_t_8 = ((__pyx_v_rc == -1L) != 0);
   if (unlikely(__pyx_t_8)) {
 
-    /* "cedar/_tree.pyx":201
+    /* "cedar/_tree.pyx":180
  * 
  *         if rc == -1:
  *             raise MemoryError()             # <<<<<<<<<<<<<<
  * 
- *     @cython.boundscheck(False)
+ *     cdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,
  */
-    PyErr_NoMemory(); __PYX_ERR(0, 201, __pyx_L1_error)
+    PyErr_NoMemory(); __PYX_ERR(0, 180, __pyx_L1_error)
 
-    /* "cedar/_tree.pyx":200
+    /* "cedar/_tree.pyx":179
  *                 free(samples)
  * 
  *         if rc == -1:             # <<<<<<<<<<<<<<
@@ -4395,8 +4175,8 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
   }
 
-  /* "cedar/_tree.pyx":76
- *         return X, y, f
+  /* "cedar/_tree.pyx":55
+ *         rand()
  * 
  *     cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f):             # <<<<<<<<<<<<<<
  *         """
@@ -4411,9 +4191,9 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_14, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_15, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_16, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
   __Pyx_WriteUnraisable("cedar._tree._TreeBuilder.build", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
   __Pyx_XDECREF((PyObject *)__pyx_v_splitter);
@@ -4463,23 +4243,23 @@ static PyObject *__pyx_pw_5cedar_5_tree_12_TreeBuilder_3build(PyObject *__pyx_v_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_X)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, 1); __PYX_ERR(0, 76, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, 1); __PYX_ERR(0, 55, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, 2); __PYX_ERR(0, 76, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, 2); __PYX_ERR(0, 55, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_f)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, 3); __PYX_ERR(0, 76, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, 3); __PYX_ERR(0, 55, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "build") < 0)) __PYX_ERR(0, 76, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "build") < 0)) __PYX_ERR(0, 55, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -4496,15 +4276,15 @@ static PyObject *__pyx_pw_5cedar_5_tree_12_TreeBuilder_3build(PyObject *__pyx_v_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 76, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("build", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 55, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._tree._TreeBuilder.build", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree), __pyx_ptype_5cedar_5_tree__Tree, 1, "tree", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_f), __pyx_ptype_5numpy_ndarray, 1, "f", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree), __pyx_ptype_5cedar_5_tree__Tree, 1, "tree", 0))) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_f), __pyx_ptype_5numpy_ndarray, 1, "f", 0))) __PYX_ERR(0, 55, __pyx_L1_error)
   __pyx_r = __pyx_pf_5cedar_5_tree_12_TreeBuilder_2build(((struct __pyx_obj_5cedar_5_tree__TreeBuilder *)__pyx_v_self), __pyx_v_tree, __pyx_v_X, __pyx_v_y, __pyx_v_f);
 
   /* function exit code */
@@ -4522,7 +4302,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_2build(struct __pyx_obj_5
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("build", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_12_TreeBuilder_build(__pyx_v_self, __pyx_v_tree, __pyx_v_X, __pyx_v_y, __pyx_v_f, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_12_TreeBuilder_build(__pyx_v_self, __pyx_v_tree, __pyx_v_X, __pyx_v_y, __pyx_v_f, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4539,7 +4319,686 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_2build(struct __pyx_obj_5
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":206
+/* "cedar/_tree.pyx":182
+ *             raise MemoryError()
+ * 
+ *     cdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,             # <<<<<<<<<<<<<<
+ *                             int node_id, int depth, int parent, double parent_p,
+ *                             bint is_left, int* samples, int* features, int n_features):
+ */
+
+static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build_at_node(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, PyObject *__pyx_v_X, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_f, int __pyx_v_node_id, int __pyx_v_depth, int __pyx_v_parent, double __pyx_v_parent_p, int __pyx_v_is_left, int *__pyx_v_samples, int *__pyx_v_features, int __pyx_v_n_features) {
+  struct __pyx_obj_5cedar_9_splitter__Splitter *__pyx_v_splitter = 0;
+  int __pyx_v_max_depth;
+  int __pyx_v_min_samples_leaf;
+  int __pyx_v_min_samples_split;
+  struct __pyx_t_5cedar_6_utils_StackRecord __pyx_v_stack_record;
+  int __pyx_v_n_samples;
+  struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_stack = 0;
+  struct __pyx_t_5cedar_9_splitter_SplitRecord __pyx_v_split;
+  int __pyx_v_is_leaf;
+  int __pyx_v_feature;
+  double __pyx_v_value;
+  struct __pyx_t_5cedar_9_splitter_Meta __pyx_v_meta;
+  int __pyx_v_rc;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *(*__pyx_t_5)(PyObject *);
+  int __pyx_t_6;
+  int __pyx_t_7;
+  int *__pyx_t_8;
+  int __pyx_t_9;
+  __Pyx_memviewslice __pyx_t_10 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_t_11 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_t_12 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_RefNannySetupContext("build_at_node", 0);
+  __Pyx_INCREF(__pyx_v_X);
+  __Pyx_INCREF((PyObject *)__pyx_v_y);
+  __Pyx_INCREF((PyObject *)__pyx_v_f);
+
+  /* "cedar/_tree.pyx":190
+ * 
+ *         # check input
+ *         X, y = _check_samples(X, y)             # <<<<<<<<<<<<<<
+ *         f = _check_features(f)
+ * 
+ */
+  __pyx_t_1 = __pyx_f_5cedar_6_utils__check_samples(__pyx_v_X, __pyx_v_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
+    PyObject* sequence = __pyx_t_1;
+    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+    if (unlikely(size != 2)) {
+      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 190, __pyx_L1_error)
+    }
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 0); 
+      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 1); 
+    } else {
+      __pyx_t_2 = PyList_GET_ITEM(sequence, 0); 
+      __pyx_t_3 = PyList_GET_ITEM(sequence, 1); 
+    }
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx_t_3);
+    #else
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    #endif
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  } else {
+    Py_ssize_t index = -1;
+    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
+    index = 0; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_2);
+    index = 1; __pyx_t_3 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_3);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_5 = NULL;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    goto __pyx_L4_unpacking_done;
+    __pyx_L3_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_5 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_L4_unpacking_done:;
+  }
+  if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 190, __pyx_L1_error)
+  __Pyx_DECREF_SET(__pyx_v_X, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __Pyx_DECREF_SET(__pyx_v_y, ((PyArrayObject *)__pyx_t_3));
+  __pyx_t_3 = 0;
+
+  /* "cedar/_tree.pyx":191
+ *         # check input
+ *         X, y = _check_samples(X, y)
+ *         f = _check_features(f)             # <<<<<<<<<<<<<<
+ * 
+ *         # Parameters
+ */
+  __pyx_t_1 = __pyx_f_5cedar_6_utils__check_features(__pyx_v_f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 191, __pyx_L1_error)
+  __Pyx_DECREF_SET(__pyx_v_f, ((PyArrayObject *)__pyx_t_1));
+  __pyx_t_1 = 0;
+
+  /* "cedar/_tree.pyx":194
+ * 
+ *         # Parameters
+ *         cdef _Splitter splitter = self.splitter             # <<<<<<<<<<<<<<
+ *         cdef int max_depth = self.max_depth
+ *         cdef int min_samples_leaf = self.min_samples_leaf
+ */
+  __pyx_t_1 = ((PyObject *)__pyx_v_self->splitter);
+  __Pyx_INCREF(__pyx_t_1);
+  __pyx_v_splitter = ((struct __pyx_obj_5cedar_9_splitter__Splitter *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "cedar/_tree.pyx":195
+ *         # Parameters
+ *         cdef _Splitter splitter = self.splitter
+ *         cdef int max_depth = self.max_depth             # <<<<<<<<<<<<<<
+ *         cdef int min_samples_leaf = self.min_samples_leaf
+ *         cdef int min_samples_split = self.min_samples_split
+ */
+  __pyx_t_6 = __pyx_v_self->max_depth;
+  __pyx_v_max_depth = __pyx_t_6;
+
+  /* "cedar/_tree.pyx":196
+ *         cdef _Splitter splitter = self.splitter
+ *         cdef int max_depth = self.max_depth
+ *         cdef int min_samples_leaf = self.min_samples_leaf             # <<<<<<<<<<<<<<
+ *         cdef int min_samples_split = self.min_samples_split
+ * 
+ */
+  __pyx_t_6 = __pyx_v_self->min_samples_leaf;
+  __pyx_v_min_samples_leaf = __pyx_t_6;
+
+  /* "cedar/_tree.pyx":197
+ *         cdef int max_depth = self.max_depth
+ *         cdef int min_samples_leaf = self.min_samples_leaf
+ *         cdef int min_samples_split = self.min_samples_split             # <<<<<<<<<<<<<<
+ * 
+ *         # StackRecord parameters
+ */
+  __pyx_t_6 = __pyx_v_self->min_samples_split;
+  __pyx_v_min_samples_split = __pyx_t_6;
+
+  /* "cedar/_tree.pyx":201
+ *         # StackRecord parameters
+ *         cdef StackRecord stack_record
+ *         cdef int n_samples = X.shape[0]             # <<<<<<<<<<<<<<
+ *         cdef Stack stack = Stack(INITIAL_STACK_SIZE)
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_n_samples = __pyx_t_6;
+
+  /* "cedar/_tree.pyx":202
+ *         cdef StackRecord stack_record
+ *         cdef int n_samples = X.shape[0]
+ *         cdef Stack stack = Stack(INITIAL_STACK_SIZE)             # <<<<<<<<<<<<<<
+ * 
+ *         # compute variables
+ */
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_5cedar_5_tree_INITIAL_STACK_SIZE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5cedar_6_utils_Stack), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_stack = ((struct __pyx_obj_5cedar_6_utils_Stack *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "cedar/_tree.pyx":215
+ *         # push root node onto stack
+ *         # TODO: add checks for out-of-memory
+ *         rc = stack.push(depth, parent, parent_p, is_left,             # <<<<<<<<<<<<<<
+ *                         samples, n_samples, features, n_features)
+ * 
+ */
+  __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, __pyx_v_depth, __pyx_v_parent, __pyx_v_parent_p, __pyx_v_is_left, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_features, __pyx_v_n_features);
+
+  /* "cedar/_tree.pyx":218
+ *                         samples, n_samples, features, n_features)
+ * 
+ *         while not stack.is_empty():             # <<<<<<<<<<<<<<
+ *             stack.pop(&stack_record)
+ *             depth = stack_record.depth
+ */
+  while (1) {
+    __pyx_t_7 = ((!(((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->is_empty(__pyx_v_stack) != 0)) != 0);
+    if (!__pyx_t_7) break;
+
+    /* "cedar/_tree.pyx":219
+ * 
+ *         while not stack.is_empty():
+ *             stack.pop(&stack_record)             # <<<<<<<<<<<<<<
+ *             depth = stack_record.depth
+ *             parent = stack_record.parent
+ */
+    (void)(((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->pop(__pyx_v_stack, (&__pyx_v_stack_record)));
+
+    /* "cedar/_tree.pyx":220
+ *         while not stack.is_empty():
+ *             stack.pop(&stack_record)
+ *             depth = stack_record.depth             # <<<<<<<<<<<<<<
+ *             parent = stack_record.parent
+ *             is_left = stack_record.is_left
+ */
+    __pyx_t_6 = __pyx_v_stack_record.depth;
+    __pyx_v_depth = __pyx_t_6;
+
+    /* "cedar/_tree.pyx":221
+ *             stack.pop(&stack_record)
+ *             depth = stack_record.depth
+ *             parent = stack_record.parent             # <<<<<<<<<<<<<<
+ *             is_left = stack_record.is_left
+ *             samples = stack_record.samples
+ */
+    __pyx_t_6 = __pyx_v_stack_record.parent;
+    __pyx_v_parent = __pyx_t_6;
+
+    /* "cedar/_tree.pyx":222
+ *             depth = stack_record.depth
+ *             parent = stack_record.parent
+ *             is_left = stack_record.is_left             # <<<<<<<<<<<<<<
+ *             samples = stack_record.samples
+ *             n_samples = stack_record.n_samples
+ */
+    __pyx_t_7 = __pyx_v_stack_record.is_left;
+    __pyx_v_is_left = __pyx_t_7;
+
+    /* "cedar/_tree.pyx":223
+ *             parent = stack_record.parent
+ *             is_left = stack_record.is_left
+ *             samples = stack_record.samples             # <<<<<<<<<<<<<<
+ *             n_samples = stack_record.n_samples
+ *             features = stack_record.features
+ */
+    __pyx_t_8 = __pyx_v_stack_record.samples;
+    __pyx_v_samples = __pyx_t_8;
+
+    /* "cedar/_tree.pyx":224
+ *             is_left = stack_record.is_left
+ *             samples = stack_record.samples
+ *             n_samples = stack_record.n_samples             # <<<<<<<<<<<<<<
+ *             features = stack_record.features
+ *             n_features = stack_record.n_features
+ */
+    __pyx_t_6 = __pyx_v_stack_record.n_samples;
+    __pyx_v_n_samples = __pyx_t_6;
+
+    /* "cedar/_tree.pyx":225
+ *             samples = stack_record.samples
+ *             n_samples = stack_record.n_samples
+ *             features = stack_record.features             # <<<<<<<<<<<<<<
+ *             n_features = stack_record.n_features
+ * 
+ */
+    __pyx_t_8 = __pyx_v_stack_record.features;
+    __pyx_v_features = __pyx_t_8;
+
+    /* "cedar/_tree.pyx":226
+ *             n_samples = stack_record.n_samples
+ *             features = stack_record.features
+ *             n_features = stack_record.n_features             # <<<<<<<<<<<<<<
+ * 
+ *             meta.count = n_samples
+ */
+    __pyx_t_6 = __pyx_v_stack_record.n_features;
+    __pyx_v_n_features = __pyx_t_6;
+
+    /* "cedar/_tree.pyx":228
+ *             n_features = stack_record.n_features
+ * 
+ *             meta.count = n_samples             # <<<<<<<<<<<<<<
+ * 
+ *             printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
+ */
+    __pyx_v_meta.count = __pyx_v_n_samples;
+
+    /* "cedar/_tree.pyx":230
+ *             meta.count = n_samples
+ * 
+ *             printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)             # <<<<<<<<<<<<<<
+ * 
+ *             is_leaf = (depth >= max_depth or
+ */
+    (void)(printf(((char const *)"\npopping (%d, %d, %.7f, %d, %d, %d)\n"), __pyx_v_depth, __pyx_v_parent, __pyx_v_parent_p, __pyx_v_is_left, __pyx_v_n_samples, __pyx_v_n_features));
+
+    /* "cedar/_tree.pyx":232
+ *             printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
+ * 
+ *             is_leaf = (depth >= max_depth or             # <<<<<<<<<<<<<<
+ *                        n_samples < min_samples_split or
+ *                        n_samples < 2 * min_samples_leaf or
+ */
+    __pyx_t_9 = ((__pyx_v_depth >= __pyx_v_max_depth) != 0);
+    if (!__pyx_t_9) {
+    } else {
+      __pyx_t_7 = __pyx_t_9;
+      goto __pyx_L7_bool_binop_done;
+    }
+
+    /* "cedar/_tree.pyx":233
+ * 
+ *             is_leaf = (depth >= max_depth or
+ *                        n_samples < min_samples_split or             # <<<<<<<<<<<<<<
+ *                        n_samples < 2 * min_samples_leaf or
+ *                        n_features <= 1)
+ */
+    __pyx_t_9 = ((__pyx_v_n_samples < __pyx_v_min_samples_split) != 0);
+    if (!__pyx_t_9) {
+    } else {
+      __pyx_t_7 = __pyx_t_9;
+      goto __pyx_L7_bool_binop_done;
+    }
+
+    /* "cedar/_tree.pyx":234
+ *             is_leaf = (depth >= max_depth or
+ *                        n_samples < min_samples_split or
+ *                        n_samples < 2 * min_samples_leaf or             # <<<<<<<<<<<<<<
+ *                        n_features <= 1)
+ * 
+ */
+    __pyx_t_9 = ((__pyx_v_n_samples < (2 * __pyx_v_min_samples_leaf)) != 0);
+    if (!__pyx_t_9) {
+    } else {
+      __pyx_t_7 = __pyx_t_9;
+      goto __pyx_L7_bool_binop_done;
+    }
+
+    /* "cedar/_tree.pyx":235
+ *                        n_samples < min_samples_split or
+ *                        n_samples < 2 * min_samples_leaf or
+ *                        n_features <= 1)             # <<<<<<<<<<<<<<
+ * 
+ *             if not is_leaf:
+ */
+    __pyx_t_9 = ((__pyx_v_n_features <= 1) != 0);
+    __pyx_t_7 = __pyx_t_9;
+    __pyx_L7_bool_binop_done:;
+    __pyx_v_is_leaf = __pyx_t_7;
+
+    /* "cedar/_tree.pyx":237
+ *                        n_features <= 1)
+ * 
+ *             if not is_leaf:             # <<<<<<<<<<<<<<
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+ *                 if rc == -2:
+ */
+    __pyx_t_7 = ((!(__pyx_v_is_leaf != 0)) != 0);
+    if (__pyx_t_7) {
+
+      /* "cedar/_tree.pyx":238
+ * 
+ *             if not is_leaf:
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)             # <<<<<<<<<<<<<<
+ *                 if rc == -2:
+ *                     is_leaf = 1
+ */
+      __pyx_t_10 = __Pyx_PyObject_to_MemoryviewSlice_dcd__int(__pyx_v_X, PyBUF_WRITABLE); if (unlikely(!__pyx_t_10.memview)) __PYX_ERR(0, 238, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_y), PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 238, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_f), PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 238, __pyx_L1_error)
+      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *)__pyx_v_splitter->__pyx_vtab)->node_split(__pyx_v_splitter, __pyx_t_10, __pyx_t_11, __pyx_t_12, __pyx_v_parent_p, __pyx_v_samples, __pyx_v_features, __pyx_v_n_features, (&__pyx_v_split), (&__pyx_v_meta));
+      __PYX_XDEC_MEMVIEW(&__pyx_t_10, 1);
+      __pyx_t_10.memview = NULL;
+      __pyx_t_10.data = NULL;
+      __PYX_XDEC_MEMVIEW(&__pyx_t_11, 1);
+      __pyx_t_11.memview = NULL;
+      __pyx_t_11.data = NULL;
+      __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
+      __pyx_t_12.memview = NULL;
+      __pyx_t_12.data = NULL;
+
+      /* "cedar/_tree.pyx":239
+ *             if not is_leaf:
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+ *                 if rc == -2:             # <<<<<<<<<<<<<<
+ *                     is_leaf = 1
+ *                 else:
+ */
+      __pyx_t_7 = ((__pyx_v_rc == -2L) != 0);
+      if (__pyx_t_7) {
+
+        /* "cedar/_tree.pyx":240
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+ *                 if rc == -2:
+ *                     is_leaf = 1             # <<<<<<<<<<<<<<
+ *                 else:
+ *                     feature = split.feature
+ */
+        __pyx_v_is_leaf = 1;
+
+        /* "cedar/_tree.pyx":239
+ *             if not is_leaf:
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+ *                 if rc == -2:             # <<<<<<<<<<<<<<
+ *                     is_leaf = 1
+ *                 else:
+ */
+        goto __pyx_L12;
+      }
+
+      /* "cedar/_tree.pyx":242
+ *                     is_leaf = 1
+ *                 else:
+ *                     feature = split.feature             # <<<<<<<<<<<<<<
+ *                     value = _TREE_UNDEFINED
+ * 
+ */
+      /*else*/ {
+        __pyx_t_6 = __pyx_v_split.feature;
+        __pyx_v_feature = __pyx_t_6;
+
+        /* "cedar/_tree.pyx":243
+ *                 else:
+ *                     feature = split.feature
+ *                     value = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
+ * 
+ *             if is_leaf:
+ */
+        __pyx_v_value = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
+      }
+      __pyx_L12:;
+
+      /* "cedar/_tree.pyx":237
+ *                        n_features <= 1)
+ * 
+ *             if not is_leaf:             # <<<<<<<<<<<<<<
+ *                 rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+ *                 if rc == -2:
+ */
+    }
+
+    /* "cedar/_tree.pyx":245
+ *                     value = _TREE_UNDEFINED
+ * 
+ *             if is_leaf:             # <<<<<<<<<<<<<<
+ *                 value = self._leaf_value(y, samples, n_samples, &meta)
+ *                 meta.feature_count = _TREE_UNDEFINED
+ */
+    __pyx_t_7 = (__pyx_v_is_leaf != 0);
+    if (__pyx_t_7) {
+
+      /* "cedar/_tree.pyx":246
+ * 
+ *             if is_leaf:
+ *                 value = self._leaf_value(y, samples, n_samples, &meta)             # <<<<<<<<<<<<<<
+ *                 meta.feature_count = _TREE_UNDEFINED
+ * 
+ */
+      __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(((PyObject *)__pyx_v_y), PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 246, __pyx_L1_error)
+      __pyx_v_value = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_leaf_value(__pyx_v_self, __pyx_t_12, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_meta));
+      __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
+      __pyx_t_12.memview = NULL;
+      __pyx_t_12.data = NULL;
+
+      /* "cedar/_tree.pyx":247
+ *             if is_leaf:
+ *                 value = self._leaf_value(y, samples, n_samples, &meta)
+ *                 meta.feature_count = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
+ * 
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
+ */
+      __pyx_v_meta.feature_count = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
+
+      /* "cedar/_tree.pyx":245
+ *                     value = _TREE_UNDEFINED
+ * 
+ *             if is_leaf:             # <<<<<<<<<<<<<<
+ *                 value = self._leaf_value(y, samples, n_samples, &meta)
+ *                 meta.feature_count = _TREE_UNDEFINED
+ */
+    }
+
+    /* "cedar/_tree.pyx":249
+ *                 meta.feature_count = _TREE_UNDEFINED
+ * 
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)             # <<<<<<<<<<<<<<
+ * 
+ *             if not is_leaf:
+ */
+    __pyx_t_6 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_tree->__pyx_vtab)->add_node(__pyx_v_tree, __pyx_v_parent, __pyx_v_is_left, __pyx_v_is_leaf, __pyx_v_feature, __pyx_v_value, __pyx_v_depth, __pyx_v_samples, (&__pyx_v_meta)); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_v_node_id = __pyx_t_6;
+
+    /* "cedar/_tree.pyx":251
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
+ * 
+ *             if not is_leaf:             # <<<<<<<<<<<<<<
+ * 
+ *                 # Push right child on stack
+ */
+    __pyx_t_7 = ((!(__pyx_v_is_leaf != 0)) != 0);
+    if (__pyx_t_7) {
+
+      /* "cedar/_tree.pyx":256
+ *                 # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
+ *                 #        split.right_count, split.n_features)
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,             # <<<<<<<<<<<<<<
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:
+ */
+      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, (__pyx_v_depth + 1), __pyx_v_node_id, __pyx_v_meta.p, 0, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.features, __pyx_v_split.n_features);
+
+      /* "cedar/_tree.pyx":258
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:             # <<<<<<<<<<<<<<
+ *                     break
+ * 
+ */
+      __pyx_t_7 = ((__pyx_v_rc == -1L) != 0);
+      if (__pyx_t_7) {
+
+        /* "cedar/_tree.pyx":259
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:
+ *                     break             # <<<<<<<<<<<<<<
+ * 
+ *                 # Push left child on stack
+ */
+        goto __pyx_L6_break;
+
+        /* "cedar/_tree.pyx":258
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:             # <<<<<<<<<<<<<<
+ *                     break
+ * 
+ */
+      }
+
+      /* "cedar/_tree.pyx":264
+ *                 # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
+ *                 #        split.left_count, split.n_features)
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,             # <<<<<<<<<<<<<<
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:
+ */
+      __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_6_utils_Stack *)__pyx_v_stack->__pyx_vtab)->push(__pyx_v_stack, (__pyx_v_depth + 1), __pyx_v_node_id, __pyx_v_meta.p, 1, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.features, __pyx_v_split.n_features);
+
+      /* "cedar/_tree.pyx":266
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:             # <<<<<<<<<<<<<<
+ *                     break
+ * 
+ */
+      __pyx_t_7 = ((__pyx_v_rc == -1L) != 0);
+      if (__pyx_t_7) {
+
+        /* "cedar/_tree.pyx":267
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:
+ *                     break             # <<<<<<<<<<<<<<
+ * 
+ *             # clean up
+ */
+        goto __pyx_L6_break;
+
+        /* "cedar/_tree.pyx":266
+ *                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,
+ *                                 split.features, split.n_features)
+ *                 if rc == -1:             # <<<<<<<<<<<<<<
+ *                     break
+ * 
+ */
+      }
+
+      /* "cedar/_tree.pyx":251
+ *             node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
+ * 
+ *             if not is_leaf:             # <<<<<<<<<<<<<<
+ * 
+ *                 # Push right child on stack
+ */
+    }
+
+    /* "cedar/_tree.pyx":270
+ * 
+ *             # clean up
+ *             if not is_leaf:             # <<<<<<<<<<<<<<
+ *                 free(samples)
+ * 
+ */
+    __pyx_t_7 = ((!(__pyx_v_is_leaf != 0)) != 0);
+    if (__pyx_t_7) {
+
+      /* "cedar/_tree.pyx":271
+ *             # clean up
+ *             if not is_leaf:
+ *                 free(samples)             # <<<<<<<<<<<<<<
+ * 
+ *         if rc == -1:
+ */
+      free(__pyx_v_samples);
+
+      /* "cedar/_tree.pyx":270
+ * 
+ *             # clean up
+ *             if not is_leaf:             # <<<<<<<<<<<<<<
+ *                 free(samples)
+ * 
+ */
+    }
+  }
+  __pyx_L6_break:;
+
+  /* "cedar/_tree.pyx":273
+ *                 free(samples)
+ * 
+ *         if rc == -1:             # <<<<<<<<<<<<<<
+ *             raise MemoryError()
+ * 
+ */
+  __pyx_t_7 = ((__pyx_v_rc == -1L) != 0);
+  if (unlikely(__pyx_t_7)) {
+
+    /* "cedar/_tree.pyx":274
+ * 
+ *         if rc == -1:
+ *             raise MemoryError()             # <<<<<<<<<<<<<<
+ * 
+ *     @cython.boundscheck(False)
+ */
+    PyErr_NoMemory(); __PYX_ERR(0, 274, __pyx_L1_error)
+
+    /* "cedar/_tree.pyx":273
+ *                 free(samples)
+ * 
+ *         if rc == -1:             # <<<<<<<<<<<<<<
+ *             raise MemoryError()
+ * 
+ */
+  }
+
+  /* "cedar/_tree.pyx":182
+ *             raise MemoryError()
+ * 
+ *     cdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,             # <<<<<<<<<<<<<<
+ *                             int node_id, int depth, int parent, double parent_p,
+ *                             bint is_left, int* samples, int* features, int n_features):
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_10, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_11, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
+  __Pyx_WriteUnraisable("cedar._tree._TreeBuilder.build_at_node", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_splitter);
+  __Pyx_XDECREF((PyObject *)__pyx_v_stack);
+  __Pyx_XDECREF(__pyx_v_X);
+  __Pyx_XDECREF((PyObject *)__pyx_v_y);
+  __Pyx_XDECREF((PyObject *)__pyx_v_f);
+  __Pyx_RefNannyFinishContext();
+}
+
+/* "cedar/_tree.pyx":279
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
  *     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:             # <<<<<<<<<<<<<<
@@ -4556,7 +5015,7 @@ static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED str
   int __pyx_t_3;
   Py_ssize_t __pyx_t_4;
 
-  /* "cedar/_tree.pyx":207
+  /* "cedar/_tree.pyx":280
  *     @cython.cdivision(True)
  *     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:
  *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
@@ -4565,7 +5024,7 @@ static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED str
  */
   __pyx_v_pos_count = 0;
 
-  /* "cedar/_tree.pyx":210
+  /* "cedar/_tree.pyx":283
  *         cdef int i
  * 
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -4577,7 +5036,7 @@ static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED str
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cedar/_tree.pyx":211
+    /* "cedar/_tree.pyx":284
  * 
  *         for i in range(n_samples):
  *             pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
@@ -4588,7 +5047,7 @@ static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED str
     __pyx_v_pos_count = (__pyx_v_pos_count + (*((int *) ( /* dim=0 */ ((char *) (((int *) __pyx_v_y.data) + __pyx_t_4)) ))));
   }
 
-  /* "cedar/_tree.pyx":213
+  /* "cedar/_tree.pyx":286
  *             pos_count += y[samples[i]]
  * 
  *         meta.pos_count = pos_count             # <<<<<<<<<<<<<<
@@ -4597,7 +5056,7 @@ static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED str
  */
   __pyx_v_meta->pos_count = __pyx_v_pos_count;
 
-  /* "cedar/_tree.pyx":214
+  /* "cedar/_tree.pyx":287
  * 
  *         meta.pos_count = pos_count
  *         return pos_count / <double> n_samples             # <<<<<<<<<<<<<<
@@ -4607,7 +5066,7 @@ static double __pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value(CYTHON_UNUSED str
   __pyx_r = (((double)__pyx_v_pos_count) / ((double)__pyx_v_n_samples));
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":206
+  /* "cedar/_tree.pyx":279
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
  *     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:             # <<<<<<<<<<<<<<
@@ -4727,7 +5186,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_6__setstate_cython__(CYTH
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":224
+/* "cedar/_tree.pyx":297
  * 
  *     property n_nodes:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4754,7 +5213,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_7n_nodes___get__(struct __pyx_obj
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":225
+  /* "cedar/_tree.pyx":298
  *     property n_nodes:
  *         def __get__(self):
  *             return self.node_count             # <<<<<<<<<<<<<<
@@ -4762,13 +5221,13 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_7n_nodes___get__(struct __pyx_obj
  *     property values:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->node_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->node_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":224
+  /* "cedar/_tree.pyx":297
  * 
  *     property n_nodes:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4787,7 +5246,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_7n_nodes___get__(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":228
+/* "cedar/_tree.pyx":301
  * 
  *     property values:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4815,24 +5274,24 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6values___get__(struct __pyx_obj_
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":229
+  /* "cedar/_tree.pyx":302
  *     property values:
  *         def __get__(self):
  *             return self._get_double_ndarray(self.values)[:self.node_count]             # <<<<<<<<<<<<<<
  * 
- *     property chosen_features:
+ *     property p:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_double_ndarray(__pyx_v_self, __pyx_v_self->values)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_double_ndarray(__pyx_v_self, __pyx_v_self->values)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":228
+  /* "cedar/_tree.pyx":301
  * 
  *     property values:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4852,7 +5311,72 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6values___get__(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":232
+/* "cedar/_tree.pyx":305
+ * 
+ *     property p:
+ *         def __get__(self):             # <<<<<<<<<<<<<<
+ *             return self._get_double_ndarray(self.p)[:self.node_count]
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_1p_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_1p_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5cedar_5_tree_5_Tree_1p___get__(((struct __pyx_obj_5cedar_5_tree__Tree *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_1p___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "cedar/_tree.pyx":306
+ *     property p:
+ *         def __get__(self):
+ *             return self._get_double_ndarray(self.p)[:self.node_count]             # <<<<<<<<<<<<<<
+ * 
+ *     property chosen_features:
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_double_ndarray(__pyx_v_self, __pyx_v_self->p)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 306, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* "cedar/_tree.pyx":305
+ * 
+ *     property p:
+ *         def __get__(self):             # <<<<<<<<<<<<<<
+ *             return self._get_double_ndarray(self.p)[:self.node_count]
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("cedar._tree._Tree.p.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cedar/_tree.pyx":309
  * 
  *     property chosen_features:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4880,7 +5404,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_15chosen_features___get__(struct 
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":233
+  /* "cedar/_tree.pyx":310
  *     property chosen_features:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.chosen_features)[:self.node_count]             # <<<<<<<<<<<<<<
@@ -4888,16 +5412,16 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_15chosen_features___get__(struct 
  *     property left_children:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->chosen_features)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->chosen_features)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":232
+  /* "cedar/_tree.pyx":309
  * 
  *     property chosen_features:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4917,7 +5441,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_15chosen_features___get__(struct 
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":236
+/* "cedar/_tree.pyx":313
  * 
  *     property left_children:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4945,7 +5469,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_13left_children___get__(struct __
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":237
+  /* "cedar/_tree.pyx":314
  *     property left_children:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.left_children)[:self.node_count]             # <<<<<<<<<<<<<<
@@ -4953,16 +5477,16 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_13left_children___get__(struct __
  *     property right_children:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->left_children)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->left_children)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":236
+  /* "cedar/_tree.pyx":313
  * 
  *     property left_children:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -4982,7 +5506,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_13left_children___get__(struct __
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":240
+/* "cedar/_tree.pyx":317
  * 
  *     property right_children:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5010,24 +5534,24 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14right_children___get__(struct _
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":241
+  /* "cedar/_tree.pyx":318
  *     property right_children:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.right_children)[:self.node_count]             # <<<<<<<<<<<<<<
  * 
- *     # metadata
+ *     property depth:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->right_children)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->right_children)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":240
+  /* "cedar/_tree.pyx":317
  * 
  *     property right_children:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5047,7 +5571,72 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14right_children___get__(struct _
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":245
+/* "cedar/_tree.pyx":321
+ * 
+ *     property depth:
+ *         def __get__(self):             # <<<<<<<<<<<<<<
+ *             return self._get_int_ndarray(self.depth)[:self.node_count]
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_5depth_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_5depth_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5cedar_5_tree_5_Tree_5depth___get__(((struct __pyx_obj_5cedar_5_tree__Tree *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_5depth___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "cedar/_tree.pyx":322
+ *     property depth:
+ *         def __get__(self):
+ *             return self._get_int_ndarray(self.depth)[:self.node_count]             # <<<<<<<<<<<<<<
+ * 
+ *     # metadata
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->depth)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* "cedar/_tree.pyx":321
+ * 
+ *     property depth:
+ *         def __get__(self):             # <<<<<<<<<<<<<<
+ *             return self._get_int_ndarray(self.depth)[:self.node_count]
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("cedar._tree._Tree.depth.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cedar/_tree.pyx":326
  *     # metadata
  *     property counts:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5075,7 +5664,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6counts___get__(struct __pyx_obj_
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":246
+  /* "cedar/_tree.pyx":327
  *     property counts:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.count)[:self.node_count]             # <<<<<<<<<<<<<<
@@ -5083,16 +5672,16 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6counts___get__(struct __pyx_obj_
  *     property pos_counts:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":245
+  /* "cedar/_tree.pyx":326
  *     # metadata
  *     property counts:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5112,7 +5701,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6counts___get__(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":249
+/* "cedar/_tree.pyx":330
  * 
  *     property pos_counts:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5140,7 +5729,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10pos_counts___get__(struct __pyx
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":250
+  /* "cedar/_tree.pyx":331
  *     property pos_counts:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.pos_count)[:self.node_count]             # <<<<<<<<<<<<<<
@@ -5148,16 +5737,16 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10pos_counts___get__(struct __pyx
  *     property feature_counts:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->pos_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->pos_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":249
+  /* "cedar/_tree.pyx":330
  * 
  *     property pos_counts:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5177,7 +5766,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10pos_counts___get__(struct __pyx
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":253
+/* "cedar/_tree.pyx":334
  * 
  *     property feature_counts:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5205,7 +5794,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14feature_counts___get__(struct _
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_tree.pyx":254
+  /* "cedar/_tree.pyx":335
  *     property feature_counts:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.feature_count)[:self.node_count]             # <<<<<<<<<<<<<<
@@ -5213,16 +5802,16 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14feature_counts___get__(struct _
  *     cpdef np.ndarray _get_left_counts(self, node_id):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->feature_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->feature_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 335, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, __pyx_v_self->node_count, NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 335, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":253
+  /* "cedar/_tree.pyx":334
  * 
  *     property feature_counts:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -5242,7 +5831,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_14feature_counts___get__(struct _
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":256
+/* "cedar/_tree.pyx":337
  *             return self._get_int_ndarray(self.feature_count)[:self.node_count]
  * 
  *     cpdef np.ndarray _get_left_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5269,7 +5858,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_left_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_left_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_1_get_left_counts)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -5286,10 +5875,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_node_id) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_node_id);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 256, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 337, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5308,7 +5897,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx
     #endif
   }
 
-  /* "cedar/_tree.pyx":257
+  /* "cedar/_tree.pyx":338
  * 
  *     cpdef np.ndarray _get_left_counts(self, node_id):
  *         return self._get_int_ndarray(self.left_counts[node_id])[:self.feature_count[node_id]]             # <<<<<<<<<<<<<<
@@ -5316,19 +5905,19 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx
  *     cpdef np.ndarray _get_left_pos_counts(self, node_id):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L1_error)
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->left_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 338, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->left_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 338, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 338, __pyx_L1_error)
   __pyx_r = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":256
+  /* "cedar/_tree.pyx":337
  *             return self._get_int_ndarray(self.feature_count)[:self.node_count]
  * 
  *     cpdef np.ndarray _get_left_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5369,7 +5958,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx_obj
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_left_counts", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_left_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5386,7 +5975,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree__get_left_counts(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":259
+/* "cedar/_tree.pyx":340
  *         return self._get_int_ndarray(self.left_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_left_pos_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5413,7 +6002,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(struct _
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_left_pos_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_left_pos_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_3_get_left_pos_counts)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -5430,10 +6019,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(struct _
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_node_id) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_node_id);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 259, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 340, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5452,7 +6041,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(struct _
     #endif
   }
 
-  /* "cedar/_tree.pyx":260
+  /* "cedar/_tree.pyx":341
  * 
  *     cpdef np.ndarray _get_left_pos_counts(self, node_id):
  *         return self._get_int_ndarray(self.left_pos_counts[node_id])[:self.feature_count[node_id]]             # <<<<<<<<<<<<<<
@@ -5460,19 +6049,19 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(struct _
  *     cpdef np.ndarray _get_right_counts(self, node_id):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 260, __pyx_L1_error)
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->left_pos_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 341, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->left_pos_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 341, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 260, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 341, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 260, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 341, __pyx_L1_error)
   __pyx_r = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":259
+  /* "cedar/_tree.pyx":340
  *         return self._get_int_ndarray(self.left_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_left_pos_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5513,7 +6102,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_2_get_left_pos_counts(struct __py
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_left_pos_counts", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_left_pos_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5530,7 +6119,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_2_get_left_pos_counts(struct __py
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":262
+/* "cedar/_tree.pyx":343
  *         return self._get_int_ndarray(self.left_pos_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_right_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5557,7 +6146,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_right_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_right_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_5_get_right_counts)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -5574,10 +6163,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_node_id) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_node_id);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 262, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 343, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5596,7 +6185,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(struct __py
     #endif
   }
 
-  /* "cedar/_tree.pyx":263
+  /* "cedar/_tree.pyx":344
  * 
  *     cpdef np.ndarray _get_right_counts(self, node_id):
  *         return self._get_int_ndarray(self.right_counts[node_id])[:self.feature_count[node_id]]             # <<<<<<<<<<<<<<
@@ -5604,19 +6193,19 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(struct __py
  *     cpdef np.ndarray _get_right_pos_counts(self, node_id):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L1_error)
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->right_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 344, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->right_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 344, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 344, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 344, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 263, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 344, __pyx_L1_error)
   __pyx_r = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":262
+  /* "cedar/_tree.pyx":343
  *         return self._get_int_ndarray(self.left_pos_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_right_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5657,7 +6246,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4_get_right_counts(struct __pyx_o
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_right_counts", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_right_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5674,7 +6263,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4_get_right_counts(struct __pyx_o
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":265
+/* "cedar/_tree.pyx":346
  *         return self._get_int_ndarray(self.right_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_right_pos_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5701,7 +6290,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(struct 
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_right_pos_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_right_pos_counts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_7_get_right_pos_counts)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -5718,10 +6307,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(struct 
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_node_id) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_node_id);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 265, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 346, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5740,7 +6329,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(struct 
     #endif
   }
 
-  /* "cedar/_tree.pyx":266
+  /* "cedar/_tree.pyx":347
  * 
  *     cpdef np.ndarray _get_right_pos_counts(self, node_id):
  *         return self._get_int_ndarray(self.right_pos_counts[node_id])[:self.feature_count[node_id]]             # <<<<<<<<<<<<<<
@@ -5748,19 +6337,19 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(struct 
  *     cpdef np.ndarray _get_features(self, node_id):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 266, __pyx_L1_error)
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->right_pos_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->right_pos_counts[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 266, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 266, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 347, __pyx_L1_error)
   __pyx_r = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":265
+  /* "cedar/_tree.pyx":346
  *         return self._get_int_ndarray(self.right_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_right_pos_counts(self, node_id):             # <<<<<<<<<<<<<<
@@ -5801,7 +6390,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6_get_right_pos_counts(struct __p
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_right_pos_counts", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5818,7 +6407,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6_get_right_pos_counts(struct __p
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":268
+/* "cedar/_tree.pyx":349
  *         return self._get_int_ndarray(self.right_pos_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_features(self, node_id):             # <<<<<<<<<<<<<<
@@ -5845,7 +6434,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_features(struct __pyx_ob
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_9_get_features)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -5862,10 +6451,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_features(struct __pyx_ob
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_node_id) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_node_id);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 268, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 349, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5884,7 +6473,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_features(struct __pyx_ob
     #endif
   }
 
-  /* "cedar/_tree.pyx":269
+  /* "cedar/_tree.pyx":350
  * 
  *     cpdef np.ndarray _get_features(self, node_id):
  *         return self._get_int_ndarray(self.features[node_id])[:self.feature_count[node_id]]             # <<<<<<<<<<<<<<
@@ -5892,19 +6481,19 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_features(struct __pyx_ob
  *     cpdef np.ndarray _get_leaf_samples(self, node_id):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 269, __pyx_L1_error)
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->features[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->features[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 269, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->feature_count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 269, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 350, __pyx_L1_error)
   __pyx_r = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":268
+  /* "cedar/_tree.pyx":349
  *         return self._get_int_ndarray(self.right_pos_counts[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_features(self, node_id):             # <<<<<<<<<<<<<<
@@ -5945,7 +6534,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8_get_features(struct __pyx_obj_5
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_features", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_features(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_features(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5962,7 +6551,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8_get_features(struct __pyx_obj_5
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":271
+/* "cedar/_tree.pyx":352
  *         return self._get_int_ndarray(self.features[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_leaf_samples(self, node_id):             # <<<<<<<<<<<<<<
@@ -5989,7 +6578,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_leaf_samples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_leaf_samples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_11_get_leaf_samples)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -6006,10 +6595,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_node_id) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_node_id);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 271, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 352, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6028,7 +6617,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(struct __py
     #endif
   }
 
-  /* "cedar/_tree.pyx":272
+  /* "cedar/_tree.pyx":353
  * 
  *     cpdef np.ndarray _get_leaf_samples(self, node_id):
  *         return self._get_int_ndarray(self.leaf_samples[node_id])[:self.count[node_id]]             # <<<<<<<<<<<<<<
@@ -6036,19 +6625,19 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(struct __py
  *     def __cinit__(self):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 272, __pyx_L1_error)
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->leaf_samples[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, (__pyx_v_self->leaf_samples[__pyx_t_5]))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 272, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyIndex_AsSsize_t(__pyx_v_node_id); if (unlikely((__pyx_t_5 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, (__pyx_v_self->count[__pyx_t_5]), NULL, NULL, NULL, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 272, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 353, __pyx_L1_error)
   __pyx_r = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":271
+  /* "cedar/_tree.pyx":352
  *         return self._get_int_ndarray(self.features[node_id])[:self.feature_count[node_id]]
  * 
  *     cpdef np.ndarray _get_leaf_samples(self, node_id):             # <<<<<<<<<<<<<<
@@ -6089,7 +6678,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10_get_leaf_samples(struct __pyx_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_leaf_samples", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples(__pyx_v_self, __pyx_v_node_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6106,7 +6695,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10_get_leaf_samples(struct __pyx_
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":274
+/* "cedar/_tree.pyx":355
  *         return self._get_int_ndarray(self.leaf_samples[node_id])[:self.count[node_id]]
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -6135,16 +6724,16 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cedar/_tree.pyx":280
+  /* "cedar/_tree.pyx":361
  * 
  *         # internal data structures
  *         self.max_depth = 0             # <<<<<<<<<<<<<<
  *         self.node_count = 0
  *         self.capacity = 3
  */
-  __pyx_v_self->max_depth = 0;
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_max_depth, __pyx_int_0) < 0) __PYX_ERR(0, 361, __pyx_L1_error)
 
-  /* "cedar/_tree.pyx":281
+  /* "cedar/_tree.pyx":362
  *         # internal data structures
  *         self.max_depth = 0
  *         self.node_count = 0             # <<<<<<<<<<<<<<
@@ -6153,52 +6742,70 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->node_count = 0;
 
-  /* "cedar/_tree.pyx":282
+  /* "cedar/_tree.pyx":363
  *         self.max_depth = 0
  *         self.node_count = 0
  *         self.capacity = 3             # <<<<<<<<<<<<<<
  *         self.values = <double *>malloc(self.capacity * sizeof(double))
- *         self.chosen_features = <int *>malloc(self.capacity * sizeof(int))
+ *         self.p = <double *>malloc(self.capacity * sizeof(double))
  */
   __pyx_v_self->capacity = 3;
 
-  /* "cedar/_tree.pyx":283
+  /* "cedar/_tree.pyx":364
  *         self.node_count = 0
  *         self.capacity = 3
  *         self.values = <double *>malloc(self.capacity * sizeof(double))             # <<<<<<<<<<<<<<
+ *         self.p = <double *>malloc(self.capacity * sizeof(double))
  *         self.chosen_features = <int *>malloc(self.capacity * sizeof(int))
- *         self.left_children = <int *>malloc(self.capacity * sizeof(int))
  */
   __pyx_v_self->values = ((double *)malloc((__pyx_v_self->capacity * (sizeof(double)))));
 
-  /* "cedar/_tree.pyx":284
+  /* "cedar/_tree.pyx":365
  *         self.capacity = 3
  *         self.values = <double *>malloc(self.capacity * sizeof(double))
+ *         self.p = <double *>malloc(self.capacity * sizeof(double))             # <<<<<<<<<<<<<<
+ *         self.chosen_features = <int *>malloc(self.capacity * sizeof(int))
+ *         self.left_children = <int *>malloc(self.capacity * sizeof(int))
+ */
+  __pyx_v_self->p = ((double *)malloc((__pyx_v_self->capacity * (sizeof(double)))));
+
+  /* "cedar/_tree.pyx":366
+ *         self.values = <double *>malloc(self.capacity * sizeof(double))
+ *         self.p = <double *>malloc(self.capacity * sizeof(double))
  *         self.chosen_features = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
  *         self.left_children = <int *>malloc(self.capacity * sizeof(int))
  *         self.right_children = <int *>malloc(self.capacity * sizeof(int))
  */
   __pyx_v_self->chosen_features = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":285
- *         self.values = <double *>malloc(self.capacity * sizeof(double))
+  /* "cedar/_tree.pyx":367
+ *         self.p = <double *>malloc(self.capacity * sizeof(double))
  *         self.chosen_features = <int *>malloc(self.capacity * sizeof(int))
  *         self.left_children = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
  *         self.right_children = <int *>malloc(self.capacity * sizeof(int))
- * 
+ *         self.depth = <int *>malloc(self.capacity * sizeof(int))
  */
   __pyx_v_self->left_children = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":286
+  /* "cedar/_tree.pyx":368
  *         self.chosen_features = <int *>malloc(self.capacity * sizeof(int))
  *         self.left_children = <int *>malloc(self.capacity * sizeof(int))
  *         self.right_children = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
+ *         self.depth = <int *>malloc(self.capacity * sizeof(int))
  * 
- *         # internal metadata
  */
   __pyx_v_self->right_children = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":289
+  /* "cedar/_tree.pyx":369
+ *         self.left_children = <int *>malloc(self.capacity * sizeof(int))
+ *         self.right_children = <int *>malloc(self.capacity * sizeof(int))
+ *         self.depth = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
+ * 
+ *         # internal metadata
+ */
+  __pyx_v_self->depth = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
+
+  /* "cedar/_tree.pyx":372
  * 
  *         # internal metadata
  *         self.count = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6207,7 +6814,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->count = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":290
+  /* "cedar/_tree.pyx":373
  *         # internal metadata
  *         self.count = <int *>malloc(self.capacity * sizeof(int))
  *         self.pos_count = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6216,7 +6823,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->pos_count = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":291
+  /* "cedar/_tree.pyx":374
  *         self.count = <int *>malloc(self.capacity * sizeof(int))
  *         self.pos_count = <int *>malloc(self.capacity * sizeof(int))
  *         self.feature_count = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6225,7 +6832,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->feature_count = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":292
+  /* "cedar/_tree.pyx":375
  *         self.pos_count = <int *>malloc(self.capacity * sizeof(int))
  *         self.feature_count = <int *>malloc(self.capacity * sizeof(int))
  *         self.left_counts = <int **>malloc(self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -6234,7 +6841,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->left_counts = ((int **)malloc((__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":293
+  /* "cedar/_tree.pyx":376
  *         self.feature_count = <int *>malloc(self.capacity * sizeof(int))
  *         self.left_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.left_pos_counts = <int **>malloc(self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -6243,7 +6850,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->left_pos_counts = ((int **)malloc((__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":294
+  /* "cedar/_tree.pyx":377
  *         self.left_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.left_pos_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.right_counts = <int **>malloc(self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -6252,7 +6859,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->right_counts = ((int **)malloc((__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":295
+  /* "cedar/_tree.pyx":378
  *         self.left_pos_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.right_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.right_pos_counts = <int **>malloc(self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -6261,7 +6868,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->right_pos_counts = ((int **)malloc((__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":296
+  /* "cedar/_tree.pyx":379
  *         self.right_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.right_pos_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.features = <int **>malloc(self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -6270,7 +6877,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->features = ((int **)malloc((__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":297
+  /* "cedar/_tree.pyx":380
  *         self.right_pos_counts = <int **>malloc(self.capacity * sizeof(int *))
  *         self.features = <int **>malloc(self.capacity * sizeof(int *))
  *         self.leaf_samples = <int **>malloc(self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -6279,7 +6886,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
  */
   __pyx_v_self->leaf_samples = ((int **)malloc((__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":274
+  /* "cedar/_tree.pyx":355
  *         return self._get_int_ndarray(self.leaf_samples[node_id])[:self.count[node_id]]
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -6289,11 +6896,16 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_12__cinit__(struct __pyx_obj_5cedar_5_t
 
   /* function exit code */
   __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("cedar._tree._Tree.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":299
+/* "cedar/_tree.pyx":382
  *         self.leaf_samples = <int **>malloc(self.capacity * sizeof(int *))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -6316,44 +6928,62 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cedar/_tree.pyx":303
+  /* "cedar/_tree.pyx":386
  *         Destructor.
  *         """
  *         free(self.values)             # <<<<<<<<<<<<<<
+ *         free(self.p)
  *         free(self.chosen_features)
- *         free(self.left_children)
  */
   free(__pyx_v_self->values);
 
-  /* "cedar/_tree.pyx":304
+  /* "cedar/_tree.pyx":387
  *         """
  *         free(self.values)
+ *         free(self.p)             # <<<<<<<<<<<<<<
+ *         free(self.chosen_features)
+ *         free(self.left_children)
+ */
+  free(__pyx_v_self->p);
+
+  /* "cedar/_tree.pyx":388
+ *         free(self.values)
+ *         free(self.p)
  *         free(self.chosen_features)             # <<<<<<<<<<<<<<
  *         free(self.left_children)
  *         free(self.right_children)
  */
   free(__pyx_v_self->chosen_features);
 
-  /* "cedar/_tree.pyx":305
- *         free(self.values)
+  /* "cedar/_tree.pyx":389
+ *         free(self.p)
  *         free(self.chosen_features)
  *         free(self.left_children)             # <<<<<<<<<<<<<<
  *         free(self.right_children)
- * 
+ *         free(self.depth)
  */
   free(__pyx_v_self->left_children);
 
-  /* "cedar/_tree.pyx":306
+  /* "cedar/_tree.pyx":390
  *         free(self.chosen_features)
  *         free(self.left_children)
  *         free(self.right_children)             # <<<<<<<<<<<<<<
+ *         free(self.depth)
  * 
- *         free(self.count)
  */
   free(__pyx_v_self->right_children);
 
-  /* "cedar/_tree.pyx":308
+  /* "cedar/_tree.pyx":391
+ *         free(self.left_children)
  *         free(self.right_children)
+ *         free(self.depth)             # <<<<<<<<<<<<<<
+ * 
+ *         free(self.count)
+ */
+  free(__pyx_v_self->depth);
+
+  /* "cedar/_tree.pyx":393
+ *         free(self.depth)
  * 
  *         free(self.count)             # <<<<<<<<<<<<<<
  *         free(self.pos_count)
@@ -6361,7 +6991,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->count);
 
-  /* "cedar/_tree.pyx":309
+  /* "cedar/_tree.pyx":394
  * 
  *         free(self.count)
  *         free(self.pos_count)             # <<<<<<<<<<<<<<
@@ -6370,7 +7000,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->pos_count);
 
-  /* "cedar/_tree.pyx":310
+  /* "cedar/_tree.pyx":395
  *         free(self.count)
  *         free(self.pos_count)
  *         free(self.feature_count)             # <<<<<<<<<<<<<<
@@ -6379,7 +7009,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->feature_count);
 
-  /* "cedar/_tree.pyx":311
+  /* "cedar/_tree.pyx":396
  *         free(self.pos_count)
  *         free(self.feature_count)
  *         free(self.left_counts)             # <<<<<<<<<<<<<<
@@ -6388,7 +7018,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->left_counts);
 
-  /* "cedar/_tree.pyx":312
+  /* "cedar/_tree.pyx":397
  *         free(self.feature_count)
  *         free(self.left_counts)
  *         free(self.left_pos_counts)             # <<<<<<<<<<<<<<
@@ -6397,7 +7027,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->left_pos_counts);
 
-  /* "cedar/_tree.pyx":313
+  /* "cedar/_tree.pyx":398
  *         free(self.left_counts)
  *         free(self.left_pos_counts)
  *         free(self.right_counts)             # <<<<<<<<<<<<<<
@@ -6406,7 +7036,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->right_counts);
 
-  /* "cedar/_tree.pyx":314
+  /* "cedar/_tree.pyx":399
  *         free(self.left_pos_counts)
  *         free(self.right_counts)
  *         free(self.right_pos_counts)             # <<<<<<<<<<<<<<
@@ -6415,7 +7045,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->right_pos_counts);
 
-  /* "cedar/_tree.pyx":315
+  /* "cedar/_tree.pyx":400
  *         free(self.right_counts)
  *         free(self.right_pos_counts)
  *         free(self.features)             # <<<<<<<<<<<<<<
@@ -6424,7 +7054,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
  */
   free(__pyx_v_self->features);
 
-  /* "cedar/_tree.pyx":299
+  /* "cedar/_tree.pyx":382
  *         self.leaf_samples = <int **>malloc(self.capacity * sizeof(int *))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -6436,23 +7066,24 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_14__dealloc__(struct __pyx_obj_5cedar_
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cedar/_tree.pyx":317
+/* "cedar/_tree.pyx":402
  *         free(self.features)
  * 
  *     cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,             # <<<<<<<<<<<<<<
- *                       double value, int* samples, Meta* meta) nogil except -1:
+ *                       double value, int depth, int* samples, Meta* meta) nogil except -1:
  * 
  */
 
-static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_v_parent, int __pyx_v_is_left, int __pyx_v_is_leaf, int __pyx_v_feature, double __pyx_v_value, int *__pyx_v_samples, struct __pyx_t_5cedar_9_splitter_Meta *__pyx_v_meta) {
+static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_v_parent, int __pyx_v_is_left, int __pyx_v_is_leaf, int __pyx_v_feature, double __pyx_v_value, int __pyx_v_depth, int *__pyx_v_samples, struct __pyx_t_5cedar_9_splitter_Meta *__pyx_v_meta) {
   int __pyx_v_node_id;
   int __pyx_r;
   int __pyx_t_1;
   int __pyx_t_2;
-  int *__pyx_t_3;
+  double __pyx_t_3;
+  int *__pyx_t_4;
 
-  /* "cedar/_tree.pyx":320
- *                       double value, int* samples, Meta* meta) nogil except -1:
+  /* "cedar/_tree.pyx":405
+ *                       double value, int depth, int* samples, Meta* meta) nogil except -1:
  * 
  *         cdef int node_id = self.node_count             # <<<<<<<<<<<<<<
  * 
@@ -6461,7 +7092,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
   __pyx_t_1 = __pyx_v_self->node_count;
   __pyx_v_node_id = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":322
+  /* "cedar/_tree.pyx":407
  *         cdef int node_id = self.node_count
  * 
  *         if node_id >= self.capacity:             # <<<<<<<<<<<<<<
@@ -6471,16 +7102,16 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
   __pyx_t_2 = ((__pyx_v_node_id >= __pyx_v_self->capacity) != 0);
   if (__pyx_t_2) {
 
-    /* "cedar/_tree.pyx":324
+    /* "cedar/_tree.pyx":409
  *         if node_id >= self.capacity:
  *             # printf("resizing\n")
  *             self._resize()             # <<<<<<<<<<<<<<
  *             # printf("done resizing\n")
  * 
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_resize(__pyx_v_self, NULL); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 324, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_resize(__pyx_v_self, NULL); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 409, __pyx_L1_error)
 
-    /* "cedar/_tree.pyx":322
+    /* "cedar/_tree.pyx":407
  *         cdef int node_id = self.node_count
  * 
  *         if node_id >= self.capacity:             # <<<<<<<<<<<<<<
@@ -6489,28 +7120,37 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
   }
 
-  /* "cedar/_tree.pyx":327
+  /* "cedar/_tree.pyx":412
  *             # printf("done resizing\n")
  * 
  *         self.count[node_id] = meta.count             # <<<<<<<<<<<<<<
  *         self.pos_count[node_id] = meta.pos_count
- * 
+ *         self.depth[node_id] = depth
  */
   __pyx_t_1 = __pyx_v_meta->count;
   (__pyx_v_self->count[__pyx_v_node_id]) = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":328
+  /* "cedar/_tree.pyx":413
  * 
  *         self.count[node_id] = meta.count
  *         self.pos_count[node_id] = meta.pos_count             # <<<<<<<<<<<<<<
+ *         self.depth[node_id] = depth
  * 
- *         if parent != _TREE_UNDEFINED:
  */
   __pyx_t_1 = __pyx_v_meta->pos_count;
   (__pyx_v_self->pos_count[__pyx_v_node_id]) = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":330
+  /* "cedar/_tree.pyx":414
+ *         self.count[node_id] = meta.count
  *         self.pos_count[node_id] = meta.pos_count
+ *         self.depth[node_id] = depth             # <<<<<<<<<<<<<<
+ * 
+ *         if parent != _TREE_UNDEFINED:
+ */
+  (__pyx_v_self->depth[__pyx_v_node_id]) = __pyx_v_depth;
+
+  /* "cedar/_tree.pyx":416
+ *         self.depth[node_id] = depth
  * 
  *         if parent != _TREE_UNDEFINED:             # <<<<<<<<<<<<<<
  *             if is_left:
@@ -6519,7 +7159,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
   __pyx_t_2 = ((__pyx_v_parent != __pyx_v_5cedar_5_tree__TREE_UNDEFINED) != 0);
   if (__pyx_t_2) {
 
-    /* "cedar/_tree.pyx":331
+    /* "cedar/_tree.pyx":417
  * 
  *         if parent != _TREE_UNDEFINED:
  *             if is_left:             # <<<<<<<<<<<<<<
@@ -6529,7 +7169,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
     __pyx_t_2 = (__pyx_v_is_left != 0);
     if (__pyx_t_2) {
 
-      /* "cedar/_tree.pyx":332
+      /* "cedar/_tree.pyx":418
  *         if parent != _TREE_UNDEFINED:
  *             if is_left:
  *                 self.left_children[parent] = node_id             # <<<<<<<<<<<<<<
@@ -6538,7 +7178,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
       (__pyx_v_self->left_children[__pyx_v_parent]) = __pyx_v_node_id;
 
-      /* "cedar/_tree.pyx":331
+      /* "cedar/_tree.pyx":417
  * 
  *         if parent != _TREE_UNDEFINED:
  *             if is_left:             # <<<<<<<<<<<<<<
@@ -6548,7 +7188,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
       goto __pyx_L5;
     }
 
-    /* "cedar/_tree.pyx":334
+    /* "cedar/_tree.pyx":420
  *                 self.left_children[parent] = node_id
  *             else:
  *                 self.right_children[parent] = node_id             # <<<<<<<<<<<<<<
@@ -6560,8 +7200,8 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
     }
     __pyx_L5:;
 
-    /* "cedar/_tree.pyx":330
- *         self.pos_count[node_id] = meta.pos_count
+    /* "cedar/_tree.pyx":416
+ *         self.depth[node_id] = depth
  * 
  *         if parent != _TREE_UNDEFINED:             # <<<<<<<<<<<<<<
  *             if is_left:
@@ -6569,36 +7209,45 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
   }
 
-  /* "cedar/_tree.pyx":336
+  /* "cedar/_tree.pyx":422
  *                 self.right_children[parent] = node_id
  * 
  *         if is_leaf:             # <<<<<<<<<<<<<<
  *             self.values[node_id] = value
- *             self.chosen_features[node_id] = _TREE_UNDEFINED
+ *             self.p[node_id] = _TREE_UNDEFINED
  */
   __pyx_t_2 = (__pyx_v_is_leaf != 0);
   if (__pyx_t_2) {
 
-    /* "cedar/_tree.pyx":337
+    /* "cedar/_tree.pyx":423
  * 
  *         if is_leaf:
  *             self.values[node_id] = value             # <<<<<<<<<<<<<<
+ *             self.p[node_id] = _TREE_UNDEFINED
  *             self.chosen_features[node_id] = _TREE_UNDEFINED
- *             self.left_children[node_id] = _TREE_LEAF
  */
     (__pyx_v_self->values[__pyx_v_node_id]) = __pyx_v_value;
 
-    /* "cedar/_tree.pyx":338
+    /* "cedar/_tree.pyx":424
  *         if is_leaf:
  *             self.values[node_id] = value
+ *             self.p[node_id] = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
+ *             self.chosen_features[node_id] = _TREE_UNDEFINED
+ *             self.left_children[node_id] = _TREE_LEAF
+ */
+    (__pyx_v_self->p[__pyx_v_node_id]) = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
+
+    /* "cedar/_tree.pyx":425
+ *             self.values[node_id] = value
+ *             self.p[node_id] = _TREE_UNDEFINED
  *             self.chosen_features[node_id] = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
  *             self.left_children[node_id] = _TREE_LEAF
  *             self.right_children[node_id] = _TREE_LEAF
  */
     (__pyx_v_self->chosen_features[__pyx_v_node_id]) = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
 
-    /* "cedar/_tree.pyx":339
- *             self.values[node_id] = value
+    /* "cedar/_tree.pyx":426
+ *             self.p[node_id] = _TREE_UNDEFINED
  *             self.chosen_features[node_id] = _TREE_UNDEFINED
  *             self.left_children[node_id] = _TREE_LEAF             # <<<<<<<<<<<<<<
  *             self.right_children[node_id] = _TREE_LEAF
@@ -6606,7 +7255,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
     (__pyx_v_self->left_children[__pyx_v_node_id]) = __pyx_v_5cedar_5_tree__TREE_LEAF;
 
-    /* "cedar/_tree.pyx":340
+    /* "cedar/_tree.pyx":427
  *             self.chosen_features[node_id] = _TREE_UNDEFINED
  *             self.left_children[node_id] = _TREE_LEAF
  *             self.right_children[node_id] = _TREE_LEAF             # <<<<<<<<<<<<<<
@@ -6615,7 +7264,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
     (__pyx_v_self->right_children[__pyx_v_node_id]) = __pyx_v_5cedar_5_tree__TREE_LEAF;
 
-    /* "cedar/_tree.pyx":342
+    /* "cedar/_tree.pyx":429
  *             self.right_children[node_id] = _TREE_LEAF
  * 
  *             self.leaf_samples[node_id] = samples             # <<<<<<<<<<<<<<
@@ -6624,7 +7273,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
     (__pyx_v_self->leaf_samples[__pyx_v_node_id]) = __pyx_v_samples;
 
-    /* "cedar/_tree.pyx":343
+    /* "cedar/_tree.pyx":430
  * 
  *             self.leaf_samples[node_id] = samples
  *             self.feature_count[node_id] = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
@@ -6633,76 +7282,86 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
     (__pyx_v_self->feature_count[__pyx_v_node_id]) = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
 
-    /* "cedar/_tree.pyx":336
+    /* "cedar/_tree.pyx":422
  *                 self.right_children[parent] = node_id
  * 
  *         if is_leaf:             # <<<<<<<<<<<<<<
  *             self.values[node_id] = value
- *             self.chosen_features[node_id] = _TREE_UNDEFINED
+ *             self.p[node_id] = _TREE_UNDEFINED
  */
     goto __pyx_L6;
   }
 
-  /* "cedar/_tree.pyx":346
+  /* "cedar/_tree.pyx":433
  *         else:
  *             # children will be set later
  *             self.values[node_id] = _TREE_UNDEFINED             # <<<<<<<<<<<<<<
+ *             self.p[node_id] = meta.p
  *             self.chosen_features[node_id] = feature
- * 
  */
   /*else*/ {
     (__pyx_v_self->values[__pyx_v_node_id]) = __pyx_v_5cedar_5_tree__TREE_UNDEFINED;
 
-    /* "cedar/_tree.pyx":347
+    /* "cedar/_tree.pyx":434
  *             # children will be set later
  *             self.values[node_id] = _TREE_UNDEFINED
+ *             self.p[node_id] = meta.p             # <<<<<<<<<<<<<<
+ *             self.chosen_features[node_id] = feature
+ * 
+ */
+    __pyx_t_3 = __pyx_v_meta->p;
+    (__pyx_v_self->p[__pyx_v_node_id]) = __pyx_t_3;
+
+    /* "cedar/_tree.pyx":435
+ *             self.values[node_id] = _TREE_UNDEFINED
+ *             self.p[node_id] = meta.p
  *             self.chosen_features[node_id] = feature             # <<<<<<<<<<<<<<
  * 
  *             self.left_counts[node_id] = meta.left_counts
  */
     (__pyx_v_self->chosen_features[__pyx_v_node_id]) = __pyx_v_feature;
 
-    /* "cedar/_tree.pyx":349
+    /* "cedar/_tree.pyx":437
  *             self.chosen_features[node_id] = feature
  * 
  *             self.left_counts[node_id] = meta.left_counts             # <<<<<<<<<<<<<<
  *             self.left_pos_counts[node_id] = meta.left_pos_counts
  *             self.right_counts[node_id] = meta.right_counts
  */
-    __pyx_t_3 = __pyx_v_meta->left_counts;
-    (__pyx_v_self->left_counts[__pyx_v_node_id]) = __pyx_t_3;
+    __pyx_t_4 = __pyx_v_meta->left_counts;
+    (__pyx_v_self->left_counts[__pyx_v_node_id]) = __pyx_t_4;
 
-    /* "cedar/_tree.pyx":350
+    /* "cedar/_tree.pyx":438
  * 
  *             self.left_counts[node_id] = meta.left_counts
  *             self.left_pos_counts[node_id] = meta.left_pos_counts             # <<<<<<<<<<<<<<
  *             self.right_counts[node_id] = meta.right_counts
  *             self.right_pos_counts[node_id] = meta.right_pos_counts
  */
-    __pyx_t_3 = __pyx_v_meta->left_pos_counts;
-    (__pyx_v_self->left_pos_counts[__pyx_v_node_id]) = __pyx_t_3;
+    __pyx_t_4 = __pyx_v_meta->left_pos_counts;
+    (__pyx_v_self->left_pos_counts[__pyx_v_node_id]) = __pyx_t_4;
 
-    /* "cedar/_tree.pyx":351
+    /* "cedar/_tree.pyx":439
  *             self.left_counts[node_id] = meta.left_counts
  *             self.left_pos_counts[node_id] = meta.left_pos_counts
  *             self.right_counts[node_id] = meta.right_counts             # <<<<<<<<<<<<<<
  *             self.right_pos_counts[node_id] = meta.right_pos_counts
  *             self.feature_count[node_id] = meta.feature_count
  */
-    __pyx_t_3 = __pyx_v_meta->right_counts;
-    (__pyx_v_self->right_counts[__pyx_v_node_id]) = __pyx_t_3;
+    __pyx_t_4 = __pyx_v_meta->right_counts;
+    (__pyx_v_self->right_counts[__pyx_v_node_id]) = __pyx_t_4;
 
-    /* "cedar/_tree.pyx":352
+    /* "cedar/_tree.pyx":440
  *             self.left_pos_counts[node_id] = meta.left_pos_counts
  *             self.right_counts[node_id] = meta.right_counts
  *             self.right_pos_counts[node_id] = meta.right_pos_counts             # <<<<<<<<<<<<<<
  *             self.feature_count[node_id] = meta.feature_count
  *             self.features[node_id] = meta.features
  */
-    __pyx_t_3 = __pyx_v_meta->right_pos_counts;
-    (__pyx_v_self->right_pos_counts[__pyx_v_node_id]) = __pyx_t_3;
+    __pyx_t_4 = __pyx_v_meta->right_pos_counts;
+    (__pyx_v_self->right_pos_counts[__pyx_v_node_id]) = __pyx_t_4;
 
-    /* "cedar/_tree.pyx":353
+    /* "cedar/_tree.pyx":441
  *             self.right_counts[node_id] = meta.right_counts
  *             self.right_pos_counts[node_id] = meta.right_pos_counts
  *             self.feature_count[node_id] = meta.feature_count             # <<<<<<<<<<<<<<
@@ -6712,19 +7371,19 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
     __pyx_t_1 = __pyx_v_meta->feature_count;
     (__pyx_v_self->feature_count[__pyx_v_node_id]) = __pyx_t_1;
 
-    /* "cedar/_tree.pyx":354
+    /* "cedar/_tree.pyx":442
  *             self.right_pos_counts[node_id] = meta.right_pos_counts
  *             self.feature_count[node_id] = meta.feature_count
  *             self.features[node_id] = meta.features             # <<<<<<<<<<<<<<
  * 
  *         self.node_count += 1
  */
-    __pyx_t_3 = __pyx_v_meta->features;
-    (__pyx_v_self->features[__pyx_v_node_id]) = __pyx_t_3;
+    __pyx_t_4 = __pyx_v_meta->features;
+    (__pyx_v_self->features[__pyx_v_node_id]) = __pyx_t_4;
   }
   __pyx_L6:;
 
-  /* "cedar/_tree.pyx":356
+  /* "cedar/_tree.pyx":444
  *             self.features[node_id] = meta.features
  * 
  *         self.node_count += 1             # <<<<<<<<<<<<<<
@@ -6733,7 +7392,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  */
   __pyx_v_self->node_count = (__pyx_v_self->node_count + 1);
 
-  /* "cedar/_tree.pyx":358
+  /* "cedar/_tree.pyx":446
  *         self.node_count += 1
  * 
  *         return node_id             # <<<<<<<<<<<<<<
@@ -6743,11 +7402,11 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
   __pyx_r = __pyx_v_node_id;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":317
+  /* "cedar/_tree.pyx":402
  *         free(self.features)
  * 
  *     cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,             # <<<<<<<<<<<<<<
- *                       double value, int* samples, Meta* meta) nogil except -1:
+ *                       double value, int depth, int* samples, Meta* meta) nogil except -1:
  * 
  */
 
@@ -6767,7 +7426,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":362
+/* "cedar/_tree.pyx":450
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef np.ndarray predict(self, object X):             # <<<<<<<<<<<<<<
@@ -6815,7 +7474,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_predict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_predict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 450, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_17predict)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
@@ -6832,10 +7491,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_X) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_X);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 450, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 362, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 450, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6854,7 +7513,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
     #endif
   }
 
-  /* "cedar/_tree.pyx":368
+  /* "cedar/_tree.pyx":456
  * 
  *         # Check input
  *         if not isinstance(X, np.ndarray):             # <<<<<<<<<<<<<<
@@ -6865,23 +7524,23 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
   __pyx_t_6 = ((!(__pyx_t_5 != 0)) != 0);
   if (unlikely(__pyx_t_6)) {
 
-    /* "cedar/_tree.pyx":369
+    /* "cedar/_tree.pyx":457
  *         # Check input
  *         if not isinstance(X, np.ndarray):
  *             raise ValueError("X should be in np.ndarray format, got %s" % type(X))             # <<<<<<<<<<<<<<
  * 
  *         if X.dtype != INT:
  */
-    __pyx_t_1 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_X_should_be_in_np_ndarray_format, ((PyObject *)Py_TYPE(__pyx_v_X))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_X_should_be_in_np_ndarray_format, ((PyObject *)Py_TYPE(__pyx_v_X))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 457, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 457, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 369, __pyx_L1_error)
+    __PYX_ERR(0, 457, __pyx_L1_error)
 
-    /* "cedar/_tree.pyx":368
+    /* "cedar/_tree.pyx":456
  * 
  *         # Check input
  *         if not isinstance(X, np.ndarray):             # <<<<<<<<<<<<<<
@@ -6890,44 +7549,44 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
   }
 
-  /* "cedar/_tree.pyx":371
+  /* "cedar/_tree.pyx":459
  *             raise ValueError("X should be in np.ndarray format, got %s" % type(X))
  * 
  *         if X.dtype != INT:             # <<<<<<<<<<<<<<
  *             raise ValueError("X.dtype should be np.int32, got %s" % X.dtype)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_dtype); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_dtype); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_INT); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_INT); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (unlikely(__pyx_t_6)) {
 
-    /* "cedar/_tree.pyx":372
+    /* "cedar/_tree.pyx":460
  * 
  *         if X.dtype != INT:
  *             raise ValueError("X.dtype should be np.int32, got %s" % X.dtype)             # <<<<<<<<<<<<<<
  * 
  *         # Extract input
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_dtype); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_dtype); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 460, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_X_dtype_should_be_np_int32_got_s, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_X_dtype_should_be_np_int32_got_s, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 460, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 460, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 372, __pyx_L1_error)
+    __PYX_ERR(0, 460, __pyx_L1_error)
 
-    /* "cedar/_tree.pyx":371
+    /* "cedar/_tree.pyx":459
  *             raise ValueError("X should be in np.ndarray format, got %s" % type(X))
  * 
  *         if X.dtype != INT:             # <<<<<<<<<<<<<<
@@ -6936,79 +7595,79 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
   }
 
-  /* "cedar/_tree.pyx":375
+  /* "cedar/_tree.pyx":463
  * 
  *         # Extract input
  *         cdef int[:, :] X_ndarray = X             # <<<<<<<<<<<<<<
  *         cdef int n_samples = X.shape[0]
  * 
  */
-  __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_v_X, PyBUF_WRITABLE); if (unlikely(!__pyx_t_7.memview)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_v_X, PyBUF_WRITABLE); if (unlikely(!__pyx_t_7.memview)) __PYX_ERR(0, 463, __pyx_L1_error)
   __pyx_v_X_ndarray = __pyx_t_7;
   __pyx_t_7.memview = NULL;
   __pyx_t_7.data = NULL;
 
-  /* "cedar/_tree.pyx":376
+  /* "cedar/_tree.pyx":464
  *         # Extract input
  *         cdef int[:, :] X_ndarray = X
  *         cdef int n_samples = X.shape[0]             # <<<<<<<<<<<<<<
  * 
  *         # Initialize output
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 376, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_X, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 376, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 376, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 464, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n_samples = __pyx_t_8;
 
-  /* "cedar/_tree.pyx":379
+  /* "cedar/_tree.pyx":467
  * 
  *         # Initialize output
  *         cdef np.ndarray[double] out = np.zeros((n_samples,), dtype=np.double)             # <<<<<<<<<<<<<<
  * 
  *         # incrementers
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_samples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_samples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_double); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_double); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_9) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_9) < 0) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 467, __pyx_L1_error)
   __pyx_t_10 = ((PyArrayObject *)__pyx_t_9);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_out.rcbuffer->pybuffer, (PyObject*)__pyx_t_10, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_out = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_out.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 379, __pyx_L1_error)
+      __PYX_ERR(0, 467, __pyx_L1_error)
     } else {__pyx_pybuffernd_out.diminfo[0].strides = __pyx_pybuffernd_out.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_out.diminfo[0].shape = __pyx_pybuffernd_out.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -7016,7 +7675,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
   __pyx_v_out = ((PyArrayObject *)__pyx_t_9);
   __pyx_t_9 = 0;
 
-  /* "cedar/_tree.pyx":382
+  /* "cedar/_tree.pyx":470
  * 
  *         # incrementers
  *         cdef int i = 0             # <<<<<<<<<<<<<<
@@ -7025,7 +7684,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
   __pyx_v_i = 0;
 
-  /* "cedar/_tree.pyx":385
+  /* "cedar/_tree.pyx":473
  *         cdef int j
  * 
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -7040,7 +7699,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
       #endif
       /*try:*/ {
 
-        /* "cedar/_tree.pyx":387
+        /* "cedar/_tree.pyx":475
  *         with nogil:
  * 
  *             for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -7052,7 +7711,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
           __pyx_v_i = __pyx_t_12;
 
-          /* "cedar/_tree.pyx":388
+          /* "cedar/_tree.pyx":476
  * 
  *             for i in range(n_samples):
  *                 j = 0             # <<<<<<<<<<<<<<
@@ -7061,7 +7720,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
           __pyx_v_j = 0;
 
-          /* "cedar/_tree.pyx":390
+          /* "cedar/_tree.pyx":478
  *                 j = 0
  * 
  *                 while self.values[j] == _TREE_UNDEFINED:             # <<<<<<<<<<<<<<
@@ -7072,7 +7731,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
             __pyx_t_6 = (((__pyx_v_self->values[__pyx_v_j]) == __pyx_v_5cedar_5_tree__TREE_UNDEFINED) != 0);
             if (!__pyx_t_6) break;
 
-            /* "cedar/_tree.pyx":391
+            /* "cedar/_tree.pyx":479
  * 
  *                 while self.values[j] == _TREE_UNDEFINED:
  *                     if X_ndarray[i, self.chosen_features[j]] == 1:             # <<<<<<<<<<<<<<
@@ -7084,7 +7743,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
             __pyx_t_6 = (((*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X_ndarray.data + __pyx_t_13 * __pyx_v_X_ndarray.strides[0]) ) + __pyx_t_14 * __pyx_v_X_ndarray.strides[1]) ))) == 1) != 0);
             if (__pyx_t_6) {
 
-              /* "cedar/_tree.pyx":392
+              /* "cedar/_tree.pyx":480
  *                 while self.values[j] == _TREE_UNDEFINED:
  *                     if X_ndarray[i, self.chosen_features[j]] == 1:
  *                         j = self.left_children[j]             # <<<<<<<<<<<<<<
@@ -7093,7 +7752,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
               __pyx_v_j = (__pyx_v_self->left_children[__pyx_v_j]);
 
-              /* "cedar/_tree.pyx":391
+              /* "cedar/_tree.pyx":479
  * 
  *                 while self.values[j] == _TREE_UNDEFINED:
  *                     if X_ndarray[i, self.chosen_features[j]] == 1:             # <<<<<<<<<<<<<<
@@ -7103,7 +7762,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
               goto __pyx_L12;
             }
 
-            /* "cedar/_tree.pyx":394
+            /* "cedar/_tree.pyx":482
  *                         j = self.left_children[j]
  *                     else:
  *                         j = self.right_children[j]             # <<<<<<<<<<<<<<
@@ -7116,7 +7775,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
             __pyx_L12:;
           }
 
-          /* "cedar/_tree.pyx":396
+          /* "cedar/_tree.pyx":484
  *                         j = self.right_children[j]
  * 
  *                 out[i] = self.values[j]             # <<<<<<<<<<<<<<
@@ -7128,7 +7787,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         }
       }
 
-      /* "cedar/_tree.pyx":385
+      /* "cedar/_tree.pyx":473
  *         cdef int j
  * 
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -7147,7 +7806,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
       }
   }
 
-  /* "cedar/_tree.pyx":398
+  /* "cedar/_tree.pyx":486
  *                 out[i] = self.values[j]
  * 
  *         return out             # <<<<<<<<<<<<<<
@@ -7159,7 +7818,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
   __pyx_r = ((PyArrayObject *)__pyx_v_out);
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":362
+  /* "cedar/_tree.pyx":450
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef np.ndarray predict(self, object X):             # <<<<<<<<<<<<<<
@@ -7214,7 +7873,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_16predict(struct __pyx_obj_5cedar
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("predict", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree_predict(__pyx_v_self, __pyx_v_X, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree_predict(__pyx_v_self, __pyx_v_X, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7231,7 +7890,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_16predict(struct __pyx_obj_5cedar
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":401
+/* "cedar/_tree.pyx":489
  * 
  *     # private
  *     cdef int _resize(self, int capacity=0) nogil except -1:             # <<<<<<<<<<<<<<
@@ -7250,7 +7909,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
     }
   }
 
-  /* "cedar/_tree.pyx":403
+  /* "cedar/_tree.pyx":491
  *     cdef int _resize(self, int capacity=0) nogil except -1:
  * 
  *         if capacity > self.capacity:             # <<<<<<<<<<<<<<
@@ -7260,7 +7919,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
   __pyx_t_1 = ((__pyx_v_capacity > __pyx_v_self->capacity) != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":404
+    /* "cedar/_tree.pyx":492
  * 
  *         if capacity > self.capacity:
  *             self.capacity = int(capacity)             # <<<<<<<<<<<<<<
@@ -7269,7 +7928,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
     __pyx_v_self->capacity = __pyx_v_capacity;
 
-    /* "cedar/_tree.pyx":403
+    /* "cedar/_tree.pyx":491
  *     cdef int _resize(self, int capacity=0) nogil except -1:
  * 
  *         if capacity > self.capacity:             # <<<<<<<<<<<<<<
@@ -7278,7 +7937,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   }
 
-  /* "cedar/_tree.pyx":406
+  /* "cedar/_tree.pyx":494
  *             self.capacity = int(capacity)
  * 
  *         if capacity <= 0 and self.node_count == self.capacity:             # <<<<<<<<<<<<<<
@@ -7296,7 +7955,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":407
+    /* "cedar/_tree.pyx":495
  * 
  *         if capacity <= 0 and self.node_count == self.capacity:
  *             self.capacity *= 2             # <<<<<<<<<<<<<<
@@ -7305,7 +7964,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
     __pyx_v_self->capacity = (__pyx_v_self->capacity * 2);
 
-    /* "cedar/_tree.pyx":406
+    /* "cedar/_tree.pyx":494
  *             self.capacity = int(capacity)
  * 
  *         if capacity <= 0 and self.node_count == self.capacity:             # <<<<<<<<<<<<<<
@@ -7314,43 +7973,61 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   }
 
-  /* "cedar/_tree.pyx":410
+  /* "cedar/_tree.pyx":498
  * 
  *         # tree info
  *         self.values = <double *>realloc(self.values, self.capacity * sizeof(double))             # <<<<<<<<<<<<<<
+ *         self.p = <double *>realloc(self.p, self.capacity * sizeof(double))
  *         self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))
- *         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
  */
   __pyx_v_self->values = ((double *)realloc(__pyx_v_self->values, (__pyx_v_self->capacity * (sizeof(double)))));
 
-  /* "cedar/_tree.pyx":411
+  /* "cedar/_tree.pyx":499
  *         # tree info
  *         self.values = <double *>realloc(self.values, self.capacity * sizeof(double))
+ *         self.p = <double *>realloc(self.p, self.capacity * sizeof(double))             # <<<<<<<<<<<<<<
+ *         self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))
+ *         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
+ */
+  __pyx_v_self->p = ((double *)realloc(__pyx_v_self->p, (__pyx_v_self->capacity * (sizeof(double)))));
+
+  /* "cedar/_tree.pyx":500
+ *         self.values = <double *>realloc(self.values, self.capacity * sizeof(double))
+ *         self.p = <double *>realloc(self.p, self.capacity * sizeof(double))
  *         self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
  *         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
  *         self.right_children = <int *>realloc(self.right_children, self.capacity * sizeof(int))
  */
   __pyx_v_self->chosen_features = ((int *)realloc(__pyx_v_self->chosen_features, (__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":412
- *         self.values = <double *>realloc(self.values, self.capacity * sizeof(double))
+  /* "cedar/_tree.pyx":501
+ *         self.p = <double *>realloc(self.p, self.capacity * sizeof(double))
  *         self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))
  *         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
  *         self.right_children = <int *>realloc(self.right_children, self.capacity * sizeof(int))
- * 
+ *         self.depth = <int *>realloc(self.depth, self.capacity * sizeof(int))
  */
   __pyx_v_self->left_children = ((int *)realloc(__pyx_v_self->left_children, (__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":413
+  /* "cedar/_tree.pyx":502
  *         self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))
  *         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
  *         self.right_children = <int *>realloc(self.right_children, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
+ *         self.depth = <int *>realloc(self.depth, self.capacity * sizeof(int))
  * 
- *         # metadata
  */
   __pyx_v_self->right_children = ((int *)realloc(__pyx_v_self->right_children, (__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":416
+  /* "cedar/_tree.pyx":503
+ *         self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
+ *         self.right_children = <int *>realloc(self.right_children, self.capacity * sizeof(int))
+ *         self.depth = <int *>realloc(self.depth, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
+ * 
+ *         # metadata
+ */
+  __pyx_v_self->depth = ((int *)realloc(__pyx_v_self->depth, (__pyx_v_self->capacity * (sizeof(int)))));
+
+  /* "cedar/_tree.pyx":506
  * 
  *         # metadata
  *         self.count = <int *>realloc(self.count, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -7359,7 +8036,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->count = ((int *)realloc(__pyx_v_self->count, (__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":417
+  /* "cedar/_tree.pyx":507
  *         # metadata
  *         self.count = <int *>realloc(self.count, self.capacity * sizeof(int))
  *         self.pos_count = <int *>realloc(self.pos_count, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -7368,7 +8045,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->pos_count = ((int *)realloc(__pyx_v_self->pos_count, (__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":418
+  /* "cedar/_tree.pyx":508
  *         self.count = <int *>realloc(self.count, self.capacity * sizeof(int))
  *         self.pos_count = <int *>realloc(self.pos_count, self.capacity * sizeof(int))
  *         self.feature_count = <int *>realloc(self.feature_count, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -7377,7 +8054,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->feature_count = ((int *)realloc(__pyx_v_self->feature_count, (__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":419
+  /* "cedar/_tree.pyx":509
  *         self.pos_count = <int *>realloc(self.pos_count, self.capacity * sizeof(int))
  *         self.feature_count = <int *>realloc(self.feature_count, self.capacity * sizeof(int))
  *         self.left_counts = <int **>realloc(self.left_counts, self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -7386,7 +8063,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->left_counts = ((int **)realloc(__pyx_v_self->left_counts, (__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":420
+  /* "cedar/_tree.pyx":510
  *         self.feature_count = <int *>realloc(self.feature_count, self.capacity * sizeof(int))
  *         self.left_counts = <int **>realloc(self.left_counts, self.capacity * sizeof(int *))
  *         self.left_pos_counts = <int **>realloc(self.left_pos_counts, self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -7395,7 +8072,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->left_pos_counts = ((int **)realloc(__pyx_v_self->left_pos_counts, (__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":421
+  /* "cedar/_tree.pyx":511
  *         self.left_counts = <int **>realloc(self.left_counts, self.capacity * sizeof(int *))
  *         self.left_pos_counts = <int **>realloc(self.left_pos_counts, self.capacity * sizeof(int *))
  *         self.right_counts = <int **>realloc(self.right_counts, self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -7404,7 +8081,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->right_counts = ((int **)realloc(__pyx_v_self->right_counts, (__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":422
+  /* "cedar/_tree.pyx":512
  *         self.left_pos_counts = <int **>realloc(self.left_pos_counts, self.capacity * sizeof(int *))
  *         self.right_counts = <int **>realloc(self.right_counts, self.capacity * sizeof(int *))
  *         self.right_pos_counts = <int **>realloc(self.right_pos_counts, self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -7413,7 +8090,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->right_pos_counts = ((int **)realloc(__pyx_v_self->right_pos_counts, (__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":423
+  /* "cedar/_tree.pyx":513
  *         self.right_counts = <int **>realloc(self.right_counts, self.capacity * sizeof(int *))
  *         self.right_pos_counts = <int **>realloc(self.right_pos_counts, self.capacity * sizeof(int *))
  *         self.features = <int **>realloc(self.features, self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -7422,7 +8099,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->features = ((int **)realloc(__pyx_v_self->features, (__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":424
+  /* "cedar/_tree.pyx":514
  *         self.right_pos_counts = <int **>realloc(self.right_pos_counts, self.capacity * sizeof(int *))
  *         self.features = <int **>realloc(self.features, self.capacity * sizeof(int *))
  *         self.leaf_samples = <int **>realloc(self.leaf_samples, self.capacity * sizeof(int *))             # <<<<<<<<<<<<<<
@@ -7431,7 +8108,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
  */
   __pyx_v_self->leaf_samples = ((int **)realloc(__pyx_v_self->leaf_samples, (__pyx_v_self->capacity * (sizeof(int *)))));
 
-  /* "cedar/_tree.pyx":426
+  /* "cedar/_tree.pyx":516
  *         self.leaf_samples = <int **>realloc(self.leaf_samples, self.capacity * sizeof(int *))
  * 
  *         return 0             # <<<<<<<<<<<<<<
@@ -7441,7 +8118,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":401
+  /* "cedar/_tree.pyx":489
  * 
  *     # private
  *     cdef int _resize(self, int capacity=0) nogil except -1:             # <<<<<<<<<<<<<<
@@ -7454,7 +8131,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__resize(struct __pyx_obj_5cedar_5_tree__
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":428
+/* "cedar/_tree.pyx":518
  *         return 0
  * 
  *     cdef np.ndarray _get_double_ndarray(self, double *data):             # <<<<<<<<<<<<<<
@@ -7471,7 +8148,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("_get_double_ndarray", 0);
 
-  /* "cedar/_tree.pyx":434
+  /* "cedar/_tree.pyx":524
  *         """
  *         cdef np.npy_intp shape[1]
  *         shape[0] = self.node_count             # <<<<<<<<<<<<<<
@@ -7481,20 +8158,20 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __
   __pyx_t_1 = __pyx_v_self->node_count;
   (__pyx_v_shape[0]) = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":435
+  /* "cedar/_tree.pyx":525
  *         cdef np.npy_intp shape[1]
  *         shape[0] = self.node_count
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)             # <<<<<<<<<<<<<<
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self
  */
-  __pyx_t_2 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_DOUBLE, __pyx_v_data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
+  __pyx_t_2 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_DOUBLE, __pyx_v_data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 435, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 525, __pyx_L1_error)
   __pyx_v_arr = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "cedar/_tree.pyx":436
+  /* "cedar/_tree.pyx":526
  *         shape[0] = self.node_count
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)
  *         Py_INCREF(self)             # <<<<<<<<<<<<<<
@@ -7503,7 +8180,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __
  */
   Py_INCREF(((PyObject *)__pyx_v_self));
 
-  /* "cedar/_tree.pyx":437
+  /* "cedar/_tree.pyx":527
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self             # <<<<<<<<<<<<<<
@@ -7512,7 +8189,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __
  */
   __pyx_v_arr->base = ((PyObject *)__pyx_v_self);
 
-  /* "cedar/_tree.pyx":438
+  /* "cedar/_tree.pyx":528
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self
  *         return arr             # <<<<<<<<<<<<<<
@@ -7524,7 +8201,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __
   __pyx_r = __pyx_v_arr;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":428
+  /* "cedar/_tree.pyx":518
  *         return 0
  * 
  *     cdef np.ndarray _get_double_ndarray(self, double *data):             # <<<<<<<<<<<<<<
@@ -7544,7 +8221,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray(struct __
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":440
+/* "cedar/_tree.pyx":530
  *         return arr
  * 
  *     cdef np.ndarray _get_int_ndarray(self, int *data):             # <<<<<<<<<<<<<<
@@ -7561,7 +8238,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray(struct __pyx
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("_get_int_ndarray", 0);
 
-  /* "cedar/_tree.pyx":446
+  /* "cedar/_tree.pyx":536
  *         """
  *         cdef np.npy_intp shape[1]
  *         shape[0] = self.node_count             # <<<<<<<<<<<<<<
@@ -7571,20 +8248,20 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray(struct __pyx
   __pyx_t_1 = __pyx_v_self->node_count;
   (__pyx_v_shape[0]) = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":447
+  /* "cedar/_tree.pyx":537
  *         cdef np.npy_intp shape[1]
  *         shape[0] = self.node_count
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)             # <<<<<<<<<<<<<<
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self
  */
-  __pyx_t_2 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_INT, __pyx_v_data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 447, __pyx_L1_error)
+  __pyx_t_2 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_INT, __pyx_v_data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 537, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 447, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 537, __pyx_L1_error)
   __pyx_v_arr = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "cedar/_tree.pyx":448
+  /* "cedar/_tree.pyx":538
  *         shape[0] = self.node_count
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
  *         Py_INCREF(self)             # <<<<<<<<<<<<<<
@@ -7593,7 +8270,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray(struct __pyx
  */
   Py_INCREF(((PyObject *)__pyx_v_self));
 
-  /* "cedar/_tree.pyx":449
+  /* "cedar/_tree.pyx":539
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self             # <<<<<<<<<<<<<<
@@ -7601,7 +8278,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray(struct __pyx
  */
   __pyx_v_arr->base = ((PyObject *)__pyx_v_self);
 
-  /* "cedar/_tree.pyx":450
+  /* "cedar/_tree.pyx":540
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self
  *         return arr             # <<<<<<<<<<<<<<
@@ -7611,7 +8288,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray(struct __pyx
   __pyx_r = __pyx_v_arr;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":440
+  /* "cedar/_tree.pyx":530
  *         return arr
  * 
  *     cdef np.ndarray _get_int_ndarray(self, int *data):             # <<<<<<<<<<<<<<
@@ -7634,82 +8311,6 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray(struct __pyx
 /* "cedar/_tree.pxd":22
  *     # Inner structures: values are stored separately from node structure,
  *     # since size is determined at runtime.
- *     cdef public int max_depth            # Max depth of the tree             # <<<<<<<<<<<<<<
- *     cdef public int node_count           # Counter for node IDs
- *     cdef public int capacity             # Capacity of tree, in terms of nodes
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_9max_depth_1__get__(PyObject *__pyx_v_self); /*proto*/
-static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_9max_depth_1__get__(PyObject *__pyx_v_self) {
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5cedar_5_tree_5_Tree_9max_depth___get__(((struct __pyx_obj_5cedar_5_tree__Tree *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_9max_depth___get__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("__get__", 0);
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->max_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("cedar._tree._Tree.max_depth.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* Python wrapper */
-static int __pyx_pw_5cedar_5_tree_5_Tree_9max_depth_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
-static int __pyx_pw_5cedar_5_tree_5_Tree_9max_depth_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
-  int __pyx_r;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5cedar_5_tree_5_Tree_9max_depth_2__set__(((struct __pyx_obj_5cedar_5_tree__Tree *)__pyx_v_self), ((PyObject *)__pyx_v_value));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static int __pyx_pf_5cedar_5_tree_5_Tree_9max_depth_2__set__(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, PyObject *__pyx_v_value) {
-  int __pyx_r;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 22, __pyx_L1_error)
-  __pyx_v_self->max_depth = __pyx_t_1;
-
-  /* function exit code */
-  __pyx_r = 0;
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("cedar._tree._Tree.max_depth.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = -1;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "cedar/_tree.pxd":23
- *     # since size is determined at runtime.
- *     cdef public int max_depth            # Max depth of the tree
  *     cdef public int node_count           # Counter for node IDs             # <<<<<<<<<<<<<<
  *     cdef public int capacity             # Capacity of tree, in terms of nodes
  *     cdef double* values                  # Array of values, shape=[capacity]
@@ -7734,7 +8335,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_10node_count___get__(struct __pyx
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->node_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 23, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->node_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7769,7 +8370,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_10node_count_2__set__(struct __pyx_obj_
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 23, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 22, __pyx_L1_error)
   __pyx_v_self->node_count = __pyx_t_1;
 
   /* function exit code */
@@ -7783,12 +8384,12 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_10node_count_2__set__(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "cedar/_tree.pxd":24
- *     cdef public int max_depth            # Max depth of the tree
+/* "cedar/_tree.pxd":23
+ *     # since size is determined at runtime.
  *     cdef public int node_count           # Counter for node IDs
  *     cdef public int capacity             # Capacity of tree, in terms of nodes             # <<<<<<<<<<<<<<
  *     cdef double* values                  # Array of values, shape=[capacity]
- *     cdef int* chosen_features            # Array of chosen features, shape=[capacity]
+ *     cdef double* p                       # Array of probabilities, shape=[capacity]
  */
 
 /* Python wrapper */
@@ -7810,7 +8411,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8capacity___get__(struct __pyx_ob
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->capacity); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 24, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->capacity); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7845,7 +8446,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree_8capacity_2__set__(struct __pyx_obj_5ce
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 24, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 23, __pyx_L1_error)
   __pyx_v_self->capacity = __pyx_t_1;
 
   /* function exit code */
@@ -7966,7 +8567,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_20__setstate_cython__(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
  *         # experimental exception made for __getbuffer__ and __releasebuffer__
  *         # -- the details of this may change.
  *         def __getbuffer__(ndarray self, Py_buffer* info, int flags):             # <<<<<<<<<<<<<<
@@ -8015,7 +8616,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_v_info->obj = Py_None; __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(__pyx_v_info->obj);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":265
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":265
  * 
  *             cdef int i, ndim
  *             cdef int endian_detector = 1             # <<<<<<<<<<<<<<
@@ -8024,7 +8625,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_endian_detector = 1;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":266
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":266
  *             cdef int i, ndim
  *             cdef int endian_detector = 1
  *             cdef bint little_endian = ((<char*>&endian_detector)[0] != 0)             # <<<<<<<<<<<<<<
@@ -8033,7 +8634,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_little_endian = ((((char *)(&__pyx_v_endian_detector))[0]) != 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":268
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":268
  *             cdef bint little_endian = ((<char*>&endian_detector)[0] != 0)
  * 
  *             ndim = PyArray_NDIM(self)             # <<<<<<<<<<<<<<
@@ -8042,7 +8643,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_ndim = PyArray_NDIM(__pyx_v_self);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
  *             ndim = PyArray_NDIM(self)
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -8056,7 +8657,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":271
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":271
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_C_CONTIGUOUS)):             # <<<<<<<<<<<<<<
@@ -8067,7 +8668,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
  *             ndim = PyArray_NDIM(self)
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -8076,7 +8677,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   if (unlikely(__pyx_t_1)) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_C_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not C contiguous")             # <<<<<<<<<<<<<<
@@ -8089,7 +8690,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_ERR(3, 272, __pyx_L1_error)
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
  *             ndim = PyArray_NDIM(self)
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -8098,7 +8699,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
  *                 raise ValueError(u"ndarray is not C contiguous")
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -8112,7 +8713,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     goto __pyx_L7_bool_binop_done;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":275
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":275
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_F_CONTIGUOUS)):             # <<<<<<<<<<<<<<
@@ -8123,7 +8724,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = __pyx_t_2;
   __pyx_L7_bool_binop_done:;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
  *                 raise ValueError(u"ndarray is not C contiguous")
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -8132,7 +8733,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   if (unlikely(__pyx_t_1)) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_F_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not Fortran contiguous")             # <<<<<<<<<<<<<<
@@ -8145,7 +8746,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_ERR(3, 276, __pyx_L1_error)
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
  *                 raise ValueError(u"ndarray is not C contiguous")
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -8154,7 +8755,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":278
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":278
  *                 raise ValueError(u"ndarray is not Fortran contiguous")
  * 
  *             info.buf = PyArray_DATA(self)             # <<<<<<<<<<<<<<
@@ -8163,7 +8764,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->buf = PyArray_DATA(__pyx_v_self);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":279
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":279
  * 
  *             info.buf = PyArray_DATA(self)
  *             info.ndim = ndim             # <<<<<<<<<<<<<<
@@ -8172,7 +8773,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->ndim = __pyx_v_ndim;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
  *             info.buf = PyArray_DATA(self)
  *             info.ndim = ndim
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -8182,7 +8783,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = (((sizeof(npy_intp)) != (sizeof(Py_ssize_t))) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":283
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":283
  *                 # Allocate new buffer for strides and shape info.
  *                 # This is allocated as one block, strides first.
  *                 info.strides = <Py_ssize_t*>PyObject_Malloc(sizeof(Py_ssize_t) * 2 * <size_t>ndim)             # <<<<<<<<<<<<<<
@@ -8191,7 +8792,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_info->strides = ((Py_ssize_t *)PyObject_Malloc((((sizeof(Py_ssize_t)) * 2) * ((size_t)__pyx_v_ndim))));
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":284
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":284
  *                 # This is allocated as one block, strides first.
  *                 info.strides = <Py_ssize_t*>PyObject_Malloc(sizeof(Py_ssize_t) * 2 * <size_t>ndim)
  *                 info.shape = info.strides + ndim             # <<<<<<<<<<<<<<
@@ -8200,7 +8801,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_info->shape = (__pyx_v_info->strides + __pyx_v_ndim);
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":285
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":285
  *                 info.strides = <Py_ssize_t*>PyObject_Malloc(sizeof(Py_ssize_t) * 2 * <size_t>ndim)
  *                 info.shape = info.strides + ndim
  *                 for i in range(ndim):             # <<<<<<<<<<<<<<
@@ -8212,7 +8813,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":286
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":286
  *                 info.shape = info.strides + ndim
  *                 for i in range(ndim):
  *                     info.strides[i] = PyArray_STRIDES(self)[i]             # <<<<<<<<<<<<<<
@@ -8221,7 +8822,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
       (__pyx_v_info->strides[__pyx_v_i]) = (PyArray_STRIDES(__pyx_v_self)[__pyx_v_i]);
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":287
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":287
  *                 for i in range(ndim):
  *                     info.strides[i] = PyArray_STRIDES(self)[i]
  *                     info.shape[i] = PyArray_DIMS(self)[i]             # <<<<<<<<<<<<<<
@@ -8231,7 +8832,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       (__pyx_v_info->shape[__pyx_v_i]) = (PyArray_DIMS(__pyx_v_self)[__pyx_v_i]);
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
  *             info.buf = PyArray_DATA(self)
  *             info.ndim = ndim
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -8241,7 +8842,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     goto __pyx_L9;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":289
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":289
  *                     info.shape[i] = PyArray_DIMS(self)[i]
  *             else:
  *                 info.strides = <Py_ssize_t*>PyArray_STRIDES(self)             # <<<<<<<<<<<<<<
@@ -8251,7 +8852,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   /*else*/ {
     __pyx_v_info->strides = ((Py_ssize_t *)PyArray_STRIDES(__pyx_v_self));
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":290
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":290
  *             else:
  *                 info.strides = <Py_ssize_t*>PyArray_STRIDES(self)
  *                 info.shape = <Py_ssize_t*>PyArray_DIMS(self)             # <<<<<<<<<<<<<<
@@ -8262,7 +8863,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   }
   __pyx_L9:;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":291
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":291
  *                 info.strides = <Py_ssize_t*>PyArray_STRIDES(self)
  *                 info.shape = <Py_ssize_t*>PyArray_DIMS(self)
  *             info.suboffsets = NULL             # <<<<<<<<<<<<<<
@@ -8271,7 +8872,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->suboffsets = NULL;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":292
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":292
  *                 info.shape = <Py_ssize_t*>PyArray_DIMS(self)
  *             info.suboffsets = NULL
  *             info.itemsize = PyArray_ITEMSIZE(self)             # <<<<<<<<<<<<<<
@@ -8280,7 +8881,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->itemsize = PyArray_ITEMSIZE(__pyx_v_self);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":293
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":293
  *             info.suboffsets = NULL
  *             info.itemsize = PyArray_ITEMSIZE(self)
  *             info.readonly = not PyArray_ISWRITEABLE(self)             # <<<<<<<<<<<<<<
@@ -8289,7 +8890,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->readonly = (!(PyArray_ISWRITEABLE(__pyx_v_self) != 0));
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":296
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":296
  * 
  *             cdef int t
  *             cdef char* f = NULL             # <<<<<<<<<<<<<<
@@ -8298,7 +8899,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_f = NULL;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":297
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":297
  *             cdef int t
  *             cdef char* f = NULL
  *             cdef dtype descr = <dtype>PyArray_DESCR(self)             # <<<<<<<<<<<<<<
@@ -8311,7 +8912,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_v_descr = ((PyArray_Descr *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":300
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":300
  *             cdef int offset
  * 
  *             info.obj = self             # <<<<<<<<<<<<<<
@@ -8324,7 +8925,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __Pyx_DECREF(__pyx_v_info->obj);
   __pyx_v_info->obj = ((PyObject *)__pyx_v_self);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
  *             info.obj = self
  * 
  *             if not PyDataType_HASFIELDS(descr):             # <<<<<<<<<<<<<<
@@ -8334,7 +8935,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = ((!(PyDataType_HASFIELDS(__pyx_v_descr) != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":303
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":303
  * 
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num             # <<<<<<<<<<<<<<
@@ -8344,7 +8945,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_t_4 = __pyx_v_descr->type_num;
     __pyx_v_t = __pyx_t_4;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -8364,7 +8965,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     }
     __pyx_L15_next_or:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":305
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":305
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or
  *                     (descr.byteorder == c'<' and not little_endian)):             # <<<<<<<<<<<<<<
@@ -8381,7 +8982,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_t_1 = __pyx_t_2;
     __pyx_L14_bool_binop_done:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -8390,7 +8991,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     if (unlikely(__pyx_t_1)) {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
  *                 if ((descr.byteorder == c'>' and little_endian) or
  *                     (descr.byteorder == c'<' and not little_endian)):
  *                     raise ValueError(u"Non-native byte order not supported")             # <<<<<<<<<<<<<<
@@ -8403,7 +9004,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(3, 306, __pyx_L1_error)
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -8412,7 +9013,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":307
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":307
  *                     (descr.byteorder == c'<' and not little_endian)):
  *                     raise ValueError(u"Non-native byte order not supported")
  *                 if   t == NPY_BYTE:        f = "b"             # <<<<<<<<<<<<<<
@@ -8425,7 +9026,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_UBYTE:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":308
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":308
  *                     raise ValueError(u"Non-native byte order not supported")
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"             # <<<<<<<<<<<<<<
@@ -8436,7 +9037,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_SHORT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":309
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":309
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  *                 elif t == NPY_SHORT:       f = "h"             # <<<<<<<<<<<<<<
@@ -8447,7 +9048,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_USHORT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":310
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":310
  *                 elif t == NPY_UBYTE:       f = "B"
  *                 elif t == NPY_SHORT:       f = "h"
  *                 elif t == NPY_USHORT:      f = "H"             # <<<<<<<<<<<<<<
@@ -8458,7 +9059,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_INT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":311
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":311
  *                 elif t == NPY_SHORT:       f = "h"
  *                 elif t == NPY_USHORT:      f = "H"
  *                 elif t == NPY_INT:         f = "i"             # <<<<<<<<<<<<<<
@@ -8469,7 +9070,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_UINT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":312
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":312
  *                 elif t == NPY_USHORT:      f = "H"
  *                 elif t == NPY_INT:         f = "i"
  *                 elif t == NPY_UINT:        f = "I"             # <<<<<<<<<<<<<<
@@ -8480,7 +9081,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_LONG:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":313
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":313
  *                 elif t == NPY_INT:         f = "i"
  *                 elif t == NPY_UINT:        f = "I"
  *                 elif t == NPY_LONG:        f = "l"             # <<<<<<<<<<<<<<
@@ -8491,7 +9092,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_ULONG:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":314
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":314
  *                 elif t == NPY_UINT:        f = "I"
  *                 elif t == NPY_LONG:        f = "l"
  *                 elif t == NPY_ULONG:       f = "L"             # <<<<<<<<<<<<<<
@@ -8502,7 +9103,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_LONGLONG:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":315
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":315
  *                 elif t == NPY_LONG:        f = "l"
  *                 elif t == NPY_ULONG:       f = "L"
  *                 elif t == NPY_LONGLONG:    f = "q"             # <<<<<<<<<<<<<<
@@ -8513,7 +9114,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_ULONGLONG:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":316
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":316
  *                 elif t == NPY_ULONG:       f = "L"
  *                 elif t == NPY_LONGLONG:    f = "q"
  *                 elif t == NPY_ULONGLONG:   f = "Q"             # <<<<<<<<<<<<<<
@@ -8524,7 +9125,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_FLOAT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":317
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":317
  *                 elif t == NPY_LONGLONG:    f = "q"
  *                 elif t == NPY_ULONGLONG:   f = "Q"
  *                 elif t == NPY_FLOAT:       f = "f"             # <<<<<<<<<<<<<<
@@ -8535,7 +9136,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_DOUBLE:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":318
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":318
  *                 elif t == NPY_ULONGLONG:   f = "Q"
  *                 elif t == NPY_FLOAT:       f = "f"
  *                 elif t == NPY_DOUBLE:      f = "d"             # <<<<<<<<<<<<<<
@@ -8546,7 +9147,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_LONGDOUBLE:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":319
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":319
  *                 elif t == NPY_FLOAT:       f = "f"
  *                 elif t == NPY_DOUBLE:      f = "d"
  *                 elif t == NPY_LONGDOUBLE:  f = "g"             # <<<<<<<<<<<<<<
@@ -8557,7 +9158,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_CFLOAT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":320
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":320
  *                 elif t == NPY_DOUBLE:      f = "d"
  *                 elif t == NPY_LONGDOUBLE:  f = "g"
  *                 elif t == NPY_CFLOAT:      f = "Zf"             # <<<<<<<<<<<<<<
@@ -8568,7 +9169,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_CDOUBLE:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":321
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":321
  *                 elif t == NPY_LONGDOUBLE:  f = "g"
  *                 elif t == NPY_CFLOAT:      f = "Zf"
  *                 elif t == NPY_CDOUBLE:     f = "Zd"             # <<<<<<<<<<<<<<
@@ -8579,7 +9180,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_CLONGDOUBLE:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":322
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":322
  *                 elif t == NPY_CFLOAT:      f = "Zf"
  *                 elif t == NPY_CDOUBLE:     f = "Zd"
  *                 elif t == NPY_CLONGDOUBLE: f = "Zg"             # <<<<<<<<<<<<<<
@@ -8590,7 +9191,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_OBJECT:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":323
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":323
  *                 elif t == NPY_CDOUBLE:     f = "Zd"
  *                 elif t == NPY_CLONGDOUBLE: f = "Zg"
  *                 elif t == NPY_OBJECT:      f = "O"             # <<<<<<<<<<<<<<
@@ -8601,7 +9202,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       default:
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":325
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":325
  *                 elif t == NPY_OBJECT:      f = "O"
  *                 else:
  *                     raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)             # <<<<<<<<<<<<<<
@@ -8622,7 +9223,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":326
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":326
  *                 else:
  *                     raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)
  *                 info.format = f             # <<<<<<<<<<<<<<
@@ -8631,7 +9232,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_info->format = __pyx_v_f;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":327
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":327
  *                     raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)
  *                 info.format = f
  *                 return             # <<<<<<<<<<<<<<
@@ -8641,7 +9242,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
  *             info.obj = self
  * 
  *             if not PyDataType_HASFIELDS(descr):             # <<<<<<<<<<<<<<
@@ -8650,7 +9251,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":329
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":329
  *                 return
  *             else:
  *                 info.format = <char*>PyObject_Malloc(_buffer_format_string_len)             # <<<<<<<<<<<<<<
@@ -8660,7 +9261,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   /*else*/ {
     __pyx_v_info->format = ((char *)PyObject_Malloc(0xFF));
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":330
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":330
  *             else:
  *                 info.format = <char*>PyObject_Malloc(_buffer_format_string_len)
  *                 info.format[0] = c'^' # Native data types, manual alignment             # <<<<<<<<<<<<<<
@@ -8669,7 +9270,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     (__pyx_v_info->format[0]) = '^';
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":331
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":331
  *                 info.format = <char*>PyObject_Malloc(_buffer_format_string_len)
  *                 info.format[0] = c'^' # Native data types, manual alignment
  *                 offset = 0             # <<<<<<<<<<<<<<
@@ -8678,7 +9279,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_offset = 0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":332
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":332
  *                 info.format[0] = c'^' # Native data types, manual alignment
  *                 offset = 0
  *                 f = _util_dtypestring(descr, info.format + 1,             # <<<<<<<<<<<<<<
@@ -8688,7 +9289,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_t_9 = __pyx_f_5numpy__util_dtypestring(__pyx_v_descr, (__pyx_v_info->format + 1), (__pyx_v_info->format + 0xFF), (&__pyx_v_offset)); if (unlikely(__pyx_t_9 == ((char *)NULL))) __PYX_ERR(3, 332, __pyx_L1_error)
     __pyx_v_f = __pyx_t_9;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":335
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":335
  *                                       info.format + _buffer_format_string_len,
  *                                       &offset)
  *                 f[0] = c'\0' # Terminate format string             # <<<<<<<<<<<<<<
@@ -8698,7 +9299,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     (__pyx_v_f[0]) = '\x00';
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
  *         # experimental exception made for __getbuffer__ and __releasebuffer__
  *         # -- the details of this may change.
  *         def __getbuffer__(ndarray self, Py_buffer* info, int flags):             # <<<<<<<<<<<<<<
@@ -8730,7 +9331,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
  *                 f[0] = c'\0' # Terminate format string
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):             # <<<<<<<<<<<<<<
@@ -8754,7 +9355,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__releasebuffer__", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):
  *             if PyArray_HASFIELDS(self):             # <<<<<<<<<<<<<<
@@ -8764,7 +9365,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __pyx_t_1 = (PyArray_HASFIELDS(__pyx_v_self) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":339
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":339
  *         def __releasebuffer__(ndarray self, Py_buffer* info):
  *             if PyArray_HASFIELDS(self):
  *                 PyObject_Free(info.format)             # <<<<<<<<<<<<<<
@@ -8773,7 +9374,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
     PyObject_Free(__pyx_v_info->format);
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):
  *             if PyArray_HASFIELDS(self):             # <<<<<<<<<<<<<<
@@ -8782,7 +9383,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
  *             if PyArray_HASFIELDS(self):
  *                 PyObject_Free(info.format)
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -8792,7 +9393,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __pyx_t_1 = (((sizeof(npy_intp)) != (sizeof(Py_ssize_t))) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":341
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":341
  *                 PyObject_Free(info.format)
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):
  *                 PyObject_Free(info.strides)             # <<<<<<<<<<<<<<
@@ -8801,7 +9402,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
     PyObject_Free(__pyx_v_info->strides);
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
  *             if PyArray_HASFIELDS(self):
  *                 PyObject_Free(info.format)
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -8810,7 +9411,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
  *                 f[0] = c'\0' # Terminate format string
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):             # <<<<<<<<<<<<<<
@@ -8822,7 +9423,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __Pyx_RefNannyFinishContext();
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
  * ctypedef npy_cdouble     complex_t
  * 
  * cdef inline object PyArray_MultiIterNew1(a):             # <<<<<<<<<<<<<<
@@ -8836,7 +9437,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew1(PyObject *__
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew1", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":822
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":822
  * 
  * cdef inline object PyArray_MultiIterNew1(a):
  *     return PyArray_MultiIterNew(1, <void*>a)             # <<<<<<<<<<<<<<
@@ -8850,7 +9451,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew1(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
  * ctypedef npy_cdouble     complex_t
  * 
  * cdef inline object PyArray_MultiIterNew1(a):             # <<<<<<<<<<<<<<
@@ -8869,7 +9470,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew1(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
  *     return PyArray_MultiIterNew(1, <void*>a)
  * 
  * cdef inline object PyArray_MultiIterNew2(a, b):             # <<<<<<<<<<<<<<
@@ -8883,7 +9484,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew2(PyObject *__
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew2", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":825
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":825
  * 
  * cdef inline object PyArray_MultiIterNew2(a, b):
  *     return PyArray_MultiIterNew(2, <void*>a, <void*>b)             # <<<<<<<<<<<<<<
@@ -8897,7 +9498,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew2(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
  *     return PyArray_MultiIterNew(1, <void*>a)
  * 
  * cdef inline object PyArray_MultiIterNew2(a, b):             # <<<<<<<<<<<<<<
@@ -8916,7 +9517,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew2(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
  *     return PyArray_MultiIterNew(2, <void*>a, <void*>b)
  * 
  * cdef inline object PyArray_MultiIterNew3(a, b, c):             # <<<<<<<<<<<<<<
@@ -8930,7 +9531,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew3(PyObject *__
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew3", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":828
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":828
  * 
  * cdef inline object PyArray_MultiIterNew3(a, b, c):
  *     return PyArray_MultiIterNew(3, <void*>a, <void*>b, <void*> c)             # <<<<<<<<<<<<<<
@@ -8944,7 +9545,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew3(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
  *     return PyArray_MultiIterNew(2, <void*>a, <void*>b)
  * 
  * cdef inline object PyArray_MultiIterNew3(a, b, c):             # <<<<<<<<<<<<<<
@@ -8963,7 +9564,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew3(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
  *     return PyArray_MultiIterNew(3, <void*>a, <void*>b, <void*> c)
  * 
  * cdef inline object PyArray_MultiIterNew4(a, b, c, d):             # <<<<<<<<<<<<<<
@@ -8977,7 +9578,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew4(PyObject *__
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew4", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":831
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":831
  * 
  * cdef inline object PyArray_MultiIterNew4(a, b, c, d):
  *     return PyArray_MultiIterNew(4, <void*>a, <void*>b, <void*>c, <void*> d)             # <<<<<<<<<<<<<<
@@ -8991,7 +9592,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew4(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
  *     return PyArray_MultiIterNew(3, <void*>a, <void*>b, <void*> c)
  * 
  * cdef inline object PyArray_MultiIterNew4(a, b, c, d):             # <<<<<<<<<<<<<<
@@ -9010,7 +9611,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew4(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
  *     return PyArray_MultiIterNew(4, <void*>a, <void*>b, <void*>c, <void*> d)
  * 
  * cdef inline object PyArray_MultiIterNew5(a, b, c, d, e):             # <<<<<<<<<<<<<<
@@ -9024,7 +9625,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew5(PyObject *__
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew5", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":834
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":834
  * 
  * cdef inline object PyArray_MultiIterNew5(a, b, c, d, e):
  *     return PyArray_MultiIterNew(5, <void*>a, <void*>b, <void*>c, <void*> d, <void*> e)             # <<<<<<<<<<<<<<
@@ -9038,7 +9639,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew5(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
  *     return PyArray_MultiIterNew(4, <void*>a, <void*>b, <void*>c, <void*> d)
  * 
  * cdef inline object PyArray_MultiIterNew5(a, b, c, d, e):             # <<<<<<<<<<<<<<
@@ -9057,7 +9658,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew5(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
  *     return PyArray_MultiIterNew(5, <void*>a, <void*>b, <void*>c, <void*> d, <void*> e)
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):             # <<<<<<<<<<<<<<
@@ -9071,7 +9672,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("PyDataType_SHAPE", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):
  *     if PyDataType_HASSUBARRAY(d):             # <<<<<<<<<<<<<<
@@ -9081,7 +9682,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
   __pyx_t_1 = (PyDataType_HASSUBARRAY(__pyx_v_d) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":838
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":838
  * cdef inline tuple PyDataType_SHAPE(dtype d):
  *     if PyDataType_HASSUBARRAY(d):
  *         return <tuple>d.subarray.shape             # <<<<<<<<<<<<<<
@@ -9093,7 +9694,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
     __pyx_r = ((PyObject*)__pyx_v_d->subarray->shape);
     goto __pyx_L0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):
  *     if PyDataType_HASSUBARRAY(d):             # <<<<<<<<<<<<<<
@@ -9102,7 +9703,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":840
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":840
  *         return <tuple>d.subarray.shape
  *     else:
  *         return ()             # <<<<<<<<<<<<<<
@@ -9116,7 +9717,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
     goto __pyx_L0;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
  *     return PyArray_MultiIterNew(5, <void*>a, <void*>b, <void*>c, <void*> d, <void*> e)
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):             # <<<<<<<<<<<<<<
@@ -9131,7 +9732,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
  *         return ()
  * 
  * cdef inline char* _util_dtypestring(dtype descr, char* f, char* end, int* offset) except NULL:             # <<<<<<<<<<<<<<
@@ -9160,7 +9761,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   char *__pyx_t_9;
   __Pyx_RefNannySetupContext("_util_dtypestring", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":847
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":847
  * 
  *     cdef dtype child
  *     cdef int endian_detector = 1             # <<<<<<<<<<<<<<
@@ -9169,7 +9770,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
   __pyx_v_endian_detector = 1;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":848
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":848
  *     cdef dtype child
  *     cdef int endian_detector = 1
  *     cdef bint little_endian = ((<char*>&endian_detector)[0] != 0)             # <<<<<<<<<<<<<<
@@ -9178,7 +9779,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
   __pyx_v_little_endian = ((((char *)(&__pyx_v_endian_detector))[0]) != 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
  *     cdef tuple fields
  * 
  *     for childname in descr.names:             # <<<<<<<<<<<<<<
@@ -9201,7 +9802,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __Pyx_XDECREF_SET(__pyx_v_childname, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":852
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":852
  * 
  *     for childname in descr.names:
  *         fields = descr.fields[childname]             # <<<<<<<<<<<<<<
@@ -9218,7 +9819,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __Pyx_XDECREF_SET(__pyx_v_fields, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":853
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":853
  *     for childname in descr.names:
  *         fields = descr.fields[childname]
  *         child, new_offset = fields             # <<<<<<<<<<<<<<
@@ -9253,7 +9854,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __Pyx_XDECREF_SET(__pyx_v_new_offset, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
  *         child, new_offset = fields
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:             # <<<<<<<<<<<<<<
@@ -9270,7 +9871,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_6 = ((((__pyx_v_end - __pyx_v_f) - ((int)__pyx_t_5)) < 15) != 0);
     if (unlikely(__pyx_t_6)) {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")             # <<<<<<<<<<<<<<
@@ -9283,7 +9884,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(3, 856, __pyx_L1_error)
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
  *         child, new_offset = fields
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:             # <<<<<<<<<<<<<<
@@ -9292,7 +9893,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")
  * 
  *         if ((child.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -9312,7 +9913,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     }
     __pyx_L8_next_or:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":859
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":859
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  *             (child.byteorder == c'<' and not little_endian)):             # <<<<<<<<<<<<<<
@@ -9329,7 +9930,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_6 = __pyx_t_7;
     __pyx_L7_bool_binop_done:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")
  * 
  *         if ((child.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -9338,7 +9939,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
     if (unlikely(__pyx_t_6)) {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":860
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":860
  *         if ((child.byteorder == c'>' and little_endian) or
  *             (child.byteorder == c'<' and not little_endian)):
  *             raise ValueError(u"Non-native byte order not supported")             # <<<<<<<<<<<<<<
@@ -9351,7 +9952,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(3, 860, __pyx_L1_error)
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")
  * 
  *         if ((child.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -9360,7 +9961,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":870
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":870
  * 
  *         # Output padding bytes
  *         while offset[0] < new_offset:             # <<<<<<<<<<<<<<
@@ -9376,7 +9977,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (!__pyx_t_6) break;
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":871
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":871
  *         # Output padding bytes
  *         while offset[0] < new_offset:
  *             f[0] = 120 # "x"; pad byte             # <<<<<<<<<<<<<<
@@ -9385,7 +9986,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       (__pyx_v_f[0]) = 0x78;
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":872
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":872
  *         while offset[0] < new_offset:
  *             f[0] = 120 # "x"; pad byte
  *             f += 1             # <<<<<<<<<<<<<<
@@ -9394,7 +9995,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       __pyx_v_f = (__pyx_v_f + 1);
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":873
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":873
  *             f[0] = 120 # "x"; pad byte
  *             f += 1
  *             offset[0] += 1             # <<<<<<<<<<<<<<
@@ -9405,7 +10006,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       (__pyx_v_offset[__pyx_t_8]) = ((__pyx_v_offset[__pyx_t_8]) + 1);
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":875
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":875
  *             offset[0] += 1
  * 
  *         offset[0] += child.itemsize             # <<<<<<<<<<<<<<
@@ -9415,7 +10016,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_8 = 0;
     (__pyx_v_offset[__pyx_t_8]) = ((__pyx_v_offset[__pyx_t_8]) + __pyx_v_child->elsize);
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
  *         offset[0] += child.itemsize
  * 
  *         if not PyDataType_HASFIELDS(child):             # <<<<<<<<<<<<<<
@@ -9425,7 +10026,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_6 = ((!(PyDataType_HASFIELDS(__pyx_v_child) != 0)) != 0);
     if (__pyx_t_6) {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":878
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":878
  * 
  *         if not PyDataType_HASFIELDS(child):
  *             t = child.type_num             # <<<<<<<<<<<<<<
@@ -9437,7 +10038,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_XDECREF_SET(__pyx_v_t, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
  *         if not PyDataType_HASFIELDS(child):
  *             t = child.type_num
  *             if end - f < 5:             # <<<<<<<<<<<<<<
@@ -9447,7 +10048,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __pyx_t_6 = (((__pyx_v_end - __pyx_v_f) < 5) != 0);
       if (unlikely(__pyx_t_6)) {
 
-        /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
+        /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
  *             t = child.type_num
  *             if end - f < 5:
  *                 raise RuntimeError(u"Format string allocated too short.")             # <<<<<<<<<<<<<<
@@ -9460,7 +10061,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __PYX_ERR(3, 880, __pyx_L1_error)
 
-        /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
+        /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
  *         if not PyDataType_HASFIELDS(child):
  *             t = child.type_num
  *             if end - f < 5:             # <<<<<<<<<<<<<<
@@ -9469,7 +10070,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":883
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":883
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  *             if   t == NPY_BYTE:        f[0] =  98 #"b"             # <<<<<<<<<<<<<<
@@ -9487,7 +10088,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":884
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":884
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  *             if   t == NPY_BYTE:        f[0] =  98 #"b"
  *             elif t == NPY_UBYTE:       f[0] =  66 #"B"             # <<<<<<<<<<<<<<
@@ -9505,7 +10106,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":885
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":885
  *             if   t == NPY_BYTE:        f[0] =  98 #"b"
  *             elif t == NPY_UBYTE:       f[0] =  66 #"B"
  *             elif t == NPY_SHORT:       f[0] = 104 #"h"             # <<<<<<<<<<<<<<
@@ -9523,7 +10124,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":886
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":886
  *             elif t == NPY_UBYTE:       f[0] =  66 #"B"
  *             elif t == NPY_SHORT:       f[0] = 104 #"h"
  *             elif t == NPY_USHORT:      f[0] =  72 #"H"             # <<<<<<<<<<<<<<
@@ -9541,7 +10142,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":887
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":887
  *             elif t == NPY_SHORT:       f[0] = 104 #"h"
  *             elif t == NPY_USHORT:      f[0] =  72 #"H"
  *             elif t == NPY_INT:         f[0] = 105 #"i"             # <<<<<<<<<<<<<<
@@ -9559,7 +10160,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":888
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":888
  *             elif t == NPY_USHORT:      f[0] =  72 #"H"
  *             elif t == NPY_INT:         f[0] = 105 #"i"
  *             elif t == NPY_UINT:        f[0] =  73 #"I"             # <<<<<<<<<<<<<<
@@ -9577,7 +10178,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":889
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":889
  *             elif t == NPY_INT:         f[0] = 105 #"i"
  *             elif t == NPY_UINT:        f[0] =  73 #"I"
  *             elif t == NPY_LONG:        f[0] = 108 #"l"             # <<<<<<<<<<<<<<
@@ -9595,7 +10196,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":890
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":890
  *             elif t == NPY_UINT:        f[0] =  73 #"I"
  *             elif t == NPY_LONG:        f[0] = 108 #"l"
  *             elif t == NPY_ULONG:       f[0] = 76  #"L"             # <<<<<<<<<<<<<<
@@ -9613,7 +10214,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":891
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":891
  *             elif t == NPY_LONG:        f[0] = 108 #"l"
  *             elif t == NPY_ULONG:       f[0] = 76  #"L"
  *             elif t == NPY_LONGLONG:    f[0] = 113 #"q"             # <<<<<<<<<<<<<<
@@ -9631,7 +10232,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":892
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":892
  *             elif t == NPY_ULONG:       f[0] = 76  #"L"
  *             elif t == NPY_LONGLONG:    f[0] = 113 #"q"
  *             elif t == NPY_ULONGLONG:   f[0] = 81  #"Q"             # <<<<<<<<<<<<<<
@@ -9649,7 +10250,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":893
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":893
  *             elif t == NPY_LONGLONG:    f[0] = 113 #"q"
  *             elif t == NPY_ULONGLONG:   f[0] = 81  #"Q"
  *             elif t == NPY_FLOAT:       f[0] = 102 #"f"             # <<<<<<<<<<<<<<
@@ -9667,7 +10268,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":894
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":894
  *             elif t == NPY_ULONGLONG:   f[0] = 81  #"Q"
  *             elif t == NPY_FLOAT:       f[0] = 102 #"f"
  *             elif t == NPY_DOUBLE:      f[0] = 100 #"d"             # <<<<<<<<<<<<<<
@@ -9685,7 +10286,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":895
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":895
  *             elif t == NPY_FLOAT:       f[0] = 102 #"f"
  *             elif t == NPY_DOUBLE:      f[0] = 100 #"d"
  *             elif t == NPY_LONGDOUBLE:  f[0] = 103 #"g"             # <<<<<<<<<<<<<<
@@ -9703,7 +10304,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":896
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":896
  *             elif t == NPY_DOUBLE:      f[0] = 100 #"d"
  *             elif t == NPY_LONGDOUBLE:  f[0] = 103 #"g"
  *             elif t == NPY_CFLOAT:      f[0] = 90; f[1] = 102; f += 1 # Zf             # <<<<<<<<<<<<<<
@@ -9723,7 +10324,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":897
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":897
  *             elif t == NPY_LONGDOUBLE:  f[0] = 103 #"g"
  *             elif t == NPY_CFLOAT:      f[0] = 90; f[1] = 102; f += 1 # Zf
  *             elif t == NPY_CDOUBLE:     f[0] = 90; f[1] = 100; f += 1 # Zd             # <<<<<<<<<<<<<<
@@ -9743,7 +10344,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":898
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":898
  *             elif t == NPY_CFLOAT:      f[0] = 90; f[1] = 102; f += 1 # Zf
  *             elif t == NPY_CDOUBLE:     f[0] = 90; f[1] = 100; f += 1 # Zd
  *             elif t == NPY_CLONGDOUBLE: f[0] = 90; f[1] = 103; f += 1 # Zg             # <<<<<<<<<<<<<<
@@ -9763,7 +10364,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":899
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":899
  *             elif t == NPY_CDOUBLE:     f[0] = 90; f[1] = 100; f += 1 # Zd
  *             elif t == NPY_CLONGDOUBLE: f[0] = 90; f[1] = 103; f += 1 # Zg
  *             elif t == NPY_OBJECT:      f[0] = 79 #"O"             # <<<<<<<<<<<<<<
@@ -9781,7 +10382,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":901
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":901
  *             elif t == NPY_OBJECT:      f[0] = 79 #"O"
  *             else:
  *                 raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)             # <<<<<<<<<<<<<<
@@ -9800,7 +10401,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       }
       __pyx_L15:;
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":902
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":902
  *             else:
  *                 raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)
  *             f += 1             # <<<<<<<<<<<<<<
@@ -9809,7 +10410,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       __pyx_v_f = (__pyx_v_f + 1);
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
  *         offset[0] += child.itemsize
  * 
  *         if not PyDataType_HASFIELDS(child):             # <<<<<<<<<<<<<<
@@ -9819,7 +10420,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       goto __pyx_L13;
     }
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":906
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":906
  *             # Cython ignores struct boundary information ("T{...}"),
  *             # so don't output it
  *             f = _util_dtypestring(child, f, end, offset)             # <<<<<<<<<<<<<<
@@ -9832,7 +10433,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     }
     __pyx_L13:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
  *     cdef tuple fields
  * 
  *     for childname in descr.names:             # <<<<<<<<<<<<<<
@@ -9842,7 +10443,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":907
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":907
  *             # so don't output it
  *             f = _util_dtypestring(child, f, end, offset)
  *     return f             # <<<<<<<<<<<<<<
@@ -9852,7 +10453,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   __pyx_r = __pyx_v_f;
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
  *         return ()
  * 
  * cdef inline char* _util_dtypestring(dtype descr, char* f, char* end, int* offset) except NULL:             # <<<<<<<<<<<<<<
@@ -9877,7 +10478,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
  *     int _import_umath() except -1
  * 
  * cdef inline void set_array_base(ndarray arr, object base):             # <<<<<<<<<<<<<<
@@ -9889,7 +10490,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("set_array_base", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1023
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1023
  * 
  * cdef inline void set_array_base(ndarray arr, object base):
  *     Py_INCREF(base) # important to do this before stealing the reference below!             # <<<<<<<<<<<<<<
@@ -9898,7 +10499,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
  */
   Py_INCREF(__pyx_v_base);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1024
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1024
  * cdef inline void set_array_base(ndarray arr, object base):
  *     Py_INCREF(base) # important to do this before stealing the reference below!
  *     PyArray_SetBaseObject(arr, base)             # <<<<<<<<<<<<<<
@@ -9907,7 +10508,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
  */
   (void)(PyArray_SetBaseObject(__pyx_v_arr, __pyx_v_base));
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
  *     int _import_umath() except -1
  * 
  * cdef inline void set_array_base(ndarray arr, object base):             # <<<<<<<<<<<<<<
@@ -9919,7 +10520,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
   __Pyx_RefNannyFinishContext();
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
  *     PyArray_SetBaseObject(arr, base)
  * 
  * cdef inline object get_array_base(ndarray arr):             # <<<<<<<<<<<<<<
@@ -9934,7 +10535,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("get_array_base", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1027
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1027
  * 
  * cdef inline object get_array_base(ndarray arr):
  *     base = PyArray_BASE(arr)             # <<<<<<<<<<<<<<
@@ -9943,7 +10544,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
  */
   __pyx_v_base = PyArray_BASE(__pyx_v_arr);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
  * cdef inline object get_array_base(ndarray arr):
  *     base = PyArray_BASE(arr)
  *     if base is NULL:             # <<<<<<<<<<<<<<
@@ -9953,7 +10554,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   __pyx_t_1 = ((__pyx_v_base == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1029
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1029
  *     base = PyArray_BASE(arr)
  *     if base is NULL:
  *         return None             # <<<<<<<<<<<<<<
@@ -9964,7 +10565,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
  * cdef inline object get_array_base(ndarray arr):
  *     base = PyArray_BASE(arr)
  *     if base is NULL:             # <<<<<<<<<<<<<<
@@ -9973,7 +10574,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
  */
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1030
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1030
  *     if base is NULL:
  *         return None
  *     return <object>base             # <<<<<<<<<<<<<<
@@ -9985,7 +10586,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   __pyx_r = ((PyObject *)__pyx_v_base);
   goto __pyx_L0;
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
  *     PyArray_SetBaseObject(arr, base)
  * 
  * cdef inline object get_array_base(ndarray arr):             # <<<<<<<<<<<<<<
@@ -10000,7 +10601,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
  * # Versions of the import_* functions which are more suitable for
  * # Cython code.
  * cdef inline int import_array() except -1:             # <<<<<<<<<<<<<<
@@ -10021,7 +10622,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("import_array", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
  * # Cython code.
  * cdef inline int import_array() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10037,7 +10638,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1036
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1036
  * cdef inline int import_array() except -1:
  *     try:
  *         _import_array()             # <<<<<<<<<<<<<<
@@ -10046,7 +10647,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
  */
       __pyx_t_4 = _import_array(); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(3, 1036, __pyx_L3_error)
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
  * # Cython code.
  * cdef inline int import_array() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10060,7 +10661,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1037
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1037
  *     try:
  *         _import_array()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -10075,7 +10676,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
  *         _import_array()
  *     except Exception:
  *         raise ImportError("numpy.core.multiarray failed to import")             # <<<<<<<<<<<<<<
@@ -10091,7 +10692,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
  * # Cython code.
  * cdef inline int import_array() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10106,7 +10707,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     __pyx_L8_try_end:;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
  * # Versions of the import_* functions which are more suitable for
  * # Cython code.
  * cdef inline int import_array() except -1:             # <<<<<<<<<<<<<<
@@ -10129,7 +10730,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
  *         raise ImportError("numpy.core.multiarray failed to import")
  * 
  * cdef inline int import_umath() except -1:             # <<<<<<<<<<<<<<
@@ -10150,7 +10751,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("import_umath", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
  * 
  * cdef inline int import_umath() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10166,7 +10767,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1042
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1042
  * cdef inline int import_umath() except -1:
  *     try:
  *         _import_umath()             # <<<<<<<<<<<<<<
@@ -10175,7 +10776,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
  */
       __pyx_t_4 = _import_umath(); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(3, 1042, __pyx_L3_error)
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
  * 
  * cdef inline int import_umath() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10189,7 +10790,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1043
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1043
  *     try:
  *         _import_umath()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -10204,7 +10805,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
@@ -10220,7 +10821,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
  * 
  * cdef inline int import_umath() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10235,7 +10836,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     __pyx_L8_try_end:;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
  *         raise ImportError("numpy.core.multiarray failed to import")
  * 
  * cdef inline int import_umath() except -1:             # <<<<<<<<<<<<<<
@@ -10258,7 +10859,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
   return __pyx_r;
 }
 
-/* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
+/* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
  *         raise ImportError("numpy.core.umath failed to import")
  * 
  * cdef inline int import_ufunc() except -1:             # <<<<<<<<<<<<<<
@@ -10279,7 +10880,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("import_ufunc", 0);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
  * 
  * cdef inline int import_ufunc() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10295,7 +10896,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1048
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1048
  * cdef inline int import_ufunc() except -1:
  *     try:
  *         _import_umath()             # <<<<<<<<<<<<<<
@@ -10304,7 +10905,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
  */
       __pyx_t_4 = _import_umath(); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(3, 1048, __pyx_L3_error)
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
  * 
  * cdef inline int import_ufunc() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10318,7 +10919,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1049
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1049
  *     try:
  *         _import_umath()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -10332,7 +10933,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1050
+      /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1050
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
@@ -10346,7 +10947,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
+    /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
  * 
  * cdef inline int import_ufunc() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -10361,7 +10962,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     __pyx_L8_try_end:;
   }
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
  *         raise ImportError("numpy.core.umath failed to import")
  * 
  * cdef inline int import_ufunc() except -1:             # <<<<<<<<<<<<<<
@@ -23251,6 +23852,10 @@ static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_values(PyObject *o, CYTHON_U
   return __pyx_pw_5cedar_5_tree_5_Tree_6values_1__get__(o);
 }
 
+static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_p(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5cedar_5_tree_5_Tree_1p_1__get__(o);
+}
+
 static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_chosen_features(PyObject *o, CYTHON_UNUSED void *x) {
   return __pyx_pw_5cedar_5_tree_5_Tree_15chosen_features_1__get__(o);
 }
@@ -23263,6 +23868,10 @@ static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_right_children(PyObject *o, 
   return __pyx_pw_5cedar_5_tree_5_Tree_14right_children_1__get__(o);
 }
 
+static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_depth(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5cedar_5_tree_5_Tree_5depth_1__get__(o);
+}
+
 static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_counts(PyObject *o, CYTHON_UNUSED void *x) {
   return __pyx_pw_5cedar_5_tree_5_Tree_6counts_1__get__(o);
 }
@@ -23273,20 +23882,6 @@ static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_pos_counts(PyObject *o, CYTH
 
 static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_feature_counts(PyObject *o, CYTHON_UNUSED void *x) {
   return __pyx_pw_5cedar_5_tree_5_Tree_14feature_counts_1__get__(o);
-}
-
-static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_max_depth(PyObject *o, CYTHON_UNUSED void *x) {
-  return __pyx_pw_5cedar_5_tree_5_Tree_9max_depth_1__get__(o);
-}
-
-static int __pyx_setprop_5cedar_5_tree_5_Tree_max_depth(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
-  if (v) {
-    return __pyx_pw_5cedar_5_tree_5_Tree_9max_depth_3__set__(o, v);
-  }
-  else {
-    PyErr_SetString(PyExc_NotImplementedError, "__del__");
-    return -1;
-  }
 }
 
 static PyObject *__pyx_getprop_5cedar_5_tree_5_Tree_node_count(PyObject *o, CYTHON_UNUSED void *x) {
@@ -23333,13 +23928,14 @@ static PyMethodDef __pyx_methods_5cedar_5_tree__Tree[] = {
 static struct PyGetSetDef __pyx_getsets_5cedar_5_tree__Tree[] = {
   {(char *)"n_nodes", __pyx_getprop_5cedar_5_tree_5_Tree_n_nodes, 0, (char *)0, 0},
   {(char *)"values", __pyx_getprop_5cedar_5_tree_5_Tree_values, 0, (char *)0, 0},
+  {(char *)"p", __pyx_getprop_5cedar_5_tree_5_Tree_p, 0, (char *)0, 0},
   {(char *)"chosen_features", __pyx_getprop_5cedar_5_tree_5_Tree_chosen_features, 0, (char *)0, 0},
   {(char *)"left_children", __pyx_getprop_5cedar_5_tree_5_Tree_left_children, 0, (char *)0, 0},
   {(char *)"right_children", __pyx_getprop_5cedar_5_tree_5_Tree_right_children, 0, (char *)0, 0},
+  {(char *)"depth", __pyx_getprop_5cedar_5_tree_5_Tree_depth, 0, (char *)0, 0},
   {(char *)"counts", __pyx_getprop_5cedar_5_tree_5_Tree_counts, 0, (char *)0, 0},
   {(char *)"pos_counts", __pyx_getprop_5cedar_5_tree_5_Tree_pos_counts, 0, (char *)0, 0},
   {(char *)"feature_counts", __pyx_getprop_5cedar_5_tree_5_Tree_feature_counts, 0, (char *)0, 0},
-  {(char *)"max_depth", __pyx_getprop_5cedar_5_tree_5_Tree_max_depth, __pyx_setprop_5cedar_5_tree_5_Tree_max_depth, (char *)0, 0},
   {(char *)"node_count", __pyx_getprop_5cedar_5_tree_5_Tree_node_count, __pyx_setprop_5cedar_5_tree_5_Tree_node_count, (char *)0, 0},
   {(char *)"capacity", __pyx_getprop_5cedar_5_tree_5_Tree_capacity, __pyx_setprop_5cedar_5_tree_5_Tree_capacity, (char *)0, 0},
   {0, 0, 0, 0, 0}
@@ -24307,10 +24903,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Cannot_assign_to_read_only_memor, __pyx_k_Cannot_assign_to_read_only_memor, sizeof(__pyx_k_Cannot_assign_to_read_only_memor), 0, 0, 1, 0},
   {&__pyx_kp_s_Cannot_create_writable_memory_vi, __pyx_k_Cannot_create_writable_memory_vi, sizeof(__pyx_k_Cannot_create_writable_memory_vi), 0, 0, 1, 0},
   {&__pyx_kp_s_Cannot_index_with_type_s, __pyx_k_Cannot_index_with_type_s, sizeof(__pyx_k_Cannot_index_with_type_s), 0, 0, 1, 0},
-  {&__pyx_n_s_DOUBLE, __pyx_k_DOUBLE, sizeof(__pyx_k_DOUBLE), 0, 0, 1, 1},
   {&__pyx_n_s_Ellipsis, __pyx_k_Ellipsis, sizeof(__pyx_k_Ellipsis), 0, 0, 1, 1},
   {&__pyx_kp_s_Empty_shape_tuple_for_cython_arr, __pyx_k_Empty_shape_tuple_for_cython_arr, sizeof(__pyx_k_Empty_shape_tuple_for_cython_arr), 0, 0, 1, 0},
-  {&__pyx_n_s_FLOAT, __pyx_k_FLOAT, sizeof(__pyx_k_FLOAT), 0, 0, 1, 1},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_n_s_INT, __pyx_k_INT, sizeof(__pyx_k_INT), 0, 0, 1, 1},
@@ -24338,15 +24932,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_X_dtype_should_be_np_int32_got_s, __pyx_k_X_dtype_should_be_np_int32_got_s, sizeof(__pyx_k_X_dtype_should_be_np_int32_got_s), 0, 1, 0, 0},
   {&__pyx_kp_u_X_should_be_in_np_ndarray_format, __pyx_k_X_should_be_in_np_ndarray_format, sizeof(__pyx_k_X_should_be_in_np_ndarray_format), 0, 1, 0, 0},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
-  {&__pyx_n_s_ascontiguousarray, __pyx_k_ascontiguousarray, sizeof(__pyx_k_ascontiguousarray), 0, 0, 1, 1},
-  {&__pyx_n_s_asfortranarray, __pyx_k_asfortranarray, sizeof(__pyx_k_asfortranarray), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_build, __pyx_k_build, sizeof(__pyx_k_build), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
-  {&__pyx_n_s_contiguous, __pyx_k_contiguous, sizeof(__pyx_k_contiguous), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
@@ -24358,8 +24949,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
   {&__pyx_n_s_f, __pyx_k_f, sizeof(__pyx_k_f), 0, 0, 1, 1},
   {&__pyx_n_s_flags, __pyx_k_flags, sizeof(__pyx_k_flags), 0, 0, 1, 1},
-  {&__pyx_n_s_float32, __pyx_k_float32, sizeof(__pyx_k_float32), 0, 0, 1, 1},
-  {&__pyx_n_s_float64, __pyx_k_float64, sizeof(__pyx_k_float64), 0, 0, 1, 1},
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {&__pyx_n_s_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 0, 1, 1},
   {&__pyx_n_u_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 0, 1},
@@ -24435,10 +25024,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 127, __pyx_L1_error)
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 180, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 457, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(3, 856, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(3, 1038, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 151, __pyx_L1_error)
@@ -24492,7 +25081,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_C_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not C contiguous")             # <<<<<<<<<<<<<<
@@ -24503,7 +25092,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_F_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not Fortran contiguous")             # <<<<<<<<<<<<<<
@@ -24514,7 +25103,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
  *                 if ((descr.byteorder == c'>' and little_endian) or
  *                     (descr.byteorder == c'<' and not little_endian)):
  *                     raise ValueError(u"Non-native byte order not supported")             # <<<<<<<<<<<<<<
@@ -24525,7 +25114,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")             # <<<<<<<<<<<<<<
@@ -24536,7 +25125,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
  *             t = child.type_num
  *             if end - f < 5:
  *                 raise RuntimeError(u"Format string allocated too short.")             # <<<<<<<<<<<<<<
@@ -24547,7 +25136,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
  *         _import_array()
  *     except Exception:
  *         raise ImportError("numpy.core.multiarray failed to import")             # <<<<<<<<<<<<<<
@@ -24558,7 +25147,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "../../../../../../../usr/local/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
+  /* "../myenv/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
@@ -24836,6 +25425,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_2 = PyInt_FromLong(2); if (unlikely(!__pyx_int_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_184977713 = PyInt_FromLong(184977713L); if (unlikely(!__pyx_int_184977713)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
@@ -24892,35 +25483,35 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5cedar_5_tree__Tree._get_right_pos_counts = (PyArrayObject *(*)(struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5cedar_5_tree_5_Tree__get_right_pos_counts;
   __pyx_vtable_5cedar_5_tree__Tree._get_features = (PyArrayObject *(*)(struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5cedar_5_tree_5_Tree__get_features;
   __pyx_vtable_5cedar_5_tree__Tree._get_leaf_samples = (PyArrayObject *(*)(struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, int __pyx_skip_dispatch))__pyx_f_5cedar_5_tree_5_Tree__get_leaf_samples;
-  __pyx_vtable_5cedar_5_tree__Tree.add_node = (int (*)(struct __pyx_obj_5cedar_5_tree__Tree *, int, int, int, int, double, int *, struct __pyx_t_5cedar_9_splitter_Meta *))__pyx_f_5cedar_5_tree_5_Tree_add_node;
+  __pyx_vtable_5cedar_5_tree__Tree.add_node = (int (*)(struct __pyx_obj_5cedar_5_tree__Tree *, int, int, int, int, double, int, int *, struct __pyx_t_5cedar_9_splitter_Meta *))__pyx_f_5cedar_5_tree_5_Tree_add_node;
   __pyx_vtable_5cedar_5_tree__Tree._get_double_ndarray = (PyArrayObject *(*)(struct __pyx_obj_5cedar_5_tree__Tree *, double *))__pyx_f_5cedar_5_tree_5_Tree__get_double_ndarray;
   __pyx_vtable_5cedar_5_tree__Tree._get_int_ndarray = (PyArrayObject *(*)(struct __pyx_obj_5cedar_5_tree__Tree *, int *))__pyx_f_5cedar_5_tree_5_Tree__get_int_ndarray;
   __pyx_vtable_5cedar_5_tree__Tree._resize = (int (*)(struct __pyx_obj_5cedar_5_tree__Tree *, struct __pyx_opt_args_5cedar_5_tree_5_Tree__resize *__pyx_optional_args))__pyx_f_5cedar_5_tree_5_Tree__resize;
-  if (PyType_Ready(&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5cedar_5_tree__Tree.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5cedar_5_tree__Tree.tp_dictoffset && __pyx_type_5cedar_5_tree__Tree.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5cedar_5_tree__Tree.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5cedar_5_tree__Tree.tp_dict, __pyx_vtabptr_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Tree, (PyObject *)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5cedar_5_tree__Tree.tp_dict, __pyx_vtabptr_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Tree, (PyObject *)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
   __pyx_ptype_5cedar_5_tree__Tree = &__pyx_type_5cedar_5_tree__Tree;
   __pyx_vtabptr_5cedar_5_tree__TreeBuilder = &__pyx_vtable_5cedar_5_tree__TreeBuilder;
   __pyx_vtable_5cedar_5_tree__TreeBuilder.build = (void (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch))__pyx_f_5cedar_5_tree_12_TreeBuilder_build;
-  __pyx_vtable_5cedar_5_tree__TreeBuilder._check_input = (PyObject *(*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, PyObject *, PyArrayObject *, PyArrayObject *))__pyx_f_5cedar_5_tree_12_TreeBuilder__check_input;
+  __pyx_vtable_5cedar_5_tree__TreeBuilder.build_at_node = (void (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, PyObject *, PyArrayObject *, PyArrayObject *, int, int, int, double, int, int *, int *, int))__pyx_f_5cedar_5_tree_12_TreeBuilder_build_at_node;
   __pyx_vtable_5cedar_5_tree__TreeBuilder._leaf_value = (double (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, __Pyx_memviewslice, int *, int, struct __pyx_t_5cedar_9_splitter_Meta *))__pyx_f_5cedar_5_tree_12_TreeBuilder__leaf_value;
-  if (PyType_Ready(&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5cedar_5_tree__TreeBuilder.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5cedar_5_tree__TreeBuilder.tp_dictoffset && __pyx_type_5cedar_5_tree__TreeBuilder.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5cedar_5_tree__TreeBuilder.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5cedar_5_tree__TreeBuilder.tp_dict, __pyx_vtabptr_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TreeBuilder, (PyObject *)&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5cedar_5_tree__TreeBuilder.tp_dict, __pyx_vtabptr_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TreeBuilder, (PyObject *)&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
   __pyx_ptype_5cedar_5_tree__TreeBuilder = &__pyx_type_5cedar_5_tree__TreeBuilder;
   __pyx_vtabptr_array = &__pyx_vtable_array;
   __pyx_vtable_array.get_memview = (PyObject *(*)(struct __pyx_array_obj *))__pyx_array_get_memview;
@@ -25019,17 +25610,23 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5numpy_ufunc = __Pyx_ImportType(__pyx_t_1, "numpy", "ufunc", sizeof(PyUFuncObject), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5numpy_ufunc) __PYX_ERR(3, 918, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 28, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 28, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 28, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 27, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 27, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 20, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_6_utils_Stack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "Stack", sizeof(struct __pyx_obj_5cedar_6_utils_Stack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_Stack) __PYX_ERR(8, 20, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_Stack = (struct __pyx_vtabstruct_5cedar_6_utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_Stack)) __PYX_ERR(8, 20, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_Stack) __PYX_ERR(8, 28, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_Stack = (struct __pyx_vtabstruct_5cedar_6_utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_Stack)) __PYX_ERR(8, 28, __pyx_L1_error)
+  __pyx_ptype_5cedar_6_utils_RemovalStack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "RemovalStack", sizeof(struct __pyx_obj_5cedar_6_utils_RemovalStack), __Pyx_ImportType_CheckSize_Warn);
+   if (!__pyx_ptype_5cedar_6_utils_RemovalStack) __PYX_ERR(8, 51, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_RemovalStack = (struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_RemovalStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_RemovalStack)) __PYX_ERR(8, 51, __pyx_L1_error)
+  __pyx_ptype_5cedar_6_utils_IntStack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "IntStack", sizeof(struct __pyx_obj_5cedar_6_utils_IntStack), __Pyx_ImportType_CheckSize_Warn);
+   if (!__pyx_ptype_5cedar_6_utils_IntStack) __PYX_ERR(8, 65, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_IntStack = (struct __pyx_vtabstruct_5cedar_6_utils_IntStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_IntStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_IntStack)) __PYX_ERR(8, 65, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -25049,10 +25646,19 @@ static int __Pyx_modinit_variable_import_code(void) {
 
 static int __Pyx_modinit_function_import_code(void) {
   __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
+  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "_check_samples", (void (**)(void))&__pyx_f_5cedar_6_utils__check_samples, "PyObject *(PyObject *, PyArrayObject *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "_check_features", (void (**)(void))&__pyx_f_5cedar_6_utils__check_features, "PyObject *(PyArrayObject *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 
@@ -25249,118 +25855,76 @@ if (!__Pyx_RefNanny) {
   if (unlikely(__Pyx_modinit_type_init_code() != 0)) goto __pyx_L1_error;
   if (unlikely(__Pyx_modinit_type_import_code() != 0)) goto __pyx_L1_error;
   (void)__Pyx_modinit_variable_import_code();
-  (void)__Pyx_modinit_function_import_code();
+  if (unlikely(__Pyx_modinit_function_import_code() != 0)) goto __pyx_L1_error;
   /*--- Execution code ---*/
   #if defined(__Pyx_Generator_USED) || defined(__Pyx_Coroutine_USED)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "cedar/_tree.pyx":21
- * from libc.time cimport time
+  /* "cedar/_tree.pyx":18
+ * from libc.stdio cimport printf
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
  * cimport numpy as np
  * np.import_array()
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cedar/_tree.pyx":23
+  /* "cedar/_tree.pyx":20
  * import numpy as np
  * cimport numpy as np
  * np.import_array()             # <<<<<<<<<<<<<<
  * 
  * from ._utils cimport Stack
  */
-  __pyx_t_2 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 20, __pyx_L1_error)
 
-  /* "cedar/_tree.pyx":29
+  /* "cedar/_tree.pyx":28
  * 
  * # constants
  * from numpy import int32 as INT             # <<<<<<<<<<<<<<
- * from numpy import float32 as FLOAT
- * from numpy import float64 as DOUBLE
+ * 
+ * cdef int _TREE_LEAF = -1
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_int32);
   __Pyx_GIVEREF(__pyx_n_s_int32);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_int32);
-  __pyx_t_3 = __Pyx_Import(__pyx_n_s_numpy, __pyx_t_1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Import(__pyx_n_s_numpy, __pyx_t_1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_3, __pyx_n_s_int32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_3, __pyx_n_s_int32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_INT, __pyx_t_1) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_INT, __pyx_t_1) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "cedar/_tree.pyx":30
- * # constants
  * from numpy import int32 as INT
- * from numpy import float32 as FLOAT             # <<<<<<<<<<<<<<
- * from numpy import float64 as DOUBLE
  * 
- */
-  __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_INCREF(__pyx_n_s_float32);
-  __Pyx_GIVEREF(__pyx_n_s_float32);
-  PyList_SET_ITEM(__pyx_t_3, 0, __pyx_n_s_float32);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, __pyx_t_3, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_float32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_FLOAT, __pyx_t_3) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "cedar/_tree.pyx":31
- * from numpy import int32 as INT
- * from numpy import float32 as FLOAT
- * from numpy import float64 as DOUBLE             # <<<<<<<<<<<<<<
- * 
- * cdef SIZE_t _TREE_LEAF = -1
- */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s_float64);
-  __Pyx_GIVEREF(__pyx_n_s_float64);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_float64);
-  __pyx_t_3 = __Pyx_Import(__pyx_n_s_numpy, __pyx_t_1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_DOUBLE, __pyx_t_1) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "cedar/_tree.pyx":33
- * from numpy import float64 as DOUBLE
- * 
- * cdef SIZE_t _TREE_LEAF = -1             # <<<<<<<<<<<<<<
- * cdef SIZE_t _TREE_UNDEFINED = -2
- * cdef SIZE_t INITIAL_STACK_SIZE = 10
+ * cdef int _TREE_LEAF = -1             # <<<<<<<<<<<<<<
+ * cdef int _TREE_UNDEFINED = -2
+ * cdef int INITIAL_STACK_SIZE = 10
  */
   __pyx_v_5cedar_5_tree__TREE_LEAF = -1;
 
-  /* "cedar/_tree.pyx":34
+  /* "cedar/_tree.pyx":31
  * 
- * cdef SIZE_t _TREE_LEAF = -1
- * cdef SIZE_t _TREE_UNDEFINED = -2             # <<<<<<<<<<<<<<
- * cdef SIZE_t INITIAL_STACK_SIZE = 10
+ * cdef int _TREE_LEAF = -1
+ * cdef int _TREE_UNDEFINED = -2             # <<<<<<<<<<<<<<
+ * cdef int INITIAL_STACK_SIZE = 10
  * 
  */
   __pyx_v_5cedar_5_tree__TREE_UNDEFINED = -2;
 
-  /* "cedar/_tree.pyx":35
- * cdef SIZE_t _TREE_LEAF = -1
- * cdef SIZE_t _TREE_UNDEFINED = -2
- * cdef SIZE_t INITIAL_STACK_SIZE = 10             # <<<<<<<<<<<<<<
+  /* "cedar/_tree.pyx":32
+ * cdef int _TREE_LEAF = -1
+ * cdef int _TREE_UNDEFINED = -2
+ * cdef int INITIAL_STACK_SIZE = 10             # <<<<<<<<<<<<<<
  * 
  * # =====================================
  */
@@ -25789,74 +26353,6 @@ static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UIN
 }
 #endif
 
-/* GetModuleGlobalName */
-#if CYTHON_USE_DICT_VERSIONS
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
-#else
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
-#endif
-{
-    PyObject *result;
-#if !CYTHON_AVOID_BORROWED_REFS
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    } else if (unlikely(PyErr_Occurred())) {
-        return NULL;
-    }
-#else
-    result = PyDict_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-#endif
-#else
-    result = PyObject_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-    PyErr_Clear();
-#endif
-    return __Pyx_GetBuiltinName(name);
-}
-
-/* PyObjectCall */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
-    PyObject *result;
-    ternaryfunc call = func->ob_type->tp_call;
-    if (unlikely(!call))
-        return PyObject_Call(func, arg, kw);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = (*call)(func, arg, kw);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
-
-/* ExtTypeTest */
-static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
-    if (unlikely(!type)) {
-        PyErr_SetString(PyExc_SystemError, "Missing type object");
-        return 0;
-    }
-    if (likely(__Pyx_TypeCheck(obj, type)))
-        return 1;
-    PyErr_Format(PyExc_TypeError, "Cannot convert %.200s to %.200s",
-                 Py_TYPE(obj)->tp_name, type->tp_name);
-    return 0;
-}
-
 /* PyFunctionFastCall */
 #if CYTHON_FAST_PYCALL
 static PyObject* __Pyx_PyFunction_FastCallNoKw(PyCodeObject *co, PyObject **args, Py_ssize_t na,
@@ -25999,6 +26495,26 @@ static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, P
 }
 #endif
 
+/* PyObjectCall */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    PyObject *result;
+    ternaryfunc call = func->ob_type->tp_call;
+    if (unlikely(!call))
+        return PyObject_Call(func, arg, kw);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = (*call)(func, arg, kw);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
 /* RaiseTooManyValuesToUnpack */
 static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
     PyErr_Format(PyExc_ValueError,
@@ -26057,6 +26573,318 @@ static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected) {
         return __Pyx_IterFinish();
     }
     return 0;
+}
+
+/* ExtTypeTest */
+static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
+    if (unlikely(!type)) {
+        PyErr_SetString(PyExc_SystemError, "Missing type object");
+        return 0;
+    }
+    if (likely(__Pyx_TypeCheck(obj, type)))
+        return 1;
+    PyErr_Format(PyExc_TypeError, "Cannot convert %.200s to %.200s",
+                 Py_TYPE(obj)->tp_name, type->tp_name);
+    return 0;
+}
+
+/* PyIntBinop */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_SubtractObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, int inplace, int zerodivision_check) {
+    (void)inplace;
+    (void)zerodivision_check;
+    #if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(op1))) {
+        const long b = intval;
+        long x;
+        long a = PyInt_AS_LONG(op1);
+            x = (long)((unsigned long)a - b);
+            if (likely((x^a) >= 0 || (x^~b) >= 0))
+                return PyInt_FromLong(x);
+            return PyLong_Type.tp_as_number->nb_subtract(op1, op2);
+    }
+    #endif
+    #if CYTHON_USE_PYLONG_INTERNALS
+    if (likely(PyLong_CheckExact(op1))) {
+        const long b = intval;
+        long a, x;
+#ifdef HAVE_LONG_LONG
+        const PY_LONG_LONG llb = intval;
+        PY_LONG_LONG lla, llx;
+#endif
+        const digit* digits = ((PyLongObject*)op1)->ob_digit;
+        const Py_ssize_t size = Py_SIZE(op1);
+        if (likely(__Pyx_sst_abs(size) <= 1)) {
+            a = likely(size) ? digits[0] : 0;
+            if (size == -1) a = -a;
+        } else {
+            switch (size) {
+                case -2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                default: return PyLong_Type.tp_as_number->nb_subtract(op1, op2);
+            }
+        }
+                x = a - b;
+            return PyLong_FromLong(x);
+#ifdef HAVE_LONG_LONG
+        long_long:
+                llx = lla - llb;
+            return PyLong_FromLongLong(llx);
+#endif
+        
+        
+    }
+    #endif
+    if (PyFloat_CheckExact(op1)) {
+        const long b = intval;
+        double a = PyFloat_AS_DOUBLE(op1);
+            double result;
+            PyFPE_START_PROTECT("subtract", return NULL)
+            result = ((double)a) - (double)b;
+            PyFPE_END_PROTECT(result)
+            return PyFloat_FromDouble(result);
+    }
+    return (inplace ? PyNumber_InPlaceSubtract : PyNumber_Subtract)(op1, op2);
+}
+#endif
+
+/* PyIntBinop */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, int inplace, int zerodivision_check) {
+    (void)inplace;
+    (void)zerodivision_check;
+    #if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(op1))) {
+        const long b = intval;
+        long x;
+        long a = PyInt_AS_LONG(op1);
+            x = (long)((unsigned long)a + b);
+            if (likely((x^a) >= 0 || (x^b) >= 0))
+                return PyInt_FromLong(x);
+            return PyLong_Type.tp_as_number->nb_add(op1, op2);
+    }
+    #endif
+    #if CYTHON_USE_PYLONG_INTERNALS
+    if (likely(PyLong_CheckExact(op1))) {
+        const long b = intval;
+        long a, x;
+#ifdef HAVE_LONG_LONG
+        const PY_LONG_LONG llb = intval;
+        PY_LONG_LONG lla, llx;
+#endif
+        const digit* digits = ((PyLongObject*)op1)->ob_digit;
+        const Py_ssize_t size = Py_SIZE(op1);
+        if (likely(__Pyx_sst_abs(size) <= 1)) {
+            a = likely(size) ? digits[0] : 0;
+            if (size == -1) a = -a;
+        } else {
+            switch (size) {
+                case -2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                default: return PyLong_Type.tp_as_number->nb_add(op1, op2);
+            }
+        }
+                x = a + b;
+            return PyLong_FromLong(x);
+#ifdef HAVE_LONG_LONG
+        long_long:
+                llx = lla + llb;
+            return PyLong_FromLongLong(llx);
+#endif
+        
+        
+    }
+    #endif
+    if (PyFloat_CheckExact(op1)) {
+        const long b = intval;
+        double a = PyFloat_AS_DOUBLE(op1);
+            double result;
+            PyFPE_START_PROTECT("add", return NULL)
+            result = ((double)a) + (double)b;
+            PyFPE_END_PROTECT(result)
+            return PyFloat_FromDouble(result);
+    }
+    return (inplace ? PyNumber_InPlaceAdd : PyNumber_Add)(op1, op2);
+}
+#endif
+
+/* PyNumberPow2 */
+static PyObject* __Pyx__PyNumber_PowerOf2(PyObject *two, PyObject *exp, PyObject *none, int inplace) {
+#if !CYTHON_COMPILING_IN_PYPY
+    Py_ssize_t shiftby;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(exp))) {
+        shiftby = PyInt_AS_LONG(exp);
+    } else
+#endif
+    if (likely(PyLong_CheckExact(exp))) {
+        #if CYTHON_USE_PYLONG_INTERNALS
+        const Py_ssize_t size = Py_SIZE(exp);
+        if (likely(size == 1)) {
+            shiftby = ((PyLongObject*)exp)->ob_digit[0];
+        } else if (size == 0) {
+            return PyInt_FromLong(1L);
+        } else if (unlikely(size < 0)) {
+            goto fallback;
+        } else {
+            shiftby = PyLong_AsSsize_t(exp);
+        }
+        #else
+        shiftby = PyLong_AsSsize_t(exp);
+        #endif
+    } else {
+        goto fallback;
+    }
+    if (likely(shiftby >= 0)) {
+        if ((size_t)shiftby <= sizeof(long) * 8 - 2) {
+            long value = 1L << shiftby;
+            return PyInt_FromLong(value);
+#ifdef HAVE_LONG_LONG
+        } else if ((size_t)shiftby <= sizeof(unsigned PY_LONG_LONG) * 8 - 1) {
+            unsigned PY_LONG_LONG value = ((unsigned PY_LONG_LONG)1) << shiftby;
+            return PyLong_FromUnsignedLongLong(value);
+#endif
+        } else {
+            PyObject *result, *one = PyInt_FromLong(1L);
+            if (unlikely(!one)) return NULL;
+            result = PyNumber_Lshift(one, exp);
+            Py_DECREF(one);
+            return result;
+        }
+    } else if (shiftby == -1 && PyErr_Occurred()) {
+        PyErr_Clear();
+    }
+fallback:
+#endif
+    return (inplace ? PyNumber_InPlacePower : PyNumber_Power)(two, exp, none);
 }
 
 /* GetItemInt */
@@ -26729,6 +27557,55 @@ invalid_keyword:
         function_name, key);
     #endif
     return 0;
+}
+
+/* PyObjectSetAttrStr */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
+    PyTypeObject* tp = Py_TYPE(obj);
+    if (likely(tp->tp_setattro))
+        return tp->tp_setattro(obj, attr_name, value);
+#if PY_MAJOR_VERSION < 3
+    if (likely(tp->tp_setattr))
+        return tp->tp_setattr(obj, PyString_AS_STRING(attr_name), value);
+#endif
+    return PyObject_SetAttr(obj, attr_name, value);
+}
+#endif
+
+/* GetModuleGlobalName */
+#if CYTHON_USE_DICT_VERSIONS
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
+#else
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
+#endif
+{
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    } else if (unlikely(PyErr_Occurred())) {
+        return NULL;
+    }
+#else
+    result = PyDict_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+#endif
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+    PyErr_Clear();
+#endif
+    return __Pyx_GetBuiltinName(name);
 }
 
 /* IsLittleEndian */
@@ -27923,130 +28800,6 @@ static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches2(PyObject *err, PyObj
 }
 #endif
 
-/* PyIntBinop */
-  #if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, int inplace, int zerodivision_check) {
-    (void)inplace;
-    (void)zerodivision_check;
-    #if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_CheckExact(op1))) {
-        const long b = intval;
-        long x;
-        long a = PyInt_AS_LONG(op1);
-            x = (long)((unsigned long)a + b);
-            if (likely((x^a) >= 0 || (x^b) >= 0))
-                return PyInt_FromLong(x);
-            return PyLong_Type.tp_as_number->nb_add(op1, op2);
-    }
-    #endif
-    #if CYTHON_USE_PYLONG_INTERNALS
-    if (likely(PyLong_CheckExact(op1))) {
-        const long b = intval;
-        long a, x;
-#ifdef HAVE_LONG_LONG
-        const PY_LONG_LONG llb = intval;
-        PY_LONG_LONG lla, llx;
-#endif
-        const digit* digits = ((PyLongObject*)op1)->ob_digit;
-        const Py_ssize_t size = Py_SIZE(op1);
-        if (likely(__Pyx_sst_abs(size) <= 1)) {
-            a = likely(size) ? digits[0] : 0;
-            if (size == -1) a = -a;
-        } else {
-            switch (size) {
-                case -2:
-                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
-                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 2:
-                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
-                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case -3:
-                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
-                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 3:
-                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
-                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case -4:
-                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
-                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 4:
-                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
-                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                default: return PyLong_Type.tp_as_number->nb_add(op1, op2);
-            }
-        }
-                x = a + b;
-            return PyLong_FromLong(x);
-#ifdef HAVE_LONG_LONG
-        long_long:
-                llx = lla + llb;
-            return PyLong_FromLongLong(llx);
-#endif
-        
-        
-    }
-    #endif
-    if (PyFloat_CheckExact(op1)) {
-        const long b = intval;
-        double a = PyFloat_AS_DOUBLE(op1);
-            double result;
-            PyFPE_START_PROTECT("add", return NULL)
-            result = ((double)a) + (double)b;
-            PyFPE_END_PROTECT(result)
-            return PyFloat_FromDouble(result);
-    }
-    return (inplace ? PyNumber_InPlaceAdd : PyNumber_Add)(op1, op2);
-}
-#endif
-
 /* None */
   static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname) {
     PyErr_Format(PyExc_UnboundLocalError, "local variable '%s' referenced before assignment", varname);
@@ -28641,33 +29394,6 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
         return (target_type) value;\
     }
 
-/* None */
-  static CYTHON_INLINE long __Pyx_pow_long(long b, long e) {
-    long t = b;
-    switch (e) {
-        case 3:
-            t *= b;
-        CYTHON_FALLTHROUGH;
-        case 2:
-            t *= b;
-        CYTHON_FALLTHROUGH;
-        case 1:
-            return t;
-        case 0:
-            return 1;
-    }
-    #if 1
-    if (unlikely(e<0)) return 0;
-    #endif
-    t = 1;
-    while (likely(e)) {
-        t *= (b * (e&1)) | ((~e)&1);
-        b *= b;
-        e >>= 1;
-    }
-    return t;
-}
-
 /* CIntToPy */
   static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) ((long) 0 - (long) 1), const_zero = (long) 0;
@@ -28695,37 +29421,6 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
         int one = 1; int little = (int)*(unsigned char *)&one;
         unsigned char *bytes = (unsigned char *)&value;
         return _PyLong_FromByteArray(bytes, sizeof(long),
-                                     little, !is_unsigned);
-    }
-}
-
-/* CIntToPy */
-  static CYTHON_INLINE PyObject* __Pyx_PyInt_From_Py_intptr_t(Py_intptr_t value) {
-    const Py_intptr_t neg_one = (Py_intptr_t) ((Py_intptr_t) 0 - (Py_intptr_t) 1), const_zero = (Py_intptr_t) 0;
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(Py_intptr_t) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(Py_intptr_t) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(Py_intptr_t) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(Py_intptr_t) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(Py_intptr_t) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
-    }
-    {
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&value;
-        return _PyLong_FromByteArray(bytes, sizeof(Py_intptr_t),
                                      little, !is_unsigned);
     }
 }
@@ -30041,6 +30736,60 @@ __pyx_fail:
     }
     return 0;
 }
+
+/* FunctionImport */
+  #ifndef __PYX_HAVE_RT_ImportFunction
+#define __PYX_HAVE_RT_ImportFunction
+static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig) {
+    PyObject *d = 0;
+    PyObject *cobj = 0;
+    union {
+        void (*fp)(void);
+        void *p;
+    } tmp;
+    d = PyObject_GetAttrString(module, (char *)"__pyx_capi__");
+    if (!d)
+        goto bad;
+    cobj = PyDict_GetItemString(d, funcname);
+    if (!cobj) {
+        PyErr_Format(PyExc_ImportError,
+            "%.200s does not export expected C function %.200s",
+                PyModule_GetName(module), funcname);
+        goto bad;
+    }
+#if PY_VERSION_HEX >= 0x02070000
+    if (!PyCapsule_IsValid(cobj, sig)) {
+        PyErr_Format(PyExc_TypeError,
+            "C function %.200s.%.200s has wrong signature (expected %.500s, got %.500s)",
+             PyModule_GetName(module), funcname, sig, PyCapsule_GetName(cobj));
+        goto bad;
+    }
+    tmp.p = PyCapsule_GetPointer(cobj, sig);
+#else
+    {const char *desc, *s1, *s2;
+    desc = (const char *)PyCObject_GetDesc(cobj);
+    if (!desc)
+        goto bad;
+    s1 = desc; s2 = sig;
+    while (*s1 != '\0' && *s1 == *s2) { s1++; s2++; }
+    if (*s1 != *s2) {
+        PyErr_Format(PyExc_TypeError,
+            "C function %.200s.%.200s has wrong signature (expected %.500s, got %.500s)",
+             PyModule_GetName(module), funcname, sig, desc);
+        goto bad;
+    }
+    tmp.p = PyCObject_AsVoidPtr(cobj);}
+#endif
+    *f = tmp.fp;
+    if (!(*f))
+        goto bad;
+    Py_DECREF(d);
+    return 0;
+bad:
+    Py_XDECREF(d);
+    return -1;
+}
+#endif
 
 /* InitStrings */
   static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
