@@ -42,10 +42,11 @@ cdef class _Splitter:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int node_split(self, int[::1, :] X, int[::1] y, double parent_p,
+    cdef int node_split(self, int** X, int* y,
                         int* samples, int* original_samples,
                         int* features, int n_features,
-                        SplitRecord* split, Meta* meta):
+                        double parent_p,
+                        SplitRecord* split, Meta* meta) nogil:
         """
         Find the best split in the node data.
         This is a placeholder method. The majority of computation will be done here.
@@ -111,7 +112,7 @@ cdef class _Splitter:
                 for i in range(n_samples):
                     # printf('sample[%d]: %d\n', i, samples[i])
 
-                    if X[samples[i], features[j]] == 1:
+                    if X[samples[i]][features[j]] == 1:
                         left_count += 1
                         left_pos_count += y[samples[i]]
 
@@ -159,7 +160,7 @@ cdef class _Splitter:
                 j = 0
                 k = 0
                 for i in range(n_samples):
-                    if X[samples[i], valid_features[chosen_ndx]] == 1:
+                    if X[samples[i]][valid_features[chosen_ndx]] == 1:
                         split.left_indices[j] = samples[i]
                         split.left_original_indices[j] = original_samples[i]
                         j += 1

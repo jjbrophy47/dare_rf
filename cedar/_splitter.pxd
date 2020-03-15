@@ -38,7 +38,8 @@ cdef class _Splitter:
     cdef int random_state                  # Random state reference
 
     # Methods
-    cdef int node_split(self, int[::1, :] X, int[::1] y, double parent_p,
+    cdef int node_split(self, int** X, int* y,
                         int* samples, int* original_samples,
                         int* features, int n_features,
-                        SplitRecord* split, Meta* meta)
+                        double parent_p,
+                        SplitRecord* split, Meta* meta) nogil

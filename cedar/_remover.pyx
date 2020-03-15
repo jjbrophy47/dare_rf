@@ -10,6 +10,7 @@ from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdio cimport printf
 from libc.math cimport exp
+from libc.time cimport time
 
 import numpy as np
 cimport numpy as np
@@ -20,7 +21,7 @@ from ._utils cimport RemovalStack
 from ._utils cimport RemovalStackRecord
 from ._utils cimport compute_gini
 from ._utils cimport generate_distribution
-from ._utils cimport get_int_ndarray
+from ._utils cimport convert_int_ndarray
 
 cdef int _TREE_LEAF = -1
 cdef int _TREE_UNDEFINED = -2
@@ -35,36 +36,37 @@ cdef class _Remover:
     Removes data from a learned tree.
     """
 
-    def __cinit__(self, double epsilon, double lmbda, get_data):
+    def __cinit__(self, _DataManager manager, double epsilon, double lmbda):
+        self.manager = manager
         self.epsilon = epsilon
         self.lmbda = lmbda
-        self.get_data = get_data
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef int remove(self, _Tree tree, _TreeBuilder tree_builder,
-                     object X, np.ndarray y, np.ndarray f,
                      np.ndarray remove_indices):
         """
         Remove the data (X, y) from the learned _Tree.
         """
-
-        # # check input
-        # X, y = _check_samples(X, y)
-        # f = _check_features(f)
-
-        # TODO: check remove_indices?
+        printf('remove\n')
 
         # Parameters
         cdef int min_samples_leaf = tree_builder.min_samples_leaf
         cdef int min_samples_split = tree_builder.min_samples_split
+        cdef _DataManager manager = self.manager
+
+        # get data
+        cdef int** X = NULL
+        cdef int* y = NULL
+        cdef int n_samples = remove_indices.shape[0]
+        cdef int* data_indices = convert_int_ndarray(remove_indices)
+        manager.get_data(data_indices, n_samples, &X, &y)
 
         # StackRecord parameters
         cdef RemovalStackRecord stack_record
         cdef int depth
         cdef int node_id
         cdef double parent_p
-        cdef int n_samples = X.shape[0]
         cdef int* samples = <int *>malloc(n_samples * sizeof(int))
         cdef RemovalStack stack = RemovalStack(INITIAL_STACK_SIZE)
 
@@ -82,6 +84,10 @@ cdef class _Remover:
         cdef int* rebuild_samples = NULL
         cdef int n_rebuild_samples
         cdef np.ndarray rebuild_samples_python
+
+        cdef int t1 = time(NULL)
+        cdef int t2
+        printf('time: %lds\n', t1)
 
         for i in range(n_samples):
             samples[i] = i
@@ -138,12 +144,15 @@ cdef class _Remover:
 
                 # retrain
                 if rc < 0:
+                    printf('time: %ds\n', time(NULL) - t1)
+
                     n_rebuild_samples = self._collect_leaf_samples(node_id, tree, remove_samples,
                                                                    n_samples, &rebuild_samples)
-                    rebuild_samples_python = get_int_ndarray(rebuild_samples, n_rebuild_samples)
-                    X, y = self.get_data(rebuild_samples_python)
-                    tree_builder.build_at_node(node_id, tree, X, y, f, depth, parent, parent_p, is_left,
-                                               rebuild_samples, meta.features, meta.feature_count)
+                    free(X)
+                    free(y)
+                    tree_builder.build_at_node(node_id, tree, rebuild_samples, n_rebuild_samples,
+                                               meta.features, meta.feature_count,
+                                               depth, parent, parent_p, is_left)
 
                     free(remove_samples)
                     remove_types[remove_type_count] = rc
@@ -172,7 +181,7 @@ cdef class _Remover:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef int _update_leaf(self, int node_id, _Tree tree, int[::1] y, int* samples,
+    cdef int _update_leaf(self, int node_id, _Tree tree, int* y, int* samples,
                           int* remove_samples, int n_samples) nogil:
         """
         Update leaf node: count, pos_count, value, leaf_samples.
@@ -233,7 +242,7 @@ cdef class _Remover:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef int _node_remove(self, int node_id, int[:, ::1] X, int[::1] y,
+    cdef int _node_remove(self, int node_id, int** X, int* y,
                           int* remove_samples, int* samples, int n_samples,
                           int min_samples_split, int min_samples_leaf,
                           int chosen_feature, double parent_p,
@@ -323,7 +332,7 @@ cdef class _Remover:
 
                 for i in range(n_samples):
 
-                    if X[samples[i], meta.features[j]] == 1:
+                    if X[samples[i]][meta.features[j]] == 1:
                         left_count += 1
                         left_pos_count += y[samples[i]]
 
@@ -366,6 +375,9 @@ cdef class _Remover:
                 free(updated_left_pos_counts)
                 free(updated_right_counts)
                 free(updated_right_pos_counts)
+
+                free(meta.features)
+                meta.feature_count = feature_count
 
             # current feature no longer valid => retrain
             elif not chosen_feature_validated:
@@ -420,7 +432,7 @@ cdef class _Remover:
                     j = 0
                     k = 0
                     for i in range(n_samples):
-                        if X[samples[i], valid_features[chosen_ndx]] == 1:
+                        if X[samples[i]][valid_features[chosen_ndx]] == 1:
                             split.left_indices[j] = samples[i]
                             split.left_remove_indices[j] = remove_samples[i]
                             j += 1

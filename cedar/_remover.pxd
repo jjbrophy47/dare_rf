@@ -1,6 +1,7 @@
 import numpy as np
 cimport numpy as np
 
+from ._manager cimport _DataManager
 from ._splitter cimport Meta
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
@@ -21,17 +22,16 @@ cdef class _Remover:
     """
 
     # Inner structures
-    cdef double epsilon       # Indistinguishability parameter
-    cdef double lmbda         # Noise parameter
-    cdef get_data
+    cdef _DataManager manager  # Database manager
+    cdef double epsilon        # Indistinguishability parameter
+    cdef double lmbda          # Noise parameter
 
     # Python API
     cpdef int remove(self, _Tree tree, _TreeBuilder tree_builder,
-                     object X, np.ndarray y, np.ndarray f,
                      np.ndarray remove_indices)
 
     # C API
-    cdef int _node_remove(self, int node_id, int[:, ::1] X, int[::1] y,
+    cdef int _node_remove(self, int node_id, int** X, int* y,
                           int* remove_samples, int* samples, int n_samples,
                           int min_samples_split, int min_samples_leaf,
                           int chosen_feature, double parent_p,
@@ -39,7 +39,7 @@ cdef class _Remover:
     cdef int _collect_leaf_samples(self, int node_id, _Tree tree,
                                    int* remove_samples, int n_remove_samples,
                                    int** rebuild_samples)
-    cdef int _update_leaf(self, int node_id, _Tree tree, int[::1] y,
+    cdef int _update_leaf(self, int node_id, _Tree tree, int* y,
                           int* samples, int* remove_samples,
                           int n_samples) nogil
     cdef int _update_decision_node(self, int node_id, _Tree tree,

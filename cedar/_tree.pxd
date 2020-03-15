@@ -7,6 +7,7 @@ ctypedef np.npy_intp SIZE_t              # Type for indices and counters
 ctypedef np.npy_int32 INT32_t            # Signed 32 bit integer
 ctypedef np.npy_uint32 UINT32_t          # Unsigned 32 bit integer
 
+from ._manager cimport _DataManager
 from ._splitter cimport Meta
 from ._splitter cimport SplitRecord
 from ._splitter cimport _Splitter
@@ -64,18 +65,20 @@ cdef class _TreeBuilder:
     evaluation order, e.g. depth-first or breadth-first.
     """
 
-    cdef _Splitter splitter           # Splitter object that chooses the attribute to split on
+    cdef _DataManager manager        # Database manager
+    cdef _Splitter splitter          # Splitter object that chooses the attribute to split on
     cdef int min_samples_split       # Minimum number of samples in an internal node
     cdef int min_samples_leaf        # Minimum number of samples in a leaf
     cdef int max_depth               # Maximal tree depth
     cdef int random_state            # Random state
 
     # Python API
-    cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f)
+    cpdef void build(self, _Tree tree)
 
     # C API
-    cdef void build_at_node(self, int node_id, _Tree tree, object X, np.ndarray y,
-                            np.ndarray f, int depth, int parent, double parent_p,
-                            bint is_left, int* original_samples,
-                            int* features, int n_features)
-    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil
+    cdef void build_at_node(self, int node_id, _Tree tree,
+                            int* original_samples, int n_samples,
+                            int* features, int n_features,
+                            int depth, int parent, double parent_p,
+                            bint is_left)
+    cdef double _leaf_value(self, int* y, int* samples, int n_samples, Meta* meta) nogil

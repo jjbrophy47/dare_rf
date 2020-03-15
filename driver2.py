@@ -8,8 +8,8 @@ from sklearn.metrics import accuracy_score
 
 import cedar
 
-n_samples = 1000000
-n_features = 30
+n_samples = 10
+n_features = 2
 
 # generate data
 np.random.seed(1)
@@ -37,12 +37,12 @@ preds = model.predict(X_test)
 print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 print()
 
-# remove instance
-t1 = time.time()
-model.delete(0)
-print('delete time: {:.7f}s'.format(time.time() - t1))
-model.print_tree(show_nodes=True, show_metadata=False)
+# # remove instance
+# t1 = time.time()
+# model.delete(0)
+# print('delete time: {:.7f}s'.format(time.time() - t1))
+# model.print_tree(show_nodes=True, show_metadata=False)
 
-preds = model.predict(X_test)
-print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-print()
+# preds = model.predict(X_test)
+# print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
+# print()

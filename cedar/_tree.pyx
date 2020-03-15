@@ -38,8 +38,9 @@ cdef class _TreeBuilder:
     Build a decision tree in depth-first fashion.
     """
 
-    def __cinit__(self, _Splitter splitter, int min_samples_split,
+    def __cinit__(self, _DataManager manager, _Splitter splitter, int min_samples_split,
                   int min_samples_leaf, int max_depth, int random_state):
+        self.manager = manager
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
@@ -50,19 +51,26 @@ cdef class _TreeBuilder:
         # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
         rand()
 
-    cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f):
+    cpdef void build(self, _Tree tree):
         """
         Build a decision tree from the training set (X, y).
         """
+        printf('build\n')
 
         # Parameters
+        cdef _DataManager manager = self.manager
         cdef _Splitter splitter = self.splitter
         cdef int max_depth = self.max_depth
         cdef int min_samples_leaf = self.min_samples_leaf
         cdef int min_samples_split = self.min_samples_split
 
-        # check input
-        # X, y = _check_samples(X, y)
+        # get data
+        cdef int** X = NULL
+        cdef int* y = NULL
+        cdef int* features = NULL
+        cdef int n_samples
+        cdef int n_features
+        manager.get_all_data(&X, &y, &features, &n_samples, &n_features)
 
         # Initial capacity
         cdef int init_capacity
@@ -81,9 +89,6 @@ cdef class _TreeBuilder:
         cdef bint is_left
         cdef int* samples
         cdef int* original_samples
-        cdef int n_samples = X.shape[0]
-        cdef int* features
-        cdef int n_features = X.shape[1]
         cdef Stack stack = Stack(INITIAL_STACK_SIZE)
 
         # compute variables
@@ -101,16 +106,12 @@ cdef class _TreeBuilder:
         # fill in samples and features arrays
         samples = <int *>malloc(n_samples * sizeof(int))
         original_samples = <int *>malloc(n_samples * sizeof(int))
-        features = <int *>malloc(n_features * sizeof(int))
 
         for i in range(n_samples):
             samples[i] = i
 
         for i in range(n_samples):
             original_samples[i] = i
-
-        for i in range(n_features):
-            features[i] = i
 
         # push root node onto stack
         rc = stack.push(0, _TREE_UNDEFINED, 1, 0, samples, original_samples, n_samples, features, n_features)
@@ -139,8 +140,8 @@ cdef class _TreeBuilder:
                        n_features <= 1)
 
             if not is_leaf:
-                rc = splitter.node_split(X, y, parent_p, samples, original_samples,
-                                         features, n_features, &split, &meta)
+                rc = splitter.node_split(X, y, samples, original_samples,
+                                         features, n_features, parent_p, &split, &meta)
                 if rc == -2:
                     is_leaf = 1
                 else:
@@ -170,28 +171,30 @@ cdef class _TreeBuilder:
             if not is_leaf:
                 free(samples)
 
-    cdef void build_at_node(self, int node_id, _Tree tree, object X, np.ndarray y,
-                            np.ndarray f, int depth, int parent, double parent_p,
-                            bint is_left, int* original_samples,
-                            int* features, int n_features):
+    cdef void build_at_node(self, int node_id, _Tree tree,
+                            int* original_samples, int n_samples,
+                            int* features, int n_features,
+                            int depth, int parent, double parent_p,
+                            bint is_left):
         """
         Build subtree from the training set (X, y) starting at `node_id`.
         """
         printf('rebuilding at node %d\n', node_id)
 
-        # # check input
-        # X, y = _check_samples(X, y)
-        # f = _check_features(f)
-
         # Parameters
+        cdef _DataManager manager = self.manager
         cdef _Splitter splitter = self.splitter
         cdef int max_depth = self.max_depth
         cdef int min_samples_leaf = self.min_samples_leaf
         cdef int min_samples_split = self.min_samples_split
 
+        # get data
+        cdef int** X = NULL
+        cdef int* y = NULL
+        manager.get_data(original_samples, n_samples, &X, &y)
+
         # StackRecord parameters
         cdef StackRecord stack_record
-        cdef int n_samples = X.shape[0]
         cdef Stack stack = Stack(INITIAL_STACK_SIZE)
 
         # compute variables
@@ -218,6 +221,7 @@ cdef class _TreeBuilder:
             stack.pop(&stack_record)
             depth = stack_record.depth
             parent = stack_record.parent
+            parent_p = stack_record.parent_p
             is_left = stack_record.is_left
             samples = stack_record.samples
             original_samples = stack_record.original_samples
@@ -227,7 +231,7 @@ cdef class _TreeBuilder:
 
             meta.count = n_samples
 
-            # printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
+            printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
 
             is_leaf = (depth >= max_depth or
                        n_samples < min_samples_split or
@@ -236,8 +240,8 @@ cdef class _TreeBuilder:
 
             if not is_leaf:
                 # printf('node_split\n')
-                rc = splitter.node_split(X, y, parent_p, samples, original_samples,
-                                         features, n_features, &split, &meta)
+                rc = splitter.node_split(X, y, samples, original_samples,
+                                         features, n_features, parent_p, &split, &meta)
                 # printf('rc: %d\n', rc)
                 if rc == -2:
                     is_leaf = 1
@@ -272,11 +276,13 @@ cdef class _TreeBuilder:
             free(samples)
             if not is_leaf:
                 free(original_samples)
+        free(X)
+        free(y)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil:
+    cdef double _leaf_value(self, int* y, int* samples, int n_samples, Meta* meta) nogil:
         cdef int pos_count = 0
         cdef int i
 

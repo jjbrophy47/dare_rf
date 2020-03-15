@@ -8,6 +8,7 @@ cdef int generate_distribution(double lmbda, double* distribution,
                                double* gini_indices, int n_gini_indices) nogil
 cdef int sample_distribution(double* distribution, int n_distribution) nogil
 cdef np.ndarray get_int_ndarray(int *data, int n_points)
+cdef int* convert_int_ndarray(np.ndarray arr)
 # cdef _check_samples(object X, np.ndarray y)
 # cdef _check_features(np.ndarray f)
 

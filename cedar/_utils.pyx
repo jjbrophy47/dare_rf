@@ -121,6 +121,18 @@ cdef np.ndarray get_int_ndarray(int *data, int n_points):
     cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
     return arr
 
+cdef int* convert_int_ndarray(np.ndarray arr):
+    """
+    Converts a numpy array into a C int array.
+    """
+    cdef int n_elem = arr.shape[0]
+    cdef int* new_arr = <int *>malloc(n_elem * sizeof(int))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
 # =============================================================================
 # Stack data structure
 # =============================================================================

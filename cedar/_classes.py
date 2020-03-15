@@ -6,6 +6,7 @@ Uses certified removal to improve deletion efficiency.
 """
 import numpy as np
 
+from ._manager import _DataManager
 from ._splitter import _Splitter
 from ._remover import _Remover
 from ._tree import _Tree
@@ -343,22 +344,26 @@ class Tree(object):
         assert y.ndim == 1
         self.n_features_ = X.shape[1]
 
-        # make data compatible with underlying C implementation
-        X = np.asfortranarray(X, dtype=np.int32)
-        y = np.ascontiguousarray(y, dtype=np.int32)
-        f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
+        # # make data compatible with underlying C implementation
+        # X = np.asfortranarray(X, dtype=np.int32)
+        # y = np.ascontiguousarray(y, dtype=np.int32)
+        # f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
 
-        # save the data for easy deletion
-        if self.single_tree_:
-            self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
+        # # save the data for easy deletion
+        # if self.single_tree_:
+        #     self.X_train_, self.y_train_ = self._numpy_to_dict(X, y)
 
+        f = np.arange(X.shape[1], dtype=np.int32)
+        # samples = np.arange(X.shape[0], dtype=np.int32)
+
+        self.manager_ = _DataManager(X, y, f)
         self.tree_ = _Tree()
         self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
-        self.remover_ = _Remover(self.epsilon, self.lmbda, self.get_data)
-        self.tree_builder_ = _TreeBuilder(self.splitter_, self.min_samples_leaf,
-                                          self.min_samples_split, self.max_depth,
-                                          self.random_state)
-        self.tree_builder_.build(self.tree_, X, y, f)
+        self.remover_ = _Remover(self.manager_, self.epsilon, self.lmbda)
+        self.tree_builder_ = _TreeBuilder(self.manager_, self.splitter_,
+                                          self.min_samples_leaf, self.min_samples_split,
+                                          self.max_depth, self.random_state)
+        self.tree_builder_.build(self.tree_)
 
         return self
 
@@ -443,25 +448,25 @@ class Tree(object):
         if isinstance(remove_indices, int):
             remove_indices = np.array([remove_indices], dtype=np.int32)
 
-        # get data to remove
-        X, y = self.get_data(remove_indices, self.feature_indices)
+        # # get data to remove
+        # X, y = self.get_data(remove_indices, self.feature_indices)
 
-        if not self.single_tree_:
-            X = X[:, self.feature_indices]
+        # if not self.single_tree_:
+        #     X = X[:, self.feature_indices]
 
-        # make data compatible with underlying C implementation
-        X = np.asfortranarray(X, dtype=np.int32)
-        y = np.ascontiguousarray(y, dtype=np.int32)
-        f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
+        # # make data compatible with underlying C implementation
+        # X = np.asfortranarray(X, dtype=np.int32)
+        # y = np.ascontiguousarray(y, dtype=np.int32)
+        # f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
 
         # update model
-        self.remover_.remove(self.tree_, self.tree_builder_, X, y, f, remove_indices)
+        self.remover_.remove(self.tree_, self.tree_builder_, remove_indices)
 
-        # remove the instances from the data
-        if self.single_tree_:
-            for remove_ndx in remove_indices:
-                del self.X_train_[remove_ndx]
-                del self.y_train_[remove_ndx]
+        # # remove the instances from the data
+        # if self.single_tree_:
+        #     for remove_ndx in remove_indices:
+        #         del self.X_train_[remove_ndx]
+        #         del self.y_train_[remove_ndx]
 
         return 0
 
@@ -979,17 +984,24 @@ class Tree(object):
         Collects the data from the dicts as specified by indices,
         then puts them into numpy arrays.
         """
+        import time
+        t0 = time.time()
         n_samples = len(indices)
         X = np.zeros((n_samples, self.n_features_), dtype=np.int32)
         y = np.zeros(n_samples, dtype=np.int32)
 
+        t0a = time.time()
         for i, ndx in enumerate(indices):
             X[i] = self.X_train_[ndx]
             y[i] = self.y_train_[ndx]
+        print('gathering time: {.3f}s', format(time.time() - t0a))
 
+        t1 = time.time()
         # make data compatible with underlying C implementation
         X = np.asfortranarray(X, dtype=np.int32)
         y = np.ascontiguousarray(y, dtype=np.int32)
+        print('conversion time: {.3f}s', format(time.time() - t1))
+        print('total time: {.3f}s', format(time.time() - t0))
 
         return X, y
 
