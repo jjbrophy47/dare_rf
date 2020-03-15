@@ -7,7 +7,7 @@ Uses certified removal to improve deletion efficiency.
 import numpy as np
 
 from ._splitter import _Splitter
-from ._splitter import _Remover
+from ._remover import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -354,7 +354,7 @@ class Tree(object):
 
         self.tree_ = _Tree()
         self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
-        self.remover_ = _Remover(self.epsilon)
+        self.remover_ = _Remover(self.epsilon, self.lmbda, self.get_data)
         self.tree_builder_ = _TreeBuilder(self.splitter_, self.min_samples_leaf,
                                           self.min_samples_split, self.max_depth,
                                           self.random_state)
@@ -384,14 +384,15 @@ class Tree(object):
         Shows a representation of the tree.
         """
         print('nodes: {}'.format(self.tree_.n_nodes))
-        print('tree depth: {}'.format(self.tree_.max_depth))
 
         if show_nodes:
-            print('leaf values: {}'.format(self.tree_.values))
             print('counts: {}'.format(self.tree_.counts))
             print('pos counts: {}'.format(self.tree_.pos_counts))
+            print('leaf values: {}'.format(self.tree_.values))
+            print('p: {}'.format(self.tree_.p))
             print('feature counts: {}'.format(self.tree_.feature_counts))
             print('chosen features: {}'.format(self.tree_.chosen_features))
+            print('depths: {}'.format(self.tree_.depth))
 
             if show_metadata:
                 for i in range(self.tree_.n_nodes):
@@ -445,8 +446,16 @@ class Tree(object):
         # get data to remove
         X, y = self.get_data(remove_indices, self.feature_indices)
 
+        if not self.single_tree_:
+            X = X[:, self.feature_indices]
+
+        # make data compatible with underlying C implementation
+        X = np.asfortranarray(X, dtype=np.int32)
+        y = np.ascontiguousarray(y, dtype=np.int32)
+        f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
+
         # update model
-        self.remover_.remove(self.tree_, self.tree_builder_, X, y, remove_indices)
+        self.remover_.remove(self.tree_, self.tree_builder_, X, y, f, remove_indices)
 
         # remove the instances from the data
         if self.single_tree_:
@@ -971,14 +980,16 @@ class Tree(object):
         then puts them into numpy arrays.
         """
         n_samples = len(indices)
-        X = np.zeros((n_samples, self.n_features_), np.int32)
-        y = np.zeros(n_samples, np.int32)
-        # keys = np.zeros(n_samples, np.int32)
+        X = np.zeros((n_samples, self.n_features_), dtype=np.int32)
+        y = np.zeros(n_samples, dtype=np.int32)
 
         for i, ndx in enumerate(indices):
             X[i] = self.X_train_[ndx]
             y[i] = self.y_train_[ndx]
-            # keys[i] = ndx
+
+        # make data compatible with underlying C implementation
+        X = np.asfortranarray(X, dtype=np.int32)
+        y = np.ascontiguousarray(y, dtype=np.int32)
 
         return X, y
 

@@ -16,13 +16,15 @@ cdef struct Meta:
 
 cdef struct SplitRecord:
     # Data to track sample split
-    int  feature              # Which feature to split on.
-    int* left_indices         # Samples in left branch of feature.
-    int  left_count           # Number of samples in left branch.
-    int* right_indices        # Samples in right branch of feature.
-    int  right_count          # Number of samples in right branch.
-    int* features             # Valid features to consider for descendants.
-    int  n_features           # Number of valid features after split.
+    int  feature                 # Which feature to split on.
+    int* left_indices            # Samples in left branch of feature.
+    int* left_original_indices   # Original samples in left branch of feature.
+    int  left_count              # Number of samples in left branch.
+    int* right_indices           # Samples in right branch of feature.
+    int* right_original_indices  # Original samples in right branch of feature.
+    int  right_count             # Number of samples in right branch.
+    int* features                # Valid features to consider for descendants.
+    int  n_features              # Number of valid features after split.
 
 cdef class _Splitter:
     """
@@ -36,7 +38,7 @@ cdef class _Splitter:
     cdef int random_state                  # Random state reference
 
     # Methods
-    cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,
-                        double parent_p, int* samples,
+    cdef int node_split(self, int[::1, :] X, int[::1] y, double parent_p,
+                        int* samples, int* original_samples,
                         int* features, int n_features,
                         SplitRecord* split, Meta* meta)

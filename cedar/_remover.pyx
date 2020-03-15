@@ -9,20 +9,18 @@ from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdio cimport printf
+from libc.math cimport exp
 
 import numpy as np
 cimport numpy as np
 np.import_array()
 
+from ._utils cimport IntStack
 from ._utils cimport RemovalStack
 from ._utils cimport RemovalStackRecord
-from ._utils cimport _compute_gini
-from ._utils cimport _generate_distribution
-from ._utils cimport _sample_distribution
-from ._utils cimport _check_samples
-
-from ._tree import _Tree
-from ._tree import _TreeBuilder
+from ._utils cimport compute_gini
+from ._utils cimport generate_distribution
+from ._utils cimport get_int_ndarray
 
 cdef int _TREE_LEAF = -1
 cdef int _TREE_UNDEFINED = -2
@@ -37,21 +35,25 @@ cdef class _Remover:
     Removes data from a learned tree.
     """
 
-    def __cinit__(self, double epsilon):
+    def __cinit__(self, double epsilon, double lmbda, get_data):
         self.epsilon = epsilon
+        self.lmbda = lmbda
+        self.get_data = get_data
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef int remove(self, _Tree tree, _TreeBuilder tree_builder,
-                     object X, np.ndarray y, np.ndarry f,
-                     int* remove_samples):
+                     object X, np.ndarray y, np.ndarray f,
+                     np.ndarray remove_indices):
         """
         Remove the data (X, y) from the learned _Tree.
         """
 
-        # check input
-        X, y = _check_samples(X, y)
-        f = _check_features(f)
+        # # check input
+        # X, y = _check_samples(X, y)
+        # f = _check_features(f)
+
+        # TODO: check remove_indices?
 
         # Parameters
         cdef int min_samples_leaf = tree_builder.min_samples_leaf
@@ -62,9 +64,8 @@ cdef class _Remover:
         cdef int depth
         cdef int node_id
         cdef double parent_p
-        cdef int* samples
-        cdef int* remove_samples
         cdef int n_samples = X.shape[0]
+        cdef int* samples = <int *>malloc(n_samples * sizeof(int))
         cdef RemovalStack stack = RemovalStack(INITIAL_STACK_SIZE)
 
         # compute variables
@@ -74,11 +75,17 @@ cdef class _Remover:
 
         cdef int i
 
-        cdef remove_type_count = 0
-        cdef remove_types = <int *>malloc(n_samples * sizeof(int))
+        cdef int remove_type_count = 0
+        cdef int* remove_types = <int *>malloc(n_samples * sizeof(int))
+        cdef int* remove_samples = <int *>malloc(n_samples * sizeof(int))
+
+        cdef int* rebuild_samples = NULL
+        cdef int n_rebuild_samples
+        cdef np.ndarray rebuild_samples_python
 
         for i in range(n_samples):
             samples[i] = i
+            remove_samples[i] = remove_indices[i]
 
         # push root node onto stack
         rc = stack.push(0, 0, 0, _TREE_UNDEFINED, 1, samples, remove_samples, n_samples)
@@ -107,64 +114,75 @@ cdef class _Remover:
             meta.right_pos_counts = tree.right_pos_counts[node_id]
             meta.features = tree.features[node_id]
 
-            printf("\npopping (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)
+            # printf("\npopping_r (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)
 
             # leaf
             if tree.values[node_id] >= 0:
-                self._update_leaf(tree, y, samples, remove_samples, n_samples)
+                self._update_leaf(node_id, tree, y, samples, remove_samples, n_samples)
                 remove_types[remove_type_count] = 0
                 remove_type_count += 1
+
+                free(remove_samples)
+                free(samples)
 
             # decision node
             else:
                 chosen_feature = tree.chosen_features[node_id]
-                rc = _node_remove(X, y, remove_samples, samples, n_samples,
-                                  min_samples_split, min_samples_leaf,
-                                  chosen_feature, parent_p, &split, &meta)
+                # printf('chosen feature: %d\n', chosen_feature)
+                rc = self._node_remove(node_id, X, y, remove_samples, samples, n_samples,
+                                       min_samples_split, min_samples_leaf,
+                                       chosen_feature, parent_p, &split, &meta)
+                free(samples)
+
+                # printf('rc: %d\n', rc)
 
                 # retrain
                 if rc < 0:
-                    free(samples)
-                    samples = self._collect_leaf_samples(tree, node_id, remove_samples)
-                    X, y = self.get_data(samples)
-                    tree_builder.build_at_node(tree, X, y, f, node_id, depth, parent, is_left,
-                                               samples, meta.features, meta.feature_count)
+                    n_rebuild_samples = self._collect_leaf_samples(node_id, tree, remove_samples,
+                                                                   n_samples, &rebuild_samples)
+                    rebuild_samples_python = get_int_ndarray(rebuild_samples, n_rebuild_samples)
+                    X, y = self.get_data(rebuild_samples_python)
+                    tree_builder.build_at_node(node_id, tree, X, y, f, depth, parent, parent_p, is_left,
+                                               rebuild_samples, meta.features, meta.feature_count)
 
+                    free(remove_samples)
                     remove_types[remove_type_count] = rc
                     remove_type_count += 1
 
                 else:
 
-                    self._update_decision_node(tree, node_id, n_samples, &meta)
+                    self._update_decision_node(node_id, tree, n_samples, &meta)
 
                     # traverse left branch
-                    if split.left_remove_count > 0:
+                    if split.left_count > 0:
                         stack.push(depth + 1, tree.left_children[node_id], 1, node_id,
                                    meta.p, split.left_indices, split.left_remove_indices,
                                    split.left_count)
 
                     # traverse right branch
-                    if split.left_remove_count > 0:
+                    if split.right_count > 0:
                         stack.push(depth + 1, tree.right_children[node_id], 0, node_id,
                                    meta.p, split.right_indices, split.right_remove_indices,
                                    split.right_count)
 
         free(remove_types)  # TODO: do something with this data
+        return 0
 
     # private
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef int _update_leaf(self, _Tree, tree, int [::1] y, int* samples,
+    cdef int _update_leaf(self, int node_id, _Tree tree, int[::1] y, int* samples,
                           int* remove_samples, int n_samples) nogil:
         """
         Update leaf node: count, pos_count, value, leaf_samples.
         """
-        cdef int count = tree.count[node_id] - n_samples
+        cdef int current_sample_count = tree.count[node_id]
+        cdef int updated_count = tree.count[node_id] - n_samples
         cdef int pos_count = 0
 
         cdef int* leaf_samples = tree.leaf_samples[node_id]
-        cdef int* updated_leaf_samples = <int *>malloc(count * sizeof(int))
+        cdef int* updated_leaf_samples = <int *>malloc(updated_count * sizeof(int))
         cdef int leaf_sample_count = 0
         cdef bint add_sample
 
@@ -174,7 +192,7 @@ cdef class _Remover:
                 pos_count += 1
 
         # remove deleted samples from the leaf
-        for i in range(n_leaf_samples):
+        for i in range(current_sample_count):
             add_sample = 1
 
             for j in range(n_samples):
@@ -188,7 +206,7 @@ cdef class _Remover:
 
         # update tree
         free(leaf_samples)
-        tree.count[node_id] = count
+        tree.count[node_id] = updated_count
         tree.pos_count[node_id] -= pos_count
         tree.values[node_id] = tree.pos_count[node_id] / <double> tree.count[node_id]
         tree.leaf_samples[node_id] = updated_leaf_samples
@@ -197,7 +215,7 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int _update_decision_node(self, _Tree tree, int node_id, int n_samples, Meta* meta) nogil:
+    cdef int _update_decision_node(self, int node_id, _Tree tree, int n_samples, Meta* meta) nogil:
         """
         Update tree with node metadata.
         """
@@ -215,7 +233,7 @@ cdef class _Remover:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef int _node_remove(self, int[:, ::1] X, int[::1] y,
+    cdef int _node_remove(self, int node_id, int[:, ::1] X, int[::1] y,
                           int* remove_samples, int* samples, int n_samples,
                           int min_samples_split, int min_samples_leaf,
                           int chosen_feature, double parent_p,
@@ -228,6 +246,7 @@ cdef class _Remover:
 
         # parameters
         cdef double epsilon = self.epsilon
+        cdef double lmbda = self.lmbda
 
         cdef int count = n_samples
         cdef int pos_count = 0
@@ -236,12 +255,19 @@ cdef class _Remover:
         cdef int right_count
         cdef int right_pos_count
 
+        cdef int updated_count = meta.count - count
+        cdef int updated_pos_count
+        cdef int updated_left_count
+        cdef int updated_left_pos_count
+        cdef int updated_right_count
+        cdef int updated_right_pos_count
+
         cdef int i
         cdef int j
         cdef int k
 
-        cdef feature_count = 0
-        cdef result = 0
+        cdef int feature_count = 0
+        cdef int result = 0
 
         cdef bint chosen_feature_validated = 0
         cdef int chosen_ndx
@@ -258,17 +284,24 @@ cdef class _Remover:
         cdef int* right_counts
         cdef int* right_pos_counts
 
+        cdef int chosen_left_count
+        cdef int chosen_right_count
+
         # count number of pos labels in removal data
         for i in range(n_samples):
             if y[samples[i]] == 1:
                 pos_count += 1
 
+        updated_pos_count = meta.pos_count - pos_count
+
         # no samples left in this node => retrain
-        if meta.count[node_id] <= count:  # this branch will not be reached
+        if updated_count <= 0:  # this branch will not be reached
+            printf('meta count <= count\n')
             result = -1
 
         # only samples from one class are left in this node => create leaf
-        elif pos_count == 0 or meta.pos_count[node_id] <= pos_count:
+        elif updated_pos_count == 0 or updated_pos_count == updated_count:
+            printf('only samples from one class\n')
             result = -2
 
         else:
@@ -277,10 +310,10 @@ cdef class _Remover:
             distribution = <double *>malloc(meta.feature_count * sizeof(double))
             valid_features = <int *>malloc(meta.feature_count * sizeof(int))
 
-            left_counts = <int *>malloc(meta.feature_count * sizeof(int))
-            left_pos_counts = <int *>malloc(meta.feature_count * sizeof(int))
-            right_counts = <int *>malloc(meta.feature_count * sizeof(int))
-            right_pos_counts = <int *>malloc(meta.feature_count * sizeof(int))
+            updated_left_counts = <int *>malloc(meta.feature_count * sizeof(int))
+            updated_left_pos_counts = <int *>malloc(meta.feature_count * sizeof(int))
+            updated_right_counts = <int *>malloc(meta.feature_count * sizeof(int))
+            updated_right_pos_counts = <int *>malloc(meta.feature_count * sizeof(int))
 
             # compute statistics of the removal data for each attribute
             for j in range(meta.feature_count):
@@ -297,45 +330,54 @@ cdef class _Remover:
                 right_count = count - left_count
                 right_pos_count = pos_count - left_pos_count
 
+                updated_left_count = meta.left_counts[node_id] - left_count
+                updated_left_pos_count = meta.left_pos_counts[node_id] - left_pos_count
+                updated_right_count = meta.right_counts[node_id] - right_count
+                updated_right_pos_count = meta.right_pos_counts[node_id] - right_pos_count
+
                 # validate split
-                if left_count >= min_samples_leaf and right_count >= min_samples_leaf:
-                    valid_features[feature_count] = features[j]
-                    gini_indices[feature_count] = _compute_gini(count, left_count, right_count,
-                                                                left_pos_count, right_pos_count)
+                if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:
+                    valid_features[feature_count] = meta.features[j]
+                    gini_indices[feature_count] = compute_gini(updated_count, updated_left_count,
+                        updated_right_count, updated_left_pos_count, updated_right_pos_count)
 
                     # update metadata
-                    left_counts[feature_count] = left_count
-                    left_pos_counts[feature_count] = left_pos_count
-                    right_counts[feature_count] = right_count
-                    right_pos_counts[feature_count] = right_pos_count
+                    updated_left_counts[feature_count] = updated_left_count
+                    updated_left_pos_counts[feature_count] = updated_left_pos_count
+                    updated_right_counts[feature_count] = updated_right_count
+                    updated_right_pos_counts[feature_count] = updated_right_pos_count
 
                     feature_count += 1
 
                     if meta.features[j] == chosen_feature:
                         chosen_feature_validated = 1
                         chosen_ndx = j
+                        chosen_left_count = left_count
+                        chosen_right_count = right_count
 
             # no valid features after data removal => create leaf
             if feature_count == 0:
+                printf('feature_count is zero\n')
                 result = -2
                 free(gini_indices)
                 free(distribution)
                 free(valid_features)
-                free(left_counts)
-                free(left_pos_counts)
-                free(right_counts)
-                free(right_pos_counts)
+                free(updated_left_counts)
+                free(updated_left_pos_counts)
+                free(updated_right_counts)
+                free(updated_right_pos_counts)
 
             # current feature no longer valid => retrain
             elif not chosen_feature_validated:
+                printf('chosen feature not validated\n')
                 result = -1
                 free(gini_indices)
                 free(distribution)
                 free(valid_features)
-                free(left_counts)
-                free(left_pos_counts)
-                free(right_counts)
-                free(right_pos_counts)
+                free(updated_left_counts)
+                free(updated_left_pos_counts)
+                free(updated_right_counts)
+                free(updated_right_pos_counts)
 
             else:
 
@@ -344,27 +386,37 @@ cdef class _Remover:
                 distribution = <double *>realloc(distribution, feature_count * sizeof(double))
                 valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
 
-                left_counts = <int *>realloc(left_counts, feature_count * sizeof(int))
-                left_pos_counts = <int *>realloc(left_pos_counts, feature_count * sizeof(int))
-                right_counts = <int *>realloc(right_counts, feature_count * sizeof(int))
-                right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
+                updated_left_counts = <int *>realloc(updated_left_counts, feature_count * sizeof(int))
+                updated_left_pos_counts = <int *>realloc(updated_left_pos_counts, feature_count * sizeof(int))
+                updated_right_counts = <int *>realloc(updated_right_counts, feature_count * sizeof(int))
+                updated_right_pos_counts = <int *>realloc(updated_right_pos_counts, feature_count * sizeof(int))
 
                 # compute new probability for the chosen feature
-                _generate_distribution(distribution, gini_indices, feature_count)
+                generate_distribution(lmbda, distribution, gini_indices, feature_count)
                 p = parent_p * distribution[chosen_ndx]
                 ratio = p / meta.p
+
+                printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
                 # compare with previous probability => retrain if necessary
                 if ratio < exp(-epsilon) or ratio > exp(epsilon):
                     result = -1
+                    free(gini_indices)
+                    free(distribution)
+
+                    free(updated_left_counts)
+                    free(updated_left_pos_counts)
+                    free(updated_right_counts)
+                    free(updated_right_pos_counts)
+                    meta.features = valid_features
 
                 else:
 
                     # split removal data based on the chosen feature
-                    split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
-                    split.left_remove_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
-                    split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
-                    split.right_remove_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+                    split.left_indices = <int *>malloc(chosen_left_count * sizeof(int))
+                    split.left_remove_indices = <int *>malloc(chosen_left_count * sizeof(int))
+                    split.right_indices = <int *>malloc(chosen_right_count * sizeof(int))
+                    split.right_remove_indices = <int *>malloc(chosen_right_count * sizeof(int))
                     j = 0
                     k = 0
                     for i in range(n_samples):
@@ -379,7 +431,10 @@ cdef class _Remover:
                     split.left_count = j
                     split.right_count = k
 
-                    # cleanup previous metadata
+                    # cleanup
+                    free(gini_indices)
+                    free(distribution)
+
                     free(meta.left_counts)
                     free(meta.left_pos_counts)
                     free(meta.right_counts)
@@ -388,19 +443,17 @@ cdef class _Remover:
 
                     meta.pos_count = pos_count
                     meta.feature_count = feature_count
-                    meta.left_counts = left_counts
-                    meta.left_pos_counts = left_pos_counts
-                    meta.right_counts = right_counts
-                    meta.right_pos_counts = right_pos_counts
+                    meta.left_counts = updated_left_counts
+                    meta.left_pos_counts = updated_left_pos_counts
+                    meta.right_counts = updated_right_counts
+                    meta.right_pos_counts = updated_right_pos_counts
                     meta.features = valid_features
-
-                    free(gini_indices)
-                    free(distribution)
 
         return result
 
-    cdef int* _collect_leaf_samples(self, _Tree tree, int node_id, int*
-                                    remove_samples, int n_remove_samples) nogil:
+    cdef int _collect_leaf_samples(self, int node_id, _Tree tree,
+                                   int* remove_samples, int n_remove_samples,
+                                   int** rebuild_samples_ptr):
         """
         Gathers all samples at the leaves and clears any saved metadata
         as it traverses through the tree.
@@ -408,65 +461,87 @@ cdef class _Remover:
 
         cdef int i
         cdef int j
-        cdef int sample_count
+
+        cdef int rebuild_sample_count = 0
+        cdef int *rebuild_samples = NULL
 
         # get leaf ids and free nodes to be retrained
-        cdef int* leaf_ids = <int *>malloc(tree.count[node_id] * sizeof(int))  # TODO: optimize?
+        cdef int* leaf_ids = <int *>malloc(tree.count[node_id] * sizeof(int))
         cdef int leaf_count = 0
         cdef int node_remove_count = 0
         cdef int temp_id
         cdef IntStack stack = IntStack(INITIAL_STACK_SIZE)
         stack.push(node_id)
 
-        while not stack.isempty():
+        while not stack.is_empty():
             temp_id = stack.pop()
             node_remove_count += 1
 
+            # printf('popping: temp_id %d\n', temp_id)
+
             # leaf
-            if tree.values[temp_id] < 0:
+            if tree.values[temp_id] >= 0:
+                # printf('  leaf!\n')
                 leaf_ids[leaf_count] = temp_id
                 leaf_count += 1
 
             # decision node
             else:
+                stack.push(tree.right_children[temp_id])
+                stack.push(tree.left_children[temp_id])
+
                 free(tree.left_counts[temp_id])
                 free(tree.left_pos_counts[temp_id])
                 free(tree.right_counts[temp_id])
                 free(tree.right_pos_counts[temp_id])
-                free(tree.features[temp_id])
-                stack.push(tree.right_children[temp_id])
-                stack.push(tree.left_children[temp_id])
+
+                if temp_id != node_id:
+                    free(tree.features[temp_id])
 
         leaf_ids = <int *>realloc(leaf_ids, leaf_count * sizeof(int))
 
         # compile all samples from the leaves
-        samples = <int *>malloc(tree.count[node_id] * sizeof(int))
-        sample_count = 0
+        rebuild_samples = <int *>malloc(tree.count[node_id] * sizeof(int))
+        rebuild_sample_count = 0
 
+        # printf('feature[0]: %d\n', tree.features[node_id][0])
+
+        # printf('leaf_count: %d\n', leaf_count)
+
+        # TODO: could check to see if all removal indices have been accounted for
         for i in range(leaf_count):
             leaf_id = leaf_ids[i]
             leaf_samples = tree.leaf_samples[leaf_id]
             n_leaf_samples = tree.count[leaf_id]
 
+            # printf('\nleaf_id: %d\n', leaf_id)
+
             for j in range(n_leaf_samples):
                 add_sample = 1
 
+                # printf('  leaf_samples[%d]: %d\n', j, leaf_samples[j])
+
                 for k in range(n_remove_samples):
+                    # printf('    remove_samples[%d]: %d\n', k, remove_samples[k])
                     if leaf_samples[j] == remove_samples[k]:
                         add_sample = 0
                         break
 
                 if add_sample:
-                    samples[sample_count] = leaf_samples[j]
-                    sample_count += 1
+                    # printf('  adding %d at %d\n', leaf_samples[j], rebuild_sample_count)
+                    rebuild_samples[rebuild_sample_count] = leaf_samples[j]
+                    rebuild_sample_count += 1
 
             free(leaf_samples)
         free(leaf_ids)
 
-        samples = <int *>realloc(samples, sample_count * sizeof(int))
+        rebuild_samples = <int *>realloc(rebuild_samples, rebuild_sample_count * sizeof(int))
+        # printf('rebuild_samples[0]: %d\n', rebuild_samples[0])
+
+        # printf('feature[0]: %d\n', tree.features[node_id][0])
 
         # restructure tree
-        for i in range(node_id + node_remove_count, tree.node_count)
+        for i in range(node_id + node_remove_count, tree.node_count):
             j = i - node_remove_count
             tree.values[j] = tree.values[i]
             tree.chosen_features[j] = tree.chosen_features[i]
@@ -485,5 +560,6 @@ cdef class _Remover:
             tree.leaf_samples[j] = tree.leaf_samples[i]
         tree.node_count -= node_remove_count
 
-        return samples
+        rebuild_samples_ptr[0] = rebuild_samples
+        return rebuild_sample_count
 

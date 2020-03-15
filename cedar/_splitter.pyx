@@ -11,9 +11,9 @@ cimport numpy as np
 np.import_array()
 
 from ._utils cimport get_random
-from ._utils cimport _compute_gini
-from ._utils cimport _generate_distribution
-from ._utils cimport _sample_distribution
+from ._utils cimport compute_gini
+from ._utils cimport generate_distribution
+from ._utils cimport sample_distribution
 
 cdef class _Splitter:
     """
@@ -42,14 +42,13 @@ cdef class _Splitter:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int node_split(self, int[::1, :] X, int[::1] y, int[::1] f,
-                        double parent_p, int* samples,
+    cdef int node_split(self, int[::1, :] X, int[::1] y, double parent_p,
+                        int* samples, int* original_samples,
                         int* features, int n_features,
                         SplitRecord* split, Meta* meta):
         """
         Find the best split in the node data.
         This is a placeholder method. The majority of computation will be done here.
-        It should return -1 upon errors.
         """
 
         # parameters
@@ -87,6 +86,8 @@ cdef class _Splitter:
             if y[samples[i]] == 1:
                 pos_count += 1
 
+        # printf('count: %d, pos_count: %d\n', count, pos_count)
+
         if pos_count < count:
 
             gini_indices = <double *>malloc(n_features * sizeof(double))
@@ -98,13 +99,17 @@ cdef class _Splitter:
             right_counts = <int *>malloc(n_features * sizeof(int))
             right_pos_counts = <int *>malloc(n_features * sizeof(int))
 
+            # print('done allocating\n')
+
             # compute statistics for each attribute
             for j in range(n_features):
+                # printf('feature[%d]: %d\n', j, features[j])
 
                 left_count = 0
                 left_pos_count = 0
 
                 for i in range(n_samples):
+                    # printf('sample[%d]: %d\n', i, samples[i])
 
                     if X[samples[i], features[j]] == 1:
                         left_count += 1
@@ -116,8 +121,8 @@ cdef class _Splitter:
                 # validate split
                 if left_count >= min_samples_leaf and right_count >= min_samples_leaf:
                     valid_features[feature_count] = features[j]
-                    gini_indices[feature_count] = _compute_gini(count, left_count, right_count,
-                                                                left_pos_count, right_pos_count)
+                    gini_indices[feature_count] = compute_gini(count, left_count, right_count,
+                                                               left_pos_count, right_pos_count)
                     # printf('gini_indices[%d]: %.7f\n', feature_count, gini_indices[feature_count])
 
                     # save metadata
@@ -127,6 +132,8 @@ cdef class _Splitter:
                     right_pos_counts[feature_count] = right_pos_count
 
                     feature_count += 1
+
+            # printf('feature_count: %d\n', feature_count)
 
             if feature_count > 0:
 
@@ -141,20 +148,24 @@ cdef class _Splitter:
                 right_pos_counts = <int *>realloc(right_pos_counts, feature_count * sizeof(int))
 
                 # generate and sample from the distribution
-                _generate_distribution(lmbda, distribution, gini_indices, feature_count)
-                chosen_ndx = _sample_distribution(distribution, feature_count)
+                generate_distribution(lmbda, distribution, gini_indices, feature_count)
+                chosen_ndx = sample_distribution(distribution, feature_count)
 
                 # assign results from chosen feature
                 split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
+                split.left_original_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
                 split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+                split.right_original_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
                 j = 0
                 k = 0
                 for i in range(n_samples):
                     if X[samples[i], valid_features[chosen_ndx]] == 1:
                         split.left_indices[j] = samples[i]
+                        split.left_original_indices[j] = original_samples[i]
                         j += 1
                     else:
                         split.right_indices[k] = samples[i]
+                        split.right_original_indices[k] = original_samples[i]
                         k += 1
                 split.left_count = j
                 split.right_count = k

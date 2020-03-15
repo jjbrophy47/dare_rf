@@ -74,7 +74,8 @@ cdef class _TreeBuilder:
     cpdef void build(self, _Tree tree, object X, np.ndarray y, np.ndarray f)
 
     # C API
-    cdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,
-                            int node_id, int depth, int parent, double parent_p,
-                            bint is_left, int* samples, int* features, int n_features)
+    cdef void build_at_node(self, int node_id, _Tree tree, object X, np.ndarray y,
+                            np.ndarray f, int depth, int parent, double parent_p,
+                            bint is_left, int* original_samples,
+                            int* features, int n_features)
     cdef double _leaf_value(self, int[::1] y, int* samples, int n_samples, Meta* meta) nogil

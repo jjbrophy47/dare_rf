@@ -21,8 +21,6 @@ np.import_array()
 
 from ._utils cimport Stack
 from ._utils cimport StackRecord
-from ._utils cimport _check_samples
-from ._utils cimport _check_features
 
 # constants
 from numpy import int32 as INT
@@ -57,25 +55,24 @@ cdef class _TreeBuilder:
         Build a decision tree from the training set (X, y).
         """
 
-        # check input
-        X, y = _check_samples(X, y)
-        f = _check_features(f)
-
-        # Initial capacity
-        cdef int init_capacity
-
-        if tree.max_depth <= 10:
-            init_capacity = (2 ** (tree.max_depth + 1)) - 1
-        else:
-            init_capacity = 2047
-
-        tree._resize(init_capacity)
-
         # Parameters
         cdef _Splitter splitter = self.splitter
         cdef int max_depth = self.max_depth
         cdef int min_samples_leaf = self.min_samples_leaf
         cdef int min_samples_split = self.min_samples_split
+
+        # check input
+        # X, y = _check_samples(X, y)
+
+        # Initial capacity
+        cdef int init_capacity
+
+        if max_depth <= 10:
+            init_capacity = (2 ** (max_depth + 1)) - 1
+        else:
+            init_capacity = 2047
+
+        tree._resize(init_capacity)
 
         # StackRecord parameters
         cdef StackRecord stack_record
@@ -83,6 +80,7 @@ cdef class _TreeBuilder:
         cdef int parent
         cdef bint is_left
         cdef int* samples
+        cdef int* original_samples
         cdef int n_samples = X.shape[0]
         cdef int* features
         cdef int n_features = X.shape[1]
@@ -96,27 +94,26 @@ cdef class _TreeBuilder:
         cdef int node_id
 
         cdef int i
-        cdef max_depth_seen = 0
-
         cdef Meta meta
+
+        cdef int rc
 
         # fill in samples and features arrays
         samples = <int *>malloc(n_samples * sizeof(int))
+        original_samples = <int *>malloc(n_samples * sizeof(int))
         features = <int *>malloc(n_features * sizeof(int))
 
         for i in range(n_samples):
             samples[i] = i
 
+        for i in range(n_samples):
+            original_samples[i] = i
+
         for i in range(n_features):
             features[i] = i
 
-
-
-        # with nogil:
-
         # push root node onto stack
-        # TODO: add checks for out-of-memory
-        rc = stack.push(0, _TREE_UNDEFINED, 1, 0, samples, n_samples, features, n_features)
+        rc = stack.push(0, _TREE_UNDEFINED, 1, 0, samples, original_samples, n_samples, features, n_features)
 
         while not stack.is_empty():
 
@@ -127,6 +124,7 @@ cdef class _TreeBuilder:
             parent_p = stack_record.parent_p
             is_left = stack_record.is_left
             samples = stack_record.samples
+            original_samples = stack_record.original_samples
             n_samples = stack_record.n_samples
             features = stack_record.features
             n_features = stack_record.n_features
@@ -141,7 +139,8 @@ cdef class _TreeBuilder:
                        n_features <= 1)
 
             if not is_leaf:
-                rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+                rc = splitter.node_split(X, y, parent_p, samples, original_samples,
+                                         features, n_features, &split, &meta)
                 if rc == -2:
                     is_leaf = 1
                 else:
@@ -152,43 +151,37 @@ cdef class _TreeBuilder:
                 value = self._leaf_value(y, samples, n_samples, &meta)
                 meta.feature_count = _TREE_UNDEFINED
 
-            node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
+            node_id = tree.add_node(parent, is_left, is_leaf, feature, value,
+                                    depth, original_samples, &meta)
 
             if not is_leaf:
 
                 # Push right child on stack
-                # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
-                #        split.right_count, split.n_features)
-                rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,
+                rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices,
+                                split.right_original_indices, split.right_count,
                                 split.features, split.n_features)
-                if rc == -1:
-                    break
 
                 # Push left child on stack
-                # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
-                #        split.left_count, split.n_features)
-                rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,
+                rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices,
+                                split.left_original_indices, split.left_count,
                                 split.features, split.n_features)
-                if rc == -1:
-                    break
 
             # clean up
             if not is_leaf:
                 free(samples)
 
-        if rc == -1:
-            raise MemoryError()
-
-    cdef void build_at_node(self, _Tree tree, object X, np.ndarray y, np.ndarray f,
-                            int node_id, int depth, int parent, double parent_p,
-                            bint is_left, int* samples, int* features, int n_features):
+    cdef void build_at_node(self, int node_id, _Tree tree, object X, np.ndarray y,
+                            np.ndarray f, int depth, int parent, double parent_p,
+                            bint is_left, int* original_samples,
+                            int* features, int n_features):
         """
         Build subtree from the training set (X, y) starting at `node_id`.
         """
+        printf('rebuilding at node %d\n', node_id)
 
-        # check input
-        X, y = _check_samples(X, y)
-        f = _check_features(f)
+        # # check input
+        # X, y = _check_samples(X, y)
+        # f = _check_features(f)
 
         # Parameters
         cdef _Splitter splitter = self.splitter
@@ -210,24 +203,31 @@ cdef class _TreeBuilder:
         cdef int i
         cdef Meta meta
 
+        cdef int *samples = <int *>malloc(n_samples * sizeof(int))
+        for i in range(n_samples):
+            samples[i] = i
+
         # push root node onto stack
         # TODO: add checks for out-of-memory
-        rc = stack.push(depth, parent, parent_p, is_left,
-                        samples, n_samples, features, n_features)
+        rc = stack.push(depth, parent, parent_p, is_left, samples,
+                        original_samples, n_samples, features, n_features)
 
         while not stack.is_empty():
+
+            # populate record
             stack.pop(&stack_record)
             depth = stack_record.depth
             parent = stack_record.parent
             is_left = stack_record.is_left
             samples = stack_record.samples
+            original_samples = stack_record.original_samples
             n_samples = stack_record.n_samples
             features = stack_record.features
             n_features = stack_record.n_features
 
             meta.count = n_samples
 
-            printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
+            # printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
 
             is_leaf = (depth >= max_depth or
                        n_samples < min_samples_split or
@@ -235,7 +235,10 @@ cdef class _TreeBuilder:
                        n_features <= 1)
 
             if not is_leaf:
-                rc = splitter.node_split(X, y, f, parent_p, samples, features, n_features, &split, &meta)
+                # printf('node_split\n')
+                rc = splitter.node_split(X, y, parent_p, samples, original_samples,
+                                         features, n_features, &split, &meta)
+                # printf('rc: %d\n', rc)
                 if rc == -2:
                     is_leaf = 1
                 else:
@@ -246,32 +249,29 @@ cdef class _TreeBuilder:
                 value = self._leaf_value(y, samples, n_samples, &meta)
                 meta.feature_count = _TREE_UNDEFINED
 
-            node_id = tree.add_node(parent, is_left, is_leaf, feature, value, depth, samples, &meta)
+            node_id = tree.add_node(parent, is_left, is_leaf, feature, value,
+                                    depth, original_samples, &meta)
 
             if not is_leaf:
 
                 # Push right child on stack
                 # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
                 #        split.right_count, split.n_features)
-                rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, split.right_count,
+                rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, 
+                                split.right_original_indices, split.right_count,
                                 split.features, split.n_features)
-                if rc == -1:
-                    break
 
                 # Push left child on stack
                 # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
                 #        split.left_count, split.n_features)
-                rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices, split.left_count,
+                rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices,
+                                split.left_original_indices, split.left_count,
                                 split.features, split.n_features)
-                if rc == -1:
-                    break
 
             # clean up
+            free(samples)
             if not is_leaf:
-                free(samples)
-
-        if rc == -1:
-            raise MemoryError()
+                free(original_samples)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -358,7 +358,6 @@ cdef class _Tree:
         """
 
         # internal data structures
-        self.max_depth = 0
         self.node_count = 0
         self.capacity = 3
         self.values = <double *>malloc(self.capacity * sizeof(double))

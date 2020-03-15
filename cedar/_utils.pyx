@@ -10,6 +10,7 @@ cimport cython
 
 import numpy as np
 cimport numpy as np
+np.import_array()
 
 # constants
 from numpy import int32 as INT
@@ -21,8 +22,8 @@ cdef inline double get_random() nogil:
     return rand() / RAND_MAX
 
 @cython.cdivision(True)
-cdef double _compute_gini(double count, double left_count, double right_count,
-                          int left_pos_count, int right_pos_count) nogil:
+cdef double compute_gini(double count, double left_count, double right_count,
+                         int left_pos_count, int right_pos_count) nogil:
     """
     Compute the Gini index of this attribute.
     """
@@ -51,8 +52,8 @@ cdef double _compute_gini(double count, double left_count, double right_count,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
-cdef int _generate_distribution(double lmbda, double* distribution,
-                                double* gini_indices, int n_gini_indices) nogil:
+cdef int generate_distribution(double lmbda, double* distribution,
+                               double* gini_indices, int n_gini_indices) nogil:
     """
     Generate a probability distribution based on the Gini index values.
     """
@@ -94,7 +95,7 @@ cdef int _generate_distribution(double lmbda, double* distribution,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int _sample_distribution(double* distribution, int n_distribution) nogil:
+cdef int sample_distribution(double* distribution, int n_distribution) nogil:
     """
     Randomly sample a feature from the probability distribution.
     """
@@ -111,29 +112,14 @@ cdef int _sample_distribution(double* distribution, int n_distribution) nogil:
 
     return i
 
-# TODO: check for int dtype and if it's a contiguous array
-cdef inline _check_samples(object X, np.ndarray y):
+cdef np.ndarray get_int_ndarray(int *data, int n_points):
     """
-    Check input dtype, layout and format.
+    Wraps value as a 1-d NumPy array.
     """
-    if X.dtype != INT:
-        # since we have to copy we will make it fortran for efficiency
-        X = np.asfortranarray(X, dtype=np.int32)
-
-    if y.dtype != INT or not y.flags.contiguous:
-        y = np.ascontiguousarray(y, dtype=np.int32)
-
-    return X, y
-
-# TODO: check for int dtype and if it's a contiguous array
-cdef inline _check_features(np.ndarray f):
-    """
-    Check input dtype, layout and format.
-    """
-    if f.dtype != INT or not f.flags.contiguous:
-        f = np.ascontiguousarray(f, dtype=np.int32)
-
-    return f
+    cdef np.npy_intp shape[1]
+    shape[0] = n_points
+    cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
+    return arr
 
 # =============================================================================
 # Stack data structure
@@ -165,7 +151,8 @@ cdef class Stack:
         return self.top <= 0
 
     cdef int push(self, int depth, int parent, double parent_p, bint is_left,
-                  int* samples, int n_samples, int* features, int n_features) nogil:
+                  int* samples, int* original_samples, int n_samples,
+                  int* features, int n_features) nogil:
         """
         Push a new element onto the stack.
         """
@@ -183,6 +170,7 @@ cdef class Stack:
         stack[top].parent_p = parent_p
         stack[top].is_left = is_left
         stack[top].samples = samples
+        stack[top].original_samples = original_samples
         stack[top].n_samples = n_samples
         stack[top].features = features
         stack[top].n_features = n_features
@@ -300,9 +288,9 @@ cdef class IntStack:
     """
 
     def __cinit__(self, int capacity):
-        self.stack_ = <int *>malloc(self.capacity * sizeof(int))
         self.capacity = capacity
         self.top = 0
+        self.stack_ = <int *>malloc(self.capacity * sizeof(int))
 
     def __dealloc__(self):
         free(self.stack_)

@@ -2,13 +2,14 @@ import numpy as np
 cimport numpy as np
 
 cdef double get_random() nogil
-cdef double _compute_gini(double count, double left_count, double right_count,
-                          int left_pos_count, int right_pos_count) nogil
-cdef int _generate_distribution(double lmbda, double* distribution,
-                                double* gini_indices, int n_gini_indices) nogil
-cdef int _sample_distribution(double* distribution, int n_distribution) nogil
-cdef _check_samples(object X, np.ndarray y)
-cdef _check_features(np.ndarray f)
+cdef double compute_gini(double count, double left_count, double right_count,
+                         int left_pos_count, int right_pos_count) nogil
+cdef int generate_distribution(double lmbda, double* distribution,
+                               double* gini_indices, int n_gini_indices) nogil
+cdef int sample_distribution(double* distribution, int n_distribution) nogil
+cdef np.ndarray get_int_ndarray(int *data, int n_points)
+# cdef _check_samples(object X, np.ndarray y)
+# cdef _check_features(np.ndarray f)
 
 # =============================================================================
 # Stack data structure
@@ -21,6 +22,7 @@ cdef struct StackRecord:
     double parent_p
     bint is_left
     int* samples
+    int* original_samples
     int n_samples
     int* features
     int n_features
@@ -32,7 +34,8 @@ cdef class Stack:
 
     cdef bint is_empty(self) nogil
     cdef int push(self, int depth, int parent, double parent_p, bint is_left,
-                  int* samples, int n_samples, int* features, int n_features) nogil
+                  int* samples, int* original_samples, int n_samples,
+                  int* features, int n_features) nogil
     cdef int pop(self, StackRecord* res) nogil
 
 # =============================================================================

@@ -1,4 +1,4 @@
-build/temp.macosx-10.14-x86_64-3.7/_tree.o: _tree.c \
+build/temp.macosx-10.14-x86_64-3.7/_remover.o: _remover.c \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/Python.h \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/patchlevel.h \
   /usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/include/python3.7m/pyconfig.h \
