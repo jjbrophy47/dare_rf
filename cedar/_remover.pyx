@@ -351,8 +351,6 @@ cdef class _Remover:
                 updated_right_pos_count = meta.right_pos_counts[feature_count] - right_pos_count
 
                 # validate split
-                printf('updated_left_count: %d, updated_right_count: %d\n', updated_left_count, updated_right_count)
-                printf('min_samples_leaf: %d\n', min_samples_leaf)
                 if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:
                     valid_features[feature_count] = meta.features[j]
                     gini_indices[feature_count] = compute_gini(updated_count, updated_left_count,

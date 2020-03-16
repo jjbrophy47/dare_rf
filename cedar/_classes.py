@@ -449,7 +449,10 @@ class Tree(object):
         Removes instance remove_ndx from the training data and updates the model.
         """
         if isinstance(remove_indices, int):
-            remove_indices = np.array([remove_indices], dtype=np.int32)
+            remove_indices = [remove_indices]
+
+        if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
+            remove_indices = np.array(remove_indices, dtype=np.int32)
 
         # # get data to remove
         # X, y = self.get_data(remove_indices, self.feature_indices)
