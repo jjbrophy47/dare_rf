@@ -24,6 +24,18 @@ cdef class _DataManager:
     Database manager.
     """
 
+    property n_samples:
+        def __get__(self):
+            return self.n_samples
+
+    property n_features:
+        def __get__(self):
+            return self.n_features
+
+    property n_vacant:
+        def __get__(self):
+            return self.n_vacant
+
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def __cinit__(self, object X_in, np.ndarray y_in, np.ndarray f_in):
@@ -102,46 +114,64 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int get_all_data(self, int*** X_ptr, int** y_ptr, int**f_ptr,
-                          int* n_samples, int* n_features) nogil:
+    cdef void get_data(self, int*** X_ptr, int** y_ptr) nogil:
         """
         Receive pointers to the data.
         """
-        cdef int result = 0
-
         X_ptr[0] = self.X
         y_ptr[0] = self.y
-        f_ptr[0] = self.f
-        n_samples[0] = self.n_samples
-        n_features[0] = self.n_features
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int get_data(self, int* samples, int n_samples,
-                      int ***X_sub_ptr, int **y_sub_ptr) nogil:
+    cdef void get_features(self, int** f_ptr) nogil:
         """
-        Return a copied sliced view of the data.
+        Receive pointers to the data.
         """
+        f_ptr[0] = self.f    
 
-        # parameters
-        cdef int** X = self.X
-        cdef int* y = self.y
+    # @cython.boundscheck(False)
+    # @cython.wraparound(False)
+    # cdef int get_all_data(self, int*** X_ptr, int** y_ptr, int** f_ptr,
+    #                       int* n_samples, int* n_features) nogil:
+    #     """
+    #     Receive pointers to the data.
+    #     """
+    #     cdef int result = 0
 
-        cdef int** X_sub = <int **>malloc(n_samples * sizeof(int *))
-        cdef int* y_sub = <int *>malloc(n_samples * sizeof(int))
+    #     X_ptr[0] = self.X
+    #     y_ptr[0] = self.y
+    #     f_ptr[0] = self.f
+    #     n_samples[0] = self.n_samples
+    #     n_features[0] = self.n_features
 
-        cdef int i
-        cdef int result = 0
+    # # TODO: remove?
+    # @cython.boundscheck(False)
+    # @cython.wraparound(False)
+    # cdef int get_data_subset(self, int* samples, int n_samples,
+    #                          int ***X_sub_ptr, int **y_sub_ptr) nogil:
+    #     """
+    #     Return a copied sliced view of the data.
+    #     """
 
-        for i in range(n_samples):
-            X_sub[i] = X[samples[i]]
-            y_sub[i] = y[samples[i]]
+    #     # parameters
+    #     cdef int** X = self.X
+    #     cdef int* y = self.y
 
-        # populate structures
-        X_sub_ptr[0] = X_sub
-        y_sub_ptr[0] = y_sub
+    #     cdef int** X_sub = <int **>malloc(n_samples * sizeof(int *))
+    #     cdef int* y_sub = <int *>malloc(n_samples * sizeof(int))
 
-        return result
+    #     cdef int i
+    #     cdef int result = 0
+
+    #     for i in range(n_samples):
+    #         X_sub[i] = X[samples[i]]
+    #         y_sub[i] = y[samples[i]]
+
+    #     # populate structures
+    #     X_sub_ptr[0] = X_sub
+    #     y_sub_ptr[0] = y_sub
+
+    #     return result
 
     @cython.boundscheck(False)
     @cython.wraparound(False)

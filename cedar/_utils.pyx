@@ -164,8 +164,7 @@ cdef class Stack:
         return self.top <= 0
 
     cdef int push(self, int depth, int parent, double parent_p, bint is_left,
-                  int* samples, int* original_samples, int n_samples,
-                  int* features, int n_features) nogil:
+                  int* samples, int n_samples, int* features, int n_features) nogil:
         """
         Push a new element onto the stack.
         """
@@ -183,7 +182,7 @@ cdef class Stack:
         stack[top].parent_p = parent_p
         stack[top].is_left = is_left
         stack[top].samples = samples
-        stack[top].original_samples = original_samples
+        # stack[top].original_samples = original_samples
         stack[top].n_samples = n_samples
         stack[top].features = features
         stack[top].n_features = n_features
@@ -238,8 +237,7 @@ cdef class RemovalStack:
         return self.top <= 0
 
     cdef int push(self, int depth, int node_id, bint is_left, int parent,
-                  double parent_p, int* samples, int* remove_samples,
-                  int n_samples) nogil:
+                  double parent_p, int* samples, int n_samples) nogil:
         """
         Push a new element onto the stack.
         """
@@ -260,7 +258,7 @@ cdef class RemovalStack:
         stack[top].parent = parent
         stack[top].parent_p = parent_p
         stack[top].samples = samples
-        stack[top].remove_samples = remove_samples
+        # stack[top].remove_samples = remove_samples
         stack[top].n_samples = n_samples
 
         # Increment stack pointer

@@ -43,10 +43,9 @@ cdef class _Splitter:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef int node_split(self, int** X, int* y,
-                        int* samples, int* original_samples,
+                        int* samples, int n_samples,
                         int* features, int n_features,
-                        double parent_p,
-                        SplitRecord* split, Meta* meta) nogil:
+                        double parent_p, SplitRecord* split, Meta* meta) nogil:
         """
         Find the best split in the node data.
         This is a placeholder method. The majority of computation will be done here.
@@ -62,8 +61,7 @@ cdef class _Splitter:
         cdef int chosen_ndx
         cdef int chosen_feature
 
-        cdef int n_samples = meta.count
-        cdef int count = meta.count
+        cdef int count = n_samples
         cdef int pos_count = 0
         cdef int left_count
         cdef int left_pos_count
@@ -148,19 +146,19 @@ cdef class _Splitter:
 
                 # assign results from chosen feature
                 split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
-                split.left_original_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
+                # split.left_original_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
                 split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
-                split.right_original_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
+                # split.right_original_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
                 j = 0
                 k = 0
                 for i in range(n_samples):
                     if X[samples[i]][valid_features[chosen_ndx]] == 1:
                         split.left_indices[j] = samples[i]
-                        split.left_original_indices[j] = original_samples[i]
+                        # split.left_original_indices[j] = original_samples[i]
                         j += 1
                     else:
                         split.right_indices[k] = samples[i]
-                        split.right_original_indices[k] = original_samples[i]
+                        # split.right_original_indices[k] = original_samples[i]
                         k += 1
                 split.left_count = j
                 split.right_count = k
@@ -169,6 +167,7 @@ cdef class _Splitter:
                 split.n_features = feature_count
 
                 meta.p = parent_p * distribution[chosen_ndx]
+                meta.count = count
                 meta.pos_count = pos_count
                 meta.feature_count = feature_count
                 meta.left_counts = left_counts

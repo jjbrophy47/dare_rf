@@ -1141,13 +1141,12 @@ struct __pyx_t_5cedar_6_utils_StackRecord {
   double parent_p;
   int is_left;
   int *samples;
-  int *original_samples;
   int n_samples;
   int *features;
   int n_features;
 };
 
-/* "cedar/_utils.pxd":47
+/* "cedar/_utils.pxd":46
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct RemovalStackRecord:             # <<<<<<<<<<<<<<
@@ -1161,7 +1160,6 @@ struct __pyx_t_5cedar_6_utils_RemovalStackRecord {
   int parent;
   double parent_p;
   int *samples;
-  int *remove_samples;
   int n_samples;
 };
 
@@ -1181,7 +1179,7 @@ struct __pyx_obj_5cedar_6_utils_Stack {
 };
 
 
-/* "cedar/_utils.pxd":57
+/* "cedar/_utils.pxd":56
  *     int n_samples
  * 
  * cdef class RemovalStack:             # <<<<<<<<<<<<<<
@@ -1197,7 +1195,7 @@ struct __pyx_obj_5cedar_6_utils_RemovalStack {
 };
 
 
-/* "cedar/_utils.pxd":72
+/* "cedar/_utils.pxd":70
  * # =============================================================================
  * 
  * cdef class IntStack:             # <<<<<<<<<<<<<<
@@ -1224,13 +1222,13 @@ struct __pyx_obj_5cedar_6_utils_IntStack {
 
 struct __pyx_vtabstruct_5cedar_6_utils_Stack {
   int (*is_empty)(struct __pyx_obj_5cedar_6_utils_Stack *);
-  int (*push)(struct __pyx_obj_5cedar_6_utils_Stack *, int, int, double, int, int *, int *, int, int *, int);
+  int (*push)(struct __pyx_obj_5cedar_6_utils_Stack *, int, int, double, int, int *, int, int *, int);
   int (*pop)(struct __pyx_obj_5cedar_6_utils_Stack *, struct __pyx_t_5cedar_6_utils_StackRecord *);
 };
 static struct __pyx_vtabstruct_5cedar_6_utils_Stack *__pyx_vtabptr_5cedar_6_utils_Stack;
 
 
-/* "cedar/_utils.pyx":215
+/* "cedar/_utils.pyx":214
  * # =============================================================================
  * 
  * cdef class RemovalStack:             # <<<<<<<<<<<<<<
@@ -1240,13 +1238,13 @@ static struct __pyx_vtabstruct_5cedar_6_utils_Stack *__pyx_vtabptr_5cedar_6_util
 
 struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack {
   int (*is_empty)(struct __pyx_obj_5cedar_6_utils_RemovalStack *);
-  int (*push)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, int, int, int, int, double, int *, int *, int);
+  int (*push)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, int, int, int, int, double, int *, int);
   int (*pop)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, struct __pyx_t_5cedar_6_utils_RemovalStackRecord *);
 };
 static struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack *__pyx_vtabptr_5cedar_6_utils_RemovalStack;
 
 
-/* "cedar/_utils.pyx":291
+/* "cedar/_utils.pyx":289
  * # =============================================================================
  * 
  * cdef class IntStack:             # <<<<<<<<<<<<<<
@@ -1738,10 +1736,10 @@ static int __Pyx_ExportFunction(const char *name, void (*f)(void), const char *s
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 static int __pyx_f_5cedar_6_utils_5Stack_is_empty(struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_self); /* proto*/
-static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_parent, double __pyx_v_parent_p, int __pyx_v_is_left, int *__pyx_v_samples, int *__pyx_v_original_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features); /* proto*/
+static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_parent, double __pyx_v_parent_p, int __pyx_v_is_left, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features); /* proto*/
 static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_self, struct __pyx_t_5cedar_6_utils_StackRecord *__pyx_v_res); /* proto*/
 static int __pyx_f_5cedar_6_utils_12RemovalStack_is_empty(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self); /* proto*/
-static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_node_id, int __pyx_v_is_left, int __pyx_v_parent, double __pyx_v_parent_p, int *__pyx_v_samples, int *__pyx_v_remove_samples, int __pyx_v_n_samples); /* proto*/
+static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_node_id, int __pyx_v_is_left, int __pyx_v_parent, double __pyx_v_parent_p, int *__pyx_v_samples, int __pyx_v_n_samples); /* proto*/
 static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self, struct __pyx_t_5cedar_6_utils_RemovalStackRecord *__pyx_v_res); /* proto*/
 static int __pyx_f_5cedar_6_utils_8IntStack_is_empty(struct __pyx_obj_5cedar_6_utils_IntStack *__pyx_v_self); /* proto*/
 static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils_IntStack *__pyx_v_self, int __pyx_v_node_id); /* proto*/
@@ -2831,11 +2829,11 @@ static int __pyx_f_5cedar_6_utils_5Stack_is_empty(struct __pyx_obj_5cedar_6_util
  *         return self.top <= 0
  * 
  *     cdef int push(self, int depth, int parent, double parent_p, bint is_left,             # <<<<<<<<<<<<<<
- *                   int* samples, int* original_samples, int n_samples,
- *                   int* features, int n_features) nogil:
+ *                   int* samples, int n_samples, int* features, int n_features) nogil:
+ *         """
  */
 
-static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_parent, double __pyx_v_parent_p, int __pyx_v_is_left, int *__pyx_v_samples, int *__pyx_v_original_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features) {
+static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_Stack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_parent, double __pyx_v_parent_p, int __pyx_v_is_left, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features) {
   int __pyx_v_top;
   struct __pyx_t_5cedar_6_utils_StackRecord *__pyx_v_stack;
   int __pyx_r;
@@ -2843,7 +2841,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
   int __pyx_t_2;
   struct __pyx_t_5cedar_6_utils_StackRecord *__pyx_t_3;
 
-  /* "cedar/_utils.pyx":172
+  /* "cedar/_utils.pyx":171
  *         Push a new element onto the stack.
  *         """
  *         cdef int top = self.top             # <<<<<<<<<<<<<<
@@ -2853,7 +2851,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
   __pyx_t_1 = __pyx_v_self->top;
   __pyx_v_top = __pyx_t_1;
 
-  /* "cedar/_utils.pyx":173
+  /* "cedar/_utils.pyx":172
  *         """
  *         cdef int top = self.top
  *         cdef StackRecord* stack = NULL             # <<<<<<<<<<<<<<
@@ -2862,7 +2860,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   __pyx_v_stack = NULL;
 
-  /* "cedar/_utils.pyx":176
+  /* "cedar/_utils.pyx":175
  * 
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:             # <<<<<<<<<<<<<<
@@ -2872,7 +2870,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
   __pyx_t_2 = ((__pyx_v_top >= __pyx_v_self->capacity) != 0);
   if (__pyx_t_2) {
 
-    /* "cedar/_utils.pyx":177
+    /* "cedar/_utils.pyx":176
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:
  *             self.capacity *= 2             # <<<<<<<<<<<<<<
@@ -2881,7 +2879,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
     __pyx_v_self->capacity = (__pyx_v_self->capacity * 2);
 
-    /* "cedar/_utils.pyx":178
+    /* "cedar/_utils.pyx":177
  *         if top >= self.capacity:
  *             self.capacity *= 2
  *             self.stack_ = <StackRecord *>realloc(self.stack_, self.capacity * sizeof(StackRecord))             # <<<<<<<<<<<<<<
@@ -2890,7 +2888,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
     __pyx_v_self->stack_ = ((struct __pyx_t_5cedar_6_utils_StackRecord *)realloc(__pyx_v_self->stack_, (__pyx_v_self->capacity * (sizeof(struct __pyx_t_5cedar_6_utils_StackRecord)))));
 
-    /* "cedar/_utils.pyx":176
+    /* "cedar/_utils.pyx":175
  * 
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:             # <<<<<<<<<<<<<<
@@ -2899,7 +2897,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   }
 
-  /* "cedar/_utils.pyx":180
+  /* "cedar/_utils.pyx":179
  *             self.stack_ = <StackRecord *>realloc(self.stack_, self.capacity * sizeof(StackRecord))
  * 
  *         stack = self.stack_             # <<<<<<<<<<<<<<
@@ -2909,7 +2907,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
   __pyx_t_3 = __pyx_v_self->stack_;
   __pyx_v_stack = __pyx_t_3;
 
-  /* "cedar/_utils.pyx":181
+  /* "cedar/_utils.pyx":180
  * 
  *         stack = self.stack_
  *         stack[top].depth = depth             # <<<<<<<<<<<<<<
@@ -2918,7 +2916,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   (__pyx_v_stack[__pyx_v_top]).depth = __pyx_v_depth;
 
-  /* "cedar/_utils.pyx":182
+  /* "cedar/_utils.pyx":181
  *         stack = self.stack_
  *         stack[top].depth = depth
  *         stack[top].parent = parent             # <<<<<<<<<<<<<<
@@ -2927,7 +2925,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   (__pyx_v_stack[__pyx_v_top]).parent = __pyx_v_parent;
 
-  /* "cedar/_utils.pyx":183
+  /* "cedar/_utils.pyx":182
  *         stack[top].depth = depth
  *         stack[top].parent = parent
  *         stack[top].parent_p = parent_p             # <<<<<<<<<<<<<<
@@ -2936,44 +2934,35 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   (__pyx_v_stack[__pyx_v_top]).parent_p = __pyx_v_parent_p;
 
-  /* "cedar/_utils.pyx":184
+  /* "cedar/_utils.pyx":183
  *         stack[top].parent = parent
  *         stack[top].parent_p = parent_p
  *         stack[top].is_left = is_left             # <<<<<<<<<<<<<<
  *         stack[top].samples = samples
- *         stack[top].original_samples = original_samples
+ *         # stack[top].original_samples = original_samples
  */
   (__pyx_v_stack[__pyx_v_top]).is_left = __pyx_v_is_left;
 
-  /* "cedar/_utils.pyx":185
+  /* "cedar/_utils.pyx":184
  *         stack[top].parent_p = parent_p
  *         stack[top].is_left = is_left
  *         stack[top].samples = samples             # <<<<<<<<<<<<<<
- *         stack[top].original_samples = original_samples
+ *         # stack[top].original_samples = original_samples
  *         stack[top].n_samples = n_samples
  */
   (__pyx_v_stack[__pyx_v_top]).samples = __pyx_v_samples;
 
   /* "cedar/_utils.pyx":186
- *         stack[top].is_left = is_left
  *         stack[top].samples = samples
- *         stack[top].original_samples = original_samples             # <<<<<<<<<<<<<<
- *         stack[top].n_samples = n_samples
- *         stack[top].features = features
- */
-  (__pyx_v_stack[__pyx_v_top]).original_samples = __pyx_v_original_samples;
-
-  /* "cedar/_utils.pyx":187
- *         stack[top].samples = samples
- *         stack[top].original_samples = original_samples
+ *         # stack[top].original_samples = original_samples
  *         stack[top].n_samples = n_samples             # <<<<<<<<<<<<<<
  *         stack[top].features = features
  *         stack[top].n_features = n_features
  */
   (__pyx_v_stack[__pyx_v_top]).n_samples = __pyx_v_n_samples;
 
-  /* "cedar/_utils.pyx":188
- *         stack[top].original_samples = original_samples
+  /* "cedar/_utils.pyx":187
+ *         # stack[top].original_samples = original_samples
  *         stack[top].n_samples = n_samples
  *         stack[top].features = features             # <<<<<<<<<<<<<<
  *         stack[top].n_features = n_features
@@ -2981,7 +2970,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   (__pyx_v_stack[__pyx_v_top]).features = __pyx_v_features;
 
-  /* "cedar/_utils.pyx":189
+  /* "cedar/_utils.pyx":188
  *         stack[top].n_samples = n_samples
  *         stack[top].features = features
  *         stack[top].n_features = n_features             # <<<<<<<<<<<<<<
@@ -2990,7 +2979,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   (__pyx_v_stack[__pyx_v_top]).n_features = __pyx_v_n_features;
 
-  /* "cedar/_utils.pyx":192
+  /* "cedar/_utils.pyx":191
  * 
  *         # Increment stack pointer
  *         self.top = top + 1             # <<<<<<<<<<<<<<
@@ -2999,7 +2988,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  */
   __pyx_v_self->top = (__pyx_v_top + 1);
 
-  /* "cedar/_utils.pyx":193
+  /* "cedar/_utils.pyx":192
  *         # Increment stack pointer
  *         self.top = top + 1
  *         return 0             # <<<<<<<<<<<<<<
@@ -3013,8 +3002,8 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
  *         return self.top <= 0
  * 
  *     cdef int push(self, int depth, int parent, double parent_p, bint is_left,             # <<<<<<<<<<<<<<
- *                   int* samples, int* original_samples, int n_samples,
- *                   int* features, int n_features) nogil:
+ *                   int* samples, int n_samples, int* features, int n_features) nogil:
+ *         """
  */
 
   /* function exit code */
@@ -3022,7 +3011,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_push(struct __pyx_obj_5cedar_6_utils_St
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":195
+/* "cedar/_utils.pyx":194
  *         return 0
  * 
  *     cdef int pop(self, StackRecord* res) nogil:             # <<<<<<<<<<<<<<
@@ -3038,7 +3027,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
   struct __pyx_t_5cedar_6_utils_StackRecord *__pyx_t_2;
   int __pyx_t_3;
 
-  /* "cedar/_utils.pyx":199
+  /* "cedar/_utils.pyx":198
  *         Remove the top element from the stack and copy to ``res``.
  *         """
  *         cdef int top = self.top             # <<<<<<<<<<<<<<
@@ -3048,7 +3037,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
   __pyx_t_1 = __pyx_v_self->top;
   __pyx_v_top = __pyx_t_1;
 
-  /* "cedar/_utils.pyx":200
+  /* "cedar/_utils.pyx":199
  *         """
  *         cdef int top = self.top
  *         cdef StackRecord* stack = self.stack_             # <<<<<<<<<<<<<<
@@ -3058,7 +3047,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
   __pyx_t_2 = __pyx_v_self->stack_;
   __pyx_v_stack = __pyx_t_2;
 
-  /* "cedar/_utils.pyx":202
+  /* "cedar/_utils.pyx":201
  *         cdef StackRecord* stack = self.stack_
  * 
  *         if top <= 0:             # <<<<<<<<<<<<<<
@@ -3068,7 +3057,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
   __pyx_t_3 = ((__pyx_v_top <= 0) != 0);
   if (__pyx_t_3) {
 
-    /* "cedar/_utils.pyx":203
+    /* "cedar/_utils.pyx":202
  * 
  *         if top <= 0:
  *             return -1             # <<<<<<<<<<<<<<
@@ -3078,7 +3067,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
     __pyx_r = -1;
     goto __pyx_L0;
 
-    /* "cedar/_utils.pyx":202
+    /* "cedar/_utils.pyx":201
  *         cdef StackRecord* stack = self.stack_
  * 
  *         if top <= 0:             # <<<<<<<<<<<<<<
@@ -3087,7 +3076,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
  */
   }
 
-  /* "cedar/_utils.pyx":205
+  /* "cedar/_utils.pyx":204
  *             return -1
  * 
  *         res[0] = stack[top - 1]             # <<<<<<<<<<<<<<
@@ -3096,7 +3085,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
  */
   (__pyx_v_res[0]) = (__pyx_v_stack[(__pyx_v_top - 1)]);
 
-  /* "cedar/_utils.pyx":206
+  /* "cedar/_utils.pyx":205
  * 
  *         res[0] = stack[top - 1]
  *         self.top = top - 1             # <<<<<<<<<<<<<<
@@ -3105,7 +3094,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
  */
   __pyx_v_self->top = (__pyx_v_top - 1);
 
-  /* "cedar/_utils.pyx":208
+  /* "cedar/_utils.pyx":207
  *         self.top = top - 1
  * 
  *         return 0             # <<<<<<<<<<<<<<
@@ -3115,7 +3104,7 @@ static int __pyx_f_5cedar_6_utils_5Stack_pop(struct __pyx_obj_5cedar_6_utils_Sta
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":195
+  /* "cedar/_utils.pyx":194
  *         return 0
  * 
  *     cdef int pop(self, StackRecord* res) nogil:             # <<<<<<<<<<<<<<
@@ -3235,7 +3224,7 @@ static PyObject *__pyx_pf_5cedar_6_utils_5Stack_6__setstate_cython__(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":229
+/* "cedar/_utils.pyx":228
  *     """
  * 
  *     def __cinit__(self, int capacity):             # <<<<<<<<<<<<<<
@@ -3269,18 +3258,18 @@ static int __pyx_pw_5cedar_6_utils_12RemovalStack_1__cinit__(PyObject *__pyx_v_s
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 229, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 228, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_capacity = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_capacity == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 229, __pyx_L3_error)
+    __pyx_v_capacity = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_capacity == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 228, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 229, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 228, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._utils.RemovalStack.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3298,7 +3287,7 @@ static int __pyx_pf_5cedar_6_utils_12RemovalStack___cinit__(struct __pyx_obj_5ce
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cedar/_utils.pyx":230
+  /* "cedar/_utils.pyx":229
  * 
  *     def __cinit__(self, int capacity):
  *         self.capacity = capacity             # <<<<<<<<<<<<<<
@@ -3307,7 +3296,7 @@ static int __pyx_pf_5cedar_6_utils_12RemovalStack___cinit__(struct __pyx_obj_5ce
  */
   __pyx_v_self->capacity = __pyx_v_capacity;
 
-  /* "cedar/_utils.pyx":231
+  /* "cedar/_utils.pyx":230
  *     def __cinit__(self, int capacity):
  *         self.capacity = capacity
  *         self.top = 0             # <<<<<<<<<<<<<<
@@ -3316,7 +3305,7 @@ static int __pyx_pf_5cedar_6_utils_12RemovalStack___cinit__(struct __pyx_obj_5ce
  */
   __pyx_v_self->top = 0;
 
-  /* "cedar/_utils.pyx":232
+  /* "cedar/_utils.pyx":231
  *         self.capacity = capacity
  *         self.top = 0
  *         self.stack_ = <RemovalStackRecord*> malloc(capacity * sizeof(RemovalStackRecord))             # <<<<<<<<<<<<<<
@@ -3325,7 +3314,7 @@ static int __pyx_pf_5cedar_6_utils_12RemovalStack___cinit__(struct __pyx_obj_5ce
  */
   __pyx_v_self->stack_ = ((struct __pyx_t_5cedar_6_utils_RemovalStackRecord *)malloc((__pyx_v_capacity * (sizeof(struct __pyx_t_5cedar_6_utils_RemovalStackRecord)))));
 
-  /* "cedar/_utils.pyx":229
+  /* "cedar/_utils.pyx":228
  *     """
  * 
  *     def __cinit__(self, int capacity):             # <<<<<<<<<<<<<<
@@ -3339,7 +3328,7 @@ static int __pyx_pf_5cedar_6_utils_12RemovalStack___cinit__(struct __pyx_obj_5ce
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":234
+/* "cedar/_utils.pyx":233
  *         self.stack_ = <RemovalStackRecord*> malloc(capacity * sizeof(RemovalStackRecord))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3362,7 +3351,7 @@ static void __pyx_pf_5cedar_6_utils_12RemovalStack_2__dealloc__(struct __pyx_obj
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cedar/_utils.pyx":235
+  /* "cedar/_utils.pyx":234
  * 
  *     def __dealloc__(self):
  *         free(self.stack_)             # <<<<<<<<<<<<<<
@@ -3371,7 +3360,7 @@ static void __pyx_pf_5cedar_6_utils_12RemovalStack_2__dealloc__(struct __pyx_obj
  */
   free(__pyx_v_self->stack_);
 
-  /* "cedar/_utils.pyx":234
+  /* "cedar/_utils.pyx":233
  *         self.stack_ = <RemovalStackRecord*> malloc(capacity * sizeof(RemovalStackRecord))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3383,7 +3372,7 @@ static void __pyx_pf_5cedar_6_utils_12RemovalStack_2__dealloc__(struct __pyx_obj
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cedar/_utils.pyx":237
+/* "cedar/_utils.pyx":236
  *         free(self.stack_)
  * 
  *     cdef bint is_empty(self) nogil:             # <<<<<<<<<<<<<<
@@ -3394,7 +3383,7 @@ static void __pyx_pf_5cedar_6_utils_12RemovalStack_2__dealloc__(struct __pyx_obj
 static int __pyx_f_5cedar_6_utils_12RemovalStack_is_empty(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self) {
   int __pyx_r;
 
-  /* "cedar/_utils.pyx":238
+  /* "cedar/_utils.pyx":237
  * 
  *     cdef bint is_empty(self) nogil:
  *         return self.top <= 0             # <<<<<<<<<<<<<<
@@ -3404,7 +3393,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_is_empty(struct __pyx_obj_5ceda
   __pyx_r = (__pyx_v_self->top <= 0);
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":237
+  /* "cedar/_utils.pyx":236
  *         free(self.stack_)
  * 
  *     cdef bint is_empty(self) nogil:             # <<<<<<<<<<<<<<
@@ -3417,15 +3406,15 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_is_empty(struct __pyx_obj_5ceda
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":240
+/* "cedar/_utils.pyx":239
  *         return self.top <= 0
  * 
  *     cdef int push(self, int depth, int node_id, bint is_left, int parent,             # <<<<<<<<<<<<<<
- *                   double parent_p, int* samples, int* remove_samples,
- *                   int n_samples) nogil:
+ *                   double parent_p, int* samples, int n_samples) nogil:
+ *         """
  */
 
-static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_node_id, int __pyx_v_is_left, int __pyx_v_parent, double __pyx_v_parent_p, int *__pyx_v_samples, int *__pyx_v_remove_samples, int __pyx_v_n_samples) {
+static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_utils_RemovalStack *__pyx_v_self, int __pyx_v_depth, int __pyx_v_node_id, int __pyx_v_is_left, int __pyx_v_parent, double __pyx_v_parent_p, int *__pyx_v_samples, int __pyx_v_n_samples) {
   int __pyx_v_top;
   struct __pyx_t_5cedar_6_utils_RemovalStackRecord *__pyx_v_stack;
   int __pyx_v_num_bytes;
@@ -3434,7 +3423,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
   int __pyx_t_2;
   struct __pyx_t_5cedar_6_utils_RemovalStackRecord *__pyx_t_3;
 
-  /* "cedar/_utils.pyx":246
+  /* "cedar/_utils.pyx":244
  *         Push a new element onto the stack.
  *         """
  *         cdef int top = self.top             # <<<<<<<<<<<<<<
@@ -3444,7 +3433,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
   __pyx_t_1 = __pyx_v_self->top;
   __pyx_v_top = __pyx_t_1;
 
-  /* "cedar/_utils.pyx":247
+  /* "cedar/_utils.pyx":245
  *         """
  *         cdef int top = self.top
  *         cdef RemovalStackRecord* stack = NULL             # <<<<<<<<<<<<<<
@@ -3453,7 +3442,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   __pyx_v_stack = NULL;
 
-  /* "cedar/_utils.pyx":251
+  /* "cedar/_utils.pyx":249
  * 
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:             # <<<<<<<<<<<<<<
@@ -3463,7 +3452,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
   __pyx_t_2 = ((__pyx_v_top >= __pyx_v_self->capacity) != 0);
   if (__pyx_t_2) {
 
-    /* "cedar/_utils.pyx":252
+    /* "cedar/_utils.pyx":250
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:
  *             self.capacity *= 2             # <<<<<<<<<<<<<<
@@ -3472,7 +3461,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
     __pyx_v_self->capacity = (__pyx_v_self->capacity * 2);
 
-    /* "cedar/_utils.pyx":253
+    /* "cedar/_utils.pyx":251
  *         if top >= self.capacity:
  *             self.capacity *= 2
  *             num_bytes = self.capacity * sizeof(RemovalStackRecord)             # <<<<<<<<<<<<<<
@@ -3481,7 +3470,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
     __pyx_v_num_bytes = (__pyx_v_self->capacity * (sizeof(struct __pyx_t_5cedar_6_utils_RemovalStackRecord)));
 
-    /* "cedar/_utils.pyx":254
+    /* "cedar/_utils.pyx":252
  *             self.capacity *= 2
  *             num_bytes = self.capacity * sizeof(RemovalStackRecord)
  *             self.stack_ = <RemovalStackRecord *>realloc(self.stack_, num_bytes)             # <<<<<<<<<<<<<<
@@ -3490,7 +3479,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
     __pyx_v_self->stack_ = ((struct __pyx_t_5cedar_6_utils_RemovalStackRecord *)realloc(__pyx_v_self->stack_, __pyx_v_num_bytes));
 
-    /* "cedar/_utils.pyx":251
+    /* "cedar/_utils.pyx":249
  * 
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:             # <<<<<<<<<<<<<<
@@ -3499,7 +3488,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   }
 
-  /* "cedar/_utils.pyx":256
+  /* "cedar/_utils.pyx":254
  *             self.stack_ = <RemovalStackRecord *>realloc(self.stack_, num_bytes)
  * 
  *         stack = self.stack_             # <<<<<<<<<<<<<<
@@ -3509,7 +3498,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
   __pyx_t_3 = __pyx_v_self->stack_;
   __pyx_v_stack = __pyx_t_3;
 
-  /* "cedar/_utils.pyx":257
+  /* "cedar/_utils.pyx":255
  * 
  *         stack = self.stack_
  *         stack[top].depth = depth             # <<<<<<<<<<<<<<
@@ -3518,7 +3507,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   (__pyx_v_stack[__pyx_v_top]).depth = __pyx_v_depth;
 
-  /* "cedar/_utils.pyx":258
+  /* "cedar/_utils.pyx":256
  *         stack = self.stack_
  *         stack[top].depth = depth
  *         stack[top].node_id = node_id             # <<<<<<<<<<<<<<
@@ -3527,7 +3516,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   (__pyx_v_stack[__pyx_v_top]).node_id = __pyx_v_node_id;
 
-  /* "cedar/_utils.pyx":259
+  /* "cedar/_utils.pyx":257
  *         stack[top].depth = depth
  *         stack[top].node_id = node_id
  *         stack[top].is_left = is_left             # <<<<<<<<<<<<<<
@@ -3536,7 +3525,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   (__pyx_v_stack[__pyx_v_top]).is_left = __pyx_v_is_left;
 
-  /* "cedar/_utils.pyx":260
+  /* "cedar/_utils.pyx":258
  *         stack[top].node_id = node_id
  *         stack[top].is_left = is_left
  *         stack[top].parent = parent             # <<<<<<<<<<<<<<
@@ -3545,43 +3534,34 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   (__pyx_v_stack[__pyx_v_top]).parent = __pyx_v_parent;
 
-  /* "cedar/_utils.pyx":261
+  /* "cedar/_utils.pyx":259
  *         stack[top].is_left = is_left
  *         stack[top].parent = parent
  *         stack[top].parent_p = parent_p             # <<<<<<<<<<<<<<
  *         stack[top].samples = samples
- *         stack[top].remove_samples = remove_samples
+ *         # stack[top].remove_samples = remove_samples
  */
   (__pyx_v_stack[__pyx_v_top]).parent_p = __pyx_v_parent_p;
 
-  /* "cedar/_utils.pyx":262
+  /* "cedar/_utils.pyx":260
  *         stack[top].parent = parent
  *         stack[top].parent_p = parent_p
  *         stack[top].samples = samples             # <<<<<<<<<<<<<<
- *         stack[top].remove_samples = remove_samples
+ *         # stack[top].remove_samples = remove_samples
  *         stack[top].n_samples = n_samples
  */
   (__pyx_v_stack[__pyx_v_top]).samples = __pyx_v_samples;
 
-  /* "cedar/_utils.pyx":263
- *         stack[top].parent_p = parent_p
+  /* "cedar/_utils.pyx":262
  *         stack[top].samples = samples
- *         stack[top].remove_samples = remove_samples             # <<<<<<<<<<<<<<
- *         stack[top].n_samples = n_samples
- * 
- */
-  (__pyx_v_stack[__pyx_v_top]).remove_samples = __pyx_v_remove_samples;
-
-  /* "cedar/_utils.pyx":264
- *         stack[top].samples = samples
- *         stack[top].remove_samples = remove_samples
+ *         # stack[top].remove_samples = remove_samples
  *         stack[top].n_samples = n_samples             # <<<<<<<<<<<<<<
  * 
  *         # Increment stack pointer
  */
   (__pyx_v_stack[__pyx_v_top]).n_samples = __pyx_v_n_samples;
 
-  /* "cedar/_utils.pyx":267
+  /* "cedar/_utils.pyx":265
  * 
  *         # Increment stack pointer
  *         self.top = top + 1             # <<<<<<<<<<<<<<
@@ -3590,7 +3570,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
  */
   __pyx_v_self->top = (__pyx_v_top + 1);
 
-  /* "cedar/_utils.pyx":268
+  /* "cedar/_utils.pyx":266
  *         # Increment stack pointer
  *         self.top = top + 1
  *         return 0             # <<<<<<<<<<<<<<
@@ -3600,12 +3580,12 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":240
+  /* "cedar/_utils.pyx":239
  *         return self.top <= 0
  * 
  *     cdef int push(self, int depth, int node_id, bint is_left, int parent,             # <<<<<<<<<<<<<<
- *                   double parent_p, int* samples, int* remove_samples,
- *                   int n_samples) nogil:
+ *                   double parent_p, int* samples, int n_samples) nogil:
+ *         """
  */
 
   /* function exit code */
@@ -3613,7 +3593,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_push(struct __pyx_obj_5cedar_6_
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":270
+/* "cedar/_utils.pyx":268
  *         return 0
  * 
  *     cdef int pop(self, RemovalStackRecord* res) nogil:             # <<<<<<<<<<<<<<
@@ -3629,7 +3609,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
   struct __pyx_t_5cedar_6_utils_RemovalStackRecord *__pyx_t_2;
   int __pyx_t_3;
 
-  /* "cedar/_utils.pyx":274
+  /* "cedar/_utils.pyx":272
  *         Remove the top element from the stack and copy to ``res``.
  *         """
  *         cdef int top = self.top             # <<<<<<<<<<<<<<
@@ -3639,7 +3619,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
   __pyx_t_1 = __pyx_v_self->top;
   __pyx_v_top = __pyx_t_1;
 
-  /* "cedar/_utils.pyx":275
+  /* "cedar/_utils.pyx":273
  *         """
  *         cdef int top = self.top
  *         cdef RemovalStackRecord* stack = self.stack_             # <<<<<<<<<<<<<<
@@ -3649,7 +3629,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
   __pyx_t_2 = __pyx_v_self->stack_;
   __pyx_v_stack = __pyx_t_2;
 
-  /* "cedar/_utils.pyx":277
+  /* "cedar/_utils.pyx":275
  *         cdef RemovalStackRecord* stack = self.stack_
  * 
  *         if top <= 0:             # <<<<<<<<<<<<<<
@@ -3659,7 +3639,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
   __pyx_t_3 = ((__pyx_v_top <= 0) != 0);
   if (__pyx_t_3) {
 
-    /* "cedar/_utils.pyx":278
+    /* "cedar/_utils.pyx":276
  * 
  *         if top <= 0:
  *             return -1             # <<<<<<<<<<<<<<
@@ -3669,7 +3649,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
     __pyx_r = -1;
     goto __pyx_L0;
 
-    /* "cedar/_utils.pyx":277
+    /* "cedar/_utils.pyx":275
  *         cdef RemovalStackRecord* stack = self.stack_
  * 
  *         if top <= 0:             # <<<<<<<<<<<<<<
@@ -3678,7 +3658,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
  */
   }
 
-  /* "cedar/_utils.pyx":280
+  /* "cedar/_utils.pyx":278
  *             return -1
  * 
  *         res[0] = stack[top - 1]             # <<<<<<<<<<<<<<
@@ -3687,7 +3667,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
  */
   (__pyx_v_res[0]) = (__pyx_v_stack[(__pyx_v_top - 1)]);
 
-  /* "cedar/_utils.pyx":281
+  /* "cedar/_utils.pyx":279
  * 
  *         res[0] = stack[top - 1]
  *         self.top = top - 1             # <<<<<<<<<<<<<<
@@ -3696,7 +3676,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
  */
   __pyx_v_self->top = (__pyx_v_top - 1);
 
-  /* "cedar/_utils.pyx":283
+  /* "cedar/_utils.pyx":281
  *         self.top = top - 1
  * 
  *         return 0             # <<<<<<<<<<<<<<
@@ -3706,7 +3686,7 @@ static int __pyx_f_5cedar_6_utils_12RemovalStack_pop(struct __pyx_obj_5cedar_6_u
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":270
+  /* "cedar/_utils.pyx":268
  *         return 0
  * 
  *     cdef int pop(self, RemovalStackRecord* res) nogil:             # <<<<<<<<<<<<<<
@@ -3826,7 +3806,7 @@ static PyObject *__pyx_pf_5cedar_6_utils_12RemovalStack_6__setstate_cython__(CYT
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":303
+/* "cedar/_utils.pyx":301
  *     """
  * 
  *     def __cinit__(self, int capacity):             # <<<<<<<<<<<<<<
@@ -3860,18 +3840,18 @@ static int __pyx_pw_5cedar_6_utils_8IntStack_1__cinit__(PyObject *__pyx_v_self, 
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 303, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 301, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_capacity = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_capacity == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 303, __pyx_L3_error)
+    __pyx_v_capacity = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_capacity == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 301, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 303, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 301, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._utils.IntStack.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3889,7 +3869,7 @@ static int __pyx_pf_5cedar_6_utils_8IntStack___cinit__(struct __pyx_obj_5cedar_6
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cedar/_utils.pyx":304
+  /* "cedar/_utils.pyx":302
  * 
  *     def __cinit__(self, int capacity):
  *         self.capacity = capacity             # <<<<<<<<<<<<<<
@@ -3898,7 +3878,7 @@ static int __pyx_pf_5cedar_6_utils_8IntStack___cinit__(struct __pyx_obj_5cedar_6
  */
   __pyx_v_self->capacity = __pyx_v_capacity;
 
-  /* "cedar/_utils.pyx":305
+  /* "cedar/_utils.pyx":303
  *     def __cinit__(self, int capacity):
  *         self.capacity = capacity
  *         self.top = 0             # <<<<<<<<<<<<<<
@@ -3907,7 +3887,7 @@ static int __pyx_pf_5cedar_6_utils_8IntStack___cinit__(struct __pyx_obj_5cedar_6
  */
   __pyx_v_self->top = 0;
 
-  /* "cedar/_utils.pyx":306
+  /* "cedar/_utils.pyx":304
  *         self.capacity = capacity
  *         self.top = 0
  *         self.stack_ = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3916,7 +3896,7 @@ static int __pyx_pf_5cedar_6_utils_8IntStack___cinit__(struct __pyx_obj_5cedar_6
  */
   __pyx_v_self->stack_ = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_utils.pyx":303
+  /* "cedar/_utils.pyx":301
  *     """
  * 
  *     def __cinit__(self, int capacity):             # <<<<<<<<<<<<<<
@@ -3930,7 +3910,7 @@ static int __pyx_pf_5cedar_6_utils_8IntStack___cinit__(struct __pyx_obj_5cedar_6
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":308
+/* "cedar/_utils.pyx":306
  *         self.stack_ = <int *>malloc(self.capacity * sizeof(int))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3953,7 +3933,7 @@ static void __pyx_pf_5cedar_6_utils_8IntStack_2__dealloc__(struct __pyx_obj_5ced
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cedar/_utils.pyx":309
+  /* "cedar/_utils.pyx":307
  * 
  *     def __dealloc__(self):
  *         free(self.stack_)             # <<<<<<<<<<<<<<
@@ -3962,7 +3942,7 @@ static void __pyx_pf_5cedar_6_utils_8IntStack_2__dealloc__(struct __pyx_obj_5ced
  */
   free(__pyx_v_self->stack_);
 
-  /* "cedar/_utils.pyx":308
+  /* "cedar/_utils.pyx":306
  *         self.stack_ = <int *>malloc(self.capacity * sizeof(int))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3974,7 +3954,7 @@ static void __pyx_pf_5cedar_6_utils_8IntStack_2__dealloc__(struct __pyx_obj_5ced
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cedar/_utils.pyx":311
+/* "cedar/_utils.pyx":309
  *         free(self.stack_)
  * 
  *     cdef bint is_empty(self) nogil:             # <<<<<<<<<<<<<<
@@ -3985,7 +3965,7 @@ static void __pyx_pf_5cedar_6_utils_8IntStack_2__dealloc__(struct __pyx_obj_5ced
 static int __pyx_f_5cedar_6_utils_8IntStack_is_empty(struct __pyx_obj_5cedar_6_utils_IntStack *__pyx_v_self) {
   int __pyx_r;
 
-  /* "cedar/_utils.pyx":312
+  /* "cedar/_utils.pyx":310
  * 
  *     cdef bint is_empty(self) nogil:
  *         return self.top <= 0             # <<<<<<<<<<<<<<
@@ -3995,7 +3975,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_is_empty(struct __pyx_obj_5cedar_6_u
   __pyx_r = (__pyx_v_self->top <= 0);
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":311
+  /* "cedar/_utils.pyx":309
  *         free(self.stack_)
  * 
  *     cdef bint is_empty(self) nogil:             # <<<<<<<<<<<<<<
@@ -4008,7 +3988,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_is_empty(struct __pyx_obj_5cedar_6_u
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":314
+/* "cedar/_utils.pyx":312
  *         return self.top <= 0
  * 
  *     cdef int push(self, int node_id) nogil:             # <<<<<<<<<<<<<<
@@ -4024,7 +4004,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
   int __pyx_t_2;
   int *__pyx_t_3;
 
-  /* "cedar/_utils.pyx":318
+  /* "cedar/_utils.pyx":316
  *         Push a new element onto the stack.
  *         """
  *         cdef int top = self.top             # <<<<<<<<<<<<<<
@@ -4034,7 +4014,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
   __pyx_t_1 = __pyx_v_self->top;
   __pyx_v_top = __pyx_t_1;
 
-  /* "cedar/_utils.pyx":321
+  /* "cedar/_utils.pyx":319
  * 
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:             # <<<<<<<<<<<<<<
@@ -4044,7 +4024,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
   __pyx_t_2 = ((__pyx_v_top >= __pyx_v_self->capacity) != 0);
   if (__pyx_t_2) {
 
-    /* "cedar/_utils.pyx":322
+    /* "cedar/_utils.pyx":320
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:
  *             self.capacity *= 2             # <<<<<<<<<<<<<<
@@ -4053,7 +4033,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
  */
     __pyx_v_self->capacity = (__pyx_v_self->capacity * 2);
 
-    /* "cedar/_utils.pyx":323
+    /* "cedar/_utils.pyx":321
  *         if top >= self.capacity:
  *             self.capacity *= 2
  *             self.stack_ = <int *>realloc(self.stack_, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -4062,7 +4042,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
  */
     __pyx_v_self->stack_ = ((int *)realloc(__pyx_v_self->stack_, (__pyx_v_self->capacity * (sizeof(int)))));
 
-    /* "cedar/_utils.pyx":321
+    /* "cedar/_utils.pyx":319
  * 
  *         # Resize if capacity not sufficient
  *         if top >= self.capacity:             # <<<<<<<<<<<<<<
@@ -4071,7 +4051,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
  */
   }
 
-  /* "cedar/_utils.pyx":325
+  /* "cedar/_utils.pyx":323
  *             self.stack_ = <int *>realloc(self.stack_, self.capacity * sizeof(int))
  * 
  *         stack = self.stack_             # <<<<<<<<<<<<<<
@@ -4081,7 +4061,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
   __pyx_t_3 = __pyx_v_self->stack_;
   __pyx_v_stack = __pyx_t_3;
 
-  /* "cedar/_utils.pyx":326
+  /* "cedar/_utils.pyx":324
  * 
  *         stack = self.stack_
  *         stack[top] = node_id             # <<<<<<<<<<<<<<
@@ -4090,7 +4070,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
  */
   (__pyx_v_stack[__pyx_v_top]) = __pyx_v_node_id;
 
-  /* "cedar/_utils.pyx":329
+  /* "cedar/_utils.pyx":327
  * 
  *         # Increment stack pointer
  *         self.top = top + 1             # <<<<<<<<<<<<<<
@@ -4099,7 +4079,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
  */
   __pyx_v_self->top = (__pyx_v_top + 1);
 
-  /* "cedar/_utils.pyx":330
+  /* "cedar/_utils.pyx":328
  *         # Increment stack pointer
  *         self.top = top + 1
  *         return 0             # <<<<<<<<<<<<<<
@@ -4109,7 +4089,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":314
+  /* "cedar/_utils.pyx":312
  *         return self.top <= 0
  * 
  *     cdef int push(self, int node_id) nogil:             # <<<<<<<<<<<<<<
@@ -4122,7 +4102,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_push(struct __pyx_obj_5cedar_6_utils
   return __pyx_r;
 }
 
-/* "cedar/_utils.pyx":332
+/* "cedar/_utils.pyx":330
  *         return 0
  * 
  *     cdef int pop(self) nogil:             # <<<<<<<<<<<<<<
@@ -4139,7 +4119,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
   int *__pyx_t_2;
   int __pyx_t_3;
 
-  /* "cedar/_utils.pyx":336
+  /* "cedar/_utils.pyx":334
  *         Remove the top element from the stack and copy to ``res``.
  *         """
  *         cdef int top = self.top             # <<<<<<<<<<<<<<
@@ -4149,7 +4129,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
   __pyx_t_1 = __pyx_v_self->top;
   __pyx_v_top = __pyx_t_1;
 
-  /* "cedar/_utils.pyx":337
+  /* "cedar/_utils.pyx":335
  *         """
  *         cdef int top = self.top
  *         cdef int* stack = self.stack_             # <<<<<<<<<<<<<<
@@ -4159,7 +4139,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
   __pyx_t_2 = __pyx_v_self->stack_;
   __pyx_v_stack = __pyx_t_2;
 
-  /* "cedar/_utils.pyx":340
+  /* "cedar/_utils.pyx":338
  *         cdef int result
  * 
  *         if top <= 0:             # <<<<<<<<<<<<<<
@@ -4169,7 +4149,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
   __pyx_t_3 = ((__pyx_v_top <= 0) != 0);
   if (__pyx_t_3) {
 
-    /* "cedar/_utils.pyx":341
+    /* "cedar/_utils.pyx":339
  * 
  *         if top <= 0:
  *             return -1             # <<<<<<<<<<<<<<
@@ -4179,7 +4159,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
     __pyx_r = -1;
     goto __pyx_L0;
 
-    /* "cedar/_utils.pyx":340
+    /* "cedar/_utils.pyx":338
  *         cdef int result
  * 
  *         if top <= 0:             # <<<<<<<<<<<<<<
@@ -4188,7 +4168,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
  */
   }
 
-  /* "cedar/_utils.pyx":343
+  /* "cedar/_utils.pyx":341
  *             return -1
  * 
  *         result = stack[top - 1]             # <<<<<<<<<<<<<<
@@ -4197,7 +4177,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
  */
   __pyx_v_result = (__pyx_v_stack[(__pyx_v_top - 1)]);
 
-  /* "cedar/_utils.pyx":344
+  /* "cedar/_utils.pyx":342
  * 
  *         result = stack[top - 1]
  *         self.top = top - 1             # <<<<<<<<<<<<<<
@@ -4206,7 +4186,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
  */
   __pyx_v_self->top = (__pyx_v_top - 1);
 
-  /* "cedar/_utils.pyx":346
+  /* "cedar/_utils.pyx":344
  *         self.top = top - 1
  * 
  *         return result             # <<<<<<<<<<<<<<
@@ -4214,7 +4194,7 @@ static int __pyx_f_5cedar_6_utils_8IntStack_pop(struct __pyx_obj_5cedar_6_utils_
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cedar/_utils.pyx":332
+  /* "cedar/_utils.pyx":330
  *         return 0
  * 
  *     cdef int pop(self) nogil:             # <<<<<<<<<<<<<<
@@ -7376,7 +7356,7 @@ static int __Pyx_modinit_type_init_code(void) {
   /*--- Type init code ---*/
   __pyx_vtabptr_5cedar_6_utils_Stack = &__pyx_vtable_5cedar_6_utils_Stack;
   __pyx_vtable_5cedar_6_utils_Stack.is_empty = (int (*)(struct __pyx_obj_5cedar_6_utils_Stack *))__pyx_f_5cedar_6_utils_5Stack_is_empty;
-  __pyx_vtable_5cedar_6_utils_Stack.push = (int (*)(struct __pyx_obj_5cedar_6_utils_Stack *, int, int, double, int, int *, int *, int, int *, int))__pyx_f_5cedar_6_utils_5Stack_push;
+  __pyx_vtable_5cedar_6_utils_Stack.push = (int (*)(struct __pyx_obj_5cedar_6_utils_Stack *, int, int, double, int, int *, int, int *, int))__pyx_f_5cedar_6_utils_5Stack_push;
   __pyx_vtable_5cedar_6_utils_Stack.pop = (int (*)(struct __pyx_obj_5cedar_6_utils_Stack *, struct __pyx_t_5cedar_6_utils_StackRecord *))__pyx_f_5cedar_6_utils_5Stack_pop;
   if (PyType_Ready(&__pyx_type_5cedar_6_utils_Stack) < 0) __PYX_ERR(0, 141, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
@@ -7391,33 +7371,33 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_ptype_5cedar_6_utils_Stack = &__pyx_type_5cedar_6_utils_Stack;
   __pyx_vtabptr_5cedar_6_utils_RemovalStack = &__pyx_vtable_5cedar_6_utils_RemovalStack;
   __pyx_vtable_5cedar_6_utils_RemovalStack.is_empty = (int (*)(struct __pyx_obj_5cedar_6_utils_RemovalStack *))__pyx_f_5cedar_6_utils_12RemovalStack_is_empty;
-  __pyx_vtable_5cedar_6_utils_RemovalStack.push = (int (*)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, int, int, int, int, double, int *, int *, int))__pyx_f_5cedar_6_utils_12RemovalStack_push;
+  __pyx_vtable_5cedar_6_utils_RemovalStack.push = (int (*)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, int, int, int, int, double, int *, int))__pyx_f_5cedar_6_utils_12RemovalStack_push;
   __pyx_vtable_5cedar_6_utils_RemovalStack.pop = (int (*)(struct __pyx_obj_5cedar_6_utils_RemovalStack *, struct __pyx_t_5cedar_6_utils_RemovalStackRecord *))__pyx_f_5cedar_6_utils_12RemovalStack_pop;
-  if (PyType_Ready(&__pyx_type_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5cedar_6_utils_RemovalStack.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5cedar_6_utils_RemovalStack.tp_dictoffset && __pyx_type_5cedar_6_utils_RemovalStack.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5cedar_6_utils_RemovalStack.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5cedar_6_utils_RemovalStack.tp_dict, __pyx_vtabptr_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_RemovalStack, (PyObject *)&__pyx_type_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5cedar_6_utils_RemovalStack.tp_dict, __pyx_vtabptr_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_RemovalStack, (PyObject *)&__pyx_type_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_6_utils_RemovalStack) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
   __pyx_ptype_5cedar_6_utils_RemovalStack = &__pyx_type_5cedar_6_utils_RemovalStack;
   __pyx_vtabptr_5cedar_6_utils_IntStack = &__pyx_vtable_5cedar_6_utils_IntStack;
   __pyx_vtable_5cedar_6_utils_IntStack.is_empty = (int (*)(struct __pyx_obj_5cedar_6_utils_IntStack *))__pyx_f_5cedar_6_utils_8IntStack_is_empty;
   __pyx_vtable_5cedar_6_utils_IntStack.push = (int (*)(struct __pyx_obj_5cedar_6_utils_IntStack *, int))__pyx_f_5cedar_6_utils_8IntStack_push;
   __pyx_vtable_5cedar_6_utils_IntStack.pop = (int (*)(struct __pyx_obj_5cedar_6_utils_IntStack *))__pyx_f_5cedar_6_utils_8IntStack_pop;
-  if (PyType_Ready(&__pyx_type_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5cedar_6_utils_IntStack.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5cedar_6_utils_IntStack.tp_dictoffset && __pyx_type_5cedar_6_utils_IntStack.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5cedar_6_utils_IntStack.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5cedar_6_utils_IntStack.tp_dict, __pyx_vtabptr_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_IntStack, (PyObject *)&__pyx_type_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5cedar_6_utils_IntStack.tp_dict, __pyx_vtabptr_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_IntStack, (PyObject *)&__pyx_type_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_6_utils_IntStack) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
   __pyx_ptype_5cedar_6_utils_IntStack = &__pyx_type_5cedar_6_utils_IntStack;
   __Pyx_RefNannyFinishContext();
   return 0;

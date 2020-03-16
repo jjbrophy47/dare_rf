@@ -23,7 +23,7 @@ cdef struct StackRecord:
     double parent_p
     bint is_left
     int* samples
-    int* original_samples
+    # int* original_samples
     int n_samples
     int* features
     int n_features
@@ -35,8 +35,7 @@ cdef class Stack:
 
     cdef bint is_empty(self) nogil
     cdef int push(self, int depth, int parent, double parent_p, bint is_left,
-                  int* samples, int* original_samples, int n_samples,
-                  int* features, int n_features) nogil
+                  int* samples, int n_samples, int* features, int n_features) nogil
     cdef int pop(self, StackRecord* res) nogil
 
 # =============================================================================
@@ -51,7 +50,7 @@ cdef struct RemovalStackRecord:
     int parent
     double parent_p
     int* samples
-    int* remove_samples
+    # int* remove_samples
     int n_samples
 
 cdef class RemovalStack:
@@ -61,8 +60,7 @@ cdef class RemovalStack:
 
     cdef bint is_empty(self) nogil
     cdef int push(self, int depth, int node_id, bint is_left, int parent,
-                  double parent_p, int* samples, int* remove_samples,
-                  int n_samples) nogil
+                  double parent_p, int* samples, int n_samples) nogil
     cdef int pop(self, RemovalStackRecord* res) nogil
 
 # =============================================================================

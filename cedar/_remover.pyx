@@ -79,7 +79,7 @@ cdef class _Remover:
 
         cdef int remove_type_count = 0
         cdef int* remove_types = <int *>malloc(n_samples * sizeof(int))
-        cdef int* remove_samples = <int *>malloc(n_samples * sizeof(int))
+        # cdef int* remove_samples = <int *>malloc(n_samples * sizeof(int))
 
         cdef int* rebuild_samples = NULL
         cdef int n_rebuild_samples
@@ -88,15 +88,15 @@ cdef class _Remover:
         rc = manager.check_sample_validity(data_indices, n_samples)
         if rc == -1:
             return -1
-        manager.get_data(data_indices, n_samples, &X, &y)
+        manager.get_data(&X, &y)
 
         # populate indices for removal data
         for i in range(n_samples):
-            samples[i] = i
-            remove_samples[i] = remove_indices[i]
+            samples[i] = remove_indices[i]
+            # remove_samples[i] = remove_indices[i]
 
         # push root node onto stack
-        rc = stack.push(0, 0, 0, _TREE_UNDEFINED, 1, samples, remove_samples, n_samples)
+        rc = stack.push(0, 0, 0, _TREE_UNDEFINED, 1, samples, n_samples)
 
         while not stack.is_empty():
 
@@ -108,7 +108,7 @@ cdef class _Remover:
             parent = stack_record.parent
             parent_p = stack_record.parent_p
             samples = stack_record.samples
-            remove_samples = stack_record.remove_samples
+            # remove_samples = stack_record.remove_samples
             n_samples = stack_record.n_samples
 
             # populate node metadata
@@ -126,17 +126,17 @@ cdef class _Remover:
 
             # leaf
             if tree.values[node_id] >= 0:
-                self._update_leaf(node_id, tree, y, samples, remove_samples, n_samples)
+                self._update_leaf(node_id, tree, y, samples, n_samples)
                 remove_types[remove_type_count] = 0
                 remove_type_count += 1
 
-                free(remove_samples)
+                # free(remove_samples)
                 free(samples)
 
             # decision node
             else:
                 chosen_feature = tree.chosen_features[node_id]
-                rc = self._node_remove(node_id, X, y, remove_samples, samples, n_samples,
+                rc = self._node_remove(node_id, X, y, samples, n_samples,
                                        min_samples_split, min_samples_leaf,
                                        chosen_feature, parent_p, &split, &meta)
                 free(samples)
@@ -146,15 +146,17 @@ cdef class _Remover:
                 # retrain
                 if rc < 0:
 
-                    n_rebuild_samples = self._collect_leaf_samples(node_id, tree, remove_samples,
+                    n_rebuild_samples = self._collect_leaf_samples(node_id, tree, samples,
                                                                    n_samples, &rebuild_samples)
-                    free(X)
-                    free(y)
+                    # free(X)
+                    # free(y)
                     tree_builder.build_at_node(node_id, tree, rebuild_samples, n_rebuild_samples,
                                                meta.features, meta.feature_count,
                                                depth, parent, parent_p, is_left)
 
-                    free(remove_samples)
+                    # free(remove_samples)
+
+                    free(samples)
                     remove_types[remove_type_count] = rc
                     remove_type_count += 1
 
@@ -165,14 +167,12 @@ cdef class _Remover:
                     # traverse left branch
                     if split.left_count > 0:
                         stack.push(depth + 1, tree.left_children[node_id], 1, node_id,
-                                   meta.p, split.left_indices, split.left_remove_indices,
-                                   split.left_count)
+                                   meta.p, split.left_indices, split.left_count)
 
                     # traverse right branch
                     if split.right_count > 0:
                         stack.push(depth + 1, tree.right_children[node_id], 0, node_id,
-                                   meta.p, split.right_indices, split.right_remove_indices,
-                                   split.right_count)
+                                   meta.p, split.right_indices, split.right_count)
 
         # remove samples from the database
         manager.remove_data(data_indices, n_data_indices)
@@ -188,7 +188,7 @@ cdef class _Remover:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int _update_leaf(self, int node_id, _Tree tree, int* y, int* samples,
-                          int* remove_samples, int n_samples) nogil:
+                          int n_samples) nogil:
         """
         Update leaf node: count, pos_count, value, leaf_samples.
         """
@@ -211,7 +211,7 @@ cdef class _Remover:
             add_sample = 1
 
             for j in range(n_samples):
-                if leaf_samples[i] == remove_samples[j]:
+                if leaf_samples[i] == samples[j]:
                     add_sample = 0
                     break
 
@@ -249,7 +249,7 @@ cdef class _Remover:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int _node_remove(self, int node_id, int** X, int* y,
-                          int* remove_samples, int* samples, int n_samples,
+                          int* samples, int n_samples,
                           int min_samples_split, int min_samples_leaf,
                           int chosen_feature, double parent_p,
                           RemovalSplitRecord *split, Meta* meta) nogil:
@@ -432,19 +432,19 @@ cdef class _Remover:
 
                     # split removal data based on the chosen feature
                     split.left_indices = <int *>malloc(chosen_left_count * sizeof(int))
-                    split.left_remove_indices = <int *>malloc(chosen_left_count * sizeof(int))
+                    # split.left_remove_indices = <int *>malloc(chosen_left_count * sizeof(int))
                     split.right_indices = <int *>malloc(chosen_right_count * sizeof(int))
-                    split.right_remove_indices = <int *>malloc(chosen_right_count * sizeof(int))
+                    # split.right_remove_indices = <int *>malloc(chosen_right_count * sizeof(int))
                     j = 0
                     k = 0
                     for i in range(n_samples):
                         if X[samples[i]][valid_features[chosen_ndx]] == 1:
                             split.left_indices[j] = samples[i]
-                            split.left_remove_indices[j] = remove_samples[i]
+                            # split.left_remove_indices[j] = remove_samples[i]
                             j += 1
                         else:
                             split.right_indices[k] = samples[i]
-                            split.right_remove_indices[j] = remove_samples[i]
+                            # split.right_remove_indices[j] = remove_samples[i]
                             k += 1
                     split.left_count = j
                     split.right_count = k
