@@ -418,7 +418,7 @@ cdef class _Tree:
         self.pos_count[node_id] = meta.pos_count
         self.depth[node_id] = depth
 
-        printf('parent: %d, node_id: %d\n', parent, node_id)
+        # printf('parent: %d, node_id: %d\n', parent, node_id)
 
         if parent != _TREE_UNDEFINED:
             if is_left:

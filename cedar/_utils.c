@@ -2330,7 +2330,7 @@ static int __pyx_f_5cedar_6_utils_generate_distribution(double __pyx_v_lmbda, do
  * 
  *         for i in range(n_gini_indices):             # <<<<<<<<<<<<<<
  *             distribution[i] /= normalizing_constant
- *             printf('distribution[%d]: %.7f\n', i, distribution[i])
+ *             # printf('distribution[%d]: %.7f\n', i, distribution[i])
  */
     __pyx_t_1 = __pyx_v_n_gini_indices;
     __pyx_t_2 = __pyx_t_1;
@@ -2341,26 +2341,17 @@ static int __pyx_f_5cedar_6_utils_generate_distribution(double __pyx_v_lmbda, do
  * 
  *         for i in range(n_gini_indices):
  *             distribution[i] /= normalizing_constant             # <<<<<<<<<<<<<<
- *             printf('distribution[%d]: %.7f\n', i, distribution[i])
+ *             # printf('distribution[%d]: %.7f\n', i, distribution[i])
  * 
  */
       __pyx_t_6 = __pyx_v_i;
       (__pyx_v_distribution[__pyx_t_6]) = ((__pyx_v_distribution[__pyx_t_6]) / __pyx_v_normalizing_constant);
-
-      /* "cedar/_utils.pyx":93
- *         for i in range(n_gini_indices):
- *             distribution[i] /= normalizing_constant
- *             printf('distribution[%d]: %.7f\n', i, distribution[i])             # <<<<<<<<<<<<<<
- * 
- *     return 0
- */
-      (void)(printf(((char const *)"distribution[%d]: %.7f\n"), __pyx_v_i, (__pyx_v_distribution[__pyx_v_i])));
     }
   }
   __pyx_L6:;
 
   /* "cedar/_utils.pyx":95
- *             printf('distribution[%d]: %.7f\n', i, distribution[i])
+ *             # printf('distribution[%d]: %.7f\n', i, distribution[i])
  * 
  *     return 0             # <<<<<<<<<<<<<<
  * 

@@ -388,6 +388,7 @@ class Tree(object):
         """
         Shows a representation of the tree.
         """
+        print('\nTree:')
         print('nodes: {}'.format(self.tree_.n_nodes))
 
         if show_nodes:

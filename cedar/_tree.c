@@ -6796,21 +6796,12 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
  *         self.pos_count[node_id] = meta.pos_count
  *         self.depth[node_id] = depth             # <<<<<<<<<<<<<<
  * 
- *         printf('parent: %d, node_id: %d\n', parent, node_id)
+ *         # printf('parent: %d, node_id: %d\n', parent, node_id)
  */
   (__pyx_v_self->depth[__pyx_v_node_id]) = __pyx_v_depth;
 
-  /* "cedar/_tree.pyx":421
- *         self.depth[node_id] = depth
- * 
- *         printf('parent: %d, node_id: %d\n', parent, node_id)             # <<<<<<<<<<<<<<
- * 
- *         if parent != _TREE_UNDEFINED:
- */
-  (void)(printf(((char const *)"parent: %d, node_id: %d\n"), __pyx_v_parent, __pyx_v_node_id));
-
   /* "cedar/_tree.pyx":423
- *         printf('parent: %d, node_id: %d\n', parent, node_id)
+ *         # printf('parent: %d, node_id: %d\n', parent, node_id)
  * 
  *         if parent != _TREE_UNDEFINED:             # <<<<<<<<<<<<<<
  *             if is_left:
@@ -6861,7 +6852,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree_add_node(struct __pyx_obj_5cedar_5_tree_
     __pyx_L5:;
 
     /* "cedar/_tree.pyx":423
- *         printf('parent: %d, node_id: %d\n', parent, node_id)
+ *         # printf('parent: %d, node_id: %d\n', parent, node_id)
  * 
  *         if parent != _TREE_UNDEFINED:             # <<<<<<<<<<<<<<
  *             if is_left:

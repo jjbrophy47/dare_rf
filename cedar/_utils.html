@@ -597,12 +597,11 @@ body.cython { font-family: courier; font-size: 12; }
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">092</span>:             <span class="n">distribution</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/=</span> <span class="n">normalizing_constant</span></pre>
 <pre class='cython code score-0 '>      __pyx_t_6 = __pyx_v_i;
       (__pyx_v_distribution[__pyx_t_6]) = ((__pyx_v_distribution[__pyx_t_6]) / __pyx_v_normalizing_constant);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">093</span>:             <span class="n">printf</span><span class="p">(</span><span class="s">&#39;distribution[</span><span class="si">%d</span><span class="s">]: </span><span class="si">%.7f</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">distribution</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></pre>
-<pre class='cython code score-0 '>      (void)(printf(((char const *)"distribution[%d]: %.7f\n"), __pyx_v_i, (__pyx_v_distribution[__pyx_v_i])));
     }
   }
   __pyx_L6:;
-</pre><pre class="cython line score-0">&#xA0;<span class="">094</span>: </pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">093</span>:             <span class="c"># printf(&#39;distribution[%d]: %.7f\n&#39;, i, distribution[i])</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">094</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">095</span>:     <span class="k">return</span> <span class="mf">0</span></pre>
 <pre class='cython code score-0 '>  __pyx_r = 0;
   goto __pyx_L0;

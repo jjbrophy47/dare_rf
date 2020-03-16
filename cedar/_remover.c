@@ -2383,7 +2383,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
   int *__pyx_v_remove_samples;
   int *__pyx_v_rebuild_samples;
   int __pyx_v_n_rebuild_samples;
-  int __pyx_v_t1;
+  CYTHON_UNUSED int __pyx_v_t1;
   int __pyx_v_rc;
   int __pyx_v_is_left;
   int __pyx_v_parent;
@@ -2633,21 +2633,12 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  * 
  *         cdef int t1 = time(NULL)             # <<<<<<<<<<<<<<
  *         cdef int t2
- *         printf('time: %lds\n', t1)
+ *         # printf('time: %lds\n', t1)
  */
   __pyx_v_t1 = time(NULL);
 
-  /* "cedar/_remover.pyx":90
- *         cdef int t1 = time(NULL)
- *         cdef int t2
- *         printf('time: %lds\n', t1)             # <<<<<<<<<<<<<<
- * 
- *         for i in range(n_samples):
- */
-  (void)(printf(((char const *)"time: %lds\n"), __pyx_v_t1));
-
   /* "cedar/_remover.pyx":92
- *         printf('time: %lds\n', t1)
+ *         # printf('time: %lds\n', t1)
  * 
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
  *             samples[i] = i
@@ -2867,18 +2858,9 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  *             meta.right_pos_counts = tree.right_pos_counts[node_id]
  *             meta.features = tree.features[node_id]             # <<<<<<<<<<<<<<
  * 
- *             printf("\npopping_r (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)
+ *             # printf("\npopping_r (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)
  */
     __pyx_v_meta.features = (__pyx_v_tree->features[__pyx_v_node_id]);
-
-    /* "cedar/_remover.pyx":123
- *             meta.features = tree.features[node_id]
- * 
- *             printf("\npopping_r (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)             # <<<<<<<<<<<<<<
- * 
- *             # leaf
- */
-    (void)(printf(((char const *)"\npopping_r (%d, %d, %d, %d, %.7f, %d)\n"), __pyx_v_depth, __pyx_v_node_id, __pyx_v_is_left, __pyx_v_parent, __pyx_v_parent_p, __pyx_v_n_samples));
 
     /* "cedar/_remover.pyx":126
  * 
@@ -2949,23 +2931,14 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  *             # decision node
  *             else:
  *                 chosen_feature = tree.chosen_features[node_id]             # <<<<<<<<<<<<<<
- *                 printf('pos_count[0]: %d\n', tree.pos_count[0])
+ *                 # printf('pos_count[0]: %d\n', tree.pos_count[0])
  *                 # printf('chosen feature: %d\n', chosen_feature)
  */
     /*else*/ {
       __pyx_v_chosen_feature = (__pyx_v_tree->chosen_features[__pyx_v_node_id]);
 
-      /* "cedar/_remover.pyx":137
- *             else:
- *                 chosen_feature = tree.chosen_features[node_id]
- *                 printf('pos_count[0]: %d\n', tree.pos_count[0])             # <<<<<<<<<<<<<<
- *                 # printf('chosen feature: %d\n', chosen_feature)
- *                 rc = self._node_remove(node_id, X, y, remove_samples, samples, n_samples,
- */
-      (void)(printf(((char const *)"pos_count[0]: %d\n"), (__pyx_v_tree->pos_count[0])));
-
       /* "cedar/_remover.pyx":139
- *                 printf('pos_count[0]: %d\n', tree.pos_count[0])
+ *                 # printf('pos_count[0]: %d\n', tree.pos_count[0])
  *                 # printf('chosen feature: %d\n', chosen_feature)
  *                 rc = self._node_remove(node_id, X, y, remove_samples, samples, n_samples,             # <<<<<<<<<<<<<<
  *                                        min_samples_split, min_samples_leaf,
@@ -2973,54 +2946,27 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
       __pyx_v_rc = ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_node_remove(__pyx_v_self, __pyx_v_node_id, __pyx_v_X, __pyx_v_y, __pyx_v_remove_samples, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_min_samples_split, __pyx_v_min_samples_leaf, __pyx_v_chosen_feature, __pyx_v_parent_p, (&__pyx_v_split), (&__pyx_v_meta));
 
-      /* "cedar/_remover.pyx":142
- *                                        min_samples_split, min_samples_leaf,
- *                                        chosen_feature, parent_p, &split, &meta)
- *                 printf('pos_count2[0]: %d\n', tree.pos_count[0])             # <<<<<<<<<<<<<<
- *                 free(samples)
- * 
- */
-      (void)(printf(((char const *)"pos_count2[0]: %d\n"), (__pyx_v_tree->pos_count[0])));
-
       /* "cedar/_remover.pyx":143
  *                                        chosen_feature, parent_p, &split, &meta)
- *                 printf('pos_count2[0]: %d\n', tree.pos_count[0])
+ *                 # printf('pos_count2[0]: %d\n', tree.pos_count[0])
  *                 free(samples)             # <<<<<<<<<<<<<<
  * 
- *                 printf('rc: %d\n', rc)
+ *                 # printf('rc: %d\n', rc)
  */
       free(__pyx_v_samples);
-
-      /* "cedar/_remover.pyx":145
- *                 free(samples)
- * 
- *                 printf('rc: %d\n', rc)             # <<<<<<<<<<<<<<
- * 
- *                 # retrain
- */
-      (void)(printf(((char const *)"rc: %d\n"), __pyx_v_rc));
 
       /* "cedar/_remover.pyx":148
  * 
  *                 # retrain
  *                 if rc < 0:             # <<<<<<<<<<<<<<
- *                     printf('time: %ds\n', time(NULL) - t1)
+ *                     # printf('time: %ds\n', time(NULL) - t1)
  * 
  */
       __pyx_t_10 = ((__pyx_v_rc < 0) != 0);
       if (__pyx_t_10) {
 
-        /* "cedar/_remover.pyx":149
- *                 # retrain
- *                 if rc < 0:
- *                     printf('time: %ds\n', time(NULL) - t1)             # <<<<<<<<<<<<<<
- * 
- *                     n_rebuild_samples = self._collect_leaf_samples(node_id, tree, remove_samples,
- */
-        (void)(printf(((char const *)"time: %ds\n"), (time(NULL) - __pyx_v_t1)));
-
         /* "cedar/_remover.pyx":151
- *                     printf('time: %ds\n', time(NULL) - t1)
+ *                     # printf('time: %ds\n', time(NULL) - t1)
  * 
  *                     n_rebuild_samples = self._collect_leaf_samples(node_id, tree, remove_samples,             # <<<<<<<<<<<<<<
  *                                                                    n_samples, &rebuild_samples)
@@ -3086,7 +3032,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  * 
  *                 # retrain
  *                 if rc < 0:             # <<<<<<<<<<<<<<
- *                     printf('time: %ds\n', time(NULL) - t1)
+ *                     # printf('time: %ds\n', time(NULL) - t1)
  * 
  */
         goto __pyx_L8;
@@ -3096,20 +3042,11 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  *                 else:
  * 
  *                     self._update_decision_node(node_id, tree, n_samples, &meta)             # <<<<<<<<<<<<<<
- *                     printf('pos_count3[0]: %d\n', tree.pos_count[0])
+ *                     # printf('pos_count3[0]: %d\n', tree.pos_count[0])
  * 
  */
       /*else*/ {
         (void)(((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_decision_node(__pyx_v_self, __pyx_v_node_id, __pyx_v_tree, __pyx_v_n_samples, (&__pyx_v_meta)));
-
-        /* "cedar/_remover.pyx":166
- * 
- *                     self._update_decision_node(node_id, tree, n_samples, &meta)
- *                     printf('pos_count3[0]: %d\n', tree.pos_count[0])             # <<<<<<<<<<<<<<
- * 
- *                     # traverse left branch
- */
-        (void)(printf(((char const *)"pos_count3[0]: %d\n"), (__pyx_v_tree->pos_count[0])));
 
         /* "cedar/_remover.pyx":169
  * 
@@ -5124,15 +5061,6 @@ static int __pyx_f_5cedar_8_remover_8_Remover__collect_leaf_samples(CYTHON_UNUSE
   int __pyx_t_12;
   __Pyx_RefNannySetupContext("_collect_leaf_samples", 0);
 
-  /* "cedar/_remover.pyx":478
- *         """
- * 
- *         printf('pos_count[0]: %d\n', tree.pos_count[0])             # <<<<<<<<<<<<<<
- * 
- *         cdef int i
- */
-  (void)(printf(((char const *)"pos_count[0]: %d\n"), (__pyx_v_tree->pos_count[0])));
-
   /* "cedar/_remover.pyx":483
  *         cdef int j
  * 
@@ -5559,15 +5487,6 @@ static int __pyx_f_5cedar_8_remover_8_Remover__collect_leaf_samples(CYTHON_UNUSE
  */
   __pyx_v_rebuild_samples = ((int *)realloc(__pyx_v_rebuild_samples, (__pyx_v_rebuild_sample_count * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":561
- *         # printf('feature[0]: %d\n', tree.features[node_id][0])
- * 
- *         printf('pos_count[0]: %d\n', tree.pos_count[0])             # <<<<<<<<<<<<<<
- * 
- *         # restructure tree
- */
-  (void)(printf(((char const *)"pos_count[0]: %d\n"), (__pyx_v_tree->pos_count[0])));
-
   /* "cedar/_remover.pyx":564
  * 
  *         # restructure tree
@@ -5709,32 +5628,14 @@ static int __pyx_f_5cedar_8_remover_8_Remover__collect_leaf_samples(CYTHON_UNUSE
  *             tree.right_children[j] = tree.right_children[i]
  * 
  *             tree.count[j] = tree.count[i]             # <<<<<<<<<<<<<<
- *             printf('pos_count[%d]: %d\n', j, tree.pos_count[j])
- *             printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
+ *             # printf('pos_count[%d]: %d\n', j, tree.pos_count[j])
+ *             # printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
  */
     (__pyx_v_tree->count[__pyx_v_j]) = (__pyx_v_tree->count[__pyx_v_i]);
 
-    /* "cedar/_remover.pyx":580
- * 
- *             tree.count[j] = tree.count[i]
- *             printf('pos_count[%d]: %d\n', j, tree.pos_count[j])             # <<<<<<<<<<<<<<
- *             printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
- *             tree.pos_count[j] = tree.pos_count[i]
- */
-    (void)(printf(((char const *)"pos_count[%d]: %d\n"), __pyx_v_j, (__pyx_v_tree->pos_count[__pyx_v_j])));
-
-    /* "cedar/_remover.pyx":581
- *             tree.count[j] = tree.count[i]
- *             printf('pos_count[%d]: %d\n', j, tree.pos_count[j])
- *             printf('pos_count[%d]: %d\n', i, tree.pos_count[i])             # <<<<<<<<<<<<<<
- *             tree.pos_count[j] = tree.pos_count[i]
- *             tree.feature_count[j] = tree.feature_count[i]
- */
-    (void)(printf(((char const *)"pos_count[%d]: %d\n"), __pyx_v_i, (__pyx_v_tree->pos_count[__pyx_v_i])));
-
     /* "cedar/_remover.pyx":582
- *             printf('pos_count[%d]: %d\n', j, tree.pos_count[j])
- *             printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
+ *             # printf('pos_count[%d]: %d\n', j, tree.pos_count[j])
+ *             # printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
  *             tree.pos_count[j] = tree.pos_count[i]             # <<<<<<<<<<<<<<
  *             tree.feature_count[j] = tree.feature_count[i]
  *             tree.left_counts[j] = tree.left_counts[i]
@@ -5742,7 +5643,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover__collect_leaf_samples(CYTHON_UNUSE
     (__pyx_v_tree->pos_count[__pyx_v_j]) = (__pyx_v_tree->pos_count[__pyx_v_i]);
 
     /* "cedar/_remover.pyx":583
- *             printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
+ *             # printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
  *             tree.pos_count[j] = tree.pos_count[i]
  *             tree.feature_count[j] = tree.feature_count[i]             # <<<<<<<<<<<<<<
  *             tree.left_counts[j] = tree.left_counts[i]
@@ -5791,7 +5692,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover__collect_leaf_samples(CYTHON_UNUSE
  *             tree.right_pos_counts[j] = tree.right_pos_counts[i]
  *             tree.features[j] = tree.features[i]             # <<<<<<<<<<<<<<
  *             tree.leaf_samples[j] = tree.leaf_samples[i]
- *         printf('pos_count[0]: %d\n', tree.pos_count[0])
+ *         # printf('pos_count[0]: %d\n', tree.pos_count[0])
  */
     (__pyx_v_tree->features[__pyx_v_j]) = (__pyx_v_tree->features[__pyx_v_i]);
 
@@ -5799,24 +5700,15 @@ static int __pyx_f_5cedar_8_remover_8_Remover__collect_leaf_samples(CYTHON_UNUSE
  *             tree.right_pos_counts[j] = tree.right_pos_counts[i]
  *             tree.features[j] = tree.features[i]
  *             tree.leaf_samples[j] = tree.leaf_samples[i]             # <<<<<<<<<<<<<<
- *         printf('pos_count[0]: %d\n', tree.pos_count[0])
+ *         # printf('pos_count[0]: %d\n', tree.pos_count[0])
  *         tree.node_count -= node_remove_count
  */
     (__pyx_v_tree->leaf_samples[__pyx_v_j]) = (__pyx_v_tree->leaf_samples[__pyx_v_i]);
   }
 
-  /* "cedar/_remover.pyx":590
- *             tree.features[j] = tree.features[i]
- *             tree.leaf_samples[j] = tree.leaf_samples[i]
- *         printf('pos_count[0]: %d\n', tree.pos_count[0])             # <<<<<<<<<<<<<<
- *         tree.node_count -= node_remove_count
- * 
- */
-  (void)(printf(((char const *)"pos_count[0]: %d\n"), (__pyx_v_tree->pos_count[0])));
-
   /* "cedar/_remover.pyx":591
  *             tree.leaf_samples[j] = tree.leaf_samples[i]
- *         printf('pos_count[0]: %d\n', tree.pos_count[0])
+ *         # printf('pos_count[0]: %d\n', tree.pos_count[0])
  *         tree.node_count -= node_remove_count             # <<<<<<<<<<<<<<
  * 
  *         rebuild_samples_ptr[0] = rebuild_samples
