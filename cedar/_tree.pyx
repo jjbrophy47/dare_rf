@@ -55,7 +55,6 @@ cdef class _TreeBuilder:
         """
         Build a decision tree from the training set (X, y).
         """
-        # printf('build\n')
 
         # Parameters
         cdef _DataManager manager = self.manager
@@ -70,8 +69,6 @@ cdef class _TreeBuilder:
         cdef int* features = NULL
         cdef int n_samples = manager.n_samples
         cdef int n_features = manager.n_features
-        manager.get_data(&X, &y)
-        manager.get_features(&features)
 
         # Initial capacity
         cdef int init_capacity
@@ -89,7 +86,6 @@ cdef class _TreeBuilder:
         cdef int parent
         cdef bint is_left
         cdef int* samples
-        # cdef int* original_samples
         cdef Stack stack = Stack(INITIAL_STACK_SIZE)
 
         # compute variables
@@ -99,20 +95,17 @@ cdef class _TreeBuilder:
         cdef double value
         cdef int node_id
 
-        cdef int i
         cdef Meta meta
-
+        cdef int i
         cdef int rc
+
+        manager.get_data(&X, &y)
+        manager.get_features(&features)        
 
         # fill in samples and features arrays
         samples = <int *>malloc(n_samples * sizeof(int))
-        # original_samples = <int *>malloc(n_samples * sizeof(int))
-
         for i in range(n_samples):
             samples[i] = i
-
-        # for i in range(n_samples):
-        #     original_samples[i] = i
 
         # push root node onto stack
         rc = stack.push(0, _TREE_UNDEFINED, 1, 0, samples, n_samples, features, n_features)
@@ -126,7 +119,6 @@ cdef class _TreeBuilder:
             parent_p = stack_record.parent_p
             is_left = stack_record.is_left
             samples = stack_record.samples
-            # original_samples = stack_record.original_samples
             n_samples = stack_record.n_samples
             features = stack_record.features
             n_features = stack_record.n_features
@@ -170,6 +162,7 @@ cdef class _TreeBuilder:
             if not is_leaf:
                 free(samples)
 
+    # TODO: reinitialize srand for this tree?
     cdef void build_at_node(self, int node_id, _Tree tree,
                             int* samples, int n_samples,
                             int* features, int n_features,
@@ -178,7 +171,7 @@ cdef class _TreeBuilder:
         """
         Build subtree from the training set (X, y) starting at `node_id`.
         """
-        printf('rebuilding at node %d\n', node_id)
+        # printf('rebuilding at node %d\n', node_id)
 
         # Parameters
         cdef _DataManager manager = self.manager
@@ -190,7 +183,6 @@ cdef class _TreeBuilder:
         # get data
         cdef int** X = NULL
         cdef int* y = NULL
-        manager.get_data(&X, &y)
 
         # StackRecord parameters
         cdef StackRecord stack_record
@@ -207,12 +199,7 @@ cdef class _TreeBuilder:
 
         manager.get_data(&X, &y)
 
-        # cdef int *samples = <int *>malloc(n_samples * sizeof(int))
-        # for i in range(n_samples):
-        #     samples[i] = i
-
         # push root node onto stack
-        # TODO: add checks for out-of-memory
         rc = stack.push(depth, parent, parent_p, is_left, samples,
                         n_samples, features, n_features)
 
@@ -225,7 +212,6 @@ cdef class _TreeBuilder:
             parent_p = stack_record.parent_p
             is_left = stack_record.is_left
             samples = stack_record.samples
-            # original_samples = stack_record.original_samples
             n_samples = stack_record.n_samples
             features = stack_record.features
             n_features = stack_record.n_features
@@ -240,7 +226,6 @@ cdef class _TreeBuilder:
                        n_features <= 1)
 
             if not is_leaf:
-                # printf('node_split\n')
                 rc = splitter.node_split(X, y, samples, n_samples, features, n_features,
                                          parent_p, &split, &meta)
                 # printf('rc: %d\n', rc)
@@ -254,31 +239,26 @@ cdef class _TreeBuilder:
                 value = self._leaf_value(y, samples, n_samples, &meta)
                 meta.feature_count = _TREE_UNDEFINED
 
-            # printf('adding node\n')
             node_id = tree.add_node(parent, is_left, is_leaf, feature, value,
                                     depth, samples, &meta)
-            # printf('done adding node\n')
 
             if not is_leaf:
 
                 # Push right child on stack
-                printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
-                       split.right_count, split.n_features)
+                # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
+                #        split.right_count, split.n_features)
                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, 
                                 split.right_count, split.features, split.n_features)
 
                 # Push left child on stack
-                printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
-                       split.left_count, split.n_features)
+                # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
+                #        split.left_count, split.n_features)
                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices,
                                 split.left_count, split.features, split.n_features)
 
             # clean up
-            # free(samples)
             if not is_leaf:
                 free(samples)
-        # free(X)
-        # free(y)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -411,15 +391,11 @@ cdef class _Tree:
         cdef int node_id = self.node_count
 
         if node_id >= self.capacity:
-            # printf("resizing\n")
             self._resize()
-            # printf("done resizing\n")
 
         self.count[node_id] = meta.count
         self.pos_count[node_id] = meta.pos_count
         self.depth[node_id] = depth
-
-        # printf('parent: %d, node_id: %d\n', parent, node_id)
 
         if parent != _TREE_UNDEFINED:
             if is_left:

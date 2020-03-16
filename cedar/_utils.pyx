@@ -182,7 +182,6 @@ cdef class Stack:
         stack[top].parent_p = parent_p
         stack[top].is_left = is_left
         stack[top].samples = samples
-        # stack[top].original_samples = original_samples
         stack[top].n_samples = n_samples
         stack[top].features = features
         stack[top].n_features = n_features
@@ -258,7 +257,6 @@ cdef class RemovalStack:
         stack[top].parent = parent
         stack[top].parent_p = parent_p
         stack[top].samples = samples
-        # stack[top].remove_samples = remove_samples
         stack[top].n_samples = n_samples
 
         # Increment stack pointer

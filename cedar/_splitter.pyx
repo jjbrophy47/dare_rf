@@ -85,8 +85,6 @@ cdef class _Splitter:
             if y[samples[i]] == 1:
                 pos_count += 1
 
-        # printf('count: %d, pos_count: %d\n', count, pos_count)
-
         if pos_count < count:
 
             gini_indices = <double *>malloc(n_features * sizeof(double))
@@ -118,7 +116,6 @@ cdef class _Splitter:
                     valid_features[feature_count] = features[j]
                     gini_indices[feature_count] = compute_gini(count, left_count, right_count,
                                                                left_pos_count, right_pos_count)
-                    # printf('gini_indices[%d]: %.7f\n', feature_count, gini_indices[feature_count])
 
                     # save metadata
                     left_counts[feature_count] = left_count
@@ -146,19 +143,15 @@ cdef class _Splitter:
 
                 # assign results from chosen feature
                 split.left_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
-                # split.left_original_indices = <int *>malloc(left_counts[chosen_ndx] * sizeof(int))
                 split.right_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
-                # split.right_original_indices = <int *>malloc(right_counts[chosen_ndx] * sizeof(int))
                 j = 0
                 k = 0
                 for i in range(n_samples):
                     if X[samples[i]][valid_features[chosen_ndx]] == 1:
                         split.left_indices[j] = samples[i]
-                        # split.left_original_indices[j] = original_samples[i]
                         j += 1
                     else:
                         split.right_indices[k] = samples[i]
-                        # split.right_original_indices[k] = original_samples[i]
                         k += 1
                 split.left_count = j
                 split.right_count = k
