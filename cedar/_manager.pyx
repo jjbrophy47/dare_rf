@@ -73,6 +73,35 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
+    cdef int check_sample_validity(self, int *samples, int n_samples) nogil:
+        """
+        Checks to make sure `samples` are in the database.
+        Returns -1 if one a sample is not available; 0 otherwise
+        """
+        cdef int *vacant = self.vacant
+        cdef int n_vacant = self.n_vacant
+
+        cdef int result = 0
+        cdef int i
+        cdef int j
+
+        if n_vacant > 0:
+
+            for i in range(n_samples):
+
+                for j in range(n_vacant):
+
+                    if samples[i] == vacant[j]:
+                        result = -1
+                        break
+
+                if result == -1:
+                    break
+
+        return result
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     cdef int get_all_data(self, int*** X_ptr, int** y_ptr, int**f_ptr,
                           int* n_samples, int* n_features) nogil:
         """
@@ -85,8 +114,6 @@ cdef class _DataManager:
         f_ptr[0] = self.f
         n_samples[0] = self.n_samples
         n_features[0] = self.n_features
-
-        printf('got data!\n')
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -107,8 +134,8 @@ cdef class _DataManager:
         cdef int result = 0
 
         for i in range(n_samples):
-            X_sub[i] = X[i]
-            y_sub[i] = y[i]
+            X_sub[i] = X[samples[i]]
+            y_sub[i] = y[samples[i]]
 
         # populate structures
         X_sub_ptr[0] = X_sub
@@ -123,30 +150,36 @@ cdef class _DataManager:
         # parameters
         cdef int** X = self.X
         cdef int* y = self.y
-        cdef int* vacant = self.vacant
+        cdef int *vacant = self.vacant
         cdef int n_vacant = self.n_vacant
-        cdef int updated_n_vacant = n_vacant + n_samples
 
         cdef int i
         cdef int result = 0
+        cdef int updated_n_vacant = n_vacant + n_samples
 
-        for i in range(n_samples):
-            free(X[i])
-            y[i] = _UNDEFINED
+        # printf('n_vacant: %d\n', n_vacant)
+        # printf('updated_n_vacant: %d\n', updated_n_vacant)
 
-        # TODO: could hold off on this until data needs to be added
-        # keep track of vacant indices to use later
-        if not vacant:
+        # realloc vacant array
+        if n_vacant == 0:
             vacant = <int *>malloc(updated_n_vacant * sizeof(int))
+
         elif updated_n_vacant > n_vacant:
             vacant = <int *>realloc(vacant, updated_n_vacant * sizeof(int))
 
-            i = n_vacant
-            while i < updated_n_vacant:
-                vacant[i] = samples[i]
-                i += 1
+        # keep track of vacant indices
+        i = n_vacant
+        while i < updated_n_vacant:
+            vacant[i] = samples[i]
+            i += 1
+
+        # remove data
+        for i in range(n_samples):
+            free(X[samples[i]])
+            y[samples[i]] = _UNDEFINED
 
         self.n_samples -= n_samples
         self.n_vacant = updated_n_vacant
+        self.vacant = vacant
 
         return result

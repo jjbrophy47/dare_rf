@@ -6,6 +6,8 @@ from ._splitter cimport Meta
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
 
+# TODO: remove left_indices and right_indices, return whole X, y dataset,
+#   and index into it using left_remove_indices and right_remove_indices.
 cdef struct RemovalSplitRecord:
     # Data to track sample split
     int* left_indices          # Samples in left branch of feature.

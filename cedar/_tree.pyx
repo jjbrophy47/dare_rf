@@ -55,7 +55,7 @@ cdef class _TreeBuilder:
         """
         Build a decision tree from the training set (X, y).
         """
-        printf('build\n')
+        # printf('build\n')
 
         # Parameters
         cdef _DataManager manager = self.manager
@@ -231,7 +231,7 @@ cdef class _TreeBuilder:
 
             meta.count = n_samples
 
-            printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
+            # printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
 
             is_leaf = (depth >= max_depth or
                        n_samples < min_samples_split or
@@ -253,21 +253,23 @@ cdef class _TreeBuilder:
                 value = self._leaf_value(y, samples, n_samples, &meta)
                 meta.feature_count = _TREE_UNDEFINED
 
+            # printf('adding node\n')
             node_id = tree.add_node(parent, is_left, is_leaf, feature, value,
                                     depth, original_samples, &meta)
+            # printf('done adding node\n')
 
             if not is_leaf:
 
                 # Push right child on stack
-                # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
-                #        split.right_count, split.n_features)
+                printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
+                       split.right_count, split.n_features)
                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, 
                                 split.right_original_indices, split.right_count,
                                 split.features, split.n_features)
 
                 # Push left child on stack
-                # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
-                #        split.left_count, split.n_features)
+                printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
+                       split.left_count, split.n_features)
                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices,
                                 split.left_original_indices, split.left_count,
                                 split.features, split.n_features)

@@ -361,7 +361,7 @@ class Tree(object):
         self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
         self.remover_ = _Remover(self.manager_, self.epsilon, self.lmbda)
         self.tree_builder_ = _TreeBuilder(self.manager_, self.splitter_,
-                                          self.min_samples_leaf, self.min_samples_split,
+                                          self.min_samples_split, self.min_samples_leaf,
                                           self.max_depth, self.random_state)
         self.tree_builder_.build(self.tree_)
 
@@ -463,7 +463,10 @@ class Tree(object):
         # f = np.ascontiguousarray(np.arange(X.shape[1]), dtype=np.int32)
 
         # update model
-        self.remover_.remove(self.tree_, self.tree_builder_, remove_indices)
+        rc = self.remover_.remove(self.tree_, self.tree_builder_, remove_indices)
+
+        if rc == -1:
+            exit('Removal index invalid!')
 
         # # remove the instances from the data
         # if self.single_tree_:

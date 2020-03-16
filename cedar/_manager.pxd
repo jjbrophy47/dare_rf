@@ -15,10 +15,8 @@ cdef class _DataManager:
     cdef int*  f               # Features
     cdef int*  vacant          # Empty indices in the database
 
-    # # Python API
-    # cpdef int init(self, object X_in, np.ndarray y_in, np.ndarray f_in)
-
     # C API
+    cdef int check_sample_validity(self, int *samples, int n_samples) nogil
     cdef int get_all_data(self, int*** X_ptr, int** y_ptr, int**f_ptr,
                           int* n_samples, int* n_features) nogil
     cdef int get_data(self, int* samples, int n_samples,
