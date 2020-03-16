@@ -65,46 +65,11 @@ cdef class _DataManager:
         """
         Destructor.
         """
-        printf('freeing manager data X!\n')
         free(self.X)
-        printf('freeing manager data y!\n')
         free(self.y)
         free(self.f)
-
-        printf('freeing vacant\n')
         if self.vacant:
             free(self.vacant)
-
-    # @cython.boundscheck(False)
-    # @cython.wraparound(False)
-    # cpdef int init(self, object X_in, np.ndarray y_in, np.ndarray f_in):
-    #     cdef int n_samples = X_in.shape[0]
-    #     cdef int n_features = X_in.shape[1]
-
-    #     cdef int** X = <int **>malloc(n_samples * sizeof(int *))
-    #     cdef int* y = <int *>malloc(n_samples * sizeof(int))
-    #     cdef int* f = <int *>malloc(n_features * sizeof(int))
-
-    #     cdef int i
-    #     cdef int j
-    #     cdef int result
-
-    #     for i in range(n_samples):
-    #         X[i] = <int *>malloc(n_features * sizeof(int))
-    #         for j in range(n_features):
-    #             X[i][j] = X_in[i][j]
-    #         y[i] = y_in[i]
-
-    #     for i in range(n_features):
-    #         f[i] = f_in[i]
-
-    #     self.X = X
-    #     self.y = y
-    #     self.f = f
-    #     self.n_samples = n_samples
-    #     self.n_features = n_features
-
-    #     return 0
 
     @cython.boundscheck(False)
     @cython.wraparound(False)

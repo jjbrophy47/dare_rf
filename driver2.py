@@ -28,21 +28,21 @@ y_test = np.random.randint(2, size=10, dtype=np.int32)
 print('data assembled')
 
 t1 = time.time()
-model = cedar.Tree(epsilon=0.5, lmbda=10, max_depth=10, random_state=1).fit(X_train, y_train)
+model = cedar.Tree(epsilon=0.1, lmbda=10, max_depth=10, random_state=1).fit(X_train, y_train)
 print('build time: {:.7f}s'.format(time.time() - t1))
 
-model.print_tree(show_nodes=False, show_metadata=True)
+model.print_tree(show_nodes=True, show_metadata=True)
 
 preds = model.predict(X_test)
 print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 print()
 
-# # remove instance
-# t1 = time.time()
-# model.delete(0)
-# print('delete time: {:.7f}s'.format(time.time() - t1))
-# model.print_tree(show_nodes=True, show_metadata=False)
+# remove instance
+t1 = time.time()
+model.delete(0)
+print('delete time: {:.7f}s'.format(time.time() - t1))
+model.print_tree(show_nodes=True, show_metadata=True)
 
-# preds = model.predict(X_test)
-# print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-# print()
+preds = model.predict(X_test)
+print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
+print()

@@ -4,6 +4,7 @@ from libc.stdlib cimport realloc
 from libc.stdlib cimport free
 from libc.stdlib cimport rand
 from libc.stdlib cimport RAND_MAX
+from libc.stdio cimport printf
 from libc.math cimport exp
 
 cimport cython
@@ -89,7 +90,7 @@ cdef int generate_distribution(double lmbda, double* distribution,
 
         for i in range(n_gini_indices):
             distribution[i] /= normalizing_constant
-            # printf('distribution[%d]: %.7f\n', i, distribution[i])
+            printf('distribution[%d]: %.7f\n', i, distribution[i])
 
     return 0
 

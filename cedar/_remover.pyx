@@ -120,7 +120,7 @@ cdef class _Remover:
             meta.right_pos_counts = tree.right_pos_counts[node_id]
             meta.features = tree.features[node_id]
 
-            # printf("\npopping_r (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)
+            printf("\npopping_r (%d, %d, %d, %d, %.7f, %d)\n", depth, node_id, is_left, parent, parent_p, n_samples)
 
             # leaf
             if tree.values[node_id] >= 0:
@@ -134,13 +134,15 @@ cdef class _Remover:
             # decision node
             else:
                 chosen_feature = tree.chosen_features[node_id]
+                printf('pos_count[0]: %d\n', tree.pos_count[0])
                 # printf('chosen feature: %d\n', chosen_feature)
                 rc = self._node_remove(node_id, X, y, remove_samples, samples, n_samples,
                                        min_samples_split, min_samples_leaf,
                                        chosen_feature, parent_p, &split, &meta)
+                printf('pos_count2[0]: %d\n', tree.pos_count[0])
                 free(samples)
 
-                # printf('rc: %d\n', rc)
+                printf('rc: %d\n', rc)
 
                 # retrain
                 if rc < 0:
@@ -161,6 +163,7 @@ cdef class _Remover:
                 else:
 
                     self._update_decision_node(node_id, tree, n_samples, &meta)
+                    printf('pos_count3[0]: %d\n', tree.pos_count[0])
 
                     # traverse left branch
                     if split.left_count > 0:
@@ -228,6 +231,7 @@ cdef class _Remover:
         """
         Update tree with node metadata.
         """
+        printf('node_id: %d\n', node_id)
         tree.count[node_id] = meta.count - n_samples
         tree.pos_count[node_id] = meta.pos_count
         tree.feature_count[node_id] = meta.feature_count
@@ -453,7 +457,7 @@ cdef class _Remover:
                     free(meta.right_pos_counts)
                     free(meta.features)
 
-                    meta.pos_count = pos_count
+                    meta.pos_count = updated_pos_count
                     meta.feature_count = feature_count
                     meta.left_counts = updated_left_counts
                     meta.left_pos_counts = updated_left_pos_counts
@@ -470,6 +474,8 @@ cdef class _Remover:
         Gathers all samples at the leaves and clears any saved metadata
         as it traverses through the tree.
         """
+
+        printf('pos_count[0]: %d\n', tree.pos_count[0])
 
         cdef int i
         cdef int j
@@ -552,16 +558,27 @@ cdef class _Remover:
 
         # printf('feature[0]: %d\n', tree.features[node_id][0])
 
+        printf('pos_count[0]: %d\n', tree.pos_count[0])
+
         # restructure tree
+        for i in range(tree.node_count):
+            if tree.left_children[i] > node_remove_count:
+                tree.left_children[i] -= node_remove_count
+
+            if tree.right_children[i] > node_remove_count:
+                tree.right_children[i] -= node_remove_count
+
         for i in range(node_id + node_remove_count, tree.node_count):
             j = i - node_remove_count
             tree.values[j] = tree.values[i]
             tree.chosen_features[j] = tree.chosen_features[i]
+            tree.depth[j] = tree.depth[i]
             tree.left_children[j] = tree.left_children[i]
             tree.right_children[j] = tree.right_children[i]
-            tree.depth[j] = tree.depth[i]
 
             tree.count[j] = tree.count[i]
+            printf('pos_count[%d]: %d\n', j, tree.pos_count[j])
+            printf('pos_count[%d]: %d\n', i, tree.pos_count[i])
             tree.pos_count[j] = tree.pos_count[i]
             tree.feature_count[j] = tree.feature_count[i]
             tree.left_counts[j] = tree.left_counts[i]
@@ -570,6 +587,7 @@ cdef class _Remover:
             tree.right_pos_counts[j] = tree.right_pos_counts[i]
             tree.features[j] = tree.features[i]
             tree.leaf_samples[j] = tree.leaf_samples[i]
+        printf('pos_count[0]: %d\n', tree.pos_count[0])
         tree.node_count -= node_remove_count
 
         rebuild_samples_ptr[0] = rebuild_samples

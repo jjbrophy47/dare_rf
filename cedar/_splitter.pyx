@@ -100,17 +100,13 @@ cdef class _Splitter:
             right_counts = <int *>malloc(n_features * sizeof(int))
             right_pos_counts = <int *>malloc(n_features * sizeof(int))
 
-            # print('done allocating\n')
-
             # compute statistics for each attribute
             for j in range(n_features):
-                # printf('feature[%d]: %d\n', j, features[j])
 
                 left_count = 0
                 left_pos_count = 0
 
                 for i in range(n_samples):
-                    # printf('sample[%d]: %d\n', i, samples[i])
 
                     if X[samples[i]][features[j]] == 1:
                         left_count += 1
@@ -133,8 +129,6 @@ cdef class _Splitter:
                     right_pos_counts[feature_count] = right_pos_count
 
                     feature_count += 1
-
-            # printf('feature_count: %d\n', feature_count)
 
             if feature_count > 0:
 

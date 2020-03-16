@@ -398,6 +398,8 @@ class Tree(object):
             print('feature counts: {}'.format(self.tree_.feature_counts))
             print('chosen features: {}'.format(self.tree_.chosen_features))
             print('depths: {}'.format(self.tree_.depth))
+            print('left_children: {}'.format(self.tree_.left_children))
+            print('right_children: {}'.format(self.tree_.right_children))
 
             if show_metadata:
                 for i in range(self.tree_.n_nodes):
