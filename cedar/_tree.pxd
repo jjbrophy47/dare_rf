@@ -18,21 +18,24 @@ cdef class _Tree:
     TreeBuilder. The tree structure is used for predictions.
     """
 
-    # Inner structures: values are stored separately from node structure,
-    # since size is determined at runtime.
-    cdef public int node_count           # Counter for node IDs
-    cdef public int capacity             # Capacity of tree, in terms of nodes
+    # data specific stucture
+    cdef int  n_feature_indices          # Number of features this tree builds on
+    cdef int* feature_indices            # Array of features, shape=[n_features]
+
+    # Inner structures
+    cdef public  int node_count          # Counter for node IDs
+    cdef public  int capacity            # Capacity of tree, in terms of nodes
     cdef double* values                  # Array of values, shape=[capacity]
     cdef double* p                       # Array of probabilities, shape=[capacity]
-    cdef int* chosen_features            # Array of chosen features, shape=[capacity]
-    cdef int* left_children              # Array of left children indices, shape=[capacity]
-    cdef int* right_children             # Array of right children indices, shape=[capacity]
-    cdef int* depth                      # Array of depths, shape=[capacity]
+    cdef int*    chosen_features         # Array of chosen features, shape=[capacity]
+    cdef int*    left_children           # Array of left children indices, shape=[capacity]
+    cdef int*    right_children          # Array of right children indices, shape=[capacity]
+    cdef int*    depth                   # Array of depths, shape=[capacity]
 
     # Internal metadata, stored for efficient updating
-    cdef int* count                # Array of sample counts, shape=[capacity]
-    cdef int* pos_count            # Array of positive sample counts, shape=[capacity]
-    cdef int* feature_count        # Array of feature counts, shape=[capacity]
+    cdef int*  count               # Array of sample counts, shape=[capacity]
+    cdef int*  pos_count           # Array of positive sample counts, shape=[capacity]
+    cdef int*  feature_count       # Array of feature counts, shape=[capacity]
     cdef int** left_counts         # Array of arrays of left counts, shape=[capacity, n_features]
     cdef int** left_pos_counts     # Array of arrays of left positive counts, shape=[capacity, n_features]
     cdef int** right_counts        # Array of arrays of right counts, shape=[capacity, n_features]
@@ -52,8 +55,8 @@ cdef class _Tree:
     # C API
     cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,
                       double value, int depth, int* samples, Meta* meta) nogil except -1
-    cdef np.ndarray _get_double_ndarray(self, double *data)
-    cdef np.ndarray _get_int_ndarray(self, int *data)
+    cdef np.ndarray _get_double_ndarray(self, double *data, int n_elem)
+    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
     cdef int _resize(self, int capacity=*) nogil except -1
 
 cdef class _TreeBuilder:

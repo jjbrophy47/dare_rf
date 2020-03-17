@@ -57,16 +57,14 @@ cdef class _Remover:
         # get data
         cdef int** X = NULL
         cdef int* y = NULL
-        cdef int n_samples = remove_indices.shape[0]
-        cdef int n_data_indices = remove_indices.shape[0]
-        cdef int* data_indices = convert_int_ndarray(remove_indices)
 
         # StackRecord parameters
         cdef RemovalStackRecord stack_record
         cdef int depth
         cdef int node_id
         cdef double parent_p
-        cdef int* samples = <int *>malloc(n_samples * sizeof(int))
+        cdef int* samples = convert_int_ndarray(remove_indices)
+        cdef int n_samples = remove_indices.shape[0]
         cdef RemovalStack stack = RemovalStack(INITIAL_STACK_SIZE)
 
         # compute variables
@@ -84,14 +82,10 @@ cdef class _Remover:
         cdef int n_rebuild_samples
 
         # check if any sample has already been deleted
-        rc = manager.check_sample_validity(data_indices, n_samples)
+        rc = manager.check_sample_validity(samples, n_samples)
         if rc == -1:
             return -1
         manager.get_data(&X, &y)
-
-        # populate indices for removal data
-        for i in range(n_samples):
-            samples[i] = remove_indices[i]
 
         # push root node onto stack
         rc = stack.push(0, 0, 0, _TREE_UNDEFINED, 1, samples, n_samples)
@@ -126,7 +120,6 @@ cdef class _Remover:
                 self._update_leaf(node_id, tree, y, samples, n_samples)
                 remove_types[remove_type_count] = 0
                 remove_type_count += 1
-
                 free(samples)
 
             # decision node
@@ -135,19 +128,18 @@ cdef class _Remover:
                 rc = self._node_remove(node_id, X, y, samples, n_samples,
                                        min_samples_split, min_samples_leaf,
                                        chosen_feature, parent_p, &split, &meta)
-                free(samples)
 
                 # printf('rc: %d\n', rc)
 
                 # retrain
                 if rc < 0:
 
-                    n_rebuild_samples = self._collect_leaf_samples(node_id, tree, samples,
-                                                                   n_samples, &rebuild_samples)
+                    n_rebuild_samples = self._collect_leaf_samples(node_id, is_left, parent,
+                                                                   tree, samples, n_samples,
+                                                                   &rebuild_samples)
                     tree_builder.build_at_node(node_id, tree, rebuild_samples, n_rebuild_samples,
                                                meta.features, meta.feature_count,
                                                depth, parent, parent_p, is_left)
-                    free(samples)
                     remove_types[remove_type_count] = rc
                     remove_type_count += 1
 
@@ -155,21 +147,19 @@ cdef class _Remover:
 
                     self._update_decision_node(node_id, tree, n_samples, &meta)
 
-                    # traverse left branch
-                    if split.left_count > 0:
-                        stack.push(depth + 1, tree.left_children[node_id], 1, node_id,
-                                   meta.p, split.left_indices, split.left_count)
-
-                    # traverse right branch
+                    # push right branch
                     if split.right_count > 0:
                         stack.push(depth + 1, tree.right_children[node_id], 0, node_id,
                                    meta.p, split.right_indices, split.right_count)
 
-        # remove samples from the database
-        manager.remove_data(data_indices, n_data_indices)
+                    # push left branch
+                    if split.left_count > 0:
+                        stack.push(depth + 1, tree.left_children[node_id], 1, node_id,
+                                   meta.p, split.left_indices, split.left_count)
+
+                free(samples)
 
         # cleanup
-        free(data_indices)
         free(remove_types)  # TODO: do something with this data
 
         return 0
@@ -405,7 +395,7 @@ cdef class _Remover:
                 p = parent_p * distribution[chosen_ndx]
                 ratio = p / meta.p
 
-                printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
+                # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
                 # compare with previous probability => retrain if necessary
                 if ratio < exp(-epsilon) or ratio > exp(epsilon):
@@ -456,8 +446,9 @@ cdef class _Remover:
 
         return result
 
-    cdef int _collect_leaf_samples(self, int node_id, _Tree tree,
-                                   int* remove_samples, int n_remove_samples,
+    cdef int _collect_leaf_samples(self, int node_id, int is_left,
+                                   int parent, _Tree tree, int*
+                                   remove_samples, int n_remove_samples,
                                    int** rebuild_samples_ptr):
         """
         Gathers all samples at the leaves and clears any saved metadata
@@ -530,7 +521,7 @@ cdef class _Remover:
         rebuild_samples = <int *>realloc(rebuild_samples, rebuild_sample_count * sizeof(int))
 
         # restructure tree
-        for i in range(tree.node_count):
+        for i in range(node_id + node_remove_count, tree.node_count):
             if tree.left_children[i] > node_remove_count:
                 tree.left_children[i] -= node_remove_count
 
@@ -555,6 +546,14 @@ cdef class _Remover:
             tree.features[j] = tree.features[i]
             tree.leaf_samples[j] = tree.leaf_samples[i]
         tree.node_count -= node_remove_count
+
+        # re-register parent node's other child
+        if is_left:
+            if tree.right_children[parent] >= node_id + node_remove_count:
+                tree.right_children[parent] -= node_remove_count
+        else:
+            if tree.left_children[parent] >= node_id + node_remove_count:
+                tree.left_children[parent] -= node_remove_count
 
         rebuild_samples_ptr[0] = rebuild_samples
         return rebuild_sample_count

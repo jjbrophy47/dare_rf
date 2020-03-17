@@ -21,6 +21,7 @@ np.import_array()
 
 from ._utils cimport Stack
 from ._utils cimport StackRecord
+from ._utils cimport convert_int_ndarray
 
 # constants
 from numpy import int32 as INT
@@ -66,9 +67,9 @@ cdef class _TreeBuilder:
         # get data
         cdef int** X = NULL
         cdef int* y = NULL
-        cdef int* features = NULL
         cdef int n_samples = manager.n_samples
-        cdef int n_features = manager.n_features
+        cdef int* features = tree.feature_indices
+        cdef int n_features = tree.n_feature_indices
 
         # Initial capacity
         cdef int init_capacity
@@ -100,7 +101,6 @@ cdef class _TreeBuilder:
         cdef int rc
 
         manager.get_data(&X, &y)
-        manager.get_features(&features)        
 
         # fill in samples and features arrays
         samples = <int *>malloc(n_samples * sizeof(int))
@@ -284,65 +284,73 @@ cdef class _Tree:
         def __get__(self):
             return self.node_count
 
+    property feature_indices:
+        def __get__(self):
+            return self._get_int_ndarray(self.feature_indices, self.n_feature_indices)
+
     property values:
         def __get__(self):
-            return self._get_double_ndarray(self.values)[:self.node_count]
+            return self._get_double_ndarray(self.values, self.node_count)
 
     property p:
         def __get__(self):
-            return self._get_double_ndarray(self.p)[:self.node_count]
+            return self._get_double_ndarray(self.p, self.node_count)
 
     property chosen_features:
         def __get__(self):
-            return self._get_int_ndarray(self.chosen_features)[:self.node_count]
+            return self._get_int_ndarray(self.chosen_features, self.node_count)
 
     property left_children:
         def __get__(self):
-            return self._get_int_ndarray(self.left_children)[:self.node_count]
+            return self._get_int_ndarray(self.left_children, self.node_count)
 
     property right_children:
         def __get__(self):
-            return self._get_int_ndarray(self.right_children)[:self.node_count]
+            return self._get_int_ndarray(self.right_children, self.node_count)
 
     property depth:
         def __get__(self):
-            return self._get_int_ndarray(self.depth)[:self.node_count]
+            return self._get_int_ndarray(self.depth, self.node_count)
 
     # metadata
     property counts:
         def __get__(self):
-            return self._get_int_ndarray(self.count)[:self.node_count]
+            return self._get_int_ndarray(self.count, self.node_count)
 
     property pos_counts:
         def __get__(self):
-            return self._get_int_ndarray(self.pos_count)[:self.node_count]
+            return self._get_int_ndarray(self.pos_count, self.node_count)
 
     property feature_counts:
         def __get__(self):
-            return self._get_int_ndarray(self.feature_count)[:self.node_count]
+            return self._get_int_ndarray(self.feature_count, self.node_count)
 
     cpdef np.ndarray _get_left_counts(self, node_id):
-        return self._get_int_ndarray(self.left_counts[node_id])[:self.feature_count[node_id]]
+        return self._get_int_ndarray(self.left_counts[node_id], self.feature_count[node_id])
 
     cpdef np.ndarray _get_left_pos_counts(self, node_id):
-        return self._get_int_ndarray(self.left_pos_counts[node_id])[:self.feature_count[node_id]]
+        return self._get_int_ndarray(self.left_pos_counts[node_id], self.feature_count[node_id])
 
     cpdef np.ndarray _get_right_counts(self, node_id):
-        return self._get_int_ndarray(self.right_counts[node_id])[:self.feature_count[node_id]]
+        return self._get_int_ndarray(self.right_counts[node_id], self.feature_count[node_id])
 
     cpdef np.ndarray _get_right_pos_counts(self, node_id):
-        return self._get_int_ndarray(self.right_pos_counts[node_id])[:self.feature_count[node_id]]
+        return self._get_int_ndarray(self.right_pos_counts[node_id], self.feature_count[node_id])
 
     cpdef np.ndarray _get_features(self, node_id):
-        return self._get_int_ndarray(self.features[node_id])[:self.feature_count[node_id]]
+        return self._get_int_ndarray(self.features[node_id], self.feature_count[node_id])
 
     cpdef np.ndarray _get_leaf_samples(self, node_id):
-        return self._get_int_ndarray(self.leaf_samples[node_id])[:self.count[node_id]]
+        return self._get_int_ndarray(self.leaf_samples[node_id], self.count[node_id])
 
-    def __cinit__(self):
+    def __cinit__(self, np.ndarray features):
         """
         Constructor.
         """
+
+        # features this tree is built on
+        self.n_feature_indices = features.shape[0]
+        self.feature_indices = convert_int_ndarray(features)
 
         # internal data structures
         self.node_count = 0
@@ -375,6 +383,7 @@ cdef class _Tree:
         free(self.left_children)
         free(self.right_children)
         free(self.depth)
+        free(self.feature_indices)
 
         free(self.count)
         free(self.pos_count)
@@ -499,25 +508,25 @@ cdef class _Tree:
 
         return 0
 
-    cdef np.ndarray _get_double_ndarray(self, double *data):
+    cdef np.ndarray _get_double_ndarray(self, double *data, int n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.
         """
         cdef np.npy_intp shape[1]
-        shape[0] = self.node_count
+        shape[0] = n_elem
         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)
         Py_INCREF(self)
         arr.base = <PyObject*> self
         return arr
 
-    cdef np.ndarray _get_int_ndarray(self, int *data):
+    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.
         """
         cdef np.npy_intp shape[1]
-        shape[0] = self.node_count
+        shape[0] = n_elem
         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
         Py_INCREF(self)
         arr.base = <PyObject*> self

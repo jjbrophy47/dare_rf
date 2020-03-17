@@ -7,10 +7,7 @@ cdef double compute_gini(double count, double left_count, double right_count,
 cdef int generate_distribution(double lmbda, double* distribution,
                                double* gini_indices, int n_gini_indices) nogil
 cdef int sample_distribution(double* distribution, int n_distribution) nogil
-cdef np.ndarray get_int_ndarray(int *data, int n_points)
 cdef int* convert_int_ndarray(np.ndarray arr)
-# cdef _check_samples(object X, np.ndarray y)
-# cdef _check_features(np.ndarray f)
 
 # =============================================================================
 # Stack data structure
@@ -23,7 +20,6 @@ cdef struct StackRecord:
     double parent_p
     bint is_left
     int* samples
-    # int* original_samples
     int n_samples
     int* features
     int n_features
@@ -50,7 +46,6 @@ cdef struct RemovalStackRecord:
     int parent
     double parent_p
     int* samples
-    # int* remove_samples
     int n_samples
 
 cdef class RemovalStack:

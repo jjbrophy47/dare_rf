@@ -1118,7 +1118,7 @@ typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_t_5cedar_6_utils_StackRecord;
 struct __pyx_t_5cedar_6_utils_RemovalStackRecord;
 
-/* "_utils.pxd":20
+/* "_utils.pxd":18
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct StackRecord:             # <<<<<<<<<<<<<<
@@ -1136,7 +1136,7 @@ struct __pyx_t_5cedar_6_utils_StackRecord {
   int n_features;
 };
 
-/* "_utils.pxd":46
+/* "_utils.pxd":43
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct RemovalStackRecord:             # <<<<<<<<<<<<<<
@@ -1191,7 +1191,7 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int n_features;
 };
 
-/* "_utils.pxd":31
+/* "_utils.pxd":28
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1207,7 +1207,7 @@ struct __pyx_obj_5cedar_6_utils_Stack {
 };
 
 
-/* "_utils.pxd":56
+/* "_utils.pxd":52
  *     int n_samples
  * 
  * cdef class RemovalStack:             # <<<<<<<<<<<<<<
@@ -1223,7 +1223,7 @@ struct __pyx_obj_5cedar_6_utils_RemovalStack {
 };
 
 
-/* "_utils.pxd":70
+/* "_utils.pxd":66
  * # =============================================================================
  * 
  * cdef class IntStack:             # <<<<<<<<<<<<<<
@@ -1239,7 +1239,7 @@ struct __pyx_obj_5cedar_6_utils_IntStack {
 };
 
 
-/* "cedar/_splitter.pxd":29
+/* "cedar/_splitter.pxd":27
  *     int  n_features              # Number of valid features after split.
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1256,7 +1256,7 @@ struct __pyx_obj_5cedar_9_splitter__Splitter {
 
 
 
-/* "_utils.pxd":31
+/* "_utils.pxd":28
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1272,7 +1272,7 @@ struct __pyx_vtabstruct_5cedar_6_utils_Stack {
 static struct __pyx_vtabstruct_5cedar_6_utils_Stack *__pyx_vtabptr_5cedar_6_utils_Stack;
 
 
-/* "_utils.pxd":56
+/* "_utils.pxd":52
  *     int n_samples
  * 
  * cdef class RemovalStack:             # <<<<<<<<<<<<<<
@@ -1288,7 +1288,7 @@ struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack {
 static struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack *__pyx_vtabptr_5cedar_6_utils_RemovalStack;
 
 
-/* "_utils.pxd":70
+/* "_utils.pxd":66
  * # =============================================================================
  * 
  * cdef class IntStack:             # <<<<<<<<<<<<<<
@@ -2909,7 +2909,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
   return __pyx_r;
 }
 
-/* "cedar/_splitter.pxd":36
+/* "cedar/_splitter.pxd":34
  *     """
  *     # Internal structures
  *     cdef public int min_samples_leaf       # Min samples in a leaf             # <<<<<<<<<<<<<<
@@ -2936,7 +2936,7 @@ static PyObject *__pyx_pf_5cedar_9_splitter_9_Splitter_16min_samples_leaf___get_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->min_samples_leaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 36, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->min_samples_leaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2971,7 +2971,7 @@ static int __pyx_pf_5cedar_9_splitter_9_Splitter_16min_samples_leaf_2__set__(str
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 36, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 34, __pyx_L1_error)
   __pyx_v_self->min_samples_leaf = __pyx_t_1;
 
   /* function exit code */
@@ -5928,17 +5928,17 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5numpy_ufunc = __Pyx_ImportType(__pyx_t_1, "numpy", "ufunc", sizeof(PyUFuncObject), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5numpy_ufunc) __PYX_ERR(3, 918, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 31, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_6_utils_Stack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "Stack", sizeof(struct __pyx_obj_5cedar_6_utils_Stack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_Stack) __PYX_ERR(5, 31, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_Stack = (struct __pyx_vtabstruct_5cedar_6_utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_Stack)) __PYX_ERR(5, 31, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_Stack) __PYX_ERR(5, 28, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_Stack = (struct __pyx_vtabstruct_5cedar_6_utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_Stack)) __PYX_ERR(5, 28, __pyx_L1_error)
   __pyx_ptype_5cedar_6_utils_RemovalStack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "RemovalStack", sizeof(struct __pyx_obj_5cedar_6_utils_RemovalStack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_RemovalStack) __PYX_ERR(5, 56, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_RemovalStack = (struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_RemovalStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_RemovalStack)) __PYX_ERR(5, 56, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_RemovalStack) __PYX_ERR(5, 52, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_RemovalStack = (struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_RemovalStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_RemovalStack)) __PYX_ERR(5, 52, __pyx_L1_error)
   __pyx_ptype_5cedar_6_utils_IntStack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "IntStack", sizeof(struct __pyx_obj_5cedar_6_utils_IntStack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_IntStack) __PYX_ERR(5, 70, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_IntStack = (struct __pyx_vtabstruct_5cedar_6_utils_IntStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_IntStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_IntStack)) __PYX_ERR(5, 70, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_IntStack) __PYX_ERR(5, 66, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_IntStack = (struct __pyx_vtabstruct_5cedar_6_utils_IntStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_IntStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_IntStack)) __PYX_ERR(5, 66, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

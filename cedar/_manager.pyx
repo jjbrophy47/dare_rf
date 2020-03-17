@@ -32,13 +32,9 @@ cdef class _DataManager:
         def __get__(self):
             return self.n_features
 
-    property n_vacant:
-        def __get__(self):
-            return self.n_vacant
-
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def __cinit__(self, object X_in, np.ndarray y_in, np.ndarray f_in):
+    def __cinit__(self, object X_in, np.ndarray y_in):
         """
         Constructor.
         """
@@ -47,7 +43,6 @@ cdef class _DataManager:
 
         cdef int** X = <int **>malloc(n_samples * sizeof(int *))
         cdef int* y = <int *>malloc(n_samples * sizeof(int))
-        cdef int* f = <int *>malloc(n_features * sizeof(int))
 
         cdef int *vacant = NULL
 
@@ -62,15 +57,10 @@ cdef class _DataManager:
                 X[i][j] = X_in[i][j]
             y[i] = y_in[i]
 
-        for i in range(n_features):
-            f[i] = f_in[i]
-
         self.X = X
         self.y = y
-        self.f = f
         self.vacant = vacant
         self.n_samples = n_samples
-        self.n_features = n_features
         self.n_vacant = 0
 
     def __dealloc__(self):
@@ -79,7 +69,6 @@ cdef class _DataManager:
         """
         free(self.X)
         free(self.y)
-        free(self.f)
         if self.vacant:
             free(self.vacant)
 
@@ -123,21 +112,15 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void get_features(self, int** f_ptr) nogil:
-        """
-        Receive pointers to the data.
-        """
-        f_ptr[0] = self.f
-
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    cdef int remove_data(self, int* samples, int n_samples) nogil:
+    cpdef int remove_data(self, int[:] samples):
 
         # parameters
         cdef int** X = self.X
         cdef int* y = self.y
         cdef int *vacant = self.vacant
         cdef int n_vacant = self.n_vacant
+
+        cdef int n_samples = samples.shape[0]
 
         cdef int i
         cdef int result = 0

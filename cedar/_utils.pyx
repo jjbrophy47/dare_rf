@@ -113,15 +113,6 @@ cdef int sample_distribution(double* distribution, int n_distribution) nogil:
 
     return i
 
-cdef np.ndarray get_int_ndarray(int *data, int n_points):
-    """
-    Wraps value as a 1-d NumPy array.
-    """
-    cdef np.npy_intp shape[1]
-    shape[0] = n_points
-    cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
-    return arr
-
 cdef int* convert_int_ndarray(np.ndarray arr):
     """
     Converts a numpy array into a C int array.
