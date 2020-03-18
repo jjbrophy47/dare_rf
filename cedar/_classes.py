@@ -103,6 +103,7 @@ class Forest(object):
         # build forest
         self.trees_ = []
         for i in range(self.n_estimators):
+            print('tree {}'.format(i))
 
             if self.verbose > 2:
                 print('tree {}'.format(i))
@@ -185,6 +186,7 @@ class Forest(object):
 
         # update trees
         for i in range(len(self.trees_)):
+            print('tree {}'.format(i))
             self.trees_[i].delete(remove_indices)
 
         # remove data from tree

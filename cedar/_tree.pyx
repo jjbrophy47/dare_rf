@@ -22,6 +22,7 @@ np.import_array()
 from ._utils cimport Stack
 from ._utils cimport StackRecord
 from ._utils cimport convert_int_ndarray
+from ._utils cimport set_srand
 
 # constants
 from numpy import int32 as INT
@@ -47,10 +48,7 @@ cdef class _TreeBuilder:
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = 1000 if max_depth == -1 else max_depth
         self.random_state = random_state
-        srand(random_state)  # do once? yes, once per tree
-        # get rid of garbage first value:
-        # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
-        rand()
+        set_srand(self.random_state)
 
     cpdef void build(self, _Tree tree):
         """
@@ -162,7 +160,6 @@ cdef class _TreeBuilder:
             if not is_leaf:
                 free(samples)
 
-    # TODO: reinitialize srand for this tree?
     cdef void build_at_node(self, int node_id, _Tree tree,
                             int* samples, int n_samples,
                             int* features, int n_features,
@@ -171,7 +168,6 @@ cdef class _TreeBuilder:
         """
         Build subtree from the training set (X, y) starting at `node_id`.
         """
-        # printf('rebuilding at node %d\n', node_id)
 
         # Parameters
         cdef _DataManager manager = self.manager

@@ -2,6 +2,7 @@ from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdlib cimport free
 from libc.stdlib cimport rand
+from libc.stdlib cimport srand
 from libc.stdlib cimport RAND_MAX
 from libc.stdio cimport printf
 from libc.math cimport exp
@@ -103,7 +104,7 @@ cdef int sample_distribution(double* distribution, int n_distribution) nogil:
     cdef double weight = 0
 
     weight = get_random()
-    # printf('initial weight: %.7f\n', weight)
+    printf('initial weight: %.7f\n', weight)
 
     for i in range(n_distribution):
         if weight < distribution[i]:
@@ -125,6 +126,16 @@ cdef int* convert_int_ndarray(np.ndarray arr):
         new_arr[i] = arr[i]
 
     return new_arr
+
+cdef void set_srand(int random_state) nogil:
+    """
+    Sets srand given a random state.
+    """
+    srand(random_state)
+
+    # get rid of garbage first value:
+    # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
+    rand()
 
 # =============================================================================
 # Stack data structure
