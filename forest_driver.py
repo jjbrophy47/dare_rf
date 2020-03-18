@@ -9,8 +9,9 @@ from sklearn.ensemble import RandomForestClassifier
 
 import cedar
 
-n_samples = 100000
-n_features = 75
+n_samples = 15000
+n_features = 10
+n_estimators = 3
 
 # generate data
 np.random.seed(1)
@@ -29,13 +30,13 @@ print(data)
 print('data assembled')
 
 t1 = time.time()
-m1 = RandomForestClassifier(n_estimators=100, max_depth=20, random_state=1).fit(X_train, y_train)
+m1 = RandomForestClassifier(n_estimators=n_estimators, max_depth=20, random_state=1).fit(X_train, y_train)
 print('build time: {:.7f}s'.format(time.time() - t1))
 preds = m1.predict(X_test)
 print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 
 t1 = time.time()
-model = cedar.Forest(epsilon=0.1, lmbda=10, n_estimators=100,
+model = cedar.Forest(epsilon=1, lmbda=10, n_estimators=n_estimators,
                      max_depth=20, max_features='sqrt', random_state=1).fit(X_train, y_train)
 print('\nbuild time: {:.7f}s'.format(time.time() - t1))
 # model.print(show_nodes=True, show_metadata=False)
@@ -45,17 +46,11 @@ print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 
 # remove instances
 t1 = time.time()
-model.delete(np.random.choice(len(X_train), size=int(len(X_train) * 0.1), replace=False))
+model.delete([0, 1])
 print('\ndelete time: {:.7f}s'.format(time.time() - t1))
 # model.print(show_nodes=True, show_metadata=False)
-print('predicting...')
+
 preds = model.predict(X_test)
 print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 
-# # remove instance
-# t1 = time.time()
-# model.delete([2, 9])
-# print('\ndelete time: {:.7f}s'.format(time.time() - t1))
-# # model.print(show_nodes=True, show_metadata=False)
-# preds = model.predict(X_test)
-# print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
+print(model.get_removal_statistics())

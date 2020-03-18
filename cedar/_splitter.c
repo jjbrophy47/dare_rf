@@ -1118,7 +1118,7 @@ typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_t_5cedar_6_utils_StackRecord;
 struct __pyx_t_5cedar_6_utils_RemovalStackRecord;
 
-/* "_utils.pxd":18
+/* "_utils.pxd":17
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct StackRecord:             # <<<<<<<<<<<<<<
@@ -1136,7 +1136,7 @@ struct __pyx_t_5cedar_6_utils_StackRecord {
   int n_features;
 };
 
-/* "_utils.pxd":43
+/* "_utils.pxd":42
  * 
  * # A record on the stack for depth-first tree growing
  * cdef struct RemovalStackRecord:             # <<<<<<<<<<<<<<
@@ -1191,7 +1191,7 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int n_features;
 };
 
-/* "_utils.pxd":28
+/* "_utils.pxd":27
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1207,7 +1207,7 @@ struct __pyx_obj_5cedar_6_utils_Stack {
 };
 
 
-/* "_utils.pxd":52
+/* "_utils.pxd":51
  *     int n_samples
  * 
  * cdef class RemovalStack:             # <<<<<<<<<<<<<<
@@ -1223,7 +1223,7 @@ struct __pyx_obj_5cedar_6_utils_RemovalStack {
 };
 
 
-/* "_utils.pxd":66
+/* "_utils.pxd":65
  * # =============================================================================
  * 
  * cdef class IntStack:             # <<<<<<<<<<<<<<
@@ -1256,7 +1256,7 @@ struct __pyx_obj_5cedar_9_splitter__Splitter {
 
 
 
-/* "_utils.pxd":28
+/* "_utils.pxd":27
  *     int n_features
  * 
  * cdef class Stack:             # <<<<<<<<<<<<<<
@@ -1272,7 +1272,7 @@ struct __pyx_vtabstruct_5cedar_6_utils_Stack {
 static struct __pyx_vtabstruct_5cedar_6_utils_Stack *__pyx_vtabptr_5cedar_6_utils_Stack;
 
 
-/* "_utils.pxd":52
+/* "_utils.pxd":51
  *     int n_samples
  * 
  * cdef class RemovalStack:             # <<<<<<<<<<<<<<
@@ -1288,7 +1288,7 @@ struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack {
 static struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack *__pyx_vtabptr_5cedar_6_utils_RemovalStack;
 
 
-/* "_utils.pxd":66
+/* "_utils.pxd":65
  * # =============================================================================
  * 
  * cdef class IntStack:             # <<<<<<<<<<<<<<
@@ -2162,7 +2162,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  *             if y[samples[i]] == 1:
  *                 pos_count += 1             # <<<<<<<<<<<<<<
  * 
- *         if pos_count < count:
+ *         if pos_count > 0 and pos_count < count:
  */
       __pyx_v_pos_count = (__pyx_v_pos_count + 1);
 
@@ -2179,15 +2179,23 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
   /* "cedar/_splitter.pyx":88
  *                 pos_count += 1
  * 
- *         if pos_count < count:             # <<<<<<<<<<<<<<
+ *         if pos_count > 0 and pos_count < count:             # <<<<<<<<<<<<<<
  * 
  *             gini_indices = <double *>malloc(n_features * sizeof(double))
  */
-  __pyx_t_5 = ((__pyx_v_pos_count < __pyx_v_count) != 0);
+  __pyx_t_6 = ((__pyx_v_pos_count > 0) != 0);
+  if (__pyx_t_6) {
+  } else {
+    __pyx_t_5 = __pyx_t_6;
+    goto __pyx_L7_bool_binop_done;
+  }
+  __pyx_t_6 = ((__pyx_v_pos_count < __pyx_v_count) != 0);
+  __pyx_t_5 = __pyx_t_6;
+  __pyx_L7_bool_binop_done:;
   if (__pyx_t_5) {
 
     /* "cedar/_splitter.pyx":90
- *         if pos_count < count:
+ *         if pos_count > 0 and pos_count < count:
  * 
  *             gini_indices = <double *>malloc(n_features * sizeof(double))             # <<<<<<<<<<<<<<
  *             distribution = <double *>malloc(n_features * sizeof(double))
@@ -2286,10 +2294,10 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  * 
  *                     if X[samples[i]][features[j]] == 1:
  */
-      __pyx_t_6 = __pyx_v_n_samples;
-      __pyx_t_7 = __pyx_t_6;
-      for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
-        __pyx_v_i = __pyx_t_8;
+      __pyx_t_7 = __pyx_v_n_samples;
+      __pyx_t_8 = __pyx_t_7;
+      for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
+        __pyx_v_i = __pyx_t_9;
 
         /* "cedar/_splitter.pyx":107
  *                 for i in range(n_samples):
@@ -2354,15 +2362,15 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  *                     valid_features[feature_count] = features[j]
  *                     gini_indices[feature_count] = compute_gini(count, left_count, right_count,
  */
-      __pyx_t_9 = ((__pyx_v_left_count >= __pyx_v_min_samples_leaf) != 0);
-      if (__pyx_t_9) {
+      __pyx_t_6 = ((__pyx_v_left_count >= __pyx_v_min_samples_leaf) != 0);
+      if (__pyx_t_6) {
       } else {
-        __pyx_t_5 = __pyx_t_9;
-        goto __pyx_L13_bool_binop_done;
+        __pyx_t_5 = __pyx_t_6;
+        goto __pyx_L15_bool_binop_done;
       }
-      __pyx_t_9 = ((__pyx_v_right_count >= __pyx_v_min_samples_leaf) != 0);
-      __pyx_t_5 = __pyx_t_9;
-      __pyx_L13_bool_binop_done:;
+      __pyx_t_6 = ((__pyx_v_right_count >= __pyx_v_min_samples_leaf) != 0);
+      __pyx_t_5 = __pyx_t_6;
+      __pyx_L15_bool_binop_done:;
       if (__pyx_t_5) {
 
         /* "cedar/_splitter.pyx":116
@@ -2612,7 +2620,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  *                         split.left_indices[j] = samples[i]
  *                         j += 1
  */
-          goto __pyx_L18;
+          goto __pyx_L20;
         }
 
         /* "cedar/_splitter.pyx":154
@@ -2634,7 +2642,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  */
           __pyx_v_k = (__pyx_v_k + 1);
         }
-        __pyx_L18:;
+        __pyx_L20:;
       }
 
       /* "cedar/_splitter.pyx":156
@@ -2788,7 +2796,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  * 
  *                 # remove invalid features
  */
-      goto __pyx_L15;
+      goto __pyx_L17;
     }
 
     /* "cedar/_splitter.pyx":176
@@ -2864,12 +2872,12 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5ced
  */
       free(__pyx_v_right_pos_counts);
     }
-    __pyx_L15:;
+    __pyx_L17:;
 
     /* "cedar/_splitter.pyx":88
  *                 pos_count += 1
  * 
- *         if pos_count < count:             # <<<<<<<<<<<<<<
+ *         if pos_count > 0 and pos_count < count:             # <<<<<<<<<<<<<<
  * 
  *             gini_indices = <double *>malloc(n_features * sizeof(double))
  */
@@ -5928,17 +5936,17 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5numpy_ufunc = __Pyx_ImportType(__pyx_t_1, "numpy", "ufunc", sizeof(PyUFuncObject), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5numpy_ufunc) __PYX_ERR(3, 918, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 28, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._utils"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_6_utils_Stack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "Stack", sizeof(struct __pyx_obj_5cedar_6_utils_Stack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_Stack) __PYX_ERR(5, 28, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_Stack = (struct __pyx_vtabstruct_5cedar_6_utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_Stack)) __PYX_ERR(5, 28, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_Stack) __PYX_ERR(5, 27, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_Stack = (struct __pyx_vtabstruct_5cedar_6_utils_Stack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_Stack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_Stack)) __PYX_ERR(5, 27, __pyx_L1_error)
   __pyx_ptype_5cedar_6_utils_RemovalStack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "RemovalStack", sizeof(struct __pyx_obj_5cedar_6_utils_RemovalStack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_RemovalStack) __PYX_ERR(5, 52, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_RemovalStack = (struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_RemovalStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_RemovalStack)) __PYX_ERR(5, 52, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_RemovalStack) __PYX_ERR(5, 51, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_RemovalStack = (struct __pyx_vtabstruct_5cedar_6_utils_RemovalStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_RemovalStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_RemovalStack)) __PYX_ERR(5, 51, __pyx_L1_error)
   __pyx_ptype_5cedar_6_utils_IntStack = __Pyx_ImportType(__pyx_t_1, "cedar._utils", "IntStack", sizeof(struct __pyx_obj_5cedar_6_utils_IntStack), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_6_utils_IntStack) __PYX_ERR(5, 66, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_6_utils_IntStack = (struct __pyx_vtabstruct_5cedar_6_utils_IntStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_IntStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_IntStack)) __PYX_ERR(5, 66, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_6_utils_IntStack) __PYX_ERR(5, 65, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_6_utils_IntStack = (struct __pyx_vtabstruct_5cedar_6_utils_IntStack*)__Pyx_GetVtable(__pyx_ptype_5cedar_6_utils_IntStack->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_6_utils_IntStack)) __PYX_ERR(5, 65, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

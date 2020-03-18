@@ -218,7 +218,7 @@ cdef class _TreeBuilder:
 
             meta.count = n_samples
 
-            # printf("\npopping (%d, %d, %.7f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
+            # printf("\npopping (%d, %d, %.20f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
 
             is_leaf = (depth >= max_depth or
                        n_samples < min_samples_split or
@@ -245,14 +245,10 @@ cdef class _TreeBuilder:
             if not is_leaf:
 
                 # Push right child on stack
-                # printf("pushing right (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 0,
-                #        split.right_count, split.n_features)
                 rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, 
                                 split.right_count, split.features, split.n_features)
 
                 # Push left child on stack
-                # printf("pushing left (%d, %d, %d, %d, %d)\n", depth + 1, node_id, 1,
-                #        split.left_count, split.n_features)
                 rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices,
                                 split.left_count, split.features, split.n_features)
 

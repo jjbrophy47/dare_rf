@@ -3,6 +3,9 @@ CeDAR binary tree implementation; only supports binary attributes and a binary l
 Represenation is a number of parllel arrays.
 Adapted from: https://github.com/scikit-learn/scikit-learn/blob/b194674c42d54b26137a456c510c5fdba1ba23e0/sklearn/tree/_tree.pyx
 """
+from cpython cimport Py_INCREF
+from cpython.ref cimport PyObject
+
 cimport cython
 
 from libc.stdlib cimport free
@@ -36,10 +39,36 @@ cdef class _Remover:
     Removes data from a learned tree.
     """
 
+    # removal metrics
+    property remove_types:
+        def __get__(self):
+            return self._get_int_ndarray(self.remove_types, self.remove_count)
+
+    property remove_depths:
+        def __get__(self):
+            return self._get_int_ndarray(self.remove_depths, self.remove_count)
+
     def __cinit__(self, _DataManager manager, double epsilon, double lmbda):
+        """
+        Constructor.
+        """
         self.manager = manager
         self.epsilon = epsilon
         self.lmbda = lmbda
+
+        self.capacity = 10
+        self.remove_count = 0
+        self.remove_types = <int *>malloc(self.capacity * sizeof(int))
+        self.remove_depths = <int *>malloc(self.capacity * sizeof(int))
+
+    def __dealloc__(self):
+        """
+        Destructor.
+        """
+        if self.remove_types:
+            free(self.remove_types)
+        if self.remove_depths:
+            free(self.remove_depths)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -75,11 +104,15 @@ cdef class _Remover:
         cdef int rc
         cdef int i
 
-        cdef int remove_type_count = 0
+        cdef int remove_count = 0
         cdef int* remove_types = <int *>malloc(n_samples * sizeof(int))
+        cdef int* remove_depths = <int *>malloc(n_samples * sizeof(int))
 
         cdef int* rebuild_samples = NULL
         cdef int n_rebuild_samples
+
+        # make room for new deletions
+        self._resize(n_samples)
 
         # check if any sample has already been deleted
         rc = manager.check_sample_validity(samples, n_samples)
@@ -118,8 +151,9 @@ cdef class _Remover:
             # leaf
             if tree.values[node_id] >= 0:
                 self._update_leaf(node_id, tree, y, samples, n_samples)
-                remove_types[remove_type_count] = 0
-                remove_type_count += 1
+                remove_types[remove_count] = 0
+                remove_depths[remove_count] = depth
+                remove_count += 1
                 free(samples)
 
             # decision node
@@ -128,11 +162,10 @@ cdef class _Remover:
                 rc = self._node_remove(node_id, X, y, samples, n_samples,
                                        min_samples_split, min_samples_leaf,
                                        chosen_feature, parent_p, &split, &meta)
-
                 # printf('rc: %d\n', rc)
 
                 # retrain
-                if rc < 0:
+                if rc > 0:
 
                     n_rebuild_samples = self._collect_leaf_samples(node_id, is_left, parent,
                                                                    tree, samples, n_samples,
@@ -140,8 +173,9 @@ cdef class _Remover:
                     tree_builder.build_at_node(node_id, tree, rebuild_samples, n_rebuild_samples,
                                                meta.features, meta.feature_count,
                                                depth, parent, parent_p, is_left)
-                    remove_types[remove_type_count] = rc
-                    remove_type_count += 1
+                    remove_types[remove_count] = rc
+                    remove_depths[remove_count] = depth
+                    remove_count += 1
 
                 else:
 
@@ -159,10 +193,8 @@ cdef class _Remover:
 
                 free(samples)
 
-        # cleanup
-        free(remove_types)  # TODO: do something with this data
-
-        return 0
+        # update removal metrics
+        self._update_removal_metrics(remove_types, remove_depths, remove_count)
 
     # private
     @cython.boundscheck(False)
@@ -292,13 +324,13 @@ cdef class _Remover:
 
         # no samples left in this node => retrain
         if updated_count <= 0:  # this branch will not be reached
-            printf('meta count <= count\n')
-            result = -1
+            # printf('meta count <= count\n')
+            result = 2
 
         # only samples from one class are left in this node => create leaf
         elif updated_pos_count == 0 or updated_pos_count == updated_count:
-            printf('only samples from one class\n')
-            result = -2
+            # printf('only samples from one class\n')
+            result = 1
 
         else:
 
@@ -343,18 +375,18 @@ cdef class _Remover:
                     updated_right_counts[feature_count] = updated_right_count
                     updated_right_pos_counts[feature_count] = updated_right_pos_count
 
-                    feature_count += 1
-
                     if meta.features[j] == chosen_feature:
                         chosen_feature_validated = 1
-                        chosen_ndx = j
+                        chosen_ndx = feature_count
                         chosen_left_count = left_count
                         chosen_right_count = right_count
 
+                    feature_count += 1
+
             # no valid features after data removal => create leaf
             if feature_count == 0:
-                printf('feature_count is zero\n')
-                result = -2
+                # printf('feature_count is zero\n')
+                result = 1
                 free(gini_indices)
                 free(distribution)
                 free(valid_features)
@@ -368,15 +400,17 @@ cdef class _Remover:
 
             # current feature no longer valid => retrain
             elif not chosen_feature_validated:
-                printf('chosen feature not validated\n')
-                result = -1
+                # printf('chosen feature not validated\n')
+                result = 2
                 free(gini_indices)
                 free(distribution)
-                free(valid_features)
+
                 free(updated_left_counts)
                 free(updated_left_pos_counts)
                 free(updated_right_counts)
                 free(updated_right_pos_counts)
+                meta.features = valid_features
+                meta.feature_count = feature_count
 
             else:
 
@@ -399,7 +433,7 @@ cdef class _Remover:
 
                 # compare with previous probability => retrain if necessary
                 if ratio < exp(-epsilon) or ratio > exp(epsilon):
-                    result = -1
+                    result = 2
                     free(gini_indices)
                     free(distribution)
 
@@ -408,6 +442,7 @@ cdef class _Remover:
                     free(updated_right_counts)
                     free(updated_right_pos_counts)
                     meta.features = valid_features
+                    meta.feature_count = feature_count
 
                 else:
 
@@ -558,3 +593,65 @@ cdef class _Remover:
         rebuild_samples_ptr[0] = rebuild_samples
         return rebuild_sample_count
 
+    cdef void _resize(self, int capacity=0) nogil:
+        """
+        Increase size of removal allocations.
+        """
+        if capacity > self.capacity - self.remove_count:
+            if self.capacity * 2 - self.remove_count > capacity:
+                self.capacity *= 2
+            else:
+                self.capacity = int(capacity)
+
+        # if capacity <= 0 and self.remove_count == self.capacity:
+        #     self.capacity *= 2
+
+        # removal info
+        if self.remove_types and self.remove_depths:
+            self.remove_types = <int *>realloc(self.remove_types, self.capacity * sizeof(int))
+            self.remove_depths = <int *>realloc(self.remove_depths, self.capacity * sizeof(int))
+        else:
+            self.remove_types = <int *>malloc(self.capacity * sizeof(int))
+            self.remove_depths = <int *>malloc(self.capacity * sizeof(int))
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _update_removal_metrics(self, int* remove_types, int* remove_depths,
+                                      int remove_count) nogil:
+        """
+        Adds to the removal metrics.
+        """
+        cdef int current_count = self.remove_count
+        cdef int updated_count = current_count + remove_count
+        cdef int j = 0
+
+        for i in range(current_count, updated_count):
+            self.remove_types[i] = remove_types[j]
+            self.remove_depths[i] = remove_depths[j]
+            j += 1
+        self.remove_count = updated_count
+
+        free(remove_types)
+        free(remove_depths)
+
+    cpdef void clear_removal_metrics(self):
+        """
+        Resets deletion statistics.
+        """
+        self.remove_count = 0
+        free(self.remove_types)
+        free(self.remove_depths)
+        self.remove_types = NULL
+        self.remove_depths = NULL
+
+    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
+        """
+        Wraps value as a 1-d NumPy array.
+        The array keeps a reference to this Tree, which manages the underlying memory.
+        """
+        cdef np.npy_intp shape[1]
+        shape[0] = n_elem
+        cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
+        Py_INCREF(self)
+        arr.base = <PyObject*> self
+        return arr

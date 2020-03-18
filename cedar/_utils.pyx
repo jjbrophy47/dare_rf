@@ -1,4 +1,3 @@
-
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdlib cimport free
@@ -113,6 +112,8 @@ cdef int sample_distribution(double* distribution, int n_distribution) nogil:
 
     return i
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef int* convert_int_ndarray(np.ndarray arr):
     """
     Converts a numpy array into a C int array.

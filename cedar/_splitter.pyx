@@ -85,7 +85,7 @@ cdef class _Splitter:
             if y[samples[i]] == 1:
                 pos_count += 1
 
-        if pos_count < count:
+        if pos_count > 0 and pos_count < count:
 
             gini_indices = <double *>malloc(n_features * sizeof(double))
             distribution = <double *>malloc(n_features * sizeof(double))

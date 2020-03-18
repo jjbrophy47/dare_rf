@@ -24,9 +24,16 @@ cdef class _Remover:
     cdef double epsilon        # Indistinguishability parameter
     cdef double lmbda          # Noise parameter
 
+    # Metric structures
+    cdef int capacity           # Number of removal allocations for space
+    cdef int  remove_count      # Number of removals
+    cdef int* remove_types      # Removal type: retrain / no retrain
+    cdef int* remove_depths     # Depth of leaf or node needing retraining
+
     # Python API
     cpdef int remove(self, _Tree tree, _TreeBuilder tree_builder,
                      np.ndarray remove_indices)
+    cpdef void clear_removal_metrics(self)
 
     # C API
     cdef int _node_remove(self, int node_id, int** X, int* y,
@@ -42,3 +49,7 @@ cdef class _Remover:
                           int n_samples) nogil
     cdef int _update_decision_node(self, int node_id, _Tree tree,
                                    int n_samples, Meta* meta) nogil
+    cdef void _resize(self, int capacity=*) nogil
+    cdef void _update_removal_metrics(self, int* remove_types, int* remove_depths,
+                                      int remove_count) nogil
+    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)

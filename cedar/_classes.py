@@ -184,18 +184,13 @@ class Forest(object):
         remove_indices = np.unique(remove_indices).astype(np.int32)
 
         # update trees
-        for tree in self.trees_:
-            tree.delete(remove_indices)
+        for i in range(len(self.trees_)):
+            self.trees_[i].delete(remove_indices)
 
         # remove data from tree
         self.manager_.remove_data(remove_indices)
 
-        # # delete instances from each tree
-        # deletion_types = []
-        # for tree in self.trees_:
-        #     deletion_types += tree.delete(remove_indices)
-
-        # return deletion_types
+        # return types, depths
 
     def print(self, show_nodes=False, show_metadata=False):
         """
@@ -203,6 +198,22 @@ class Forest(object):
         """
         for tree in self.trees_:
             tree.print(show_nodes=show_nodes, show_metadata=show_metadata)
+
+    def get_removal_statistics(self):
+        """
+        Retrieve deletion statistics.
+        """
+        types_list, depths_list = [], []
+
+        for tree in self.trees_:
+            types, depths = tree.get_removal_statistics()
+            types_list.append(types)
+            depths_list.append(depths)
+
+        types = np.concatenate(types_list)
+        depths = np.concatenate(depths_list)
+
+        return types, depths
 
     def get_params(self, deep=False):
         """
@@ -298,8 +309,6 @@ class Tree(object):
             self.n_features_ = features.shape[0]
             self.manager_ = _DataManager(X, y)
             self.single_tree_ = True
-
-        # features = np.array([ 3, 16 , 6, 10,  2, 14,  4, 17,  7,  1, 13,  0, 19, 18,  9, 15,  8, 12, 11,  5], dtype=np.int32)
 
         self.tree_ = _Tree(features)
         self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
@@ -412,10 +421,14 @@ class Tree(object):
 
         # remove data
         if self.single_tree_:
-            print('tree is removing!')
             self.manager_.remove_data(remove_indices)
 
-        return 0
+    def get_removal_statistics(self):
+        """
+        Retrieve deletion statistics.
+        """
+        result = self.remover_.remove_types, self.remover_.remove_depths
+        return result
 
     def get_params(self, deep=False):
         """
