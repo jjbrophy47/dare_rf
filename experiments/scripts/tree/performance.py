@@ -48,7 +48,7 @@ def performance(args, logger, seed):
     dt_tree = dt_tree.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
-    dt_tree.print_tree()
+    dt_tree.print()
 
     # display performance
     exp_util.performance(sk_tree, X_test, y_test, name='sk_tree', logger=logger)

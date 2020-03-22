@@ -12,7 +12,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
-from model import cedar
+import cedar
 from utility import data_util, exp_util, print_util, exact_adv_util, cert_adv_util
 
 
@@ -59,13 +59,15 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('instances to delete: {}'.format(len(delete_indices)))
     logger.info('adversary: {}'.format(args.adversary))
 
+    print(delete_indices)
+
     # naive retraining method
     if args.retrain:
 
         # deterministic model - training
         logger.info('\nDeterministic')
         start = time.time()
-        tree = cedar.Tree(epsilon=0, lmbda=10**8, max_depth=args.max_depth,
+        tree = cedar.Tree(epsilon=0, lmbda=-1, max_depth=args.max_depth,
                           verbose=args.verbose, random_state=seed)
         tree = tree.fit(X_train, y_train)
         end_time = time.time() - start
@@ -112,7 +114,7 @@ def remove_sample(args, logger, out_dir, seed):
         # exact unlearning model - training
         logger.info('\nExact')
         start = time.time()
-        tree = cedar.Tree(epsilon=0, lmbda=10**8, max_depth=args.max_depth,
+        tree = cedar.Tree(epsilon=0, lmbda=-1, max_depth=args.max_depth,
                           verbose=args.verbose, random_state=seed)
         tree = tree.fit(X_train, y_train)
         end_time = time.time() - start
@@ -120,21 +122,24 @@ def remove_sample(args, logger, out_dir, seed):
         exp_util.performance(tree, X_test, y_test, logger=logger, name='exact')
 
         # exact unlearning model - deleting
-        delete_types = []
         delete_times = [end_time]
         for i, delete_ndx in enumerate(delete_indices):
+            print(delete_ndx)
 
             start = time.time()
-            delete_types += tree.delete(int(delete_ndx))
+            tree.delete(int(delete_ndx))
             end_time = time.time() - start
             delete_times.append(end_time)
 
             if args.verbose > 0 and i % 100 == 0:
                 logger.info('{}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
 
-        counter = Counter(delete_types)
+        delete_types, delete_depths = tree.get_removal_statistics()
+        type_counter = Counter(delete_types)
+        depth_counter = Counter(delete_depths)
         logger.info('[exact] amortized: {:.3f}s'.format(np.mean(delete_times)))
-        logger.info('[exact] delete types: {}'.format(counter))
+        logger.info('[exact] delete types: {}'.format(type_counter))
+        logger.info('[exact] delete depths: {}'.format(depth_counter))
         exp_util.performance(tree, X_test, y_test, logger=logger, name='exact')
 
         if args.save_results:
@@ -142,7 +147,8 @@ def remove_sample(args, logger, out_dir, seed):
             np.save(os.path.join(out_dir, 'exact_type.npy'), delete_types)
 
     # CeDAR method
-    for epsilon in [0.1, 1.0, 10.0]:
+    # for epsilon in [0.1, 1.0, 10.0]:
+    for epsilon in [10.0]:
 
         # removal-enabled model - training
         logger.info('\nCeDAR (ep={}, lmbda={})'.format(epsilon, args.lmbda))
@@ -155,12 +161,11 @@ def remove_sample(args, logger, out_dir, seed):
         exp_util.performance(tree, X_test, y_test, logger=logger, name='cedar')
 
         # removal-enabled model - deleting
-        delete_types = []
         delete_times = [end_time]
         for i, delete_ndx in enumerate(delete_indices):
 
             start = time.time()
-            delete_types += tree.delete(int(delete_ndx))
+            tree.delete(int(delete_ndx))
             end_time = time.time() - start
             delete_times.append(end_time)
 
@@ -168,9 +173,12 @@ def remove_sample(args, logger, out_dir, seed):
                 logger.info('{}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
 
         # performance
-        counter = Counter(delete_types)
+        delete_types, delete_depths = tree.get_removal_statistics()
+        type_counter = Counter(delete_types)
+        depth_counter = Counter(delete_depths)
         logger.info('[cedar] amortized: {:.3f}s'.format(np.mean(delete_times)))
-        logger.info('[cedar] delete types: {}'.format(counter))
+        logger.info('[cedar] delete types: {}'.format(type_counter))
+        logger.info('[cedar] delete depths: {}'.format(depth_counter))
         exp_util.performance(tree, X_test, y_test, logger=logger, name='cedar')
 
         if args.save_results:

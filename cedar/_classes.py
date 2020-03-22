@@ -8,7 +8,7 @@ import numpy as np
 
 from ._manager import _DataManager
 from ._splitter import _Splitter
-from ._remover import _Remover
+# from ._remover import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -103,7 +103,6 @@ class Forest(object):
         # build forest
         self.trees_ = []
         for i in range(self.n_estimators):
-            print('tree {}'.format(i))
 
             if self.verbose > 2:
                 print('tree {}'.format(i))
@@ -186,13 +185,10 @@ class Forest(object):
 
         # update trees
         for i in range(len(self.trees_)):
-            print('tree {}'.format(i))
             self.trees_[i].delete(remove_indices)
 
         # remove data from tree
         self.manager_.remove_data(remove_indices)
-
-        # return types, depths
 
     def print(self, show_nodes=False, show_metadata=False):
         """
@@ -314,7 +310,7 @@ class Tree(object):
 
         self.tree_ = _Tree(features)
         self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
-        self.remover_ = _Remover(self.manager_, self.epsilon, self.lmbda)
+        # self.remover_ = _Remover(self.manager_, self.epsilon, self.lmbda)
         self.tree_builder_ = _TreeBuilder(self.manager_, self.splitter_,
                                           self.min_samples_split, self.min_samples_leaf,
                                           self.max_depth, self.random_state)
@@ -339,37 +335,37 @@ class Tree(object):
         y_proba = np.hstack([1 - y_pos, y_pos])
         return y_proba
 
-    def print(self, show_nodes=False, show_metadata=False):
-        """
-        Shows a representation of the tree.
-        """
-        print('\nTree:')
-        print('nodes: {}'.format(self.tree_.n_nodes))
-        print('features: {}'.format(self.tree_.feature_indices))
+    # def print(self, show_nodes=False, show_metadata=False):
+    #     """
+    #     Shows a representation of the tree.
+    #     """
+    #     print('\nTree:')
+    #     print('nodes: {}'.format(self.tree_.n_nodes))
+    #     print('features: {}'.format(self.tree_.feature_indices))
 
-        if show_nodes:
-            print('counts: {}'.format(self.tree_.counts))
-            print('pos counts: {}'.format(self.tree_.pos_counts))
-            print('leaf values: {}'.format(self.tree_.values))
-            print('p: {}'.format(self.tree_.p))
-            print('feature counts: {}'.format(self.tree_.feature_counts))
-            print('chosen features: {}'.format(self.tree_.chosen_features))
-            print('depths: {}'.format(self.tree_.depth))
-            print('left_children: {}'.format(self.tree_.left_children))
-            print('right_children: {}'.format(self.tree_.right_children))
+    #     if show_nodes:
+    #         print('counts: {}'.format(self.tree_.counts))
+    #         print('pos counts: {}'.format(self.tree_.pos_counts))
+    #         print('leaf values: {}'.format(self.tree_.values))
+    #         print('p: {}'.format(self.tree_.p))
+    #         print('feature counts: {}'.format(self.tree_.feature_counts))
+    #         print('chosen features: {}'.format(self.tree_.chosen_features))
+    #         print('depths: {}'.format(self.tree_.depth))
+    #         print('left_children: {}'.format(self.tree_.left_children))
+    #         print('right_children: {}'.format(self.tree_.right_children))
 
-            if show_metadata:
-                for i in range(self.tree_.n_nodes):
-                    if self.tree_.chosen_features[i] != -2:
-                        print('node {}:'.format(i))
-                        print('  left counts: {}'.format(self.tree_._get_left_counts(i)))
-                        print('  left pos counts: {}'.format(self.tree_._get_left_pos_counts(i)))
-                        print('  right counts: {}'.format(self.tree_._get_right_counts(i)))
-                        print('  right pos counts: {}'.format(self.tree_._get_right_pos_counts(i)))
-                        print('  features: {}'.format(self.tree_._get_features(i)))
-                    else:
-                        print('node {}:'.format(i))
-                        print('  leaf samples: {}'.format(self.tree_._get_leaf_samples(i)))
+    #         if show_metadata:
+    #             for i in range(self.tree_.n_nodes):
+    #                 if self.tree_.chosen_features[i] != -2:
+    #                     print('node {}:'.format(i))
+    #                     print('  left counts: {}'.format(self.tree_._get_left_counts(i)))
+    #                     print('  left pos counts: {}'.format(self.tree_._get_left_pos_counts(i)))
+    #                     print('  right counts: {}'.format(self.tree_._get_right_counts(i)))
+    #                     print('  right pos counts: {}'.format(self.tree_._get_right_pos_counts(i)))
+    #                     print('  features: {}'.format(self.tree_._get_features(i)))
+    #                 else:
+    #                     print('node {}:'.format(i))
+    #                     print('  leaf samples: {}'.format(self.tree_._get_leaf_samples(i)))
 
     # def add(self, X, y, keys=None):
     #     """
@@ -400,37 +396,37 @@ class Tree(object):
 
     #     return self.addition_types_
 
-    def delete(self, remove_indices):
-        """
-        Removes instance remove_ndx from the training data and updates the model.
-        """
+    # def delete(self, remove_indices):
+    #     """
+    #     Removes instance remove_ndx from the training data and updates the model.
+    #     """
 
-        # copy remove indices to int array
-        if self.single_tree_:
+    #     # copy remove indices to int array
+    #     if self.single_tree_:
 
-            if isinstance(remove_indices, int):
-                remove_indices = [remove_indices]
+    #         if isinstance(remove_indices, int):
+    #             remove_indices = [remove_indices]
 
-            if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
-                remove_indices = np.array(remove_indices, dtype=np.int32)
+    #         if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
+    #             remove_indices = np.array(remove_indices, dtype=np.int32)
 
-            remove_indices = np.unique(remove_indices).astype(np.int32)
+    #         remove_indices = np.unique(remove_indices).astype(np.int32)
 
-        # update model
-        rc = self.remover_.remove(self.tree_, self.tree_builder_, remove_indices)
-        if rc == -1:
-            exit('Removal index invalid!')
+    #     # update model
+    #     rc = self.remover_.remove(self.tree_, self.tree_builder_, remove_indices)
+    #     if rc == -1:
+    #         exit('Removal index invalid!')
 
-        # remove data
-        if self.single_tree_:
-            self.manager_.remove_data(remove_indices)
+    #     # remove data
+    #     if self.single_tree_:
+    #         self.manager_.remove_data(remove_indices)
 
-    def get_removal_statistics(self):
-        """
-        Retrieve deletion statistics.
-        """
-        result = self.remover_.remove_types, self.remover_.remove_depths
-        return result
+    # def get_removal_statistics(self):
+    #     """
+    #     Retrieve deletion statistics.
+    #     """
+    #     result = self.remover_.remove_types, self.remover_.remove_depths
+    #     return result
 
     def get_params(self, deep=False):
         """

@@ -45,7 +45,7 @@ cdef class _Splitter:
     cdef int node_split(self, int** X, int* y,
                         int* samples, int n_samples,
                         int* features, int n_features,
-                        double parent_p, SplitRecord* split) nogil:
+                        double parent_p, SplitRecord* split, Meta* meta) nogil:
         """
         Find the best split in the node data.
         This is a placeholder method. The majority of computation will be done here.
@@ -71,14 +71,14 @@ cdef class _Splitter:
         cdef int feature_count = 0
         cdef int result = 0
 
-        cdef double* gini_indices = NULL
-        cdef double* distribution = NULL
-        cdef int* valid_features = NULL
+        cdef double* gini_indices
+        cdef double* distribution
+        cdef int* valid_features
 
-        cdef int* left_counts = NULL
-        cdef int* left_pos_counts = NULL
-        cdef int* right_counts = NULL
-        cdef int* right_pos_counts = NULL
+        cdef int* left_counts
+        cdef int* left_pos_counts
+        cdef int* right_counts
+        cdef int* right_pos_counts
 
         # count number of pos labels
         for i in range(n_samples):
@@ -156,33 +156,33 @@ cdef class _Splitter:
                 split.left_count = j
                 split.right_count = k
                 split.feature = valid_features[chosen_ndx]
+                split.features = valid_features
+                split.n_features = feature_count
 
-                split.p = parent_p * distribution[chosen_ndx]
-                split.count = count
-                split.pos_count = pos_count
-
-                split.feature_count = feature_count
-                split.valid_features = valid_features
-                split.left_counts = left_counts
-                split.left_pos_counts = left_pos_counts
-                split.right_counts = right_counts
-                split.right_pos_counts = right_pos_counts
+                meta.p = parent_p * distribution[chosen_ndx]
+                meta.count = count
+                meta.pos_count = pos_count
+                meta.feature_count = feature_count
+                meta.left_counts = left_counts
+                meta.left_pos_counts = left_pos_counts
+                meta.right_counts = right_counts
+                meta.right_pos_counts = right_pos_counts
+                meta.features = valid_features
 
                 free(gini_indices)
                 free(distribution)
 
             else:
-                result = -1
+                result = -2
                 free(gini_indices)
                 free(distribution)
                 free(valid_features)
-
                 free(left_counts)
                 free(left_pos_counts)
                 free(right_counts)
                 free(right_pos_counts)
 
         else:
-            result = -1
+            result = -2
 
         return result

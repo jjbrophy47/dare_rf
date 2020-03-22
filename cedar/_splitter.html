@@ -392,7 +392,7 @@ body.cython { font-family: courier; font-size: 12; }
 <pre class="cython line score-0">&#xA0;<span class="">017</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">018</span>: <span class="k">cdef</span> <span class="k">class</span> <span class="nf">_Splitter</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>struct __pyx_vtabstruct_5cedar_9_splitter__Splitter {
-  int (*node_split)(struct __pyx_obj_5cedar_9_splitter__Splitter *, int **, int *, int *, int, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *, struct __pyx_t_5cedar_9_splitter_Meta *);
+  int (*node_split)(struct __pyx_obj_5cedar_9_splitter__Splitter *, int **, int *, int *, int, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
 };
 static struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtabptr_5cedar_9_splitter__Splitter;
 </pre><pre class="cython line score-0">&#xA0;<span class="">019</span>:     <span class="sd">&quot;&quot;&quot;</span></pre>
@@ -513,7 +513,7 @@ static void __pyx_pf_5cedar_9_splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED str
 <pre class="cython line score-0">&#xA0;<span class="">043</span>:     <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">044</span>:     <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">045</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">node_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="o">**</span> <span class="n">X</span><span class="p">,</span> <span class="nb">int</span><span class="o">*</span> <span class="n">y</span><span class="p">,</span></pre>
-<pre class='cython code score-0 '>static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5cedar_9_splitter__Splitter *__pyx_v_self, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features, double __pyx_v_parent_p, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split, struct __pyx_t_5cedar_9_splitter_Meta *__pyx_v_meta) {
+<pre class='cython code score-0 '>static int __pyx_f_5cedar_9_splitter_9_Splitter_node_split(struct __pyx_obj_5cedar_9_splitter__Splitter *__pyx_v_self, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features, double __pyx_v_parent_p, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split) {
   int __pyx_v_min_samples_leaf;
   double __pyx_v_lmbda;
   int __pyx_v_i;
@@ -543,7 +543,7 @@ static void __pyx_pf_5cedar_9_splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED str
 }
 </pre><pre class="cython line score-0">&#xA0;<span class="">046</span>:                         <span class="nb">int</span><span class="o">*</span> <span class="n">samples</span><span class="p">,</span> <span class="nb">int</span> <span class="n">n_samples</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">047</span>:                         <span class="nb">int</span><span class="o">*</span> <span class="n">features</span><span class="p">,</span> <span class="nb">int</span> <span class="n">n_features</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">048</span>:                         <span class="n">double</span> <span class="n">parent_p</span><span class="p">,</span> <span class="n">SplitRecord</span><span class="o">*</span> <span class="n">split</span><span class="p">,</span> <span class="n">Meta</span><span class="o">*</span> <span class="n">meta</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">048</span>:                         <span class="n">double</span> <span class="n">parent_p</span><span class="p">,</span> <span class="n">SplitRecord</span><span class="o">*</span> <span class="n">split</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">049</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">050</span>: <span class="sd">        Find the best split in the node data.</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">051</span>: <span class="sd">        This is a placeholder method. The majority of computation will be done here.</span></pre>
@@ -577,15 +577,22 @@ static void __pyx_pf_5cedar_9_splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED str
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">072</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">result</span> <span class="o">=</span> <span class="mf">0</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_result = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">073</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">074</span>:         <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">gini_indices</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">075</span>:         <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">distribution</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">076</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">valid_features</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">077</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">078</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">left_counts</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">079</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">left_pos_counts</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">080</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">right_counts</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">081</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">right_pos_counts</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">082</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">074</span>:         <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">gini_indices</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_gini_indices = NULL;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">075</span>:         <span class="k">cdef</span> <span class="kt">double</span>* <span class="nf">distribution</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_distribution = NULL;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">076</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">valid_features</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_valid_features = NULL;
+</pre><pre class="cython line score-0">&#xA0;<span class="">077</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">078</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">left_counts</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_left_counts = NULL;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">079</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">left_pos_counts</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_left_pos_counts = NULL;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">080</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">right_counts</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_right_counts = NULL;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">081</span>:         <span class="k">cdef</span> <span class="kt">int</span>* <span class="nf">right_pos_counts</span> <span class="o">=</span> <span class="bp">NULL</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_right_pos_counts = NULL;
+</pre><pre class="cython line score-0">&#xA0;<span class="">082</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">083</span>:         <span class="c"># count number of pos labels</span></pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">084</span>:         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_n_samples;
@@ -769,46 +776,44 @@ static void __pyx_pf_5cedar_9_splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED str
 <pre class='cython code score-0 '>      __pyx_v_split-&gt;right_count = __pyx_v_k;
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">158</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">feature</span> <span class="o">=</span> <span class="n">valid_features</span><span class="p">[</span><span class="n">chosen_ndx</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>      __pyx_v_split-&gt;feature = (__pyx_v_valid_features[__pyx_v_chosen_ndx]);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">159</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">valid_features</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_split-&gt;features = __pyx_v_valid_features;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">160</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="n">feature_count</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_split-&gt;n_features = __pyx_v_feature_count;
-</pre><pre class="cython line score-0">&#xA0;<span class="">161</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">162</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">parent_p</span> <span class="o">*</span> <span class="n">distribution</span><span class="p">[</span><span class="n">chosen_ndx</span><span class="p">]</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;p = (__pyx_v_parent_p * (__pyx_v_distribution[__pyx_v_chosen_ndx]));
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">163</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;count = __pyx_v_count;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">164</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">pos_count</span> <span class="o">=</span> <span class="n">pos_count</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;pos_count = __pyx_v_pos_count;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">165</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">feature_count</span> <span class="o">=</span> <span class="n">feature_count</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;feature_count = __pyx_v_feature_count;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">166</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">left_counts</span> <span class="o">=</span> <span class="n">left_counts</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;left_counts = __pyx_v_left_counts;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">167</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">left_pos_counts</span> <span class="o">=</span> <span class="n">left_pos_counts</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;left_pos_counts = __pyx_v_left_pos_counts;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">168</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">right_counts</span> <span class="o">=</span> <span class="n">right_counts</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;right_counts = __pyx_v_right_counts;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">169</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">right_pos_counts</span> <span class="o">=</span> <span class="n">right_pos_counts</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;right_pos_counts = __pyx_v_right_pos_counts;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">170</span>:                 <span class="n">meta</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">valid_features</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_meta-&gt;features = __pyx_v_valid_features;
-</pre><pre class="cython line score-0">&#xA0;<span class="">171</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">172</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">gini_indices</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">159</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">160</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">parent_p</span> <span class="o">*</span> <span class="n">distribution</span><span class="p">[</span><span class="n">chosen_ndx</span><span class="p">]</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;p = (__pyx_v_parent_p * (__pyx_v_distribution[__pyx_v_chosen_ndx]));
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">161</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;count = __pyx_v_count;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">162</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">pos_count</span> <span class="o">=</span> <span class="n">pos_count</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;pos_count = __pyx_v_pos_count;
+</pre><pre class="cython line score-0">&#xA0;<span class="">163</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">164</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">feature_count</span> <span class="o">=</span> <span class="n">feature_count</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;feature_count = __pyx_v_feature_count;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">165</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">valid_features</span> <span class="o">=</span> <span class="n">valid_features</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;valid_features = __pyx_v_valid_features;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">166</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">left_counts</span> <span class="o">=</span> <span class="n">left_counts</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;left_counts = __pyx_v_left_counts;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">167</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">left_pos_counts</span> <span class="o">=</span> <span class="n">left_pos_counts</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;left_pos_counts = __pyx_v_left_pos_counts;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">168</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">right_counts</span> <span class="o">=</span> <span class="n">right_counts</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;right_counts = __pyx_v_right_counts;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">169</span>:                 <span class="n">split</span><span class="o">.</span><span class="n">right_pos_counts</span> <span class="o">=</span> <span class="n">right_pos_counts</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_split-&gt;right_pos_counts = __pyx_v_right_pos_counts;
+</pre><pre class="cython line score-0">&#xA0;<span class="">170</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">171</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">gini_indices</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_gini_indices);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">173</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">172</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_distribution);
-</pre><pre class="cython line score-0">&#xA0;<span class="">174</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">175</span>:             <span class="k">else</span><span class="p">:</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">176</span>:                 <span class="n">result</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">173</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">174</span>:             <span class="k">else</span><span class="p">:</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">175</span>:                 <span class="n">result</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1</span></pre>
 <pre class='cython code score-0 '>    /*else*/ {
-      __pyx_v_result = -2;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">177</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">gini_indices</span><span class="p">)</span></pre>
+      __pyx_v_result = -1;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">176</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">gini_indices</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_gini_indices);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">178</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">177</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_distribution);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">179</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">valid_features</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">178</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">valid_features</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_valid_features);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">180</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">left_counts</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">179</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">180</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">left_counts</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_left_counts);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">181</span>:                 <span class="n">free</span><span class="p">(</span><span class="n">left_pos_counts</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      free(__pyx_v_left_pos_counts);
@@ -820,9 +825,9 @@ static void __pyx_pf_5cedar_9_splitter_9_Splitter_2__dealloc__(CYTHON_UNUSED str
     __pyx_L17:;
 </pre><pre class="cython line score-0">&#xA0;<span class="">184</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">185</span>:         <span class="k">else</span><span class="p">:</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">186</span>:             <span class="n">result</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">186</span>:             <span class="n">result</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1</span></pre>
 <pre class='cython code score-0 '>  /*else*/ {
-    __pyx_v_result = -2;
+    __pyx_v_result = -1;
   }
   __pyx_L6:;
 </pre><pre class="cython line score-0">&#xA0;<span class="">187</span>: </pre>

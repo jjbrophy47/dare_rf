@@ -2,12 +2,11 @@ import numpy as np
 cimport numpy as np
 
 from ._manager cimport _DataManager
-# from ._splitter cimport Meta
+from ._splitter cimport Meta
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
 
 cdef struct RemovalSplitRecord:
-
     # Data to track sample split
     int* left_indices          # Samples in left branch of feature.
     int  left_count            # Number of samples in left branch.
