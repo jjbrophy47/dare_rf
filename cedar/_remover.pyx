@@ -119,7 +119,8 @@ cdef class _Remover:
 
         cdef int i  # TODO: remove
 
-        # printf("\npopping_r (%d, %d, %.7f, %d)\n", node.depth, node.is_left, parent_p, n_samples)
+        # printf("popping_r (%d, %d, %.7f, %d, %d, %d)\n", node.depth, node.is_left,
+        #        parent_p, node.count, n_samples, node.feature_count)
 
         # leaf
         if node.is_leaf:
@@ -187,6 +188,10 @@ cdef class _Remover:
         cdef int  leaf_samples_count = 0
         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
         free(node.leaf_samples)
+
+        if node.count - n_samples == 0:
+            printf('node.count: %d, n_samples: %d\n', node.count, n_samples)
+            printf('updated_count is zero!\n')
 
         node.count -= n_samples
         node.pos_count -= pos_count
@@ -345,12 +350,12 @@ cdef class _Remover:
 
         # no samples left in this node => retrain
         if updated_count <= 0:  # this branch will not be reached
-            printf('meta count <= count\n')
+            # printf('meta count <= count\n')
             result = 2
 
         # only samples from one class are left in this node => create leaf
         elif updated_pos_count == 0 or updated_pos_count == updated_count:
-            printf('only samples from one class\n')
+            # printf('only samples from one class\n')
             result = 1
             split.count = updated_count
             split.pos_count = updated_pos_count
@@ -381,10 +386,10 @@ cdef class _Remover:
                 right_count = count - left_count
                 right_pos_count = pos_count - left_pos_count
 
-                updated_left_count = node.left_counts[feature_count] - left_count
-                updated_left_pos_count = node.left_pos_counts[feature_count] - left_pos_count
-                updated_right_count = node.right_counts[feature_count] - right_count
-                updated_right_pos_count = node.right_pos_counts[feature_count] - right_pos_count
+                updated_left_count = node.left_counts[j] - left_count
+                updated_left_pos_count = node.left_pos_counts[j] - left_pos_count
+                updated_right_count = node.right_counts[j] - right_count
+                updated_right_pos_count = node.right_pos_counts[j] - right_pos_count
 
                 # validate split
                 if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:
@@ -408,7 +413,7 @@ cdef class _Remover:
 
             # no valid features after data removal => create leaf
             if feature_count == 0:
-                printf('feature_count is zero\n')
+                # printf('feature_count is zero\n')
                 result = 1
                 free(gini_indices)
                 free(distribution)
@@ -424,7 +429,7 @@ cdef class _Remover:
 
             # current feature no longer valid => retrain
             elif not chosen_feature_validated:
-                printf('chosen feature not validated\n')
+                # printf('chosen feature not validated\n')
                 result = 2
                 free(gini_indices)
                 free(distribution)
@@ -434,6 +439,7 @@ cdef class _Remover:
                 free(updated_right_counts)
                 free(updated_right_pos_counts)
 
+                split.count = updated_count
                 split.feature_count = feature_count
                 split.valid_features = valid_features
 
@@ -454,11 +460,11 @@ cdef class _Remover:
                 p = parent_p * distribution[chosen_ndx]
                 ratio = p / node.p
 
-                printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
+                # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
                 # compare with previous probability => retrain if necessary
                 if ratio < exp(-epsilon) or ratio > exp(epsilon):
-                    printf('bounds exceeded\n')
+                    # printf('bounds exceeded\n')
                     result = 2
                     free(gini_indices)
                     free(distribution)

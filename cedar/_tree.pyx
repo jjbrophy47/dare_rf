@@ -71,8 +71,6 @@ cdef class _TreeBuilder:
 
         tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0, 1.0)
 
-        # tree._print_counts()
-
     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,
                       int* features, int n_features,
                       int depth, bint is_left, double parent_p) nogil:
@@ -87,7 +85,7 @@ cdef class _TreeBuilder:
         node.depth = depth
         node.is_left = is_left
 
-        printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
+        # printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
 
         cdef bint is_leaf = (depth >= self.max_depth or
                              n_samples < self.min_samples_split or
