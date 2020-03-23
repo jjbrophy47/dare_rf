@@ -1,8 +1,5 @@
 """
-Decision tree implementation for binary-class classification and binary-valued attributes.
-Adapted from MLFromScratch: https://github.com/eriklindernoren/ML-From-Scratch.
-
-Uses certified removal to improve deletion efficiency.
+CeDAR (CErtified Data Addition and Removal) Trees.
 """
 import numpy as np
 
@@ -341,35 +338,9 @@ class Tree(object):
         """
         print('\nTree:')
         self.tree_.print_node_count()
-        self.tree_.print_depth()
+        if show_nodes:
+            self.tree_.print_depth()
         print()
-
-        # print('nodes: {}'.format(self.tree_.n_nodes))
-        # print('features: {}'.format(self.tree_.feature_indices))
-
-        # if show_nodes:
-        #     print('counts: {}'.format(self.tree_.counts))
-        #     print('pos counts: {}'.format(self.tree_.pos_counts))
-        #     print('leaf values: {}'.format(self.tree_.values))
-        #     print('p: {}'.format(self.tree_.p))
-        #     print('feature counts: {}'.format(self.tree_.feature_counts))
-        #     print('chosen features: {}'.format(self.tree_.chosen_features))
-        #     print('depths: {}'.format(self.tree_.depth))
-        #     print('left_children: {}'.format(self.tree_.left_children))
-        #     print('right_children: {}'.format(self.tree_.right_children))
-
-        #     if show_metadata:
-        #         for i in range(self.tree_.n_nodes):
-        #             if self.tree_.chosen_features[i] != -2:
-        #                 print('node {}:'.format(i))
-        #                 print('  left counts: {}'.format(self.tree_._get_left_counts(i)))
-        #                 print('  left pos counts: {}'.format(self.tree_._get_left_pos_counts(i)))
-        #                 print('  right counts: {}'.format(self.tree_._get_right_counts(i)))
-        #                 print('  right pos counts: {}'.format(self.tree_._get_right_pos_counts(i)))
-        #                 print('  features: {}'.format(self.tree_._get_features(i)))
-        #             else:
-        #                 print('node {}:'.format(i))
-        #                 print('  leaf samples: {}'.format(self.tree_._get_leaf_samples(i)))
 
     # def add(self, X, y, keys=None):
     #     """

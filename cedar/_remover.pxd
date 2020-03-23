@@ -47,6 +47,4 @@ cdef class _Remover:
     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
     cdef void _resize_metrics(self, int capacity=*) nogil
     cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil
-    # cdef void _update_removal_metrics(self, int* remove_types, int* remove_depths,
-    #                                   int remove_count) nogil
     cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)

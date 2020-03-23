@@ -103,6 +103,8 @@ cdef class _Remover:
 
         self._remove(&tree.root, X, y, samples, n_samples, 1.0)
 
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     cdef void _remove(self, Node** node_ptr, int** X, int* y,
                       int* samples, int n_samples, double parent_p) nogil:
         """
@@ -116,8 +118,6 @@ cdef class _Remover:
 
         cdef int* leaf_samples = NULL
         cdef int  leaf_samples_count
-
-        cdef int i  # TODO: remove
 
         # printf("popping_r (%d, %d, %.7f, %d, %d, %d)\n", node.depth, node.is_left,
         #        parent_p, node.count, n_samples, node.feature_count)
@@ -188,10 +188,6 @@ cdef class _Remover:
         cdef int  leaf_samples_count = 0
         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
         free(node.leaf_samples)
-
-        if node.count - n_samples == 0:
-            printf('node.count: %d, n_samples: %d\n', node.count, n_samples)
-            printf('updated_count is zero!\n')
 
         node.count -= n_samples
         node.pos_count -= pos_count

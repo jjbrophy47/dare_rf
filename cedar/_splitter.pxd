@@ -1,18 +1,6 @@
 import numpy as np
 cimport numpy as np
 
-# cdef struct Meta:
-#     # Sufficient statistics to save for each attribute
-#     double p                 # Total probability of chosen feature
-#     int  count               # Number of samples in the node
-#     int  pos_count           # Number of pos samples in the node
-#     int  feature_count       # Number of features in the node
-#     int* left_counts         # Number of left samples for each attribute
-#     int* left_pos_counts     # Number of left positive samples for each attribute
-#     int* right_counts        # Number of right samples for each attribute
-#     int* right_pos_counts    # Number of right positive samples for each attribute
-#     int* features            # Valid features considered in the node
-
 
 cdef struct SplitRecord:
 

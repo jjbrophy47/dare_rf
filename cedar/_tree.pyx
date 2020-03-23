@@ -176,75 +176,7 @@ cdef class _TreeBuilder:
 # Tree
 # =====================================
 
-# TODO: recursively travese the tree and return properties in a depth-first manner
 cdef class _Tree:
-
-    # property n_nodes:
-    #     def __get__(self):
-    #         return self.node_count - self.vacant_ids.top
-
-    # property feature_indices:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.feature_indices, self.n_feature_indices)
-
-    # property values:
-    #     def __get__(self):
-    #         return self._get_double_ndarray(self.values, self.node_count)
-
-    # property p:
-    #     def __get__(self):
-    #         return self._get_double_ndarray(self.p, self.node_count)
-
-    # property chosen_features:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.chosen_features, self.node_count)
-
-    # property left_children:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.left_children, self.node_count)
-
-    # property right_children:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.right_children, self.node_count)
-
-    # property depth:
-    #     def __get__(self):
-    #         cdef int  node_count = self._get_node_count(self.root)
-    #         cdef int *depth = <int *>malloc(node_count * sizeof(int))
-    #         cdef int  depth_count = 0
-    #         self._get_depth(self.root, &depth, &depth_count)
-    #         return self._get_int_ndarray(depth, depth_count)
-
-    # metadata
-    # property counts:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.count, self.node_count)
-
-    # property pos_counts:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.pos_count, self.node_count)
-
-    # property feature_counts:
-    #     def __get__(self):
-    #         return self._get_int_ndarray(self.feature_count, self.node_count)
-
-    # cpdef np.ndarray _get_left_counts(self, node_id):
-    #     return self._get_int_ndarray(self.left_counts[node_id], self.feature_count[node_id])
-
-    # cpdef np.ndarray _get_left_pos_counts(self, node_id):
-    #     return self._get_int_ndarray(self.left_pos_counts[node_id], self.feature_count[node_id])
-
-    # cpdef np.ndarray _get_right_counts(self, node_id):
-    #     return self._get_int_ndarray(self.right_counts[node_id], self.feature_count[node_id])
-
-    # cpdef np.ndarray _get_right_pos_counts(self, node_id):
-    #     return self._get_int_ndarray(self.right_pos_counts[node_id], self.feature_count[node_id])
-
-    # cpdef np.ndarray _get_features(self, node_id):
-    #     return self._get_int_ndarray(self.features[node_id], self.feature_count[node_id])
-
-    # cpdef np.ndarray _get_leaf_samples(self, node_id):
-    #     return self._get_int_ndarray(self.leaf_samples[node_id], self.count[node_id])
 
     def __cinit__(self, np.ndarray features):
         """
@@ -325,27 +257,3 @@ cdef class _Tree:
             return 0
         else:
             return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)
-
-    # cdef np.ndarray _get_double_ndarray(self, double *data, int n_elem):
-    #     """
-    #     Wraps value as a 1-d NumPy array.
-    #     The array keeps a reference to this Tree, which manages the underlying memory.
-    #     """
-    #     cdef np.npy_intp shape[1]
-    #     shape[0] = n_elem
-    #     cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)
-    #     Py_INCREF(self)
-    #     arr.base = <PyObject*> self
-    #     return arr
-
-    # cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
-    #     """
-    #     Wraps value as a 1-d NumPy array.
-    #     The array keeps a reference to this Tree, which manages the underlying memory.
-    #     """
-    #     cdef np.npy_intp shape[1]
-    #     shape[0] = n_elem
-    #     cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
-    #     Py_INCREF(self)
-    #     arr.base = <PyObject*> self
-    #     return arr

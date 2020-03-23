@@ -41,8 +41,8 @@ cdef class _Tree:
     cdef int* feature_indices            # Array of features, shape=[n_features]
 
     # Inner structures
-    cdef Node* root                        # Root node
-    cdef int node_count                    # Counter for node IDs
+    cdef Node* root                      # Root node
+    cdef int node_count                  # Counter for node IDs
 
     # Python/C API
     cpdef np.ndarray predict(self, int[:, :] X)
@@ -52,9 +52,6 @@ cdef class _Tree:
     # C API
     cdef void _print_depth(self, Node* node) nogil
     cdef int _get_node_count(self, Node* node) nogil
-
-    # cdef np.ndarray _get_double_ndarray(self, double *data, int n_elem)
-    # cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
 
 cdef class _TreeBuilder:
     """

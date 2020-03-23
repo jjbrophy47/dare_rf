@@ -10,9 +10,9 @@ import cedar
 from experiments.utility import data_util, exact_adv_util
 
 seed = 1
-n_remove = 10
+n_remove = 100
 
-X_train, X_test, y_train, y_test = data_util.get_data('mfc19', seed, data_dir='data')
+X_train, X_test, y_train, y_test = data_util.get_data('mfc18_mfc19', seed, data_dir='data')
 np.random.seed(seed)
 delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
 
@@ -76,13 +76,13 @@ proba = model.predict_proba(X_test)[:, 1]
 print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
 
 # sequential delete
-# for i in range(len(delete_indices)):
-#     # print('\ndeleting {}: {}'.format(delete_indices[i], data[delete_indices[i]]))
-#     # print('deleting {}'.format(delete_indices[i]))
-#     t1 = time.time()
-#     model.delete(delete_indices[i])
-#     print('delete time: {:.7f}s'.format(time.time() - t1))
-#     # model.print()
+for i in range(len(delete_indices)):
+    # print('\ndeleting {}: {}'.format(delete_indices[i], data[delete_indices[i]]))
+    # print('deleting {}'.format(delete_indices[i]))
+    t1 = time.time()
+    model.delete(delete_indices[i])
+    print('delete time: {:.7f}s'.format(time.time() - t1))
+    # model.print()
 
 # batch delete
 t1 = time.time()
