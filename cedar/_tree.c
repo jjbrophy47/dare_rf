@@ -1233,7 +1233,7 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_t_5cedar_9_splitter_SplitRecord;
 
-/* "_splitter.pxd":17
+/* "_splitter.pxd":7
  * 
  * 
  * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
@@ -1246,8 +1246,8 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int left_count;
   int *right_indices;
   int right_count;
-  int *valid_features;
-  int feature_count;
+  int *features;
+  int features_count;
   double p;
   int count;
   int pos_count;
@@ -1276,8 +1276,8 @@ struct __pyx_t_5cedar_5_tree_Node {
   double p;
   int count;
   int pos_count;
-  int feature_count;
-  int *valid_features;
+  int features_count;
+  int *features;
   int *left_counts;
   int *left_pos_counts;
   int *right_counts;
@@ -1296,19 +1296,22 @@ struct __pyx_obj_5cedar_8_manager__DataManager {
   PyObject_HEAD
   struct __pyx_vtabstruct_5cedar_8_manager__DataManager *__pyx_vtab;
   int n_samples;
-  int n_vacant;
+  int n_features;
   int **X;
   int *y;
+  int n_vacant;
   int *vacant;
+  int *add_indices;
+  int n_add_indices;
 };
 
 
-/* "_splitter.pxd":37
+/* "_splitter.pxd":27
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
  *     """
- *     The splitter searches in the input space for a feature and a threshold
+ *     The splitter searches in the input space for a feature to split on.
  */
 struct __pyx_obj_5cedar_9_splitter__Splitter {
   PyObject_HEAD
@@ -1442,28 +1445,32 @@ struct __pyx_memoryviewslice_obj {
  */
 
 struct __pyx_vtabstruct_5cedar_8_manager__DataManager {
-  int (*remove_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  void (*remove_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  void (*add_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, __Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  void (*clear_add_indices)(struct __pyx_obj_5cedar_8_manager__DataManager *, int __pyx_skip_dispatch);
   int (*check_sample_validity)(struct __pyx_obj_5cedar_8_manager__DataManager *, int *, int);
   void (*get_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, int ***, int **);
+  int *(*get_add_indices)(struct __pyx_obj_5cedar_8_manager__DataManager *);
 };
 static struct __pyx_vtabstruct_5cedar_8_manager__DataManager *__pyx_vtabptr_5cedar_8_manager__DataManager;
 
 
-/* "_splitter.pxd":37
+/* "_splitter.pxd":27
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
  *     """
- *     The splitter searches in the input space for a feature and a threshold
+ *     The splitter searches in the input space for a feature to split on.
  */
 
 struct __pyx_vtabstruct_5cedar_9_splitter__Splitter {
-  int (*node_split)(struct __pyx_obj_5cedar_9_splitter__Splitter *, int **, int *, int *, int, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
+  int (*split_node)(struct __pyx_obj_5cedar_9_splitter__Splitter *, struct __pyx_t_5cedar_5_tree_Node *, int **, int *, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
+  int (*compute_splits)(struct __pyx_obj_5cedar_9_splitter__Splitter *, struct __pyx_t_5cedar_5_tree_Node **, int **, int *, int *, int, int *, int);
 };
 static struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtabptr_5cedar_9_splitter__Splitter;
 
 
-/* "cedar/_tree.pyx":179
+/* "cedar/_tree.pyx":177
  * # =====================================
  * 
  * cdef class _Tree:             # <<<<<<<<<<<<<<
@@ -1492,7 +1499,7 @@ static struct __pyx_vtabstruct_5cedar_5_tree__Tree *__pyx_vtabptr_5cedar_5_tree_
 struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder {
   void (*build)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, int __pyx_skip_dispatch);
   struct __pyx_t_5cedar_5_tree_Node *(*_build)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, int **, int *, int *, int, int *, int, int, int, double);
-  void (*_set_leaf_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int);
+  void (*_set_leaf_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int, int);
   void (*_set_decision_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
 };
 static struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *__pyx_vtabptr_5cedar_5_tree__TreeBuilder;
@@ -2307,7 +2314,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, int __pyx_skip_dispatch); /* proto*/
 static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__build(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features, int __pyx_v_depth, int __pyx_v_is_left, double __pyx_v_parent_p); /* proto*/
-static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples); /* proto*/
+static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_is_bottom_leaf); /* proto*/
 static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_decision_node(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split); /* proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
@@ -3060,7 +3067,6 @@ static int __pyx_pf_5cedar_5_tree_12_TreeBuilder___cinit__(struct __pyx_obj_5ced
 
 static PyObject *__pyx_pw_5cedar_5_tree_12_TreeBuilder_3build(PyObject *__pyx_v_self, PyObject *__pyx_v_tree); /*proto*/
 static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, int __pyx_skip_dispatch) {
-  struct __pyx_obj_5cedar_8_manager__DataManager *__pyx_v_manager = 0;
   int **__pyx_v_X;
   int *__pyx_v_y;
   int *__pyx_v_samples;
@@ -3125,47 +3131,44 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
 
   /* "cedar/_tree.pyx":54
  * 
- *         # Parameters
- *         cdef _DataManager manager = self.manager             # <<<<<<<<<<<<<<
- * 
- *         # get data
- */
-  __pyx_t_1 = ((PyObject *)__pyx_v_self->manager);
-  __Pyx_INCREF(__pyx_t_1);
-  __pyx_v_manager = ((struct __pyx_obj_5cedar_8_manager__DataManager *)__pyx_t_1);
-  __pyx_t_1 = 0;
-
-  /* "cedar/_tree.pyx":57
- * 
- *         # get data
+ *         # Data containers
  *         cdef int** X = NULL             # <<<<<<<<<<<<<<
  *         cdef int* y = NULL
- * 
+ *         self.manager.get_data(&X, &y)
  */
   __pyx_v_X = NULL;
 
-  /* "cedar/_tree.pyx":58
- *         # get data
+  /* "cedar/_tree.pyx":55
+ *         # Data containers
  *         cdef int** X = NULL
  *         cdef int* y = NULL             # <<<<<<<<<<<<<<
+ *         self.manager.get_data(&X, &y)
  * 
- *         cdef int* samples
  */
   __pyx_v_y = NULL;
 
-  /* "cedar/_tree.pyx":61
+  /* "cedar/_tree.pyx":56
+ *         cdef int** X = NULL
+ *         cdef int* y = NULL
+ *         self.manager.get_data(&X, &y)             # <<<<<<<<<<<<<<
  * 
  *         cdef int* samples
- *         cdef int n_samples = manager.n_samples             # <<<<<<<<<<<<<<
+ */
+  ((struct __pyx_vtabstruct_5cedar_8_manager__DataManager *)__pyx_v_self->manager->__pyx_vtab)->get_data(__pyx_v_self->manager, (&__pyx_v_X), (&__pyx_v_y));
+
+  /* "cedar/_tree.pyx":59
+ * 
+ *         cdef int* samples
+ *         cdef int n_samples = self.manager.n_samples             # <<<<<<<<<<<<<<
  *         cdef int* features = tree.feature_indices
  *         cdef int n_features = tree.n_feature_indices
  */
-  __pyx_t_5 = __pyx_v_manager->n_samples;
+  __pyx_t_5 = __pyx_v_self->manager->n_samples;
   __pyx_v_n_samples = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":62
+  /* "cedar/_tree.pyx":60
  *         cdef int* samples
- *         cdef int n_samples = manager.n_samples
+ *         cdef int n_samples = self.manager.n_samples
  *         cdef int* features = tree.feature_indices             # <<<<<<<<<<<<<<
  *         cdef int n_features = tree.n_feature_indices
  * 
@@ -3173,26 +3176,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __pyx_t_6 = __pyx_v_tree->feature_indices;
   __pyx_v_features = __pyx_t_6;
 
-  /* "cedar/_tree.pyx":63
- *         cdef int n_samples = manager.n_samples
+  /* "cedar/_tree.pyx":61
+ *         cdef int n_samples = self.manager.n_samples
  *         cdef int* features = tree.feature_indices
  *         cdef int n_features = tree.n_feature_indices             # <<<<<<<<<<<<<<
  * 
- *         manager.get_data(&X, &y)
+ *         # fill in samples
  */
   __pyx_t_5 = __pyx_v_tree->n_feature_indices;
   __pyx_v_n_features = __pyx_t_5;
 
-  /* "cedar/_tree.pyx":65
- *         cdef int n_features = tree.n_feature_indices
- * 
- *         manager.get_data(&X, &y)             # <<<<<<<<<<<<<<
- * 
- *         # fill in samples
- */
-  ((struct __pyx_vtabstruct_5cedar_8_manager__DataManager *)__pyx_v_manager->__pyx_vtab)->get_data(__pyx_v_manager, (&__pyx_v_X), (&__pyx_v_y));
-
-  /* "cedar/_tree.pyx":68
+  /* "cedar/_tree.pyx":64
  * 
  *         # fill in samples
  *         samples = <int *>malloc(n_samples * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3201,7 +3195,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
  */
   __pyx_v_samples = ((int *)malloc((__pyx_v_n_samples * (sizeof(int)))));
 
-  /* "cedar/_tree.pyx":69
+  /* "cedar/_tree.pyx":65
  *         # fill in samples
  *         samples = <int *>malloc(n_samples * sizeof(int))
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3213,7 +3207,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "cedar/_tree.pyx":70
+    /* "cedar/_tree.pyx":66
  *         samples = <int *>malloc(n_samples * sizeof(int))
  *         for i in range(n_samples):
  *             samples[i] = i             # <<<<<<<<<<<<<<
@@ -3223,7 +3217,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
     (__pyx_v_samples[__pyx_v_i]) = __pyx_v_i;
   }
 
-  /* "cedar/_tree.pyx":72
+  /* "cedar/_tree.pyx":68
  *             samples[i] = i
  * 
  *         tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0, 1.0)             # <<<<<<<<<<<<<<
@@ -3249,7 +3243,6 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder_build(struct __pyx_obj_5cedar_5
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_WriteUnraisable("cedar._tree._TreeBuilder.build", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_manager);
   __Pyx_RefNannyFinishContext();
 }
 
@@ -3295,7 +3288,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_2build(struct __pyx_obj_5
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":74
+/* "cedar/_tree.pyx":70
  *         tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0, 1.0)
  * 
  *     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,             # <<<<<<<<<<<<<<
@@ -3305,14 +3298,14 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_2build(struct __pyx_obj_5
 
 static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__build(struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int *__pyx_v_features, int __pyx_v_n_features, int __pyx_v_depth, int __pyx_v_is_left, double __pyx_v_parent_p) {
   struct __pyx_t_5cedar_9_splitter_SplitRecord __pyx_v_split;
-  int __pyx_v_result;
   struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
-  int __pyx_v_is_leaf;
+  int __pyx_v_is_bottom_leaf;
+  int __pyx_v_is_middle_leaf;
   struct __pyx_t_5cedar_5_tree_Node *__pyx_r;
   int __pyx_t_1;
   int __pyx_t_2;
 
-  /* "cedar/_tree.pyx":84
+  /* "cedar/_tree.pyx":80
  *         cdef int result
  * 
  *         cdef Node *node = <Node *>malloc(sizeof(Node))             # <<<<<<<<<<<<<<
@@ -3321,7 +3314,7 @@ static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__
  */
   __pyx_v_node = ((struct __pyx_t_5cedar_5_tree_Node *)malloc((sizeof(struct __pyx_t_5cedar_5_tree_Node))));
 
-  /* "cedar/_tree.pyx":85
+  /* "cedar/_tree.pyx":81
  * 
  *         cdef Node *node = <Node *>malloc(sizeof(Node))
  *         node.depth = depth             # <<<<<<<<<<<<<<
@@ -3330,21 +3323,21 @@ static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__
  */
   __pyx_v_node->depth = __pyx_v_depth;
 
-  /* "cedar/_tree.pyx":86
+  /* "cedar/_tree.pyx":82
  *         cdef Node *node = <Node *>malloc(sizeof(Node))
  *         node.depth = depth
  *         node.is_left = is_left             # <<<<<<<<<<<<<<
  * 
- *         # printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
+ *         # printf('\n(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
  */
   __pyx_v_node->is_left = __pyx_v_is_left;
 
-  /* "cedar/_tree.pyx":90
- *         # printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
+  /* "cedar/_tree.pyx":86
+ *         # printf('\n(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
  * 
- *         cdef bint is_leaf = (depth >= self.max_depth or             # <<<<<<<<<<<<<<
- *                              n_samples < self.min_samples_split or
- *                              n_samples < 2 * self.min_samples_leaf or
+ *         cdef bint is_bottom_leaf = (depth >= self.max_depth or n_features < 1)             # <<<<<<<<<<<<<<
+ *         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
+ *                                     n_samples < 2 * self.min_samples_leaf)
  */
   __pyx_t_2 = ((__pyx_v_depth >= __pyx_v_self->max_depth) != 0);
   if (!__pyx_t_2) {
@@ -3352,173 +3345,184 @@ static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__
     __pyx_t_1 = __pyx_t_2;
     goto __pyx_L3_bool_binop_done;
   }
+  __pyx_t_2 = ((__pyx_v_n_features < 1) != 0);
+  __pyx_t_1 = __pyx_t_2;
+  __pyx_L3_bool_binop_done:;
+  __pyx_v_is_bottom_leaf = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":91
+  /* "cedar/_tree.pyx":87
  * 
- *         cdef bint is_leaf = (depth >= self.max_depth or
- *                              n_samples < self.min_samples_split or             # <<<<<<<<<<<<<<
- *                              n_samples < 2 * self.min_samples_leaf or
- *                              n_features <= 1)
+ *         cdef bint is_bottom_leaf = (depth >= self.max_depth or n_features < 1)
+ *         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or             # <<<<<<<<<<<<<<
+ *                                     n_samples < 2 * self.min_samples_leaf)
+ * 
  */
   __pyx_t_2 = ((__pyx_v_n_samples < __pyx_v_self->min_samples_split) != 0);
   if (!__pyx_t_2) {
   } else {
     __pyx_t_1 = __pyx_t_2;
-    goto __pyx_L3_bool_binop_done;
+    goto __pyx_L5_bool_binop_done;
   }
 
-  /* "cedar/_tree.pyx":92
- *         cdef bint is_leaf = (depth >= self.max_depth or
- *                              n_samples < self.min_samples_split or
- *                              n_samples < 2 * self.min_samples_leaf or             # <<<<<<<<<<<<<<
- *                              n_features <= 1)
+  /* "cedar/_tree.pyx":88
+ *         cdef bint is_bottom_leaf = (depth >= self.max_depth or n_features < 1)
+ *         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
+ *                                     n_samples < 2 * self.min_samples_leaf)             # <<<<<<<<<<<<<<
  * 
+ *         if is_bottom_leaf:
  */
   __pyx_t_2 = ((__pyx_v_n_samples < (2 * __pyx_v_self->min_samples_leaf)) != 0);
-  if (!__pyx_t_2) {
-  } else {
-    __pyx_t_1 = __pyx_t_2;
-    goto __pyx_L3_bool_binop_done;
-  }
-
-  /* "cedar/_tree.pyx":93
- *                              n_samples < self.min_samples_split or
- *                              n_samples < 2 * self.min_samples_leaf or
- *                              n_features <= 1)             # <<<<<<<<<<<<<<
- * 
- *         if not is_leaf:
- */
-  __pyx_t_2 = ((__pyx_v_n_features <= 1) != 0);
   __pyx_t_1 = __pyx_t_2;
-  __pyx_L3_bool_binop_done:;
-  __pyx_v_is_leaf = __pyx_t_1;
+  __pyx_L5_bool_binop_done:;
+  __pyx_v_is_middle_leaf = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":95
- *                              n_features <= 1)
+  /* "cedar/_tree.pyx":90
+ *                                     n_samples < 2 * self.min_samples_leaf)
  * 
- *         if not is_leaf:             # <<<<<<<<<<<<<<
- *             result = self.splitter.node_split(X, y, samples, n_samples, features,
- *                                               n_features, parent_p, &split)
+ *         if is_bottom_leaf:             # <<<<<<<<<<<<<<
+ *             # printf('bottom leaf!\n')
+ *             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
  */
-  __pyx_t_1 = ((!(__pyx_v_is_leaf != 0)) != 0);
+  __pyx_t_1 = (__pyx_v_is_bottom_leaf != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":96
- * 
- *         if not is_leaf:
- *             result = self.splitter.node_split(X, y, samples, n_samples, features,             # <<<<<<<<<<<<<<
- *                                               n_features, parent_p, &split)
- *             if result == -1:
- */
-    __pyx_v_result = ((struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *)__pyx_v_self->splitter->__pyx_vtab)->node_split(__pyx_v_self->splitter, __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_features, __pyx_v_n_features, __pyx_v_parent_p, (&__pyx_v_split));
-
-    /* "cedar/_tree.pyx":98
- *             result = self.splitter.node_split(X, y, samples, n_samples, features,
- *                                               n_features, parent_p, &split)
- *             if result == -1:             # <<<<<<<<<<<<<<
- *                 is_leaf = 1
- * 
- */
-    __pyx_t_1 = ((__pyx_v_result == -1L) != 0);
-    if (__pyx_t_1) {
-
-      /* "cedar/_tree.pyx":99
- *                                               n_features, parent_p, &split)
- *             if result == -1:
- *                 is_leaf = 1             # <<<<<<<<<<<<<<
- * 
- *         if is_leaf:
- */
-      __pyx_v_is_leaf = 1;
-
-      /* "cedar/_tree.pyx":98
- *             result = self.splitter.node_split(X, y, samples, n_samples, features,
- *                                               n_features, parent_p, &split)
- *             if result == -1:             # <<<<<<<<<<<<<<
- *                 is_leaf = 1
- * 
- */
-    }
-
-    /* "cedar/_tree.pyx":95
- *                              n_features <= 1)
- * 
- *         if not is_leaf:             # <<<<<<<<<<<<<<
- *             result = self.splitter.node_split(X, y, samples, n_samples, features,
- *                                               n_features, parent_p, &split)
- */
-  }
-
-  /* "cedar/_tree.pyx":101
- *                 is_leaf = 1
- * 
- *         if is_leaf:             # <<<<<<<<<<<<<<
- *             self._set_leaf_node(&node, y, samples, n_samples)
- * 
- */
-  __pyx_t_1 = (__pyx_v_is_leaf != 0);
-  if (__pyx_t_1) {
-
-    /* "cedar/_tree.pyx":102
- * 
- *         if is_leaf:
- *             self._set_leaf_node(&node, y, samples, n_samples)             # <<<<<<<<<<<<<<
+    /* "cedar/_tree.pyx":92
+ *         if is_bottom_leaf:
+ *             # printf('bottom leaf!\n')
+ *             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)             # <<<<<<<<<<<<<<
  * 
  *         else:
  */
-    ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_set_leaf_node(__pyx_v_self, (&__pyx_v_node), __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples);
+    ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_set_leaf_node(__pyx_v_self, (&__pyx_v_node), __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_is_bottom_leaf);
 
-    /* "cedar/_tree.pyx":101
- *                 is_leaf = 1
+    /* "cedar/_tree.pyx":90
+ *                                     n_samples < 2 * self.min_samples_leaf)
  * 
- *         if is_leaf:             # <<<<<<<<<<<<<<
- *             self._set_leaf_node(&node, y, samples, n_samples)
- * 
+ *         if is_bottom_leaf:             # <<<<<<<<<<<<<<
+ *             # printf('bottom leaf!\n')
+ *             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
  */
-    goto __pyx_L9;
+    goto __pyx_L7;
   }
 
-  /* "cedar/_tree.pyx":105
- * 
+  /* "cedar/_tree.pyx":96
  *         else:
- *             free(samples)             # <<<<<<<<<<<<<<
- *             self._set_decision_node(&node, &split)
+ *             # printf('compute splits\n')
+ *             self.splitter.compute_splits(&node, X, y, samples, n_samples, features,             # <<<<<<<<<<<<<<
+ *                                          n_features)
  * 
  */
   /*else*/ {
-    free(__pyx_v_samples);
 
-    /* "cedar/_tree.pyx":106
- *         else:
- *             free(samples)
- *             self._set_decision_node(&node, &split)             # <<<<<<<<<<<<<<
+    /* "cedar/_tree.pyx":97
+ *             # printf('compute splits\n')
+ *             self.splitter.compute_splits(&node, X, y, samples, n_samples, features,
+ *                                          n_features)             # <<<<<<<<<<<<<<
  * 
- *             node.left = self._build(X, y, split.left_indices, split.left_count,
+ *             if not is_middle_leaf:
  */
-    ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_set_decision_node(__pyx_v_self, (&__pyx_v_node), (&__pyx_v_split));
+    (void)(((struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *)__pyx_v_self->splitter->__pyx_vtab)->compute_splits(__pyx_v_self->splitter, (&__pyx_v_node), __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_features, __pyx_v_n_features));
 
-    /* "cedar/_tree.pyx":108
- *             self._set_decision_node(&node, &split)
+    /* "cedar/_tree.pyx":99
+ *                                          n_features)
  * 
- *             node.left = self._build(X, y, split.left_indices, split.left_count,             # <<<<<<<<<<<<<<
- *                                     split.valid_features, split.feature_count,
- *                                     depth + 1, 1, node.p)
+ *             if not is_middle_leaf:             # <<<<<<<<<<<<<<
+ *                 # printf('split node\n')
+ *                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
  */
-    __pyx_v_node->left = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.valid_features, __pyx_v_split.feature_count, (__pyx_v_depth + 1), 1, __pyx_v_node->p);
+    __pyx_t_1 = ((!(__pyx_v_is_middle_leaf != 0)) != 0);
+    if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":112
- *                                     depth + 1, 1, node.p)
- * 
- *             node.right = self._build(X, y, split.right_indices, split.right_count,             # <<<<<<<<<<<<<<
- *                                      split.valid_features, split.feature_count,
- *                                      depth + 1, 0, node.p)
+      /* "cedar/_tree.pyx":101
+ *             if not is_middle_leaf:
+ *                 # printf('split node\n')
+ *                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,             # <<<<<<<<<<<<<<
+ *                                                        parent_p, &split)
+ *                 # printf('result: %d\n', is_middle_leaf)
  */
-    __pyx_v_node->right = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.valid_features, __pyx_v_split.feature_count, (__pyx_v_depth + 1), 0, __pyx_v_node->p);
+      __pyx_v_is_middle_leaf = ((struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *)__pyx_v_self->splitter->__pyx_vtab)->split_node(__pyx_v_self->splitter, __pyx_v_node, __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_parent_p, (&__pyx_v_split));
+
+      /* "cedar/_tree.pyx":99
+ *                                          n_features)
+ * 
+ *             if not is_middle_leaf:             # <<<<<<<<<<<<<<
+ *                 # printf('split node\n')
+ *                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
+ */
+    }
+
+    /* "cedar/_tree.pyx":105
+ *                 # printf('result: %d\n', is_middle_leaf)
+ * 
+ *             if is_middle_leaf:             # <<<<<<<<<<<<<<
+ *                 # printf('middle leaf\n')
+ *                 self._set_leaf_node(&node, y, samples, n_samples, 0)
+ */
+    __pyx_t_1 = (__pyx_v_is_middle_leaf != 0);
+    if (__pyx_t_1) {
+
+      /* "cedar/_tree.pyx":107
+ *             if is_middle_leaf:
+ *                 # printf('middle leaf\n')
+ *                 self._set_leaf_node(&node, y, samples, n_samples, 0)             # <<<<<<<<<<<<<<
+ * 
+ *             else:
+ */
+      ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_set_leaf_node(__pyx_v_self, (&__pyx_v_node), __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, 0);
+
+      /* "cedar/_tree.pyx":105
+ *                 # printf('result: %d\n', is_middle_leaf)
+ * 
+ *             if is_middle_leaf:             # <<<<<<<<<<<<<<
+ *                 # printf('middle leaf\n')
+ *                 self._set_leaf_node(&node, y, samples, n_samples, 0)
+ */
+      goto __pyx_L9;
+    }
+
+    /* "cedar/_tree.pyx":110
+ * 
+ *             else:
+ *                 free(samples)             # <<<<<<<<<<<<<<
+ *                 self._set_decision_node(&node, &split)
+ * 
+ */
+    /*else*/ {
+      free(__pyx_v_samples);
+
+      /* "cedar/_tree.pyx":111
+ *             else:
+ *                 free(samples)
+ *                 self._set_decision_node(&node, &split)             # <<<<<<<<<<<<<<
+ * 
+ *                 node.left = self._build(X, y, split.left_indices, split.left_count,
+ */
+      ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_set_decision_node(__pyx_v_self, (&__pyx_v_node), (&__pyx_v_split));
+
+      /* "cedar/_tree.pyx":113
+ *                 self._set_decision_node(&node, &split)
+ * 
+ *                 node.left = self._build(X, y, split.left_indices, split.left_count,             # <<<<<<<<<<<<<<
+ *                                         split.features, split.features_count,
+ *                                         depth + 1, 1, node.p)
+ */
+      __pyx_v_node->left = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.features, __pyx_v_split.features_count, (__pyx_v_depth + 1), 1, __pyx_v_node->p);
+
+      /* "cedar/_tree.pyx":117
+ *                                         depth + 1, 1, node.p)
+ * 
+ *                 node.right = self._build(X, y, split.right_indices, split.right_count,             # <<<<<<<<<<<<<<
+ *                                          split.features, split.features_count,
+ *                                          depth + 1, 0, node.p)
+ */
+      __pyx_v_node->right = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->__pyx_vtab)->_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.features, __pyx_v_split.features_count, (__pyx_v_depth + 1), 0, __pyx_v_node->p);
+    }
+    __pyx_L9:;
   }
-  __pyx_L9:;
+  __pyx_L7:;
 
-  /* "cedar/_tree.pyx":116
- *                                      depth + 1, 0, node.p)
+  /* "cedar/_tree.pyx":121
+ *                                          depth + 1, 0, node.p)
  * 
  *         return node             # <<<<<<<<<<<<<<
  * 
@@ -3527,7 +3531,7 @@ static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__
   __pyx_r = __pyx_v_node;
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":74
+  /* "cedar/_tree.pyx":70
  *         tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0, 1.0)
  * 
  *     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,             # <<<<<<<<<<<<<<
@@ -3540,23 +3544,24 @@ static struct __pyx_t_5cedar_5_tree_Node *__pyx_f_5cedar_5_tree_12_TreeBuilder__
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":121
+/* "cedar/_tree.pyx":126
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
- *     cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil:             # <<<<<<<<<<<<<<
+ *     cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,             # <<<<<<<<<<<<<<
+ *                         bint is_bottom_leaf) nogil:
  *         """
- *         Compute leaf value and set all other attributes.
  */
 
-static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples) {
+static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_is_bottom_leaf) {
   int __pyx_v_pos_count;
   int __pyx_v_i;
   struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
   int __pyx_t_1;
   int __pyx_t_2;
   int __pyx_t_3;
+  int __pyx_t_4;
 
-  /* "cedar/_tree.pyx":125
+  /* "cedar/_tree.pyx":131
  *         Compute leaf value and set all other attributes.
  *         """
  *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
@@ -3565,57 +3570,148 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED st
  */
   __pyx_v_pos_count = 0;
 
-  /* "cedar/_tree.pyx":128
+  /* "cedar/_tree.pyx":134
  *         cdef int i
  * 
  *         cdef Node *node = node_ptr[0]             # <<<<<<<<<<<<<<
  * 
- *         for i in range(n_samples):
+ *         if is_bottom_leaf:
  */
   __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-  /* "cedar/_tree.pyx":130
+  /* "cedar/_tree.pyx":136
  *         cdef Node *node = node_ptr[0]
  * 
- *         for i in range(n_samples):             # <<<<<<<<<<<<<<
- *             pos_count += y[samples[i]]
+ *         if is_bottom_leaf:             # <<<<<<<<<<<<<<
+ *             node.p = UNDEF
+ *             node.feature = UNDEF
+ */
+  __pyx_t_1 = (__pyx_v_is_bottom_leaf != 0);
+  if (__pyx_t_1) {
+
+    /* "cedar/_tree.pyx":137
+ * 
+ *         if is_bottom_leaf:
+ *             node.p = UNDEF             # <<<<<<<<<<<<<<
+ *             node.feature = UNDEF
+ *             node.features_count = UNDEF
+ */
+    __pyx_v_node->p = __pyx_v_5cedar_5_tree_UNDEF;
+
+    /* "cedar/_tree.pyx":138
+ *         if is_bottom_leaf:
+ *             node.p = UNDEF
+ *             node.feature = UNDEF             # <<<<<<<<<<<<<<
+ *             node.features_count = UNDEF
+ *             node.features = NULL
+ */
+    __pyx_v_node->feature = __pyx_v_5cedar_5_tree_UNDEF;
+
+    /* "cedar/_tree.pyx":139
+ *             node.p = UNDEF
+ *             node.feature = UNDEF
+ *             node.features_count = UNDEF             # <<<<<<<<<<<<<<
+ *             node.features = NULL
+ *             node.left_counts = NULL
+ */
+    __pyx_v_node->features_count = __pyx_v_5cedar_5_tree_UNDEF;
+
+    /* "cedar/_tree.pyx":140
+ *             node.feature = UNDEF
+ *             node.features_count = UNDEF
+ *             node.features = NULL             # <<<<<<<<<<<<<<
+ *             node.left_counts = NULL
+ *             node.left_pos_counts = NULL
+ */
+    __pyx_v_node->features = NULL;
+
+    /* "cedar/_tree.pyx":141
+ *             node.features_count = UNDEF
+ *             node.features = NULL
+ *             node.left_counts = NULL             # <<<<<<<<<<<<<<
+ *             node.left_pos_counts = NULL
+ *             node.right_counts = NULL
+ */
+    __pyx_v_node->left_counts = NULL;
+
+    /* "cedar/_tree.pyx":142
+ *             node.features = NULL
+ *             node.left_counts = NULL
+ *             node.left_pos_counts = NULL             # <<<<<<<<<<<<<<
+ *             node.right_counts = NULL
+ *             node.right_pos_counts = NULL
+ */
+    __pyx_v_node->left_pos_counts = NULL;
+
+    /* "cedar/_tree.pyx":143
+ *             node.left_counts = NULL
+ *             node.left_pos_counts = NULL
+ *             node.right_counts = NULL             # <<<<<<<<<<<<<<
+ *             node.right_pos_counts = NULL
  * 
  */
-  __pyx_t_1 = __pyx_v_n_samples;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
+    __pyx_v_node->right_counts = NULL;
 
-    /* "cedar/_tree.pyx":131
+    /* "cedar/_tree.pyx":144
+ *             node.left_pos_counts = NULL
+ *             node.right_counts = NULL
+ *             node.right_pos_counts = NULL             # <<<<<<<<<<<<<<
  * 
- *         for i in range(n_samples):
- *             pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
- * 
- *         node.count = n_samples
+ *             for i in range(n_samples):
  */
-    __pyx_v_pos_count = (__pyx_v_pos_count + (__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]));
-  }
+    __pyx_v_node->right_pos_counts = NULL;
 
-  /* "cedar/_tree.pyx":133
- *             pos_count += y[samples[i]]
+    /* "cedar/_tree.pyx":146
+ *             node.right_pos_counts = NULL
  * 
- *         node.count = n_samples             # <<<<<<<<<<<<<<
- *         node.pos_count = pos_count
+ *             for i in range(n_samples):             # <<<<<<<<<<<<<<
+ *                 pos_count += y[samples[i]]
  * 
  */
-  __pyx_v_node->count = __pyx_v_n_samples;
+    __pyx_t_2 = __pyx_v_n_samples;
+    __pyx_t_3 = __pyx_t_2;
+    for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
+      __pyx_v_i = __pyx_t_4;
 
-  /* "cedar/_tree.pyx":134
+      /* "cedar/_tree.pyx":147
  * 
- *         node.count = n_samples
- *         node.pos_count = pos_count             # <<<<<<<<<<<<<<
+ *             for i in range(n_samples):
+ *                 pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
+ * 
+ *             node.count = n_samples
+ */
+      __pyx_v_pos_count = (__pyx_v_pos_count + (__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]));
+    }
+
+    /* "cedar/_tree.pyx":149
+ *                 pos_count += y[samples[i]]
+ * 
+ *             node.count = n_samples             # <<<<<<<<<<<<<<
+ *             node.pos_count = pos_count
+ * 
+ */
+    __pyx_v_node->count = __pyx_v_n_samples;
+
+    /* "cedar/_tree.pyx":150
+ * 
+ *             node.count = n_samples
+ *             node.pos_count = pos_count             # <<<<<<<<<<<<<<
  * 
  *         node.is_leaf = 1
  */
-  __pyx_v_node->pos_count = __pyx_v_pos_count;
+    __pyx_v_node->pos_count = __pyx_v_pos_count;
 
-  /* "cedar/_tree.pyx":136
- *         node.pos_count = pos_count
+    /* "cedar/_tree.pyx":136
+ *         cdef Node *node = node_ptr[0]
+ * 
+ *         if is_bottom_leaf:             # <<<<<<<<<<<<<<
+ *             node.p = UNDEF
+ *             node.feature = UNDEF
+ */
+  }
+
+  /* "cedar/_tree.pyx":152
+ *             node.pos_count = pos_count
  * 
  *         node.is_leaf = 1             # <<<<<<<<<<<<<<
  *         node.value = pos_count / <double> n_samples
@@ -3623,7 +3719,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED st
  */
   __pyx_v_node->is_leaf = 1;
 
-  /* "cedar/_tree.pyx":137
+  /* "cedar/_tree.pyx":153
  * 
  *         node.is_leaf = 1
  *         node.value = pos_count / <double> n_samples             # <<<<<<<<<<<<<<
@@ -3632,89 +3728,17 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED st
  */
   __pyx_v_node->value = (((double)__pyx_v_pos_count) / ((double)__pyx_v_n_samples));
 
-  /* "cedar/_tree.pyx":138
+  /* "cedar/_tree.pyx":154
  *         node.is_leaf = 1
  *         node.value = pos_count / <double> n_samples
  *         node.leaf_samples = samples             # <<<<<<<<<<<<<<
  * 
- *         node.p = UNDEF
+ *         node.left = NULL
  */
   __pyx_v_node->leaf_samples = __pyx_v_samples;
 
-  /* "cedar/_tree.pyx":140
+  /* "cedar/_tree.pyx":156
  *         node.leaf_samples = samples
- * 
- *         node.p = UNDEF             # <<<<<<<<<<<<<<
- *         node.feature = UNDEF
- *         node.feature_count = UNDEF
- */
-  __pyx_v_node->p = __pyx_v_5cedar_5_tree_UNDEF;
-
-  /* "cedar/_tree.pyx":141
- * 
- *         node.p = UNDEF
- *         node.feature = UNDEF             # <<<<<<<<<<<<<<
- *         node.feature_count = UNDEF
- *         node.valid_features = NULL
- */
-  __pyx_v_node->feature = __pyx_v_5cedar_5_tree_UNDEF;
-
-  /* "cedar/_tree.pyx":142
- *         node.p = UNDEF
- *         node.feature = UNDEF
- *         node.feature_count = UNDEF             # <<<<<<<<<<<<<<
- *         node.valid_features = NULL
- *         node.left_counts = NULL
- */
-  __pyx_v_node->feature_count = __pyx_v_5cedar_5_tree_UNDEF;
-
-  /* "cedar/_tree.pyx":143
- *         node.feature = UNDEF
- *         node.feature_count = UNDEF
- *         node.valid_features = NULL             # <<<<<<<<<<<<<<
- *         node.left_counts = NULL
- *         node.left_pos_counts = NULL
- */
-  __pyx_v_node->valid_features = NULL;
-
-  /* "cedar/_tree.pyx":144
- *         node.feature_count = UNDEF
- *         node.valid_features = NULL
- *         node.left_counts = NULL             # <<<<<<<<<<<<<<
- *         node.left_pos_counts = NULL
- *         node.right_counts = NULL
- */
-  __pyx_v_node->left_counts = NULL;
-
-  /* "cedar/_tree.pyx":145
- *         node.valid_features = NULL
- *         node.left_counts = NULL
- *         node.left_pos_counts = NULL             # <<<<<<<<<<<<<<
- *         node.right_counts = NULL
- *         node.right_pos_counts = NULL
- */
-  __pyx_v_node->left_pos_counts = NULL;
-
-  /* "cedar/_tree.pyx":146
- *         node.left_counts = NULL
- *         node.left_pos_counts = NULL
- *         node.right_counts = NULL             # <<<<<<<<<<<<<<
- *         node.right_pos_counts = NULL
- * 
- */
-  __pyx_v_node->right_counts = NULL;
-
-  /* "cedar/_tree.pyx":147
- *         node.left_pos_counts = NULL
- *         node.right_counts = NULL
- *         node.right_pos_counts = NULL             # <<<<<<<<<<<<<<
- * 
- *         node.left = NULL
- */
-  __pyx_v_node->right_pos_counts = NULL;
-
-  /* "cedar/_tree.pyx":149
- *         node.right_pos_counts = NULL
  * 
  *         node.left = NULL             # <<<<<<<<<<<<<<
  *         node.right = NULL
@@ -3722,7 +3746,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED st
  */
   __pyx_v_node->left = NULL;
 
-  /* "cedar/_tree.pyx":150
+  /* "cedar/_tree.pyx":157
  * 
  *         node.left = NULL
  *         node.right = NULL             # <<<<<<<<<<<<<<
@@ -3731,18 +3755,18 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED st
  */
   __pyx_v_node->right = NULL;
 
-  /* "cedar/_tree.pyx":121
+  /* "cedar/_tree.pyx":126
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
- *     cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil:             # <<<<<<<<<<<<<<
+ *     cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,             # <<<<<<<<<<<<<<
+ *                         bint is_bottom_leaf) nogil:
  *         """
- *         Compute leaf value and set all other attributes.
  */
 
   /* function exit code */
 }
 
-/* "cedar/_tree.pyx":152
+/* "cedar/_tree.pyx":159
  *         node.right = NULL
  * 
  *     cdef void _set_decision_node(self, Node** node_ptr, SplitRecord* split) nogil:             # <<<<<<<<<<<<<<
@@ -3752,41 +3776,20 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node(CYTHON_UNUSED st
 
 static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_decision_node(CYTHON_UNUSED struct __pyx_obj_5cedar_5_tree__TreeBuilder *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split) {
   struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
-  int __pyx_t_1;
-  double __pyx_t_2;
-  int *__pyx_t_3;
+  double __pyx_t_1;
+  int __pyx_t_2;
 
-  /* "cedar/_tree.pyx":156
+  /* "cedar/_tree.pyx":163
  *         Set all attributes for decision node.
  *         """
  *         cdef Node* node = node_ptr[0]             # <<<<<<<<<<<<<<
  * 
- *         node.count = split.count
+ *         node.is_leaf = 0
  */
   __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-  /* "cedar/_tree.pyx":158
+  /* "cedar/_tree.pyx":165
  *         cdef Node* node = node_ptr[0]
- * 
- *         node.count = split.count             # <<<<<<<<<<<<<<
- *         node.pos_count = split.pos_count
- * 
- */
-  __pyx_t_1 = __pyx_v_split->count;
-  __pyx_v_node->count = __pyx_t_1;
-
-  /* "cedar/_tree.pyx":159
- * 
- *         node.count = split.count
- *         node.pos_count = split.pos_count             # <<<<<<<<<<<<<<
- * 
- *         node.is_leaf = 0
- */
-  __pyx_t_1 = __pyx_v_split->pos_count;
-  __pyx_v_node->pos_count = __pyx_t_1;
-
-  /* "cedar/_tree.pyx":161
- *         node.pos_count = split.pos_count
  * 
  *         node.is_leaf = 0             # <<<<<<<<<<<<<<
  *         node.value = UNDEF
@@ -3794,7 +3797,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_decision_node(CYTHON_UNUSE
  */
   __pyx_v_node->is_leaf = 0;
 
-  /* "cedar/_tree.pyx":162
+  /* "cedar/_tree.pyx":166
  * 
  *         node.is_leaf = 0
  *         node.value = UNDEF             # <<<<<<<<<<<<<<
@@ -3803,7 +3806,7 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_decision_node(CYTHON_UNUSE
  */
   __pyx_v_node->value = __pyx_v_5cedar_5_tree_UNDEF;
 
-  /* "cedar/_tree.pyx":163
+  /* "cedar/_tree.pyx":167
  *         node.is_leaf = 0
  *         node.value = UNDEF
  *         node.leaf_samples = NULL             # <<<<<<<<<<<<<<
@@ -3812,87 +3815,27 @@ static void __pyx_f_5cedar_5_tree_12_TreeBuilder__set_decision_node(CYTHON_UNUSE
  */
   __pyx_v_node->leaf_samples = NULL;
 
-  /* "cedar/_tree.pyx":165
+  /* "cedar/_tree.pyx":169
  *         node.leaf_samples = NULL
  * 
  *         node.p = split.p             # <<<<<<<<<<<<<<
  *         node.feature = split.feature
- *         node.feature_count = split.feature_count
+ * 
  */
-  __pyx_t_2 = __pyx_v_split->p;
-  __pyx_v_node->p = __pyx_t_2;
+  __pyx_t_1 = __pyx_v_split->p;
+  __pyx_v_node->p = __pyx_t_1;
 
-  /* "cedar/_tree.pyx":166
+  /* "cedar/_tree.pyx":170
  * 
  *         node.p = split.p
  *         node.feature = split.feature             # <<<<<<<<<<<<<<
- *         node.feature_count = split.feature_count
- *         node.valid_features = split.valid_features
- */
-  __pyx_t_1 = __pyx_v_split->feature;
-  __pyx_v_node->feature = __pyx_t_1;
-
-  /* "cedar/_tree.pyx":167
- *         node.p = split.p
- *         node.feature = split.feature
- *         node.feature_count = split.feature_count             # <<<<<<<<<<<<<<
- *         node.valid_features = split.valid_features
- *         node.left_counts = split.left_counts
- */
-  __pyx_t_1 = __pyx_v_split->feature_count;
-  __pyx_v_node->feature_count = __pyx_t_1;
-
-  /* "cedar/_tree.pyx":168
- *         node.feature = split.feature
- *         node.feature_count = split.feature_count
- *         node.valid_features = split.valid_features             # <<<<<<<<<<<<<<
- *         node.left_counts = split.left_counts
- *         node.left_pos_counts = split.left_pos_counts
- */
-  __pyx_t_3 = __pyx_v_split->valid_features;
-  __pyx_v_node->valid_features = __pyx_t_3;
-
-  /* "cedar/_tree.pyx":169
- *         node.feature_count = split.feature_count
- *         node.valid_features = split.valid_features
- *         node.left_counts = split.left_counts             # <<<<<<<<<<<<<<
- *         node.left_pos_counts = split.left_pos_counts
- *         node.right_counts = split.right_counts
- */
-  __pyx_t_3 = __pyx_v_split->left_counts;
-  __pyx_v_node->left_counts = __pyx_t_3;
-
-  /* "cedar/_tree.pyx":170
- *         node.valid_features = split.valid_features
- *         node.left_counts = split.left_counts
- *         node.left_pos_counts = split.left_pos_counts             # <<<<<<<<<<<<<<
- *         node.right_counts = split.right_counts
- *         node.right_pos_counts = split.right_pos_counts
- */
-  __pyx_t_3 = __pyx_v_split->left_pos_counts;
-  __pyx_v_node->left_pos_counts = __pyx_t_3;
-
-  /* "cedar/_tree.pyx":171
- *         node.left_counts = split.left_counts
- *         node.left_pos_counts = split.left_pos_counts
- *         node.right_counts = split.right_counts             # <<<<<<<<<<<<<<
- *         node.right_pos_counts = split.right_pos_counts
- * 
- */
-  __pyx_t_3 = __pyx_v_split->right_counts;
-  __pyx_v_node->right_counts = __pyx_t_3;
-
-  /* "cedar/_tree.pyx":172
- *         node.left_pos_counts = split.left_pos_counts
- *         node.right_counts = split.right_counts
- *         node.right_pos_counts = split.right_pos_counts             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_3 = __pyx_v_split->right_pos_counts;
-  __pyx_v_node->right_pos_counts = __pyx_t_3;
+  __pyx_t_2 = __pyx_v_split->feature;
+  __pyx_v_node->feature = __pyx_t_2;
 
-  /* "cedar/_tree.pyx":152
+  /* "cedar/_tree.pyx":159
  *         node.right = NULL
  * 
  *     cdef void _set_decision_node(self, Node** node_ptr, SplitRecord* split) nogil:             # <<<<<<<<<<<<<<
@@ -4010,7 +3953,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_6__setstate_cython__(CYTH
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":181
+/* "cedar/_tree.pyx":179
  * cdef class _Tree:
  * 
  *     def __cinit__(self, np.ndarray features):             # <<<<<<<<<<<<<<
@@ -4044,7 +3987,7 @@ static int __pyx_pw_5cedar_5_tree_5_Tree_1__cinit__(PyObject *__pyx_v_self, PyOb
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 181, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 179, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -4055,13 +3998,13 @@ static int __pyx_pw_5cedar_5_tree_5_Tree_1__cinit__(PyObject *__pyx_v_self, PyOb
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 181, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 179, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._tree._Tree.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_features), __pyx_ptype_5numpy_ndarray, 1, "features", 0))) __PYX_ERR(0, 181, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_features), __pyx_ptype_5numpy_ndarray, 1, "features", 0))) __PYX_ERR(0, 179, __pyx_L1_error)
   __pyx_r = __pyx_pf_5cedar_5_tree_5_Tree___cinit__(((struct __pyx_obj_5cedar_5_tree__Tree *)__pyx_v_self), __pyx_v_features);
 
   /* function exit code */
@@ -4078,7 +4021,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree___cinit__(struct __pyx_obj_5cedar_5_tre
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cedar/_tree.pyx":187
+  /* "cedar/_tree.pyx":185
  * 
  *         # features this tree is built on
  *         self.n_feature_indices = features.shape[0]             # <<<<<<<<<<<<<<
@@ -4087,7 +4030,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree___cinit__(struct __pyx_obj_5cedar_5_tre
  */
   __pyx_v_self->n_feature_indices = (__pyx_v_features->dimensions[0]);
 
-  /* "cedar/_tree.pyx":188
+  /* "cedar/_tree.pyx":186
  *         # features this tree is built on
  *         self.n_feature_indices = features.shape[0]
  *         self.feature_indices = convert_int_ndarray(features)             # <<<<<<<<<<<<<<
@@ -4096,7 +4039,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree___cinit__(struct __pyx_obj_5cedar_5_tre
  */
   __pyx_v_self->feature_indices = __pyx_f_5cedar_6_utils_convert_int_ndarray(__pyx_v_features);
 
-  /* "cedar/_tree.pyx":191
+  /* "cedar/_tree.pyx":189
  * 
  *         # internal data structures
  *         self.node_count = 0             # <<<<<<<<<<<<<<
@@ -4105,7 +4048,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree___cinit__(struct __pyx_obj_5cedar_5_tre
  */
   __pyx_v_self->node_count = 0;
 
-  /* "cedar/_tree.pyx":192
+  /* "cedar/_tree.pyx":190
  *         # internal data structures
  *         self.node_count = 0
  *         self.root = NULL             # <<<<<<<<<<<<<<
@@ -4114,7 +4057,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree___cinit__(struct __pyx_obj_5cedar_5_tre
  */
   __pyx_v_self->root = NULL;
 
-  /* "cedar/_tree.pyx":181
+  /* "cedar/_tree.pyx":179
  * cdef class _Tree:
  * 
  *     def __cinit__(self, np.ndarray features):             # <<<<<<<<<<<<<<
@@ -4128,7 +4071,7 @@ static int __pyx_pf_5cedar_5_tree_5_Tree___cinit__(struct __pyx_obj_5cedar_5_tre
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":194
+/* "cedar/_tree.pyx":192
  *         self.root = NULL
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -4152,18 +4095,9 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_2__dealloc__(struct __pyx_obj_5cedar_5
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cedar/_tree.pyx":198
+  /* "cedar/_tree.pyx":196
  *         Destructor.
  *         """
- *         free(self.feature_indices)             # <<<<<<<<<<<<<<
- *         if self.root:
- *             dealloc(self.root)
- */
-  free(__pyx_v_self->feature_indices);
-
-  /* "cedar/_tree.pyx":199
- *         """
- *         free(self.feature_indices)
  *         if self.root:             # <<<<<<<<<<<<<<
  *             dealloc(self.root)
  *             free(self.root)
@@ -4171,8 +4105,8 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_2__dealloc__(struct __pyx_obj_5cedar_5
   __pyx_t_1 = (__pyx_v_self->root != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":200
- *         free(self.feature_indices)
+    /* "cedar/_tree.pyx":197
+ *         """
  *         if self.root:
  *             dealloc(self.root)             # <<<<<<<<<<<<<<
  *             free(self.root)
@@ -4180,7 +4114,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_2__dealloc__(struct __pyx_obj_5cedar_5
  */
     __pyx_f_5cedar_6_utils_dealloc(__pyx_v_self->root);
 
-    /* "cedar/_tree.pyx":201
+    /* "cedar/_tree.pyx":198
  *         if self.root:
  *             dealloc(self.root)
  *             free(self.root)             # <<<<<<<<<<<<<<
@@ -4189,16 +4123,16 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_2__dealloc__(struct __pyx_obj_5cedar_5
  */
     free(__pyx_v_self->root);
 
-    /* "cedar/_tree.pyx":199
+    /* "cedar/_tree.pyx":196
+ *         Destructor.
  *         """
- *         free(self.feature_indices)
  *         if self.root:             # <<<<<<<<<<<<<<
  *             dealloc(self.root)
  *             free(self.root)
  */
   }
 
-  /* "cedar/_tree.pyx":194
+  /* "cedar/_tree.pyx":192
  *         self.root = NULL
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -4210,7 +4144,7 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_2__dealloc__(struct __pyx_obj_5cedar_5
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cedar/_tree.pyx":205
+/* "cedar/_tree.pyx":202
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef np.ndarray predict(self, int[:,:] X):             # <<<<<<<<<<<<<<
@@ -4257,12 +4191,12 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_predict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_predict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_5predict)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
-        if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 205, __pyx_L1_error) }
-        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+        if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 202, __pyx_L1_error) }
+        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -4278,10 +4212,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 202, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 205, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 202, __pyx_L1_error)
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4300,7 +4234,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
     #endif
   }
 
-  /* "cedar/_tree.pyx":211
+  /* "cedar/_tree.pyx":208
  * 
  *         # In / out
  *         cdef int n_samples = X.shape[0]             # <<<<<<<<<<<<<<
@@ -4309,51 +4243,51 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
   __pyx_v_n_samples = (__pyx_v_X.shape[0]);
 
-  /* "cedar/_tree.pyx":212
+  /* "cedar/_tree.pyx":209
  *         # In / out
  *         cdef int n_samples = X.shape[0]
  *         cdef np.ndarray[double] out = np.zeros((n_samples,), dtype=np.double)             # <<<<<<<<<<<<<<
  * 
  *         # Incrementers
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_samples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_samples); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_double); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_double); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 212, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 212, __pyx_L1_error)
+  if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 209, __pyx_L1_error)
   __pyx_t_6 = ((PyArrayObject *)__pyx_t_5);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_out.rcbuffer->pybuffer, (PyObject*)__pyx_t_6, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_out = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_out.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 212, __pyx_L1_error)
+      __PYX_ERR(0, 209, __pyx_L1_error)
     } else {__pyx_pybuffernd_out.diminfo[0].strides = __pyx_pybuffernd_out.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_out.diminfo[0].shape = __pyx_pybuffernd_out.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -4361,7 +4295,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
   __pyx_v_out = ((PyArrayObject *)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "cedar/_tree.pyx":215
+  /* "cedar/_tree.pyx":212
  * 
  *         # Incrementers
  *         cdef int i = 0             # <<<<<<<<<<<<<<
@@ -4370,7 +4304,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
  */
   __pyx_v_i = 0;
 
-  /* "cedar/_tree.pyx":218
+  /* "cedar/_tree.pyx":215
  *         cdef Node* node
  * 
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -4385,7 +4319,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
       #endif
       /*try:*/ {
 
-        /* "cedar/_tree.pyx":220
+        /* "cedar/_tree.pyx":217
  *         with nogil:
  * 
  *             for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -4397,7 +4331,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
           __pyx_v_i = __pyx_t_9;
 
-          /* "cedar/_tree.pyx":221
+          /* "cedar/_tree.pyx":218
  * 
  *             for i in range(n_samples):
  *                 node = self.root             # <<<<<<<<<<<<<<
@@ -4407,7 +4341,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
           __pyx_t_10 = __pyx_v_self->root;
           __pyx_v_node = __pyx_t_10;
 
-          /* "cedar/_tree.pyx":223
+          /* "cedar/_tree.pyx":220
  *                 node = self.root
  * 
  *                 while not node.is_leaf:             # <<<<<<<<<<<<<<
@@ -4418,7 +4352,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
             __pyx_t_11 = ((!(__pyx_v_node->is_leaf != 0)) != 0);
             if (!__pyx_t_11) break;
 
-            /* "cedar/_tree.pyx":224
+            /* "cedar/_tree.pyx":221
  * 
  *                 while not node.is_leaf:
  *                     if X[i, node.feature] == 1:             # <<<<<<<<<<<<<<
@@ -4430,7 +4364,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
             __pyx_t_11 = (((*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_12 * __pyx_v_X.strides[0]) ) + __pyx_t_13 * __pyx_v_X.strides[1]) ))) == 1) != 0);
             if (__pyx_t_11) {
 
-              /* "cedar/_tree.pyx":225
+              /* "cedar/_tree.pyx":222
  *                 while not node.is_leaf:
  *                     if X[i, node.feature] == 1:
  *                         node = node.left             # <<<<<<<<<<<<<<
@@ -4440,7 +4374,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
               __pyx_t_10 = __pyx_v_node->left;
               __pyx_v_node = __pyx_t_10;
 
-              /* "cedar/_tree.pyx":224
+              /* "cedar/_tree.pyx":221
  * 
  *                 while not node.is_leaf:
  *                     if X[i, node.feature] == 1:             # <<<<<<<<<<<<<<
@@ -4450,7 +4384,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
               goto __pyx_L10;
             }
 
-            /* "cedar/_tree.pyx":227
+            /* "cedar/_tree.pyx":224
  *                         node = node.left
  *                     else:
  *                         node = node.right             # <<<<<<<<<<<<<<
@@ -4464,7 +4398,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
             __pyx_L10:;
           }
 
-          /* "cedar/_tree.pyx":229
+          /* "cedar/_tree.pyx":226
  *                         node = node.right
  * 
  *                 out[i] = node.value             # <<<<<<<<<<<<<<
@@ -4477,7 +4411,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         }
       }
 
-      /* "cedar/_tree.pyx":218
+      /* "cedar/_tree.pyx":215
  *         cdef Node* node
  * 
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -4496,7 +4430,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
       }
   }
 
-  /* "cedar/_tree.pyx":231
+  /* "cedar/_tree.pyx":228
  *                 out[i] = node.value
  * 
  *         return out             # <<<<<<<<<<<<<<
@@ -4508,7 +4442,7 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
   __pyx_r = ((PyArrayObject *)__pyx_v_out);
   goto __pyx_L0;
 
-  /* "cedar/_tree.pyx":205
+  /* "cedar/_tree.pyx":202
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef np.ndarray predict(self, int[:,:] X):             # <<<<<<<<<<<<<<
@@ -4550,7 +4484,7 @@ static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_5predict(PyObject *__pyx_v_self, 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("predict (wrapper)", 0);
   assert(__pyx_arg_X); {
-    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_arg_X, PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 205, __pyx_L3_error)
+    __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_arg_X, PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 202, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4571,8 +4505,8 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4predict(struct __pyx_obj_5cedar_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("predict", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 205, __pyx_L1_error) }
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree_predict(__pyx_v_self, __pyx_v_X, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+  if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 202, __pyx_L1_error) }
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree_predict(__pyx_v_self, __pyx_v_X, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4590,7 +4524,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4predict(struct __pyx_obj_5cedar_
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":233
+/* "cedar/_tree.pyx":230
  *         return out
  * 
  *     cpdef void print_depth(self):             # <<<<<<<<<<<<<<
@@ -4615,7 +4549,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_print_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_print_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_7print_depth)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4631,7 +4565,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4651,7 +4585,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
     #endif
   }
 
-  /* "cedar/_tree.pyx":234
+  /* "cedar/_tree.pyx":231
  * 
  *     cpdef void print_depth(self):
  *         printf('depth: [ ')             # <<<<<<<<<<<<<<
@@ -4660,7 +4594,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
  */
   (void)(printf(((char const *)"depth: [ ")));
 
-  /* "cedar/_tree.pyx":235
+  /* "cedar/_tree.pyx":232
  *     cpdef void print_depth(self):
  *         printf('depth: [ ')
  *         self._print_depth(self.root)             # <<<<<<<<<<<<<<
@@ -4669,7 +4603,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
  */
   ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_print_depth(__pyx_v_self, __pyx_v_self->root);
 
-  /* "cedar/_tree.pyx":236
+  /* "cedar/_tree.pyx":233
  *         printf('depth: [ ')
  *         self._print_depth(self.root)
  *         printf(']\n')             # <<<<<<<<<<<<<<
@@ -4678,7 +4612,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
  */
   (void)(printf(((char const *)"]\n")));
 
-  /* "cedar/_tree.pyx":233
+  /* "cedar/_tree.pyx":230
  *         return out
  * 
  *     cpdef void print_depth(self):             # <<<<<<<<<<<<<<
@@ -4717,7 +4651,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6print_depth(struct __pyx_obj_5ce
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("print_depth", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_depth(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_depth(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4734,7 +4668,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6print_depth(struct __pyx_obj_5ce
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":238
+/* "cedar/_tree.pyx":235
  *         printf(']\n')
  * 
  *     cpdef void print_node_count(self):             # <<<<<<<<<<<<<<
@@ -4760,7 +4694,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_print_node_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_print_node_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_9print_node_count)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4776,7 +4710,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4796,7 +4730,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
     #endif
   }
 
-  /* "cedar/_tree.pyx":239
+  /* "cedar/_tree.pyx":236
  * 
  *     cpdef void print_node_count(self):
  *         cdef int node_count = self._get_node_count(self.root)             # <<<<<<<<<<<<<<
@@ -4805,7 +4739,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
  */
   __pyx_v_node_count = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_get_node_count(__pyx_v_self, __pyx_v_self->root);
 
-  /* "cedar/_tree.pyx":240
+  /* "cedar/_tree.pyx":237
  *     cpdef void print_node_count(self):
  *         cdef int node_count = self._get_node_count(self.root)
  *         printf('node_count: %d\n', node_count)             # <<<<<<<<<<<<<<
@@ -4814,7 +4748,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
  */
   (void)(printf(((char const *)"node_count: %d\n"), __pyx_v_node_count));
 
-  /* "cedar/_tree.pyx":238
+  /* "cedar/_tree.pyx":235
  *         printf(']\n')
  * 
  *     cpdef void print_node_count(self):             # <<<<<<<<<<<<<<
@@ -4853,7 +4787,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8print_node_count(struct __pyx_ob
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("print_node_count", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_node_count(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_node_count(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4870,7 +4804,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8print_node_count(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "cedar/_tree.pyx":243
+/* "cedar/_tree.pyx":240
  * 
  *     # private
  *     cdef void _print_depth(self, Node* node) nogil:             # <<<<<<<<<<<<<<
@@ -4881,7 +4815,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8print_node_count(struct __pyx_ob
 static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node) {
   int __pyx_t_1;
 
-  /* "cedar/_tree.pyx":247
+  /* "cedar/_tree.pyx":244
  *         Print depth of each node.
  *         """
  *         if node:             # <<<<<<<<<<<<<<
@@ -4891,7 +4825,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_
   __pyx_t_1 = (__pyx_v_node != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":248
+    /* "cedar/_tree.pyx":245
  *         """
  *         if node:
  *             printf('%d ', node.depth)             # <<<<<<<<<<<<<<
@@ -4900,7 +4834,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_
  */
     (void)(printf(((char const *)"%d "), __pyx_v_node->depth));
 
-    /* "cedar/_tree.pyx":249
+    /* "cedar/_tree.pyx":246
  *         if node:
  *             printf('%d ', node.depth)
  *             self._print_depth(node.left)             # <<<<<<<<<<<<<<
@@ -4909,7 +4843,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_
  */
     ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_print_depth(__pyx_v_self, __pyx_v_node->left);
 
-    /* "cedar/_tree.pyx":250
+    /* "cedar/_tree.pyx":247
  *             printf('%d ', node.depth)
  *             self._print_depth(node.left)
  *             self._print_depth(node.right)             # <<<<<<<<<<<<<<
@@ -4918,7 +4852,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_
  */
     ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self->__pyx_vtab)->_print_depth(__pyx_v_self, __pyx_v_node->right);
 
-    /* "cedar/_tree.pyx":247
+    /* "cedar/_tree.pyx":244
  *         Print depth of each node.
  *         """
  *         if node:             # <<<<<<<<<<<<<<
@@ -4927,7 +4861,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_
  */
   }
 
-  /* "cedar/_tree.pyx":243
+  /* "cedar/_tree.pyx":240
  * 
  *     # private
  *     cdef void _print_depth(self, Node* node) nogil:             # <<<<<<<<<<<<<<
@@ -4938,7 +4872,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_
   /* function exit code */
 }
 
-/* "cedar/_tree.pyx":252
+/* "cedar/_tree.pyx":249
  *             self._print_depth(node.right)
  * 
  *     cdef int _get_node_count(self, Node* node) nogil:             # <<<<<<<<<<<<<<
@@ -4950,7 +4884,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__get_node_count(struct __pyx_obj_5cedar_
   int __pyx_r;
   int __pyx_t_1;
 
-  /* "cedar/_tree.pyx":256
+  /* "cedar/_tree.pyx":253
  *         Get number of nodes total.
  *         """
  *         if not node:             # <<<<<<<<<<<<<<
@@ -4960,7 +4894,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__get_node_count(struct __pyx_obj_5cedar_
   __pyx_t_1 = ((!(__pyx_v_node != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_tree.pyx":257
+    /* "cedar/_tree.pyx":254
  *         """
  *         if not node:
  *             return 0             # <<<<<<<<<<<<<<
@@ -4970,7 +4904,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__get_node_count(struct __pyx_obj_5cedar_
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "cedar/_tree.pyx":256
+    /* "cedar/_tree.pyx":253
  *         Get number of nodes total.
  *         """
  *         if not node:             # <<<<<<<<<<<<<<
@@ -4979,7 +4913,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__get_node_count(struct __pyx_obj_5cedar_
  */
   }
 
-  /* "cedar/_tree.pyx":259
+  /* "cedar/_tree.pyx":256
  *             return 0
  *         else:
  *             return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)             # <<<<<<<<<<<<<<
@@ -4989,7 +4923,7 @@ static int __pyx_f_5cedar_5_tree_5_Tree__get_node_count(struct __pyx_obj_5cedar_
     goto __pyx_L0;
   }
 
-  /* "cedar/_tree.pyx":252
+  /* "cedar/_tree.pyx":249
  *             self._print_depth(node.right)
  * 
  *     cdef int _get_node_count(self, Node* node) nogil:             # <<<<<<<<<<<<<<
@@ -21478,7 +21412,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 65, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(2, 272, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(2, 856, __pyx_L1_error)
@@ -21933,21 +21867,21 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5cedar_5_tree__Tree.print_node_count = (void (*)(struct __pyx_obj_5cedar_5_tree__Tree *, int __pyx_skip_dispatch))__pyx_f_5cedar_5_tree_5_Tree_print_node_count;
   __pyx_vtable_5cedar_5_tree__Tree._print_depth = (void (*)(struct __pyx_obj_5cedar_5_tree__Tree *, struct __pyx_t_5cedar_5_tree_Node *))__pyx_f_5cedar_5_tree_5_Tree__print_depth;
   __pyx_vtable_5cedar_5_tree__Tree._get_node_count = (int (*)(struct __pyx_obj_5cedar_5_tree__Tree *, struct __pyx_t_5cedar_5_tree_Node *))__pyx_f_5cedar_5_tree_5_Tree__get_node_count;
-  if (PyType_Ready(&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5cedar_5_tree__Tree.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5cedar_5_tree__Tree.tp_dictoffset && __pyx_type_5cedar_5_tree__Tree.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5cedar_5_tree__Tree.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5cedar_5_tree__Tree.tp_dict, __pyx_vtabptr_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Tree, (PyObject *)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5cedar_5_tree__Tree.tp_dict, __pyx_vtabptr_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Tree, (PyObject *)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_5_tree__Tree) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
   __pyx_ptype_5cedar_5_tree__Tree = &__pyx_type_5cedar_5_tree__Tree;
   __pyx_vtabptr_5cedar_5_tree__TreeBuilder = &__pyx_vtable_5cedar_5_tree__TreeBuilder;
   __pyx_vtable_5cedar_5_tree__TreeBuilder.build = (void (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, int __pyx_skip_dispatch))__pyx_f_5cedar_5_tree_12_TreeBuilder_build;
   __pyx_vtable_5cedar_5_tree__TreeBuilder._build = (struct __pyx_t_5cedar_5_tree_Node *(*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, int **, int *, int *, int, int *, int, int, int, double))__pyx_f_5cedar_5_tree_12_TreeBuilder__build;
-  __pyx_vtable_5cedar_5_tree__TreeBuilder._set_leaf_node = (void (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int))__pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node;
+  __pyx_vtable_5cedar_5_tree__TreeBuilder._set_leaf_node = (void (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int, int))__pyx_f_5cedar_5_tree_12_TreeBuilder__set_leaf_node;
   __pyx_vtable_5cedar_5_tree__TreeBuilder._set_decision_node = (void (*)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, struct __pyx_t_5cedar_9_splitter_SplitRecord *))__pyx_f_5cedar_5_tree_12_TreeBuilder__set_decision_node;
   if (PyType_Ready(&__pyx_type_5cedar_5_tree__TreeBuilder) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
@@ -22063,11 +21997,11 @@ static int __Pyx_modinit_type_import_code(void) {
    if (!__pyx_ptype_5cedar_8_manager__DataManager) __PYX_ERR(6, 4, __pyx_L1_error)
   __pyx_vtabptr_5cedar_8_manager__DataManager = (struct __pyx_vtabstruct_5cedar_8_manager__DataManager*)__Pyx_GetVtable(__pyx_ptype_5cedar_8_manager__DataManager->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_8_manager__DataManager)) __PYX_ERR(6, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 37, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 37, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 37, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 27, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 27, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

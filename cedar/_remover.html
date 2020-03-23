@@ -1337,8 +1337,8 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_4remove(struct __pyx_obj_5c
 <pre class="cython line score-0">&#xA0;<span class="">285</span>:                           <span class="n">double</span> <span class="n">parent_p</span><span class="p">,</span> <span class="n">SplitRecord</span> <span class="o">*</span><span class="n">split</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">286</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">287</span>: <span class="sd">        Update node statistics based on the removal data (X, y).</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">288</span>: <span class="sd">        Return 0 for a successful update, -1 to signal a retrain,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">289</span>: <span class="sd">          -2 to signal a leaf creation.</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">288</span>: <span class="sd">        Return 0 for a successful update, 1 to signal a leaf creation,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">289</span>: <span class="sd">          2 to signal a retrain.</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">290</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">291</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">292</span>:         <span class="c"># parameters</span></pre>

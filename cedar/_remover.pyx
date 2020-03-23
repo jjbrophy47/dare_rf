@@ -285,8 +285,8 @@ cdef class _Remover:
                           double parent_p, SplitRecord *split) nogil:
         """
         Update node statistics based on the removal data (X, y).
-        Return 0 for a successful update, -1 to signal a retrain,
-          -2 to signal a leaf creation.
+        Return 0 for a successful update, 1 to signal a leaf creation,
+          2 to signal a retrain.
         """
 
         # parameters

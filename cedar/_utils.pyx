@@ -62,19 +62,13 @@ cdef int generate_distribution(double lmbda, double* distribution,
     cdef double normalizing_constant = 0
 
     cdef double min_gini = 1
-    cdef int n_min = 0
     cdef int first_min = -1
 
-    cdef bint deterministic = 0
-
-    # find min and max Gini values
+    # find min Gini
     for i in range(n_gini_indices):
         if gini_indices[i] < min_gini:
-            n_min = 1
             first_min = i
             min_gini = gini_indices[i]
-        elif gini_indices[i] == min_gini:
-            n_min += 1
 
     # determine if tree is in deterministic mode
     if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:
@@ -127,6 +121,19 @@ cdef int* convert_int_ndarray(np.ndarray arr):
 
     return new_arr
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef int* copy_int_array(int* arr, int n_elem) nogil:
+    """
+    Copies a C int array into a new C int array.
+    """
+    cdef int* new_arr = <int *>malloc(n_elem * sizeof(int))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
 cdef void set_srand(int random_state) nogil:
     """
     Sets srand given a random state.
@@ -148,14 +155,18 @@ cdef void dealloc(Node *node) nogil:
     dealloc(node.right)
 
     # free contents of the node
-    if node.is_leaf:
-        free(node.leaf_samples)
-    else:
-        if not node.is_left:
-            free(node.valid_features)
+    if node.features:
         free(node.left_counts)
         free(node.left_pos_counts)
         free(node.right_counts)
         free(node.right_pos_counts)
+
+        if not node.is_left:
+            free(node.features)
+
+    if node.is_leaf:
+        free(node.leaf_samples)
+
+    else:
         free(node.left)
         free(node.right)

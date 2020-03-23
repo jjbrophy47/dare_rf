@@ -12,12 +12,12 @@ import cedar
 from experiments.utility import data_util
 
 seed = 1
-n_remove = 1000
+n_remove = 10000
 n_estimators = 100
 
 batch = True
 
-X_train, X_test, y_train, y_test = data_util.get_data('flight_delays', seed, data_dir='data')
+X_train, X_test, y_train, y_test = data_util.get_data('mfc19', seed, data_dir='data')
 np.random.seed(seed)
 
 # n_samples = 1000

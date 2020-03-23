@@ -22,8 +22,8 @@ cdef struct Node:
     double p                   # Total probability of chosen feature
     int    count               # Number of samples in the node
     int    pos_count           # Number of pos samples in the node
-    int    feature_count       # Number of features in the node
-    int*   valid_features      # Array of valid features, shape=[feature_count]
+    int    features_count      # Number of features in the node
+    int*   features            # Array of valid features, shape=[feature_count]
     int*   left_counts         # Array of left sample counts, shape=[feature_count]
     int*   left_pos_counts     # Array of left positive sample counts, shape=[feature_count]
     int*   right_counts        # Array of right sample counts, shape=[feature_count]
@@ -76,5 +76,7 @@ cdef class _TreeBuilder:
     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,
                       int* features, int n_features,
                       int depth, bint is_left, double parent_p) nogil
-    cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil
+    cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,
+                        bint is_bottom_leaf) nogil
+    # cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil
     cdef void _set_decision_node(self, Node** node_ptr, SplitRecord* split) nogil

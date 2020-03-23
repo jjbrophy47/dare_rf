@@ -1,6 +1,8 @@
 import numpy as np
 cimport numpy as np
 
+from ._tree cimport Node
+
 
 cdef struct SplitRecord:
 
@@ -10,8 +12,8 @@ cdef struct SplitRecord:
     int  left_count              # Number of samples in left branch.
     int* right_indices           # Samples in right branch of feature.
     int  right_count             # Number of samples in right branch.
-    int* valid_features          # Valid features to consider for descendants.
-    int  feature_count           # Number of valid features after split.
+    int* features                # Valid features to consider for descendants.
+    int  features_count          # Number of valid features after split.
 
     # Extra metadata
     double p                   # Total probability of chosen feature
@@ -24,9 +26,7 @@ cdef struct SplitRecord:
 
 cdef class _Splitter:
     """
-    The splitter searches in the input space for a feature and a threshold
-    to split the samples samples[start:end].
-    The impurity computations are delegated to a criterion object.
+    The splitter searches in the input space for a feature to split on.
     """
     # Internal structures
     cdef public int min_samples_leaf       # Min samples in a leaf
@@ -34,7 +34,9 @@ cdef class _Splitter:
     cdef int random_state                  # Random state reference
 
     # Methods
-    cdef int node_split(self, int** X, int* y,
-                        int* samples, int n_samples,
-                        int* features, int n_features,
-                        double parent_p, SplitRecord* split) nogil
+    cdef int split_node(self, Node* node, int** X, int* y,
+                        int* samples, int n_samples, double parent_p,
+                        SplitRecord *split) nogil
+    cdef int compute_splits(self, Node** node_ptr, int** X, int* y,
+                            int* samples, int n_samples,
+                            int* features, int n_features) nogil

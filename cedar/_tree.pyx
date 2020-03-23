@@ -50,19 +50,15 @@ cdef class _TreeBuilder:
         Build a decision tree from the training set (X, y).
         """
 
-        # Parameters
-        cdef _DataManager manager = self.manager
-
-        # get data
+        # Data containers
         cdef int** X = NULL
         cdef int* y = NULL
+        self.manager.get_data(&X, &y)
 
         cdef int* samples
-        cdef int n_samples = manager.n_samples
+        cdef int n_samples = self.manager.n_samples
         cdef int* features = tree.feature_indices
         cdef int n_features = tree.n_feature_indices
-
-        manager.get_data(&X, &y)
 
         # fill in samples
         samples = <int *>malloc(n_samples * sizeof(int))
@@ -85,40 +81,50 @@ cdef class _TreeBuilder:
         node.depth = depth
         node.is_left = is_left
 
-        # printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
+        # printf('\n(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
 
-        cdef bint is_leaf = (depth >= self.max_depth or
-                             n_samples < self.min_samples_split or
-                             n_samples < 2 * self.min_samples_leaf or
-                             n_features <= 1)
+        cdef bint is_bottom_leaf = (depth >= self.max_depth or n_features < 1)
+        cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
+                                    n_samples < 2 * self.min_samples_leaf)
 
-        if not is_leaf:
-            result = self.splitter.node_split(X, y, samples, n_samples, features,
-                                              n_features, parent_p, &split)
-            if result == -1:
-                is_leaf = 1
-
-        if is_leaf:
-            self._set_leaf_node(&node, y, samples, n_samples)
+        if is_bottom_leaf:
+            # printf('bottom leaf!\n')
+            self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
 
         else:
-            free(samples)
-            self._set_decision_node(&node, &split)
+            # printf('compute splits\n')
+            self.splitter.compute_splits(&node, X, y, samples, n_samples, features,
+                                         n_features)
 
-            node.left = self._build(X, y, split.left_indices, split.left_count,
-                                    split.valid_features, split.feature_count,
-                                    depth + 1, 1, node.p)
+            if not is_middle_leaf:
+                # printf('split node\n')
+                is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
+                                                       parent_p, &split)
+                # printf('result: %d\n', is_middle_leaf)
 
-            node.right = self._build(X, y, split.right_indices, split.right_count,
-                                     split.valid_features, split.feature_count,
-                                     depth + 1, 0, node.p)
+            if is_middle_leaf:
+                # printf('middle leaf\n')
+                self._set_leaf_node(&node, y, samples, n_samples, 0)
+
+            else:
+                free(samples)
+                self._set_decision_node(&node, &split)
+
+                node.left = self._build(X, y, split.left_indices, split.left_count,
+                                        split.features, split.features_count,
+                                        depth + 1, 1, node.p)
+
+                node.right = self._build(X, y, split.right_indices, split.right_count,
+                                         split.features, split.features_count,
+                                         depth + 1, 0, node.p)
 
         return node
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil:
+    cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,
+                        bint is_bottom_leaf) nogil:
         """
         Compute leaf value and set all other attributes.
         """
@@ -127,24 +133,25 @@ cdef class _TreeBuilder:
 
         cdef Node *node = node_ptr[0]
 
-        for i in range(n_samples):
-            pos_count += y[samples[i]]
+        if is_bottom_leaf:
+            node.p = UNDEF
+            node.feature = UNDEF
+            node.features_count = UNDEF
+            node.features = NULL
+            node.left_counts = NULL
+            node.left_pos_counts = NULL
+            node.right_counts = NULL
+            node.right_pos_counts = NULL
 
-        node.count = n_samples
-        node.pos_count = pos_count
+            for i in range(n_samples):
+                pos_count += y[samples[i]]
+
+            node.count = n_samples
+            node.pos_count = pos_count
 
         node.is_leaf = 1
         node.value = pos_count / <double> n_samples
         node.leaf_samples = samples
-
-        node.p = UNDEF
-        node.feature = UNDEF
-        node.feature_count = UNDEF
-        node.valid_features = NULL
-        node.left_counts = NULL
-        node.left_pos_counts = NULL
-        node.right_counts = NULL
-        node.right_pos_counts = NULL
 
         node.left = NULL
         node.right = NULL
@@ -155,21 +162,12 @@ cdef class _TreeBuilder:
         """
         cdef Node* node = node_ptr[0]
 
-        node.count = split.count
-        node.pos_count = split.pos_count
-
         node.is_leaf = 0
         node.value = UNDEF
         node.leaf_samples = NULL
 
         node.p = split.p
         node.feature = split.feature
-        node.feature_count = split.feature_count
-        node.valid_features = split.valid_features
-        node.left_counts = split.left_counts
-        node.left_pos_counts = split.left_pos_counts
-        node.right_counts = split.right_counts
-        node.right_pos_counts = split.right_pos_counts
 
 
 # =====================================
@@ -195,7 +193,6 @@ cdef class _Tree:
         """
         Destructor.
         """
-        free(self.feature_indices)
         if self.root:
             dealloc(self.root)
             free(self.root)

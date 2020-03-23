@@ -1238,7 +1238,7 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_t_5cedar_9_splitter_SplitRecord;
 
-/* "_splitter.pxd":17
+/* "_splitter.pxd":5
  * 
  * 
  * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
@@ -1321,7 +1321,7 @@ struct __pyx_obj_5cedar_8_manager__DataManager {
 };
 
 
-/* "_splitter.pxd":37
+/* "_splitter.pxd":25
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1354,8 +1354,8 @@ struct __pyx_obj_5cedar_5_tree__Tree {
 };
 
 
-/* "_tree.pxd":59
- *     # cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
+/* "_tree.pxd":56
+ *     cdef int _get_node_count(self, Node* node) nogil
  * 
  * cdef class _TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
@@ -1490,7 +1490,7 @@ struct __pyx_vtabstruct_5cedar_8_manager__DataManager {
 static struct __pyx_vtabstruct_5cedar_8_manager__DataManager *__pyx_vtabptr_5cedar_8_manager__DataManager;
 
 
-/* "_splitter.pxd":37
+/* "_splitter.pxd":25
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1522,8 +1522,8 @@ struct __pyx_vtabstruct_5cedar_5_tree__Tree {
 static struct __pyx_vtabstruct_5cedar_5_tree__Tree *__pyx_vtabptr_5cedar_5_tree__Tree;
 
 
-/* "_tree.pxd":59
- *     # cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
+/* "_tree.pxd":56
+ *     cdef int _get_node_count(self, Node* node) nogil
  * 
  * cdef class _TreeBuilder:             # <<<<<<<<<<<<<<
  *     """
@@ -23336,11 +23336,11 @@ static int __Pyx_modinit_type_import_code(void) {
    if (!__pyx_ptype_5cedar_8_manager__DataManager) __PYX_ERR(6, 4, __pyx_L1_error)
   __pyx_vtabptr_5cedar_8_manager__DataManager = (struct __pyx_vtabstruct_5cedar_8_manager__DataManager*)__Pyx_GetVtable(__pyx_ptype_5cedar_8_manager__DataManager->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_8_manager__DataManager)) __PYX_ERR(6, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 37, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 37, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 37, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 25, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 25, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("cedar._tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -23348,8 +23348,8 @@ static int __Pyx_modinit_type_import_code(void) {
    if (!__pyx_ptype_5cedar_5_tree__Tree) __PYX_ERR(8, 33, __pyx_L1_error)
   __pyx_vtabptr_5cedar_5_tree__Tree = (struct __pyx_vtabstruct_5cedar_5_tree__Tree*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__Tree->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__Tree)) __PYX_ERR(8, 33, __pyx_L1_error)
   __pyx_ptype_5cedar_5_tree__TreeBuilder = __Pyx_ImportType(__pyx_t_1, "cedar._tree", "_TreeBuilder", sizeof(struct __pyx_obj_5cedar_5_tree__TreeBuilder), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_5_tree__TreeBuilder) __PYX_ERR(8, 59, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_5_tree__TreeBuilder = (struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__TreeBuilder)) __PYX_ERR(8, 59, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_5_tree__TreeBuilder) __PYX_ERR(8, 56, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_5_tree__TreeBuilder = (struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__TreeBuilder)) __PYX_ERR(8, 56, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

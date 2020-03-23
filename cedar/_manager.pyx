@@ -13,6 +13,8 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
+from ._utils cimport copy_int_array
+
 cdef int _UNDEFINED = -2
 
 # =====================================
@@ -31,6 +33,10 @@ cdef class _DataManager:
     property n_features:
         def __get__(self):
             return self.n_features
+
+    property n_add_indices:
+        def __get__(self):
+            return self.n_add_indices
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -77,7 +83,7 @@ cdef class _DataManager:
     cdef int check_sample_validity(self, int *samples, int n_samples) nogil:
         """
         Checks to make sure `samples` are in the database.
-        Returns -1 if one a sample is not available; 0 otherwise
+        Returns -1 if one a sample is not available; 0 otherwise.
         """
         cdef int *vacant = self.vacant
         cdef int n_vacant = self.n_vacant
@@ -111,7 +117,7 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef int remove_data(self, int[:] samples):
+    cpdef void remove_data(self, int[:] samples):
 
         # parameters
         cdef int** X = self.X
@@ -120,11 +126,9 @@ cdef class _DataManager:
         cdef int n_vacant = self.n_vacant
 
         cdef int n_samples = samples.shape[0]
+        cdef int updated_n_vacant = n_vacant + n_samples
 
         cdef int i
-
-        cdef int result = 0
-        cdef int updated_n_vacant = n_vacant + n_samples
 
         # realloc vacant array
         if n_vacant == 0:
@@ -143,4 +147,80 @@ cdef class _DataManager:
         self.n_vacant = updated_n_vacant
         self.vacant = vacant
 
-        return result
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef void add_data(self, int[:, :] X_in, int[:] y_in):
+        """
+        Adds data to the database.
+        """
+        # parameters
+        cdef int** X = self.X
+        cdef int*  y = self.y
+        cdef int*  vacant = self.vacant
+        cdef int   n_vacant = self.n_vacant
+        cdef int   n_samples = self.n_samples
+        cdef int   n_features = self.n_features
+
+        cdef int  n_new_samples = X_in.shape[0]
+        cdef int  updated_n_samples = n_samples + n_new_samples
+        cdef int* add_indices = <int *>malloc(n_new_samples * sizeof(int))
+
+        cdef int i
+        cdef int j
+        cdef int k
+
+        # grow database
+        if updated_n_samples > n_samples + n_vacant:
+            X = <int **>realloc(X, updated_n_samples * sizeof(int))
+            y = <int *>realloc(y, updated_n_samples * sizeof(int))
+
+        # copy samples to the database
+        for i in range(n_new_samples):
+
+            # recycle available ID
+            if n_vacant > 0:
+                n_vacant -= 1
+                j = vacant[n_vacant]
+
+            # use a new sample ID
+            else:
+                j = n_samples
+
+            # copy sample
+            X[j] = <int *>malloc(n_features * sizeof(int))
+            for k in range(n_features):
+                X[j][k] = X_in[i][k]
+            y[j] = y_in[i]
+
+            add_indices[i] = j
+            n_samples += 1
+
+        # adjust vacant array
+        if n_vacant == 0:
+            free(vacant)
+            vacant = NULL
+        elif n_vacant > 0:
+            vacant = <int *>realloc(vacant, n_vacant * sizeof(int))
+
+        self.X = X
+        self.y = y
+        self.vacant = vacant
+        self.add_indices = add_indices
+        self.n_vacant = n_vacant
+        self.n_samples = n_samples
+        self.n_features = n_features
+        self.n_add_indices = n_new_samples
+
+    cpdef void clear_add_indices(self):
+        """
+        Clear the indices that have been added to the database.
+        """
+        free(self.add_indices)
+        self.n_add_indices = 0
+        self.add_indices = NULL
+
+    cdef int* get_add_indices(self) nogil:
+        """
+        Return a copy of the add indices.
+        """
+        return copy_int_array(self.add_indices, self.n_add_indices)

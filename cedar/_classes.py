@@ -342,34 +342,29 @@ class Tree(object):
             self.tree_.print_depth()
         print()
 
-    # def add(self, X, y, keys=None):
-    #     """
-    #     Adds instances to the training data and updates the model.
-    #     """
-    #     assert X.ndim == 2 and y.ndim == 1
+    def add(self, X, y, add_indices=None):
+        """
+        Adds instances to the training data and updates the model.
+        """
 
-    #     # assign index numbers to the new instances
-    #     if self.single_tree_:
-    #         current_keys = np.fromiter(self.X_train_.keys(), dtype=np.int64)
-    #         gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
-    #         if len(X) > len(gaps):
-    #             extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
-    #         keys = np.concatenate([gaps, extra])
-    #     else:
-    #         X = X[:, self.feature_indices]
-    #         assert keys is not None
+        if add_indices is not None:
+            assert not self.single_tree_
 
-    #     # add instances to the data
-    #     if self.single_tree_:
-    #         for i, key in enumerate(keys):
-    #             self.X_train_[key] = X[i]
-    #             self.y_train_[key] = y[i]
+        else:
+            assert self.single_tree_
+            assert X.ndim == 2 and y.ndim == 1
+            assert X.shape[1] == self.n_features_
 
-    #     # update model
-    #     self.addition_types_ = []
-    #     self.root_ = self._add(X, y, keys)
+            # add data
+            if self.single_tree_:
+                add_indices = self.manager_.add_data(X, y)
 
-    #     return self.addition_types_
+        # update model
+        self.adder_.add(self.tree_)
+
+        # cleanup
+        if self.single_tree_:
+            self.manager_.clear_add_indices()
 
     def delete(self, remove_indices):
         """
