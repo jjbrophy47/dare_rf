@@ -2,17 +2,10 @@ import numpy as np
 cimport numpy as np
 
 from ._manager cimport _DataManager
-# from ._splitter cimport Meta
+from ._splitter cimport SplitRecord
+from ._tree cimport Node
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
-
-cdef struct RemovalSplitRecord:
-
-    # Data to track sample split
-    int* left_indices          # Samples in left branch of feature.
-    int  left_count            # Number of samples in left branch.
-    int* right_indices         # Samples in right branch of feature.
-    int  right_count           # Number of samples in right branch.
 
 cdef class _Remover:
     """
@@ -21,9 +14,12 @@ cdef class _Remover:
     """
 
     # Inner structures
-    cdef _DataManager manager  # Database manager
-    cdef double epsilon        # Indistinguishability parameter
-    cdef double lmbda          # Noise parameter
+    cdef _DataManager manager        # Database manager
+    cdef _TreeBuilder tree_builder   # Tree Builder
+    cdef double epsilon              # Indistinguishability parameter
+    cdef double lmbda                # Noise parameter
+    cdef int min_samples_leaf        # Minimum number of samples for a leaf
+    cdef int min_samples_split       # Minimum number of samples for a split
 
     # Metric structures
     cdef int capacity           # Number of removal allocations for space
@@ -32,25 +28,25 @@ cdef class _Remover:
     cdef int* remove_depths     # Depth of leaf or node needing retraining
 
     # Python API
-    cpdef int remove(self, _Tree tree, _TreeBuilder tree_builder,
-                     np.ndarray remove_indices)
+    cpdef int remove(self, _Tree tree, np.ndarray remove_indices)
     cpdef void clear_removal_metrics(self)
 
     # C API
-    cdef int _node_remove(self, int node_id, int** X, int* y,
+    cdef void _remove(self, Node** node_ptr, int** X, int* y,
+                      int* samples, int n_samples, double parent_p) nogil
+    cdef int _node_remove(self, Node* node, int** X, int* y,
                           int* samples, int n_samples,
-                          int min_samples_split, int min_samples_leaf,
-                          int chosen_feature, double parent_p,
-                          RemovalSplitRecord *split, Meta* meta) nogil
-    cdef int _collect_leaf_samples(self, int node_id, int is_left, int parent,
-                                   _Tree tree, int* remove_samples,
-                                   int n_remove_samples,
-                                   int** rebuild_samples_ptr)
-    cdef int _update_leaf(self, int node_id, _Tree tree, int* y, int* samples,
-                          int n_samples) nogil
-    cdef int _update_decision_node(self, int node_id, _Tree tree,
-                                   int n_samples, Meta* meta) nogil
-    cdef void _resize(self, int capacity=*) nogil
-    cdef void _update_removal_metrics(self, int* remove_types, int* remove_depths,
-                                      int remove_count) nogil
+                          double parent_p, SplitRecord *split) nogil
+    cdef void _update_leaf(self, Node** node_ptr, int* y,
+                           int* samples, int n_samples) nogil
+    cdef void _convert_to_leaf(self, Node** node_ptr, int* samples,
+                               int n_samples, SplitRecord *split) nogil
+    cdef void _get_leaf_samples(self, Node* node, int* remove_samples,
+                                int n_remove_samples, int** leaf_samples_ptr,
+                                int* leaf_samples_count_ptr) nogil
+    cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
+    cdef void _resize_metrics(self, int capacity=*) nogil
+    cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil
+    # cdef void _update_removal_metrics(self, int* remove_types, int* remove_depths,
+    #                                   int remove_count) nogil
     cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)

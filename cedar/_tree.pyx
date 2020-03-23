@@ -11,25 +11,20 @@ from cpython.ref cimport PyObject
 from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
-# from libc.stdlib cimport rand
-# from libc.stdlib cimport srand
 from libc.stdio cimport printf
 
 import numpy as np
 cimport numpy as np
 np.import_array()
 
-# from ._utils cimport Stack
-# from ._utils cimport StackRecord
 from ._utils cimport convert_int_ndarray
 from ._utils cimport set_srand
+from ._utils cimport dealloc
 
 # constants
 from numpy import int32 as INT
 
 cdef int UNDEF = -1
-# cdef int _TREE_UNDEFINED = -2
-# cdef int INITIAL_STACK_SIZE = 10
 
 # =====================================
 # TreeBuilder
@@ -92,7 +87,7 @@ cdef class _TreeBuilder:
         node.depth = depth
         node.is_left = is_left
 
-        # printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
+        printf('(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
 
         cdef bint is_leaf = (depth >= self.max_depth or
                              n_samples < self.min_samples_split or
@@ -121,98 +116,6 @@ cdef class _TreeBuilder:
                                      depth + 1, 0, node.p)
 
         return node
-
-    # cdef void build_at_node(self, int node_id, _Tree tree,
-    #                         int* samples, int n_samples,
-    #                         int* features, int n_features,
-    #                         int depth, int parent, double parent_p,
-    #                         bint is_left):
-    #     """
-    #     Build subtree from the training set (X, y) starting at `node_id`.
-    #     """
-
-    #     # Parameters
-    #     cdef _DataManager manager = self.manager
-    #     cdef _Splitter splitter = self.splitter
-    #     cdef int max_depth = self.max_depth
-    #     cdef int min_samples_leaf = self.min_samples_leaf
-    #     cdef int min_samples_split = self.min_samples_split
-
-    #     # get data
-    #     cdef int** X = NULL
-    #     cdef int* y = NULL
-
-    #     # StackRecord parameters
-    #     cdef StackRecord stack_record
-    #     cdef Stack stack = Stack(INITIAL_STACK_SIZE)
-
-    #     # compute variables
-    #     cdef SplitRecord split
-    #     cdef bint is_leaf
-    #     cdef int feature
-    #     cdef double value
-
-    #     cdef int i
-    #     cdef Meta meta
-
-    #     manager.get_data(&X, &y)
-
-    #     # push root node onto stack
-    #     rc = stack.push(depth, parent, parent_p, is_left, samples,
-    #                     n_samples, features, n_features)
-
-    #     while not stack.is_empty():
-
-    #         # populate record
-    #         stack.pop(&stack_record)
-    #         depth = stack_record.depth
-    #         parent = stack_record.parent
-    #         parent_p = stack_record.parent_p
-    #         is_left = stack_record.is_left
-    #         samples = stack_record.samples
-    #         n_samples = stack_record.n_samples
-    #         features = stack_record.features
-    #         n_features = stack_record.n_features
-
-    #         meta.count = n_samples
-
-    #         # printf("\npopping (%d, %d, %.20f, %d, %d, %d)\n", depth, parent, parent_p, is_left, n_samples, n_features)
-
-    #         is_leaf = (depth >= max_depth or
-    #                    n_samples < min_samples_split or
-    #                    n_samples < 2 * min_samples_leaf or
-    #                    n_features <= 1)
-
-    #         if not is_leaf:
-    #             rc = splitter.node_split(X, y, samples, n_samples, features, n_features,
-    #                                      parent_p, &split, &meta)
-    #             # printf('rc: %d\n', rc)
-    #             if rc == -2:
-    #                 is_leaf = 1
-    #             else:
-    #                 feature = split.feature
-    #                 value = _TREE_UNDEFINED
-            
-    #         if is_leaf:
-    #             value = self._leaf_value(y, samples, n_samples, &meta)
-    #             meta.feature_count = _TREE_UNDEFINED
-
-    #         node_id = tree.add_node(parent, is_left, is_leaf, feature, value,
-    #                                 depth, samples, &meta)
-
-    #         if not is_leaf:
-
-    #             # Push right child on stack
-    #             rc = stack.push(depth + 1, node_id, meta.p, 0, split.right_indices, 
-    #                             split.right_count, split.features, split.n_features)
-
-    #             # Push left child on stack
-    #             rc = stack.push(depth + 1, node_id, meta.p, 1, split.left_indices,
-    #                             split.left_count, split.features, split.n_features)
-
-    #         # clean up
-    #         if not is_leaf:
-    #             free(samples)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -308,7 +211,11 @@ cdef class _Tree:
 
     # property depth:
     #     def __get__(self):
-    #         return self._get_int_ndarray(self.depth, self.node_count)
+    #         cdef int  node_count = self._get_node_count(self.root)
+    #         cdef int *depth = <int *>malloc(node_count * sizeof(int))
+    #         cdef int  depth_count = 0
+    #         self._get_depth(self.root, &depth, &depth_count)
+    #         return self._get_int_ndarray(depth, depth_count)
 
     # metadata
     # property counts:
@@ -360,94 +267,8 @@ cdef class _Tree:
         """
         free(self.feature_indices)
         if self.root:
-            self._dealloc(self.root)
+            dealloc(self.root)
             free(self.root)
-
-    cdef _dealloc(self, Node *node):
-        """
-        Recursively free all nodes in the tree.
-        """
-        if not node:
-            return
-
-        self._dealloc(node.left)
-        self._dealloc(node.right)
-
-        # free contents of the node
-        if node.is_leaf:
-            free(node.leaf_samples)
-        else:
-            if not node.is_left:
-                free(node.valid_features)
-            free(node.left_counts)
-            free(node.left_pos_counts)
-            free(node.right_counts)
-            free(node.right_pos_counts)
-            free(node.left)
-            free(node.right)
-
-    # @cython.boundscheck(False)
-    # @cython.wraparound(False)
-    # cdef int add_node(self, int parent, bint is_left, bint is_leaf, int feature,
-    #                   double value, int depth, int* samples, Meta* meta) nogil:
-
-    #     # register a new node id
-    #     cdef int node_id
-    #     cdef bint increment_node_count = 0
-
-    #     if not self.vacant_ids.is_empty():
-    #         node_id = self.vacant_ids.pop()
-    #         # printf('recycling node %d\n', node_id)
-    #     else:
-    #         node_id = self.node_count
-    #         increment_node_count = 1
-
-    #     # increase the number of available nodes
-    #     if node_id >= self.capacity:
-    #         self._resize()
-
-    #     self.count[node_id] = meta.count
-    #     self.pos_count[node_id] = meta.pos_count
-    #     self.depth[node_id] = depth
-
-    #     if parent != _TREE_UNDEFINED:
-    #         if is_left:
-    #             self.left_children[parent] = node_id
-    #         else:
-    #             self.right_children[parent] = node_id
-
-    #     if is_leaf:
-    #         self.values[node_id] = value
-    #         # printf('[A] values[%d]: %.7f\n', node_id, self.values[node_id])
-    #         # printf('count: %d\n', meta.count)
-    #         self.p[node_id] = _TREE_UNDEFINED
-    #         self.chosen_features[node_id] = _TREE_UNDEFINED
-    #         self.left_children[node_id] = _TREE_LEAF
-    #         self.right_children[node_id] = _TREE_LEAF
-
-    #         self.leaf_samples[node_id] = samples
-    #         self.feature_count[node_id] = _TREE_UNDEFINED
-    #     else:
-    #         # children will be set later
-    #         self.values[node_id] = _TREE_UNDEFINED
-    #         self.p[node_id] = meta.p
-    #         self.chosen_features[node_id] = feature
-
-    #         self.left_counts[node_id] = meta.left_counts
-    #         # printf('[A] left_counts[%d][0]: %d\n', node_id, self.left_counts[node_id][0])
-    #         self.left_pos_counts[node_id] = meta.left_pos_counts
-    #         self.right_counts[node_id] = meta.right_counts
-    #         self.right_pos_counts[node_id] = meta.right_pos_counts
-    #         self.feature_count[node_id] = meta.feature_count
-    #         self.features[node_id] = meta.features
-
-        # if depth == 0:
-        #     self.root = node_id
-
-        # if increment_node_count:
-        #     self.node_count += 1
-
-        # return node_id
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -467,117 +288,66 @@ cdef class _Tree:
         with nogil:
 
             for i in range(n_samples):
-                # printf('\nsample %d\n', i)
                 node = self.root
-
-                # printf('node depth: %d\n', node.depth)
-                # printf('  is_leaf: %d\n', node.is_leaf)
-                # printf('  value: %.7f\n', node.value)
-                # printf('  feature: %d\n', node.feature)
 
                 while not node.is_leaf:
                     if X[i, node.feature] == 1:
-                        # printf('go left!\n')
                         node = node.left
                     else:
-                        # printf('go right!\n')
                         node = node.right
 
                 out[i] = node.value
 
         return out
 
-    # @cython.boundscheck(False)
-    # @cython.wraparound(False)
-    # cdef void remove_nodes(self, int *node_ids, int n_nodes) nogil:
-    #     """
-    #     Adds the specified node ids to the list of available ids.
-    #     """
-    #     cdef int i = n_nodes
-    #     cdef int temp_id
+    cpdef void print_depth(self):
+        printf('depth: [ ')
+        self._print_depth(self.root)
+        printf(']\n')
 
-    #     # push biggest node ids on first
-    #     while i > 0:
-    #         i -= 1
-    #         temp_id = node_ids[i]
-    #         self.values[temp_id] = _TREE_UNDEFINED
-    #         self.p[temp_id] = _TREE_UNDEFINED
-    #         self.chosen_features[temp_id] = _TREE_UNDEFINED
-    #         self.left_children[temp_id] = _TREE_UNDEFINED
-    #         self.right_children[temp_id] = _TREE_UNDEFINED
-    #         self.depth[temp_id] = _TREE_UNDEFINED
-
-    #         self.count[temp_id] = _TREE_UNDEFINED
-    #         self.pos_count[temp_id] = _TREE_UNDEFINED
-    #         self.feature_count[temp_id] = _TREE_UNDEFINED
-    #         self.left_counts[temp_id] = NULL
-    #         self.left_pos_counts[temp_id] = NULL
-    #         self.right_counts[temp_id] = NULL
-    #         self.right_pos_counts[temp_id] = NULL
-    #         # self.features[temp_id] = NULL
-    #         self.leaf_samples[temp_id] = NULL
-
-    #         self.vacant_ids.push(temp_id)
+    cpdef void print_node_count(self):
+        cdef int node_count = self._get_node_count(self.root)
+        printf('node_count: %d\n', node_count)
 
     # private
-    # cdef int _resize(self, int capacity=0) nogil:
-
-    #     if capacity > self.capacity:
-    #         self.capacity = int(capacity)
-
-    #     if capacity <= 0 and self.node_count == self.capacity:
-    #         self.capacity *= 2
-
-    #     # tree info
-    #     self.values = <double *>realloc(self.values, self.capacity * sizeof(double))
-    #     self.p = <double *>realloc(self.p, self.capacity * sizeof(double))
-    #     self.chosen_features = <int *>realloc(self.chosen_features, self.capacity * sizeof(int))
-    #     self.left_children = <int *>realloc(self.left_children, self.capacity * sizeof(int))
-    #     self.right_children = <int *>realloc(self.right_children, self.capacity * sizeof(int))
-    #     self.depth = <int *>realloc(self.depth, self.capacity * sizeof(int))
-
-    #     # metadata
-    #     self.count = <int *>realloc(self.count, self.capacity * sizeof(int))
-    #     self.pos_count = <int *>realloc(self.pos_count, self.capacity * sizeof(int))
-    #     self.feature_count = <int *>realloc(self.feature_count, self.capacity * sizeof(int))
-    #     self.left_counts = <int **>realloc(self.left_counts, self.capacity * sizeof(int *))
-    #     self.left_pos_counts = <int **>realloc(self.left_pos_counts, self.capacity * sizeof(int *))
-    #     self.right_counts = <int **>realloc(self.right_counts, self.capacity * sizeof(int *))
-    #     self.right_pos_counts = <int **>realloc(self.right_pos_counts, self.capacity * sizeof(int *))
-    #     self.features = <int **>realloc(self.features, self.capacity * sizeof(int *))
-    #     self.leaf_samples = <int **>realloc(self.leaf_samples, self.capacity * sizeof(int *))
-
-    #     return 0
-
-    cdef void _print_counts(self) nogil:
-        self._counts(self.root)
-
-    cdef void _counts(self, Node *node) nogil:
+    cdef void _print_depth(self, Node* node) nogil:
+        """
+        Print depth of each node.
+        """
         if node:
             printf('%d ', node.depth)
-            self._counts(node.left)
-            self._counts(node.right)
+            self._print_depth(node.left)
+            self._print_depth(node.right)
 
-    cdef np.ndarray _get_double_ndarray(self, double *data, int n_elem):
+    cdef int _get_node_count(self, Node* node) nogil:
         """
-        Wraps value as a 1-d NumPy array.
-        The array keeps a reference to this Tree, which manages the underlying memory.
+        Get number of nodes total.
         """
-        cdef np.npy_intp shape[1]
-        shape[0] = n_elem
-        cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)
-        Py_INCREF(self)
-        arr.base = <PyObject*> self
-        return arr
+        if not node:
+            return 0
+        else:
+            return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)
 
-    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
-        """
-        Wraps value as a 1-d NumPy array.
-        The array keeps a reference to this Tree, which manages the underlying memory.
-        """
-        cdef np.npy_intp shape[1]
-        shape[0] = n_elem
-        cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
-        Py_INCREF(self)
-        arr.base = <PyObject*> self
-        return arr
+    # cdef np.ndarray _get_double_ndarray(self, double *data, int n_elem):
+    #     """
+    #     Wraps value as a 1-d NumPy array.
+    #     The array keeps a reference to this Tree, which manages the underlying memory.
+    #     """
+    #     cdef np.npy_intp shape[1]
+    #     shape[0] = n_elem
+    #     cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data)
+    #     Py_INCREF(self)
+    #     arr.base = <PyObject*> self
+    #     return arr
+
+    # cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
+    #     """
+    #     Wraps value as a 1-d NumPy array.
+    #     The array keeps a reference to this Tree, which manages the underlying memory.
+    #     """
+    #     cdef np.npy_intp shape[1]
+    #     shape[0] = n_elem
+    #     cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
+    #     Py_INCREF(self)
+    #     arr.base = <PyObject*> self
+    #     return arr

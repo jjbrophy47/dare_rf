@@ -137,6 +137,29 @@ cdef void set_srand(int random_state) nogil:
     # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
     rand()
 
+cdef void dealloc(Node *node) nogil:
+    """
+    Recursively free all nodes in the subtree.
+    """
+    if not node:
+        return
+
+    dealloc(node.left)
+    dealloc(node.right)
+
+    # free contents of the node
+    if node.is_leaf:
+        free(node.leaf_samples)
+    else:
+        if not node.is_left:
+            free(node.valid_features)
+        free(node.left_counts)
+        free(node.left_pos_counts)
+        free(node.right_counts)
+        free(node.right_pos_counts)
+        free(node.left)
+        free(node.right)
+
 # =============================================================================
 # Stack data structure
 # =============================================================================
