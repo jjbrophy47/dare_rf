@@ -1246,7 +1246,8 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int left_count;
   int *right_indices;
   int right_count;
-  int *features;
+  int *left_features;
+  int *right_features;
   int features_count;
   double p;
   int count;
@@ -1306,7 +1307,7 @@ struct __pyx_obj_5cedar_8_manager__DataManager {
 };
 
 
-/* "_splitter.pxd":27
+/* "_splitter.pxd":28
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1455,7 +1456,7 @@ struct __pyx_vtabstruct_5cedar_8_manager__DataManager {
 static struct __pyx_vtabstruct_5cedar_8_manager__DataManager *__pyx_vtabptr_5cedar_8_manager__DataManager;
 
 
-/* "_splitter.pxd":27
+/* "_splitter.pxd":28
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -3455,23 +3456,32 @@ static void __pyx_f_5cedar_6_utils_dealloc(struct __pyx_t_5cedar_5_tree_Node *__
  * 
  *     # free contents of the node
  *     if node.features:             # <<<<<<<<<<<<<<
- *         free(node.left_counts)
- *         free(node.left_pos_counts)
+ *         # printf('A\n')
+ *         free(node.features)
  */
   __pyx_t_1 = (__pyx_v_node->features != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_utils.pyx":159
- *     # free contents of the node
+    /* "cedar/_utils.pyx":160
  *     if node.features:
+ *         # printf('A\n')
+ *         free(node.features)             # <<<<<<<<<<<<<<
+ *         free(node.left_counts)
+ *         free(node.left_pos_counts)
+ */
+    free(__pyx_v_node->features);
+
+    /* "cedar/_utils.pyx":161
+ *         # printf('A\n')
+ *         free(node.features)
  *         free(node.left_counts)             # <<<<<<<<<<<<<<
  *         free(node.left_pos_counts)
  *         free(node.right_counts)
  */
     free(__pyx_v_node->left_counts);
 
-    /* "cedar/_utils.pyx":160
- *     if node.features:
+    /* "cedar/_utils.pyx":162
+ *         free(node.features)
  *         free(node.left_counts)
  *         free(node.left_pos_counts)             # <<<<<<<<<<<<<<
  *         free(node.right_counts)
@@ -3479,7 +3489,7 @@ static void __pyx_f_5cedar_6_utils_dealloc(struct __pyx_t_5cedar_5_tree_Node *__
  */
     free(__pyx_v_node->left_pos_counts);
 
-    /* "cedar/_utils.pyx":161
+    /* "cedar/_utils.pyx":163
  *         free(node.left_counts)
  *         free(node.left_pos_counts)
  *         free(node.right_counts)             # <<<<<<<<<<<<<<
@@ -3488,98 +3498,70 @@ static void __pyx_f_5cedar_6_utils_dealloc(struct __pyx_t_5cedar_5_tree_Node *__
  */
     free(__pyx_v_node->right_counts);
 
-    /* "cedar/_utils.pyx":162
+    /* "cedar/_utils.pyx":164
  *         free(node.left_pos_counts)
  *         free(node.right_counts)
  *         free(node.right_pos_counts)             # <<<<<<<<<<<<<<
  * 
- *         if not node.is_left:
- */
-    free(__pyx_v_node->right_pos_counts);
-
-    /* "cedar/_utils.pyx":164
- *         free(node.right_pos_counts)
- * 
- *         if not node.is_left:             # <<<<<<<<<<<<<<
- *             free(node.features)
- * 
- */
-    __pyx_t_1 = ((!(__pyx_v_node->is_left != 0)) != 0);
-    if (__pyx_t_1) {
-
-      /* "cedar/_utils.pyx":165
- * 
- *         if not node.is_left:
- *             free(node.features)             # <<<<<<<<<<<<<<
- * 
  *     if node.is_leaf:
  */
-      free(__pyx_v_node->features);
-
-      /* "cedar/_utils.pyx":164
- *         free(node.right_pos_counts)
- * 
- *         if not node.is_left:             # <<<<<<<<<<<<<<
- *             free(node.features)
- * 
- */
-    }
+    free(__pyx_v_node->right_pos_counts);
 
     /* "cedar/_utils.pyx":158
  * 
  *     # free contents of the node
  *     if node.features:             # <<<<<<<<<<<<<<
- *         free(node.left_counts)
- *         free(node.left_pos_counts)
+ *         # printf('A\n')
+ *         free(node.features)
  */
   }
 
-  /* "cedar/_utils.pyx":167
- *             free(node.features)
+  /* "cedar/_utils.pyx":166
+ *         free(node.right_pos_counts)
  * 
  *     if node.is_leaf:             # <<<<<<<<<<<<<<
+ *         # printf('C\n')
  *         free(node.leaf_samples)
- * 
  */
   __pyx_t_1 = (__pyx_v_node->is_leaf != 0);
   if (__pyx_t_1) {
 
     /* "cedar/_utils.pyx":168
- * 
  *     if node.is_leaf:
+ *         # printf('C\n')
  *         free(node.leaf_samples)             # <<<<<<<<<<<<<<
  * 
  *     else:
  */
     free(__pyx_v_node->leaf_samples);
 
-    /* "cedar/_utils.pyx":167
- *             free(node.features)
+    /* "cedar/_utils.pyx":166
+ *         free(node.right_pos_counts)
  * 
  *     if node.is_leaf:             # <<<<<<<<<<<<<<
+ *         # printf('C\n')
  *         free(node.leaf_samples)
- * 
  */
-    goto __pyx_L6;
+    goto __pyx_L5;
   }
 
-  /* "cedar/_utils.pyx":171
- * 
+  /* "cedar/_utils.pyx":172
  *     else:
+ *         # printf('D\n')
  *         free(node.left)             # <<<<<<<<<<<<<<
  *         free(node.right)
  */
   /*else*/ {
     free(__pyx_v_node->left);
 
-    /* "cedar/_utils.pyx":172
- *     else:
+    /* "cedar/_utils.pyx":173
+ *         # printf('D\n')
  *         free(node.left)
  *         free(node.right)             # <<<<<<<<<<<<<<
  */
     free(__pyx_v_node->right);
   }
-  __pyx_L6:;
+  __pyx_L5:;
 
   /* "cedar/_utils.pyx":147
  *     rand()
@@ -20213,11 +20195,11 @@ static int __Pyx_modinit_type_import_code(void) {
    if (!__pyx_ptype_5cedar_8_manager__DataManager) __PYX_ERR(4, 4, __pyx_L1_error)
   __pyx_vtabptr_5cedar_8_manager__DataManager = (struct __pyx_vtabstruct_5cedar_8_manager__DataManager*)__Pyx_GetVtable(__pyx_ptype_5cedar_8_manager__DataManager->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_8_manager__DataManager)) __PYX_ERR(4, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 27, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(5, 27, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(5, 27, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(5, 28, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(5, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("cedar._tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(6, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);

@@ -156,17 +156,18 @@ cdef void dealloc(Node *node) nogil:
 
     # free contents of the node
     if node.features:
+        # printf('A\n')
+        free(node.features)
         free(node.left_counts)
         free(node.left_pos_counts)
         free(node.right_counts)
         free(node.right_pos_counts)
 
-        if not node.is_left:
-            free(node.features)
-
     if node.is_leaf:
+        # printf('C\n')
         free(node.leaf_samples)
 
     else:
+        # printf('D\n')
         free(node.left)
         free(node.right)

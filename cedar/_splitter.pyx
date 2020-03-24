@@ -118,11 +118,13 @@ cdef class _Splitter:
 
                 # remove chosen feature from descendent nodes
                 split.features_count = node.features_count - 1
-                split.features = <int *>malloc(split.features_count * sizeof(int))
+                split.left_features = <int *>malloc(split.features_count * sizeof(int))
+                split.right_features = <int *>malloc(split.features_count * sizeof(int))
                 j = 0
                 for i in range(node.features_count):
                     if node.features[i] != split.feature:
-                        split.features[j] = node.features[i]
+                        split.left_features[j] = node.features[i]
+                        split.right_features[j] = node.features[i]
                         j += 1
 
             else:

@@ -1273,7 +1273,8 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int left_count;
   int *right_indices;
   int right_count;
-  int *features;
+  int *left_features;
+  int *right_features;
   int features_count;
   double p;
   int count;
@@ -1341,7 +1342,7 @@ struct __pyx_obj_5cedar_5_tree__TreeBuilder {
 };
 
 
-/* "cedar/_splitter.pxd":27
+/* "cedar/_splitter.pxd":28
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -3244,75 +3245,93 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
  * 
  *                 # remove chosen feature from descendent nodes
  *                 split.features_count = node.features_count - 1             # <<<<<<<<<<<<<<
- *                 split.features = <int *>malloc(split.features_count * sizeof(int))
- *                 j = 0
+ *                 split.left_features = <int *>malloc(split.features_count * sizeof(int))
+ *                 split.right_features = <int *>malloc(split.features_count * sizeof(int))
  */
       __pyx_v_split->features_count = (__pyx_v_node->features_count - 1);
 
       /* "cedar/_splitter.pyx":121
  *                 # remove chosen feature from descendent nodes
  *                 split.features_count = node.features_count - 1
- *                 split.features = <int *>malloc(split.features_count * sizeof(int))             # <<<<<<<<<<<<<<
+ *                 split.left_features = <int *>malloc(split.features_count * sizeof(int))             # <<<<<<<<<<<<<<
+ *                 split.right_features = <int *>malloc(split.features_count * sizeof(int))
  *                 j = 0
- *                 for i in range(node.features_count):
  */
-      __pyx_v_split->features = ((int *)malloc((__pyx_v_split->features_count * (sizeof(int)))));
+      __pyx_v_split->left_features = ((int *)malloc((__pyx_v_split->features_count * (sizeof(int)))));
 
       /* "cedar/_splitter.pyx":122
  *                 split.features_count = node.features_count - 1
- *                 split.features = <int *>malloc(split.features_count * sizeof(int))
+ *                 split.left_features = <int *>malloc(split.features_count * sizeof(int))
+ *                 split.right_features = <int *>malloc(split.features_count * sizeof(int))             # <<<<<<<<<<<<<<
+ *                 j = 0
+ *                 for i in range(node.features_count):
+ */
+      __pyx_v_split->right_features = ((int *)malloc((__pyx_v_split->features_count * (sizeof(int)))));
+
+      /* "cedar/_splitter.pyx":123
+ *                 split.left_features = <int *>malloc(split.features_count * sizeof(int))
+ *                 split.right_features = <int *>malloc(split.features_count * sizeof(int))
  *                 j = 0             # <<<<<<<<<<<<<<
  *                 for i in range(node.features_count):
  *                     if node.features[i] != split.feature:
  */
       __pyx_v_j = 0;
 
-      /* "cedar/_splitter.pyx":123
- *                 split.features = <int *>malloc(split.features_count * sizeof(int))
+      /* "cedar/_splitter.pyx":124
+ *                 split.right_features = <int *>malloc(split.features_count * sizeof(int))
  *                 j = 0
  *                 for i in range(node.features_count):             # <<<<<<<<<<<<<<
  *                     if node.features[i] != split.feature:
- *                         split.features[j] = node.features[i]
+ *                         split.left_features[j] = node.features[i]
  */
       __pyx_t_1 = __pyx_v_node->features_count;
       __pyx_t_5 = __pyx_t_1;
       for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
         __pyx_v_i = __pyx_t_6;
 
-        /* "cedar/_splitter.pyx":124
+        /* "cedar/_splitter.pyx":125
  *                 j = 0
  *                 for i in range(node.features_count):
  *                     if node.features[i] != split.feature:             # <<<<<<<<<<<<<<
- *                         split.features[j] = node.features[i]
- *                         j += 1
+ *                         split.left_features[j] = node.features[i]
+ *                         split.right_features[j] = node.features[i]
  */
         __pyx_t_3 = (((__pyx_v_node->features[__pyx_v_i]) != __pyx_v_split->feature) != 0);
         if (__pyx_t_3) {
 
-          /* "cedar/_splitter.pyx":125
+          /* "cedar/_splitter.pyx":126
  *                 for i in range(node.features_count):
  *                     if node.features[i] != split.feature:
- *                         split.features[j] = node.features[i]             # <<<<<<<<<<<<<<
+ *                         split.left_features[j] = node.features[i]             # <<<<<<<<<<<<<<
+ *                         split.right_features[j] = node.features[i]
+ *                         j += 1
+ */
+          (__pyx_v_split->left_features[__pyx_v_j]) = (__pyx_v_node->features[__pyx_v_i]);
+
+          /* "cedar/_splitter.pyx":127
+ *                     if node.features[i] != split.feature:
+ *                         split.left_features[j] = node.features[i]
+ *                         split.right_features[j] = node.features[i]             # <<<<<<<<<<<<<<
  *                         j += 1
  * 
  */
-          (__pyx_v_split->features[__pyx_v_j]) = (__pyx_v_node->features[__pyx_v_i]);
+          (__pyx_v_split->right_features[__pyx_v_j]) = (__pyx_v_node->features[__pyx_v_i]);
 
-          /* "cedar/_splitter.pyx":126
- *                     if node.features[i] != split.feature:
- *                         split.features[j] = node.features[i]
+          /* "cedar/_splitter.pyx":128
+ *                         split.left_features[j] = node.features[i]
+ *                         split.right_features[j] = node.features[i]
  *                         j += 1             # <<<<<<<<<<<<<<
  * 
  *             else:
  */
           __pyx_v_j = (__pyx_v_j + 1);
 
-          /* "cedar/_splitter.pyx":124
+          /* "cedar/_splitter.pyx":125
  *                 j = 0
  *                 for i in range(node.features_count):
  *                     if node.features[i] != split.feature:             # <<<<<<<<<<<<<<
- *                         split.features[j] = node.features[i]
- *                         j += 1
+ *                         split.left_features[j] = node.features[i]
+ *                         split.right_features[j] = node.features[i]
  */
         }
       }
@@ -3327,7 +3346,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
       goto __pyx_L11;
     }
 
-    /* "cedar/_splitter.pyx":129
+    /* "cedar/_splitter.pyx":131
  * 
  *             else:
  *                 result = 1             # <<<<<<<<<<<<<<
@@ -3339,7 +3358,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
     }
     __pyx_L11:;
 
-    /* "cedar/_splitter.pyx":131
+    /* "cedar/_splitter.pyx":133
  *                 result = 1
  * 
  *             free(gini_indices)             # <<<<<<<<<<<<<<
@@ -3348,7 +3367,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
  */
     free(__pyx_v_gini_indices);
 
-    /* "cedar/_splitter.pyx":132
+    /* "cedar/_splitter.pyx":134
  * 
  *             free(gini_indices)
  *             free(distribution)             # <<<<<<<<<<<<<<
@@ -3357,7 +3376,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
  */
     free(__pyx_v_distribution);
 
-    /* "cedar/_splitter.pyx":133
+    /* "cedar/_splitter.pyx":135
  *             free(gini_indices)
  *             free(distribution)
  *             free(valid_features)             # <<<<<<<<<<<<<<
@@ -3366,7 +3385,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
  */
     free(__pyx_v_valid_features);
 
-    /* "cedar/_splitter.pyx":134
+    /* "cedar/_splitter.pyx":136
  *             free(distribution)
  *             free(valid_features)
  *             free(valid_indices)             # <<<<<<<<<<<<<<
@@ -3385,7 +3404,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
     goto __pyx_L3;
   }
 
-  /* "cedar/_splitter.pyx":137
+  /* "cedar/_splitter.pyx":139
  * 
  *         else:
  *             result = 1             # <<<<<<<<<<<<<<
@@ -3397,7 +3416,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
   }
   __pyx_L3:;
 
-  /* "cedar/_splitter.pyx":139
+  /* "cedar/_splitter.pyx":141
  *             result = 1
  * 
  *         return result             # <<<<<<<<<<<<<<
@@ -3420,7 +3439,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_split_node(struct __pyx_obj_5ced
   return __pyx_r;
 }
 
-/* "cedar/_splitter.pyx":144
+/* "cedar/_splitter.pyx":146
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef int compute_splits(self, Node** node_ptr, int** X, int* y,             # <<<<<<<<<<<<<<
@@ -3449,7 +3468,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
   int __pyx_t_6;
   int __pyx_t_7;
 
-  /* "cedar/_splitter.pyx":150
+  /* "cedar/_splitter.pyx":152
  *         Update the metadata of this node.
  *         """
  *         cdef Node* node = node_ptr[0]             # <<<<<<<<<<<<<<
@@ -3458,7 +3477,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-  /* "cedar/_splitter.pyx":152
+  /* "cedar/_splitter.pyx":154
  *         cdef Node* node = node_ptr[0]
  * 
  *         cdef int count = n_samples             # <<<<<<<<<<<<<<
@@ -3467,7 +3486,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_count = __pyx_v_n_samples;
 
-  /* "cedar/_splitter.pyx":153
+  /* "cedar/_splitter.pyx":155
  * 
  *         cdef int count = n_samples
  *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
@@ -3476,7 +3495,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_pos_count = 0;
 
-  /* "cedar/_splitter.pyx":155
+  /* "cedar/_splitter.pyx":157
  *         cdef int pos_count = 0
  * 
  *         cdef int* left_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3485,7 +3504,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_left_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "cedar/_splitter.pyx":156
+  /* "cedar/_splitter.pyx":158
  * 
  *         cdef int* left_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3494,7 +3513,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_left_pos_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "cedar/_splitter.pyx":157
+  /* "cedar/_splitter.pyx":159
  *         cdef int* left_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* right_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3503,7 +3522,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_right_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "cedar/_splitter.pyx":158
+  /* "cedar/_splitter.pyx":160
  *         cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* right_counts = <int *>malloc(n_features * sizeof(int))
  *         cdef int* right_pos_counts = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3512,7 +3531,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_right_pos_counts = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-  /* "cedar/_splitter.pyx":166
+  /* "cedar/_splitter.pyx":168
  * 
  *         # count number of pos labels
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3524,7 +3543,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cedar/_splitter.pyx":167
+    /* "cedar/_splitter.pyx":169
  *         # count number of pos labels
  *         for i in range(n_samples):
  *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
@@ -3534,7 +3553,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
     __pyx_t_4 = (((__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]) == 1) != 0);
     if (__pyx_t_4) {
 
-      /* "cedar/_splitter.pyx":168
+      /* "cedar/_splitter.pyx":170
  *         for i in range(n_samples):
  *             if y[samples[i]] == 1:
  *                 pos_count += 1             # <<<<<<<<<<<<<<
@@ -3543,7 +3562,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
       __pyx_v_pos_count = (__pyx_v_pos_count + 1);
 
-      /* "cedar/_splitter.pyx":167
+      /* "cedar/_splitter.pyx":169
  *         # count number of pos labels
  *         for i in range(n_samples):
  *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
@@ -3553,7 +3572,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
     }
   }
 
-  /* "cedar/_splitter.pyx":171
+  /* "cedar/_splitter.pyx":173
  * 
  *         # compute statistics for each attribute
  *         for j in range(n_features):             # <<<<<<<<<<<<<<
@@ -3565,7 +3584,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_j = __pyx_t_3;
 
-    /* "cedar/_splitter.pyx":173
+    /* "cedar/_splitter.pyx":175
  *         for j in range(n_features):
  * 
  *             left_count = 0             # <<<<<<<<<<<<<<
@@ -3574,7 +3593,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
     __pyx_v_left_count = 0;
 
-    /* "cedar/_splitter.pyx":174
+    /* "cedar/_splitter.pyx":176
  * 
  *             left_count = 0
  *             left_pos_count = 0             # <<<<<<<<<<<<<<
@@ -3583,7 +3602,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
     __pyx_v_left_pos_count = 0;
 
-    /* "cedar/_splitter.pyx":176
+    /* "cedar/_splitter.pyx":178
  *             left_pos_count = 0
  * 
  *             for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3595,7 +3614,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
     for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
       __pyx_v_i = __pyx_t_7;
 
-      /* "cedar/_splitter.pyx":178
+      /* "cedar/_splitter.pyx":180
  *             for i in range(n_samples):
  * 
  *                 if X[samples[i]][features[j]] == 1:             # <<<<<<<<<<<<<<
@@ -3605,7 +3624,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
       __pyx_t_4 = ((((__pyx_v_X[(__pyx_v_samples[__pyx_v_i])])[(__pyx_v_features[__pyx_v_j])]) == 1) != 0);
       if (__pyx_t_4) {
 
-        /* "cedar/_splitter.pyx":179
+        /* "cedar/_splitter.pyx":181
  * 
  *                 if X[samples[i]][features[j]] == 1:
  *                     left_count += 1             # <<<<<<<<<<<<<<
@@ -3614,7 +3633,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
         __pyx_v_left_count = (__pyx_v_left_count + 1);
 
-        /* "cedar/_splitter.pyx":180
+        /* "cedar/_splitter.pyx":182
  *                 if X[samples[i]][features[j]] == 1:
  *                     left_count += 1
  *                     left_pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
@@ -3623,7 +3642,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
         __pyx_v_left_pos_count = (__pyx_v_left_pos_count + (__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]));
 
-        /* "cedar/_splitter.pyx":178
+        /* "cedar/_splitter.pyx":180
  *             for i in range(n_samples):
  * 
  *                 if X[samples[i]][features[j]] == 1:             # <<<<<<<<<<<<<<
@@ -3633,7 +3652,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
       }
     }
 
-    /* "cedar/_splitter.pyx":182
+    /* "cedar/_splitter.pyx":184
  *                     left_pos_count += y[samples[i]]
  * 
  *             left_counts[j] = left_count             # <<<<<<<<<<<<<<
@@ -3642,7 +3661,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
     (__pyx_v_left_counts[__pyx_v_j]) = __pyx_v_left_count;
 
-    /* "cedar/_splitter.pyx":183
+    /* "cedar/_splitter.pyx":185
  * 
  *             left_counts[j] = left_count
  *             left_pos_counts[j] = left_pos_count             # <<<<<<<<<<<<<<
@@ -3651,7 +3670,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
     (__pyx_v_left_pos_counts[__pyx_v_j]) = __pyx_v_left_pos_count;
 
-    /* "cedar/_splitter.pyx":184
+    /* "cedar/_splitter.pyx":186
  *             left_counts[j] = left_count
  *             left_pos_counts[j] = left_pos_count
  *             right_counts[j] = count - left_count             # <<<<<<<<<<<<<<
@@ -3660,7 +3679,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
     (__pyx_v_right_counts[__pyx_v_j]) = (__pyx_v_count - __pyx_v_left_count);
 
-    /* "cedar/_splitter.pyx":185
+    /* "cedar/_splitter.pyx":187
  *             left_pos_counts[j] = left_pos_count
  *             right_counts[j] = count - left_count
  *             right_pos_counts[j] = pos_count - left_pos_count             # <<<<<<<<<<<<<<
@@ -3670,7 +3689,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
     (__pyx_v_right_pos_counts[__pyx_v_j]) = (__pyx_v_pos_count - __pyx_v_left_pos_count);
   }
 
-  /* "cedar/_splitter.pyx":187
+  /* "cedar/_splitter.pyx":189
  *             right_pos_counts[j] = pos_count - left_pos_count
  * 
  *         node.count = count             # <<<<<<<<<<<<<<
@@ -3679,7 +3698,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->count = __pyx_v_count;
 
-  /* "cedar/_splitter.pyx":188
+  /* "cedar/_splitter.pyx":190
  * 
  *         node.count = count
  *         node.pos_count = pos_count             # <<<<<<<<<<<<<<
@@ -3688,7 +3707,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->pos_count = __pyx_v_pos_count;
 
-  /* "cedar/_splitter.pyx":189
+  /* "cedar/_splitter.pyx":191
  *         node.count = count
  *         node.pos_count = pos_count
  *         node.features_count = n_features             # <<<<<<<<<<<<<<
@@ -3697,7 +3716,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->features_count = __pyx_v_n_features;
 
-  /* "cedar/_splitter.pyx":190
+  /* "cedar/_splitter.pyx":192
  *         node.pos_count = pos_count
  *         node.features_count = n_features
  *         node.features = features             # <<<<<<<<<<<<<<
@@ -3706,7 +3725,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->features = __pyx_v_features;
 
-  /* "cedar/_splitter.pyx":191
+  /* "cedar/_splitter.pyx":193
  *         node.features_count = n_features
  *         node.features = features
  *         node.left_counts = left_counts             # <<<<<<<<<<<<<<
@@ -3715,7 +3734,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->left_counts = __pyx_v_left_counts;
 
-  /* "cedar/_splitter.pyx":192
+  /* "cedar/_splitter.pyx":194
  *         node.features = features
  *         node.left_counts = left_counts
  *         node.left_pos_counts = left_pos_counts             # <<<<<<<<<<<<<<
@@ -3724,7 +3743,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->left_pos_counts = __pyx_v_left_pos_counts;
 
-  /* "cedar/_splitter.pyx":193
+  /* "cedar/_splitter.pyx":195
  *         node.left_counts = left_counts
  *         node.left_pos_counts = left_pos_counts
  *         node.right_counts = right_counts             # <<<<<<<<<<<<<<
@@ -3733,7 +3752,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->right_counts = __pyx_v_right_counts;
 
-  /* "cedar/_splitter.pyx":194
+  /* "cedar/_splitter.pyx":196
  *         node.left_pos_counts = left_pos_counts
  *         node.right_counts = right_counts
  *         node.right_pos_counts = right_pos_counts             # <<<<<<<<<<<<<<
@@ -3741,7 +3760,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
  */
   __pyx_v_node->right_pos_counts = __pyx_v_right_pos_counts;
 
-  /* "cedar/_splitter.pyx":144
+  /* "cedar/_splitter.pyx":146
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef int compute_splits(self, Node** node_ptr, int** X, int* y,             # <<<<<<<<<<<<<<
@@ -3754,7 +3773,7 @@ static int __pyx_f_5cedar_9_splitter_9_Splitter_compute_splits(CYTHON_UNUSED str
   return __pyx_r;
 }
 
-/* "cedar/_splitter.pxd":32
+/* "cedar/_splitter.pxd":33
  *     """
  *     # Internal structures
  *     cdef public int min_samples_leaf       # Min samples in a leaf             # <<<<<<<<<<<<<<
@@ -3781,7 +3800,7 @@ static PyObject *__pyx_pf_5cedar_9_splitter_9_Splitter_16min_samples_leaf___get_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->min_samples_leaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 32, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->min_samples_leaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3816,7 +3835,7 @@ static int __pyx_pf_5cedar_9_splitter_9_Splitter_16min_samples_leaf_2__set__(str
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 32, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(2, 33, __pyx_L1_error)
   __pyx_v_self->min_samples_leaf = __pyx_t_1;
 
   /* function exit code */

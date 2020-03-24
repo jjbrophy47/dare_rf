@@ -109,11 +109,11 @@ cdef class _TreeBuilder:
                 self._set_decision_node(&node, &split)
 
                 node.left = self._build(X, y, split.left_indices, split.left_count,
-                                        split.features, split.features_count,
+                                        split.left_features, split.features_count,
                                         depth + 1, 1, node.p)
 
                 node.right = self._build(X, y, split.right_indices, split.right_count,
-                                         split.features, split.features_count,
+                                         split.right_features, split.features_count,
                                          depth + 1, 0, node.p)
 
         return node
@@ -193,7 +193,9 @@ cdef class _Tree:
         Destructor.
         """
         if self.root:
+            # printf('freeing tree\n')
             dealloc(self.root)
+            # printf('freeing root\n')
             free(self.root)
 
     @cython.boundscheck(False)

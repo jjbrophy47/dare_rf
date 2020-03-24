@@ -829,17 +829,17 @@ static PyObject *__pyx_pf_5cedar_5_tree_12_TreeBuilder_2build(struct __pyx_obj_5
 <pre class='cython code score-0 '>      ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_set_decision_node(__pyx_v_self, (&amp;__pyx_v_node), (&amp;__pyx_v_split));
 </pre><pre class="cython line score-0">&#xA0;<span class="">110</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">111</span>:                 <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">left_indices</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">left_count</span><span class="p">,</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_node-&gt;left = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.features, __pyx_v_split.features_count, (__pyx_v_depth + 1), 1, __pyx_v_node-&gt;p);
-</pre><pre class="cython line score-0">&#xA0;<span class="">112</span>:                                         <span class="n">split</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">features_count</span><span class="p">,</span></pre>
+<pre class='cython code score-0 '>      __pyx_v_node-&gt;left = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.left_features, __pyx_v_split.features_count, (__pyx_v_depth + 1), 1, __pyx_v_node-&gt;p);
+</pre><pre class="cython line score-0">&#xA0;<span class="">112</span>:                                         <span class="n">split</span><span class="o">.</span><span class="n">left_features</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">features_count</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">113</span>:                                         <span class="n">depth</span> <span class="o">+</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">114</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">115</span>:                 <span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">right_indices</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">right_count</span><span class="p">,</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_node-&gt;right = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.features, __pyx_v_split.features_count, (__pyx_v_depth + 1), 0, __pyx_v_node-&gt;p);
+<pre class='cython code score-0 '>      __pyx_v_node-&gt;right = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_build(__pyx_v_self, __pyx_v_X, __pyx_v_y, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.right_features, __pyx_v_split.features_count, (__pyx_v_depth + 1), 0, __pyx_v_node-&gt;p);
     }
     __pyx_L9:;
   }
   __pyx_L7:;
-</pre><pre class="cython line score-0">&#xA0;<span class="">116</span>:                                          <span class="n">split</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">features_count</span><span class="p">,</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">116</span>:                                          <span class="n">split</span><span class="o">.</span><span class="n">right_features</span><span class="p">,</span> <span class="n">split</span><span class="o">.</span><span class="n">features_count</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">117</span>:                                          <span class="n">depth</span> <span class="o">+</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">118</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">119</span>:         <span class="k">return</span> <span class="n">node</span></pre>
@@ -1068,14 +1068,16 @@ static void __pyx_pf_5cedar_5_tree_5_Tree_2__dealloc__(struct __pyx_obj_5cedar_5
   if (__pyx_t_1) {
 /* … */
   }
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">196</span>:             <span class="n">dealloc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">196</span>:             <span class="c"># printf(&#39;freeing tree\n&#39;)</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">197</span>:             <span class="n">dealloc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>    __pyx_f_5cedar_6_utils_dealloc(__pyx_v_self-&gt;root);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">197</span>:             <span class="n">free</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">198</span>:             <span class="c"># printf(&#39;freeing root\n&#39;)</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">199</span>:             <span class="n">free</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>    free(__pyx_v_self-&gt;root);
-</pre><pre class="cython line score-0">&#xA0;<span class="">198</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">199</span>:     <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">200</span>:     <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-51" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">201</span>:     <span class="k">cpdef</span> <span class="kt">np</span>.<span class="kt">ndarray</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">[:,:]</span> <span class="n">X</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">200</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">201</span>:     <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">202</span>:     <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-51" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">203</span>:     <span class="k">cpdef</span> <span class="kt">np</span>.<span class="kt">ndarray</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">[:,:]</span> <span class="n">X</span><span class="p">):</span></pre>
 <pre class='cython code score-51 '>static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_5predict(PyObject *__pyx_v_self, PyObject *__pyx_arg_X); /*proto*/
 static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, __Pyx_memviewslice __pyx_v_X, int __pyx_skip_dispatch) {
   int __pyx_v_n_samples;
@@ -1100,12 +1102,12 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_predict);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)</span>
+      __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_predict);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)</span>
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_5predict)) {
         <span class='pyx_macro_api'>__Pyx_XDECREF</span>(((PyObject *)__pyx_r));
-        if (unlikely(!__pyx_v_X.memview)) { <span class='pyx_c_api'>__Pyx_RaiseUnboundLocalError</span>("X"); <span class='error_goto'>__PYX_ERR(0, 201, __pyx_L1_error)</span> }
-        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);;<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)</span>
+        if (unlikely(!__pyx_v_X.memview)) { <span class='pyx_c_api'>__Pyx_RaiseUnboundLocalError</span>("X"); <span class='error_goto'>__PYX_ERR(0, 203, __pyx_L1_error)</span> }
+        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);;<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)</span>
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
         <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -1121,10 +1123,10 @@ static PyArrayObject *__pyx_f_5cedar_5_tree_5_Tree_predict(struct __pyx_obj_5ced
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : <span class='pyx_c_api'>__Pyx_PyObject_CallOneArg</span>(__pyx_t_4, __pyx_t_3);
         <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_5); __pyx_t_5 = 0;
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) <span class='error_goto'>__PYX_ERR(0, 201, __pyx_L1_error)</span>
+        if (unlikely(!__pyx_t_2)) <span class='error_goto'>__PYX_ERR(0, 203, __pyx_L1_error)</span>
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) <span class='error_goto'>__PYX_ERR(0, 201, __pyx_L1_error)</span>
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) <span class='error_goto'>__PYX_ERR(0, 203, __pyx_L1_error)</span>
         __pyx_r = ((PyArrayObject *)__pyx_t_2);
         __pyx_t_2 = 0;
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
@@ -1177,7 +1179,7 @@ static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_5predict(PyObject *__pyx_v_self, 
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("predict (wrapper)", 0);
   assert(__pyx_arg_X); {
-    __pyx_v_X = <span class='pyx_c_api'>__Pyx_PyObject_to_MemoryviewSlice_dsds_int</span>(__pyx_arg_X, PyBUF_WRITABLE);<span class='error_goto'> if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 201, __pyx_L3_error)</span>
+    __pyx_v_X = <span class='pyx_c_api'>__Pyx_PyObject_to_MemoryviewSlice_dsds_int</span>(__pyx_arg_X, PyBUF_WRITABLE);<span class='error_goto'> if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 203, __pyx_L3_error)</span>
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1197,8 +1199,8 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4predict(struct __pyx_obj_5cedar_
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("predict", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  if (unlikely(!__pyx_v_X.memview)) { <span class='pyx_c_api'>__Pyx_RaiseUnboundLocalError</span>("X"); <span class='error_goto'>__PYX_ERR(0, 201, __pyx_L1_error)</span> }
-  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree_predict(__pyx_v_self, __pyx_v_X, 1));<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)</span>
+  if (unlikely(!__pyx_v_X.memview)) { <span class='pyx_c_api'>__Pyx_RaiseUnboundLocalError</span>("X"); <span class='error_goto'>__PYX_ERR(0, 203, __pyx_L1_error)</span> }
+  __pyx_t_1 = ((PyObject *)__pyx_f_5cedar_5_tree_5_Tree_predict(__pyx_v_self, __pyx_v_X, 1));<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1215,65 +1217,65 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4predict(struct __pyx_obj_5cedar_
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-0">&#xA0;<span class="">202</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">203</span>: <span class="sd">        Predict probability of positive label for X.</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">204</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">205</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">206</span>:         <span class="c"># In / out</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">207</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">204</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">205</span>: <span class="sd">        Predict probability of positive label for X.</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">206</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">207</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">208</span>:         <span class="c"># In / out</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">209</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_n_samples = (__pyx_v_X.shape[0]);
-</pre><pre class="cython line score-42" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">208</span>:         <span class="k">cdef</span> <span class="kt">np</span>.<span class="kt">ndarray</span>[<span class="kt">double</span>] <span class="nf">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span></pre>
-<pre class='cython code score-42 '>  <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_t_1, __pyx_n_s_np);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+</pre><pre class="cython line score-42" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">210</span>:         <span class="k">cdef</span> <span class="kt">np</span>.<span class="kt">ndarray</span>[<span class="kt">double</span>] <span class="nf">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span></pre>
+<pre class='cython code score-42 '>  <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_t_1, __pyx_n_s_np);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_1, __pyx_n_s_zeros);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_1, __pyx_n_s_zeros);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyInt_From_int</span>(__pyx_v_n_samples);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyInt_From_int</span>(__pyx_v_n_samples);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  __pyx_t_4 = <span class='py_c_api'>PyTuple_New</span>(1);<span class='error_goto'> if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_4 = <span class='py_c_api'>PyTuple_New</span>(1);<span class='error_goto'> if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_t_1);
   <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = <span class='py_c_api'>PyTuple_New</span>(1);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_1 = <span class='py_c_api'>PyTuple_New</span>(1);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_t_4);
   <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = <span class='pyx_c_api'>__Pyx_PyDict_NewPresized</span>(1);<span class='error_goto'> if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_4 = <span class='pyx_c_api'>__Pyx_PyDict_NewPresized</span>(1);<span class='error_goto'> if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
-  <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_t_3, __pyx_n_s_np);<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_t_3, __pyx_n_s_np);<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
-  __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_3, __pyx_n_s_double);<span class='error_goto'> if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_3, __pyx_n_s_double);<span class='error_goto'> if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_5);
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_5) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 208, __pyx_L1_error)</span>
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_5) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_Call</span>(__pyx_t_2, __pyx_t_1, __pyx_t_4);<span class='error_goto'> if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 208, __pyx_L1_error)</span>
+  __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_Call</span>(__pyx_t_2, __pyx_t_1, __pyx_t_4);<span class='error_goto'> if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 210, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_5);
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_5) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) <span class='error_goto'>__PYX_ERR(0, 208, __pyx_L1_error)</span>
+  if (!(likely(((__pyx_t_5) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) <span class='error_goto'>__PYX_ERR(0, 210, __pyx_L1_error)</span>
   __pyx_t_6 = ((PyArrayObject *)__pyx_t_5);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_out.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_6, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_out = ((PyArrayObject *)Py_None); <span class='pyx_macro_api'>__Pyx_INCREF</span>(Py_None); __pyx_pybuffernd_out.rcbuffer-&gt;pybuffer.buf = NULL;
-      <span class='error_goto'>__PYX_ERR(0, 208, __pyx_L1_error)</span>
+      <span class='error_goto'>__PYX_ERR(0, 210, __pyx_L1_error)</span>
     } else {__pyx_pybuffernd_out.diminfo[0].strides = __pyx_pybuffernd_out.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_out.diminfo[0].shape = __pyx_pybuffernd_out.rcbuffer-&gt;pybuffer.shape[0];
     }
   }
   __pyx_t_6 = 0;
   __pyx_v_out = ((PyArrayObject *)__pyx_t_5);
   __pyx_t_5 = 0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">209</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">210</span>:         <span class="c"># Incrementers</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">211</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span> <span class="o">=</span> <span class="mf">0</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">211</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">212</span>:         <span class="c"># Incrementers</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">213</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span> <span class="o">=</span> <span class="mf">0</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_i = 0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">212</span>:         <span class="k">cdef</span> <span class="kt">Node</span>* <span class="nf">node</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">213</span>: </pre>
-<pre class="cython line score-4" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">214</span>:         <span class="k">with</span> <span class="k">nogil</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">214</span>:         <span class="k">cdef</span> <span class="kt">Node</span>* <span class="nf">node</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">215</span>: </pre>
+<pre class="cython line score-4" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">216</span>:         <span class="k">with</span> <span class="k">nogil</span><span class="p">:</span></pre>
 <pre class='cython code score-4 '>  {
       #ifdef WITH_THREAD
       PyThreadState *_save;
@@ -1293,21 +1295,21 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4predict(struct __pyx_obj_5cedar_
         __pyx_L5:;
       }
   }
-</pre><pre class="cython line score-0">&#xA0;<span class="">215</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">216</span>:             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">217</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">218</span>:             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>        __pyx_t_7 = __pyx_v_n_samples;
         __pyx_t_8 = __pyx_t_7;
         for (__pyx_t_9 = 0; __pyx_t_9 &lt; __pyx_t_8; __pyx_t_9+=1) {
           __pyx_v_i = __pyx_t_9;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">217</span>:                 <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">219</span>:                 <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span></pre>
 <pre class='cython code score-0 '>          __pyx_t_10 = __pyx_v_self-&gt;root;
           __pyx_v_node = __pyx_t_10;
-</pre><pre class="cython line score-0">&#xA0;<span class="">218</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">219</span>:                 <span class="k">while</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">220</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">221</span>:                 <span class="k">while</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>          while (1) {
             __pyx_t_11 = ((!(__pyx_v_node-&gt;is_leaf != 0)) != 0);
             if (!__pyx_t_11) break;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">220</span>:                     <span class="k">if</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">feature</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">222</span>:                     <span class="k">if</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">feature</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>            __pyx_t_12 = __pyx_v_i;
             __pyx_t_13 = __pyx_v_node-&gt;feature;
             __pyx_t_11 = (((*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_12 * __pyx_v_X.strides[0]) ) + __pyx_t_13 * __pyx_v_X.strides[1]) ))) == 1) != 0);
@@ -1315,32 +1317,32 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_4predict(struct __pyx_obj_5cedar_
 /* … */
               goto __pyx_L10;
             }
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">221</span>:                         <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">223</span>:                         <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span></pre>
 <pre class='cython code score-0 '>              __pyx_t_10 = __pyx_v_node-&gt;left;
               __pyx_v_node = __pyx_t_10;
-</pre><pre class="cython line score-0">&#xA0;<span class="">222</span>:                     <span class="k">else</span><span class="p">:</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">223</span>:                         <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">224</span>:                     <span class="k">else</span><span class="p">:</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">225</span>:                         <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span></pre>
 <pre class='cython code score-0 '>            /*else*/ {
               __pyx_t_10 = __pyx_v_node-&gt;right;
               __pyx_v_node = __pyx_t_10;
             }
             __pyx_L10:;
           }
-</pre><pre class="cython line score-0">&#xA0;<span class="">224</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">225</span>:                 <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">226</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">227</span>:                 <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span></pre>
 <pre class='cython code score-0 '>          __pyx_t_14 = __pyx_v_node-&gt;value;
           __pyx_t_15 = __pyx_v_i;
           *__Pyx_BufPtrStrided1d(double *, __pyx_pybuffernd_out.rcbuffer-&gt;pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_out.diminfo[0].strides) = __pyx_t_14;
         }
       }
-</pre><pre class="cython line score-0">&#xA0;<span class="">226</span>: </pre>
-<pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">227</span>:         <span class="k">return</span> <span class="n">out</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">228</span>: </pre>
+<pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">229</span>:         <span class="k">return</span> <span class="n">out</span></pre>
 <pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(((PyObject *)__pyx_r));
   <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_out));
   __pyx_r = ((PyArrayObject *)__pyx_v_out);
   goto __pyx_L0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">228</span>: </pre>
-<pre class="cython line score-32" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">229</span>:     <span class="k">cpdef</span> <span class="kt">void</span> <span class="nf">print_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">230</span>: </pre>
+<pre class="cython line score-32" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">231</span>:     <span class="k">cpdef</span> <span class="kt">void</span> <span class="nf">print_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
 <pre class='cython code score-32 '>static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_7print_depth(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_skip_dispatch) {
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
@@ -1354,7 +1356,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_print_depth);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)</span>
+      __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_print_depth);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L1_error)</span>
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_7print_depth)) {
         <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
@@ -1370,7 +1372,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_depth(struct __pyx_obj_5cedar_5_t
         }
         __pyx_t_2 = (__pyx_t_4) ? <span class='pyx_c_api'>__Pyx_PyObject_CallOneArg</span>(__pyx_t_3, __pyx_t_4) : <span class='pyx_c_api'>__Pyx_PyObject_CallNoArg</span>(__pyx_t_3);
         <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) <span class='error_goto'>__PYX_ERR(0, 229, __pyx_L1_error)</span>
+        if (unlikely(!__pyx_t_2)) <span class='error_goto'>__PYX_ERR(0, 231, __pyx_L1_error)</span>
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
@@ -1420,7 +1422,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6print_depth(struct __pyx_obj_5ce
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("print_depth", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_depth(__pyx_v_self, 1));<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)</span>
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_depth(__pyx_v_self, 1));<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1436,14 +1438,14 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_6print_depth(struct __pyx_obj_5ce
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">230</span>:         <span class="n">printf</span><span class="p">(</span><span class="s">&#39;depth: [ &#39;</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">232</span>:         <span class="n">printf</span><span class="p">(</span><span class="s">&#39;depth: [ &#39;</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  (void)(printf(((char const *)"depth: [ ")));
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">231</span>:         <span class="bp">self</span><span class="o">.</span><span class="n">_print_depth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">233</span>:         <span class="bp">self</span><span class="o">.</span><span class="n">_print_depth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_print_depth(__pyx_v_self, __pyx_v_self-&gt;root);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">232</span>:         <span class="n">printf</span><span class="p">(</span><span class="s">&#39;]</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">234</span>:         <span class="n">printf</span><span class="p">(</span><span class="s">&#39;]</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  (void)(printf(((char const *)"]\n")));
-</pre><pre class="cython line score-0">&#xA0;<span class="">233</span>: </pre>
-<pre class="cython line score-32" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">234</span>:     <span class="k">cpdef</span> <span class="kt">void</span> <span class="nf">print_node_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">235</span>: </pre>
+<pre class="cython line score-32" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">236</span>:     <span class="k">cpdef</span> <span class="kt">void</span> <span class="nf">print_node_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
 <pre class='cython code score-32 '>static PyObject *__pyx_pw_5cedar_5_tree_5_Tree_9print_node_count(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, int __pyx_skip_dispatch) {
   int __pyx_v_node_count;
@@ -1458,7 +1460,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_print_node_count);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)</span>
+      __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_print_node_count);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)</span>
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_5_tree_5_Tree_9print_node_count)) {
         <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
@@ -1474,7 +1476,7 @@ static void __pyx_f_5cedar_5_tree_5_Tree_print_node_count(struct __pyx_obj_5ceda
         }
         __pyx_t_2 = (__pyx_t_4) ? <span class='pyx_c_api'>__Pyx_PyObject_CallOneArg</span>(__pyx_t_3, __pyx_t_4) : <span class='pyx_c_api'>__Pyx_PyObject_CallNoArg</span>(__pyx_t_3);
         <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) <span class='error_goto'>__PYX_ERR(0, 234, __pyx_L1_error)</span>
+        if (unlikely(!__pyx_t_2)) <span class='error_goto'>__PYX_ERR(0, 236, __pyx_L1_error)</span>
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
@@ -1524,7 +1526,7 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8print_node_count(struct __pyx_ob
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("print_node_count", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_node_count(__pyx_v_self, 1));<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)</span>
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_5_tree_5_Tree_print_node_count(__pyx_v_self, 1));<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1540,33 +1542,33 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8print_node_count(struct __pyx_ob
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">235</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">node_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_node_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">237</span>:         <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">node_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_node_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_node_count = ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_get_node_count(__pyx_v_self, __pyx_v_self-&gt;root);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">236</span>:         <span class="n">printf</span><span class="p">(</span><span class="s">&#39;node_count: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">node_count</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">238</span>:         <span class="n">printf</span><span class="p">(</span><span class="s">&#39;node_count: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">node_count</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  (void)(printf(((char const *)"node_count: %d\n"), __pyx_v_node_count));
-</pre><pre class="cython line score-0">&#xA0;<span class="">237</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">238</span>:     <span class="c"># private</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">239</span>:     <span class="k">cdef</span> <span class="kt">void</span> <span class="nf">_print_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">239</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">240</span>:     <span class="c"># private</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">241</span>:     <span class="k">cdef</span> <span class="kt">void</span> <span class="nf">_print_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>static void __pyx_f_5cedar_5_tree_5_Tree__print_depth(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node) {
 /* … */
   /* function exit code */
 }
-</pre><pre class="cython line score-0">&#xA0;<span class="">240</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">241</span>: <span class="sd">        Print depth of each node.</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">242</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">243</span>:         <span class="k">if</span> <span class="n">node</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">242</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">243</span>: <span class="sd">        Print depth of each node.</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">244</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">245</span>:         <span class="k">if</span> <span class="n">node</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_1 = (__pyx_v_node != 0);
   if (__pyx_t_1) {
 /* … */
   }
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">244</span>:             <span class="n">printf</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> &#39;</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">246</span>:             <span class="n">printf</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> &#39;</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>    (void)(printf(((char const *)"%d "), __pyx_v_node-&gt;depth));
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">245</span>:             <span class="bp">self</span><span class="o">.</span><span class="n">_print_depth</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">247</span>:             <span class="bp">self</span><span class="o">.</span><span class="n">_print_depth</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>    ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_print_depth(__pyx_v_self, __pyx_v_node-&gt;left);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">246</span>:             <span class="bp">self</span><span class="o">.</span><span class="n">_print_depth</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">248</span>:             <span class="bp">self</span><span class="o">.</span><span class="n">_print_depth</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>    ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_print_depth(__pyx_v_self, __pyx_v_node-&gt;right);
-</pre><pre class="cython line score-0">&#xA0;<span class="">247</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">248</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">_get_node_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">249</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">250</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">_get_node_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">)</span> <span class="k">nogil</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>static int __pyx_f_5cedar_5_tree_5_Tree__get_node_count(struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node) {
   int __pyx_r;
 /* … */
@@ -1574,19 +1576,19 @@ static PyObject *__pyx_pf_5cedar_5_tree_5_Tree_8print_node_count(struct __pyx_ob
   __pyx_L0:;
   return __pyx_r;
 }
-</pre><pre class="cython line score-0">&#xA0;<span class="">249</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">250</span>: <span class="sd">        Get number of nodes total.</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">251</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">252</span>:         <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="p">:</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">251</span>:         <span class="sd">&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">252</span>: <span class="sd">        Get number of nodes total.</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">253</span>: <span class="sd">        &quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">254</span>:         <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_1 = ((!(__pyx_v_node != 0)) != 0);
   if (__pyx_t_1) {
 /* … */
   }
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">253</span>:             <span class="k">return</span> <span class="mf">0</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">255</span>:             <span class="k">return</span> <span class="mf">0</span></pre>
 <pre class='cython code score-0 '>    __pyx_r = 0;
     goto __pyx_L0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">254</span>:         <span class="k">else</span><span class="p">:</span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">255</span>:             <span class="k">return</span> <span class="mf">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_node_count</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_node_count</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">256</span>:         <span class="k">else</span><span class="p">:</span></pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">257</span>:             <span class="k">return</span> <span class="mf">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_node_count</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_node_count</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  /*else*/ {
     __pyx_r = ((1 + ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_get_node_count(__pyx_v_self, __pyx_v_node-&gt;left)) + ((struct __pyx_vtabstruct_5cedar_5_tree__Tree *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_get_node_count(__pyx_v_self, __pyx_v_node-&gt;right));
     goto __pyx_L0;

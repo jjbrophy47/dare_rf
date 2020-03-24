@@ -20,6 +20,7 @@ np.import_array()
 from ._utils cimport compute_gini
 from ._utils cimport generate_distribution
 from ._utils cimport convert_int_ndarray
+from ._utils cimport copy_int_array
 from ._utils cimport dealloc
 
 cdef int UNDEF = -1
@@ -111,11 +112,13 @@ cdef class _Remover:
         cdef SplitRecord split
         cdef int result = 0
 
-        cdef int* leaf_samples = NULL
-        cdef int  leaf_samples_count
+        # cdef int* leaf_samples = NULL
+        # cdef int  leaf_samples_count = UNDEF
+
+        # cdef int *rebuild_features = NULL
 
         cdef bint is_bottom_leaf = node.is_leaf and not node.features
-        cdef int i
+        cdef int i = UNDEF
 
         # printf("\npopping_r (%d, %d, %.7f, %d, %d, %d)\n", node.depth, node.is_left,
         #        parent_p, node.count, n_samples, node.features_count)
@@ -126,7 +129,7 @@ cdef class _Remover:
                 pos_count += 1
 
         if is_bottom_leaf:
-            # printf('bottom leaf\n')
+            printf('bottom leaf\n')
             self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
             self._add_removal_type(result, node.depth)
 
@@ -135,7 +138,7 @@ cdef class _Remover:
             self._update_splits(&node, X, y, samples, n_samples, pos_count)
 
             if node.is_leaf:
-                # printf('leaf\n')
+                printf('leaf\n')
                 self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
                 self._add_removal_type(result, node.depth)
 
@@ -145,24 +148,18 @@ cdef class _Remover:
                 # printf('check node\n')
                 result = self._check_node(node, X, y, samples, n_samples,
                                           pos_count, parent_p, &split)
-                # printf('result: %d\n', result)
+                printf('result: %d\n', result)
 
                 # convert to leaf
                 if result == 1:
-                    self._convert_to_leaf(node_ptr, samples, n_samples, pos_count, &split)
+                    # printf('convert to leaf\n')
+                    self._convert_to_leaf(node_ptr, samples, n_samples, &split)
                     self._add_removal_type(result, node.depth)
-                    # printf('converted to leaf\n')
 
                 # retrain
                 elif result == 2:
-                    leaf_samples = <int *>malloc(split.count * sizeof(int))
-                    leaf_samples_count = 0
-                    self._get_leaf_samples(node, samples, n_samples,
-                                           &leaf_samples, &leaf_samples_count)
-                    dealloc(node)
-                    node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
-                                                           node.features, node.features_count,
-                                                           node.depth, node.is_left, parent_p)
+                    printf('retrain\n')
+                    self._retrain(node_ptr, X, y, samples, n_samples, parent_p, &split)
                     self._add_removal_type(result, node.depth)
 
                 # update and recurse
@@ -208,23 +205,21 @@ cdef class _Remover:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
-                               int pos_count, SplitRecord *split) nogil:
+                               SplitRecord *split) nogil:
         """
         Convert decision node to a leaf node.
         """
         cdef Node* node = node_ptr[0]
-        cdef int updated_count = node.count - n_samples
-        cdef int updated_pos_count = node.pos_count - pos_count
 
-        cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))
+        cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
         cdef int  leaf_samples_count = 0
         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
         dealloc(node.left)
         dealloc(node.right)
         free(node.leaf_samples)
 
-        node.count = updated_count
-        node.pos_count = updated_pos_count
+        node.count = split.count
+        node.pos_count = split.pos_count
 
         node.is_leaf = 1
         node.value = node.pos_count / <double> node.count
@@ -235,6 +230,37 @@ cdef class _Remover:
 
         node.left = NULL
         node.right = NULL
+
+        # if node.features:
+        #     printf('node.features[0]: %d\n', node.features[0])
+
+    cdef void _retrain(self, Node** node_ptr, int** X, int* y, int* samples,
+                       int n_samples, double parent_p, SplitRecord *split) nogil:
+        """
+        Rebuild subtree at this node.
+        """
+        cdef Node* node = node_ptr[0]
+
+        cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
+        cdef int  leaf_samples_count = 0
+
+        cdef int* rebuild_features = NULL
+
+        self._get_leaf_samples(node, samples, n_samples,
+                               &leaf_samples, &leaf_samples_count)
+
+        rebuild_features = copy_int_array(node.features, node.features_count)
+        # printf('[A] node.count: %d, node.pos_count: %d\n', node.count, node.pos_count)
+        # printf('[A] node.depth: %d, node.feature_count: %d\n', node.depth, node.features_count)
+        dealloc(node)
+        free(node)
+
+        node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
+                                               rebuild_features, node.features_count,
+                                               node.depth, node.is_left, parent_p)
+
+        # if node.features:
+        #     printf('node.features[0]: %d\n', node.features[0])
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -277,6 +303,9 @@ cdef class _Remover:
         node.p = split.p
         node.count = split.count
         node.pos_count = split.pos_count
+
+        # if node.features:
+        #     printf('node.features[0]: %d\n', node.features[0])
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -353,7 +382,7 @@ cdef class _Remover:
 
                 # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
-                if exp(-epsilon) <= ratio or ratio <= exp(epsilon):
+                if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
 
                     # assign results from chosen feature
                     split.left_indices = <int *>malloc(n_samples * sizeof(int))
@@ -372,8 +401,6 @@ cdef class _Remover:
                     split.left_count = j
                     split.right_count = k
                     split.p = p
-                    split.count = updated_count
-                    split.pos_count = updated_pos_count
 
                 else:
                     printf('bounds exceeded\n')
@@ -395,6 +422,9 @@ cdef class _Remover:
             printf('all samples in one class\n')
             result = 1
 
+        split.count = updated_count
+        split.pos_count = updated_pos_count
+
         return result
 
     @cython.boundscheck(False)
@@ -411,13 +441,18 @@ cdef class _Remover:
 
         cdef int i
 
+        # printf('node.count: %d, node.pos_count: %d\n', node.count, node.pos_count)
+        # printf('node.depth: %d, node.feature_count: %d\n', node.depth, node.features_count)
+
         # compute statistics for each attribute
         for j in range(node.features_count):
+            # printf('node.features[%d]: %d\n', j, node.features[j])
 
             left_count = 0
             left_pos_count = 0
 
             for i in range(n_samples):
+                # printf('samples[%d]: %d\n', i, samples[i])
 
                 if X[samples[i]][node.features[j]] == 1:
                     left_count += 1

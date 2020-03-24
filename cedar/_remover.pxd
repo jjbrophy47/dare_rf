@@ -43,7 +43,9 @@ cdef class _Remover:
     cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples,
                            int n_samples, int pos_count) nogil
     cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
-                               int pos_count, SplitRecord *split) nogil
+                               SplitRecord *split) nogil
+    cdef void _retrain(self, Node** node_ptr, int** X, int* y, int* samples,
+                       int n_samples, double parent_p, SplitRecord *split) nogil
     cdef void _get_leaf_samples(self, Node* node, int* remove_samples,
                                 int n_remove_samples, int** leaf_samples_ptr,
                                 int* leaf_samples_count_ptr) nogil
