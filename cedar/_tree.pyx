@@ -1,7 +1,5 @@
 """
-CeDAR binary tree implementation; only supports binary attributes and a binary label.
-Represenation is a number of parllel arrays.
-Adapted from: https://github.com/scikit-learn/scikit-learn/blob/b194674c42d54b26137a456c510c5fdba1ba23e0/sklearn/tree/_tree.pyx
+CeDAR
 """
 cimport cython
 
@@ -134,8 +132,6 @@ cdef class _TreeBuilder:
         cdef Node *node = node_ptr[0]
 
         if is_bottom_leaf:
-            node.p = UNDEF
-            node.feature = UNDEF
             node.features_count = UNDEF
             node.features = NULL
             node.left_counts = NULL
@@ -152,6 +148,9 @@ cdef class _TreeBuilder:
         node.is_leaf = 1
         node.value = pos_count / <double> n_samples
         node.leaf_samples = samples
+
+        node.p = UNDEF
+        node.feature = UNDEF
 
         node.left = NULL
         node.right = NULL

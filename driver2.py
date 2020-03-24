@@ -10,14 +10,14 @@ import cedar
 from experiments.utility import data_util, exact_adv_util
 
 seed = 1
-n_remove = 1
+n_remove = 10
 
 X_train, X_test, y_train, y_test = data_util.get_data('mfc19', seed, data_dir='data')
 np.random.seed(seed)
-delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
+# delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
 
-delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed,
-                                                verbose=1)
+# delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed,
+#                                                 verbose=1)
 
 # delete_indices = sorted(delete_indices)
 # print(delete_indices)
@@ -40,8 +40,8 @@ delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_re
 # print(X_train[delete_indices, 141])
 # print(X_train[delete_indices, 98])
 
-n_samples = 30000
-n_features = 20
+n_samples = 10
+n_features = 2
 
 # # generate data
 # np.random.seed(1)
@@ -60,10 +60,6 @@ print(data.shape)
 
 print('data assembled')
 
-# delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
-# # print(delete_indices)
-# print('deleting {} instances'.format(n_remove))
-
 t1 = time.time()
 model = cedar.Tree(epsilon=0.5, lmbda=10, max_depth=20, random_state=1).fit(X_train, y_train)
 print('build time: {:.7f}s'.format(time.time() - t1))
@@ -75,14 +71,18 @@ print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 proba = model.predict_proba(X_test)[:, 1]
 print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
 
-# # sequential delete
-# for i in range(len(delete_indices)):
-#     # print('\ndeleting {}: {}'.format(delete_indices[i], data[delete_indices[i]]))
-#     # print('deleting {}'.format(delete_indices[i]))
-#     t1 = time.time()
-#     model.delete(delete_indices[i])
-#     print('delete time: {:.7f}s'.format(time.time() - t1))
-#     # model.print()
+
+delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
+print('deleting {} instances'.format(n_remove))
+
+# sequential delete
+for i in range(len(delete_indices)):
+    # print('\ndeleting {}: {}'.format(delete_indices[i], data[delete_indices[i]]))
+    # print('deleting {}'.format(delete_indices[i]))
+    t1 = time.time()
+    model.delete(delete_indices[i])
+    print('delete time: {:.7f}s'.format(time.time() - t1))
+    # model.print()
 
 # # batch delete
 # t1 = time.time()
@@ -91,8 +91,8 @@ print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
 # print(model.get_removal_statistics())
 # # model.print()
 
-# proba = model.predict_proba(X_test)[:, 1]
-# preds = model.predict(X_test)
-# print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-# print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
-# print()
+proba = model.predict_proba(X_test)[:, 1]
+preds = model.predict(X_test)
+print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
+print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
+print()

@@ -34,17 +34,21 @@ cdef class _Remover:
     # C API
     cdef void _remove(self, Node** node_ptr, int** X, int* y,
                       int* samples, int n_samples, double parent_p) nogil
-    cdef int _node_remove(self, Node* node, int** X, int* y,
-                          int* samples, int n_samples,
+    cdef int _check_node(self, Node* node, int** X, int* y,
+                          int* samples, int n_samples, int pos_count,
                           double parent_p, SplitRecord *split) nogil
-    cdef void _update_leaf(self, Node** node_ptr, int* y,
-                           int* samples, int n_samples) nogil
-    cdef void _convert_to_leaf(self, Node** node_ptr, int* samples,
-                               int n_samples, SplitRecord *split) nogil
+    cdef int _update_splits(self, Node** node_ptr, int** X, int* y,
+                            int* samples, int n_samples, int pos_count) nogil
+
+    cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples,
+                           int n_samples, int pos_count) nogil
+    cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
+                               int pos_count, SplitRecord *split) nogil
     cdef void _get_leaf_samples(self, Node* node, int* remove_samples,
                                 int n_remove_samples, int** leaf_samples_ptr,
                                 int* leaf_samples_count_ptr) nogil
     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
+
     cdef void _resize_metrics(self, int capacity=*) nogil
     cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil
     cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)

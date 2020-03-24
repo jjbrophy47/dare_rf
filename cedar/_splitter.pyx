@@ -54,6 +54,7 @@ cdef class _Splitter:
         cdef double* gini_indices = NULL
         cdef double* distribution = NULL
         cdef int* valid_features = NULL
+        cdef int* valid_indices = NULL
         cdef int  valid_features_count = 0
         cdef int  chosen_ndx
         cdef int  chosen_feature_ndx
@@ -130,6 +131,7 @@ cdef class _Splitter:
             free(gini_indices)
             free(distribution)
             free(valid_features)
+            free(valid_indices)
 
         else:
             result = 1

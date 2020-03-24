@@ -865,8 +865,8 @@ static const char *__pyx_f[] = {
   "bool.pxd",
   "complex.pxd",
   "_manager.pxd",
-  "_splitter.pxd",
   "_tree.pxd",
+  "_splitter.pxd",
 };
 /* ForceInitThreads.proto */
 #ifndef __PYX_FORCE_INIT_THREADS
@@ -1192,9 +1192,9 @@ static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(do
 
 /*--- Type declarations ---*/
 struct __pyx_obj_5cedar_8_manager__DataManager;
-struct __pyx_obj_5cedar_9_splitter__Splitter;
 struct __pyx_obj_5cedar_5_tree__Tree;
 struct __pyx_obj_5cedar_5_tree__TreeBuilder;
+struct __pyx_obj_5cedar_9_splitter__Splitter;
 struct __pyx_obj_5cedar_8_remover__Remover;
 struct __pyx_array_obj;
 struct __pyx_MemviewEnum_obj;
@@ -1236,31 +1236,6 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  * cdef inline object PyArray_MultiIterNew1(a):
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
-struct __pyx_t_5cedar_9_splitter_SplitRecord;
-
-/* "_splitter.pxd":5
- * 
- * 
- * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
- * 
- *     # Data to track sample split
- */
-struct __pyx_t_5cedar_9_splitter_SplitRecord {
-  int feature;
-  int *left_indices;
-  int left_count;
-  int *right_indices;
-  int right_count;
-  int *valid_features;
-  int feature_count;
-  double p;
-  int count;
-  int pos_count;
-  int *left_counts;
-  int *left_pos_counts;
-  int *right_counts;
-  int *right_pos_counts;
-};
 struct __pyx_t_5cedar_5_tree_Node;
 
 /* "_tree.pxd":8
@@ -1281,19 +1256,44 @@ struct __pyx_t_5cedar_5_tree_Node {
   double p;
   int count;
   int pos_count;
-  int feature_count;
-  int *valid_features;
+  int features_count;
+  int *features;
   int *left_counts;
   int *left_pos_counts;
   int *right_counts;
   int *right_pos_counts;
   int *leaf_samples;
 };
+struct __pyx_t_5cedar_9_splitter_SplitRecord;
+
+/* "_splitter.pxd":7
+ * 
+ * 
+ * cdef struct SplitRecord:             # <<<<<<<<<<<<<<
+ * 
+ *     # Data to track sample split
+ */
+struct __pyx_t_5cedar_9_splitter_SplitRecord {
+  int feature;
+  int *left_indices;
+  int left_count;
+  int *right_indices;
+  int right_count;
+  int *features;
+  int features_count;
+  double p;
+  int count;
+  int pos_count;
+  int *left_counts;
+  int *left_pos_counts;
+  int *right_counts;
+  int *right_pos_counts;
+};
 struct __pyx_opt_args_5cedar_8_remover_8_Remover__resize_metrics;
 
-/* "cedar/_remover.pxd":48
- *                                 int* leaf_samples_count_ptr) nogil
+/* "cedar/_remover.pxd":52
  *     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
+ * 
  *     cdef void _resize_metrics(self, int capacity=*) nogil             # <<<<<<<<<<<<<<
  *     cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil
  *     cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
@@ -1314,26 +1314,13 @@ struct __pyx_obj_5cedar_8_manager__DataManager {
   PyObject_HEAD
   struct __pyx_vtabstruct_5cedar_8_manager__DataManager *__pyx_vtab;
   int n_samples;
-  int n_vacant;
+  int n_features;
   int **X;
   int *y;
+  int n_vacant;
   int *vacant;
-};
-
-
-/* "_splitter.pxd":25
- *     int*   right_pos_counts    # Number of right positive samples for each attribute
- * 
- * cdef class _Splitter:             # <<<<<<<<<<<<<<
- *     """
- *     The splitter searches in the input space for a feature and a threshold
- */
-struct __pyx_obj_5cedar_9_splitter__Splitter {
-  PyObject_HEAD
-  struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtab;
-  int min_samples_leaf;
-  double lmbda;
-  int random_state;
+  int *add_indices;
+  int n_add_indices;
 };
 
 
@@ -1369,6 +1356,22 @@ struct __pyx_obj_5cedar_5_tree__TreeBuilder {
   int min_samples_split;
   int min_samples_leaf;
   int max_depth;
+  int random_state;
+};
+
+
+/* "_splitter.pxd":27
+ *     int*   right_pos_counts    # Number of right positive samples for each attribute
+ * 
+ * cdef class _Splitter:             # <<<<<<<<<<<<<<
+ *     """
+ *     The splitter searches in the input space for a feature to split on.
+ */
+struct __pyx_obj_5cedar_9_splitter__Splitter {
+  PyObject_HEAD
+  struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtab;
+  int min_samples_leaf;
+  double lmbda;
   int random_state;
 };
 
@@ -1483,25 +1486,14 @@ struct __pyx_memoryviewslice_obj {
  */
 
 struct __pyx_vtabstruct_5cedar_8_manager__DataManager {
-  int (*remove_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  void (*remove_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  void (*add_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, __Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch);
+  void (*clear_add_indices)(struct __pyx_obj_5cedar_8_manager__DataManager *, int __pyx_skip_dispatch);
   int (*check_sample_validity)(struct __pyx_obj_5cedar_8_manager__DataManager *, int *, int);
   void (*get_data)(struct __pyx_obj_5cedar_8_manager__DataManager *, int ***, int **);
+  int *(*get_add_indices)(struct __pyx_obj_5cedar_8_manager__DataManager *);
 };
 static struct __pyx_vtabstruct_5cedar_8_manager__DataManager *__pyx_vtabptr_5cedar_8_manager__DataManager;
-
-
-/* "_splitter.pxd":25
- *     int*   right_pos_counts    # Number of right positive samples for each attribute
- * 
- * cdef class _Splitter:             # <<<<<<<<<<<<<<
- *     """
- *     The splitter searches in the input space for a feature and a threshold
- */
-
-struct __pyx_vtabstruct_5cedar_9_splitter__Splitter {
-  int (*node_split)(struct __pyx_obj_5cedar_9_splitter__Splitter *, int **, int *, int *, int, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
-};
-static struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtabptr_5cedar_9_splitter__Splitter;
 
 
 /* "_tree.pxd":33
@@ -1533,13 +1525,28 @@ static struct __pyx_vtabstruct_5cedar_5_tree__Tree *__pyx_vtabptr_5cedar_5_tree_
 struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder {
   void (*build)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_obj_5cedar_5_tree__Tree *, int __pyx_skip_dispatch);
   struct __pyx_t_5cedar_5_tree_Node *(*_build)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, int **, int *, int *, int, int *, int, int, int, double);
-  void (*_set_leaf_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int);
+  void (*_set_leaf_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int, int);
   void (*_set_decision_node)(struct __pyx_obj_5cedar_5_tree__TreeBuilder *, struct __pyx_t_5cedar_5_tree_Node **, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
 };
 static struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *__pyx_vtabptr_5cedar_5_tree__TreeBuilder;
 
 
-/* "cedar/_remover.pyx":33
+/* "_splitter.pxd":27
+ *     int*   right_pos_counts    # Number of right positive samples for each attribute
+ * 
+ * cdef class _Splitter:             # <<<<<<<<<<<<<<
+ *     """
+ *     The splitter searches in the input space for a feature to split on.
+ */
+
+struct __pyx_vtabstruct_5cedar_9_splitter__Splitter {
+  int (*split_node)(struct __pyx_obj_5cedar_9_splitter__Splitter *, struct __pyx_t_5cedar_5_tree_Node *, int **, int *, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
+  int (*compute_splits)(struct __pyx_obj_5cedar_9_splitter__Splitter *, struct __pyx_t_5cedar_5_tree_Node **, int **, int *, int *, int, int *, int);
+};
+static struct __pyx_vtabstruct_5cedar_9_splitter__Splitter *__pyx_vtabptr_5cedar_9_splitter__Splitter;
+
+
+/* "cedar/_remover.pyx":31
  * # =====================================
  * 
  * cdef class _Remover:             # <<<<<<<<<<<<<<
@@ -1551,9 +1558,10 @@ struct __pyx_vtabstruct_5cedar_8_remover__Remover {
   int (*remove)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_obj_5cedar_5_tree__Tree *, PyArrayObject *, int __pyx_skip_dispatch);
   void (*clear_removal_metrics)(struct __pyx_obj_5cedar_8_remover__Remover *, int __pyx_skip_dispatch);
   void (*_remove)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int **, int *, int *, int, double);
-  int (*_node_remove)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node *, int **, int *, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
-  void (*_update_leaf)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int);
-  void (*_convert_to_leaf)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
+  int (*_check_node)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node *, int **, int *, int *, int, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
+  int (*_update_splits)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int **, int *, int *, int, int);
+  void (*_update_leaf)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int, int);
+  void (*_convert_to_leaf)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int, int, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
   void (*_get_leaf_samples)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node *, int *, int, int **, int *);
   void (*_update_decision_node)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, struct __pyx_t_5cedar_9_splitter_SplitRecord *);
   void (*_resize_metrics)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_opt_args_5cedar_8_remover_8_Remover__resize_metrics *__pyx_optional_args);
@@ -2329,11 +2337,12 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, PyArrayObject *__pyx_v_remove_indices, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, double __pyx_v_parent_p); /* proto*/
-static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples); /* proto*/
-static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_samples, int __pyx_v_n_samples, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split); /* proto*/
+static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, CYTHON_UNUSED int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count); /* proto*/
+static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count, CYTHON_UNUSED struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split); /* proto*/
 static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node, int *__pyx_v_remove_samples, int __pyx_v_n_remove_samples, int **__pyx_v_leaf_samples_ptr, int *__pyx_v_leaf_samples_count_ptr); /* proto*/
 static void __pyx_f_5cedar_8_remover_8_Remover__update_decision_node(CYTHON_UNUSED struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split); /* proto*/
-static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, double __pyx_v_parent_p, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split); /* proto*/
+static int __pyx_f_5cedar_8_remover_8_Remover__check_node(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node, int **__pyx_v_X, CYTHON_UNUSED int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count, double __pyx_v_parent_p, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split); /* proto*/
+static int __pyx_f_5cedar_8_remover_8_Remover__update_splits(CYTHON_UNUSED struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count); /* proto*/
 static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_opt_args_5cedar_8_remover_8_Remover__resize_metrics *__pyx_optional_args); /* proto*/
 static void __pyx_f_5cedar_8_remover_8_Remover__add_removal_type(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, int __pyx_v_remove_type, int __pyx_v_remove_depth); /* proto*/
 static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
@@ -2446,12 +2455,12 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void); /*proto*/
 /* Module declarations from 'cedar._manager' */
 static PyTypeObject *__pyx_ptype_5cedar_8_manager__DataManager = 0;
 
-/* Module declarations from 'cedar._splitter' */
-static PyTypeObject *__pyx_ptype_5cedar_9_splitter__Splitter = 0;
-
 /* Module declarations from 'cedar._tree' */
 static PyTypeObject *__pyx_ptype_5cedar_5_tree__Tree = 0;
 static PyTypeObject *__pyx_ptype_5cedar_5_tree__TreeBuilder = 0;
+
+/* Module declarations from 'cedar._splitter' */
+static PyTypeObject *__pyx_ptype_5cedar_9_splitter__Splitter = 0;
 
 /* Module declarations from 'cython.view' */
 
@@ -2604,6 +2613,7 @@ static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
+static const char __pyx_k_CeDAR_data_remover[] = "\nCeDAR data remover.\n";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
@@ -2618,7 +2628,6 @@ static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cyt
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
 static const char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
-static const char __pyx_k_CeDAR_binary_tree_implementatio[] = "\nCeDAR binary tree implementation; only supports binary attributes and a binary label.\nRepresenation is a number of parllel arrays.\nAdapted from: https://github.com/scikit-learn/scikit-learn/blob/b194674c42d54b26137a456c510c5fdba1ba23e0/sklearn/tree/_tree.pyx\n";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
 static const char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
@@ -2843,7 +2852,7 @@ static PyObject *__pyx_tuple__33;
 static PyObject *__pyx_codeobj__34;
 /* Late includes */
 
-/* "cedar/_remover.pyx":40
+/* "cedar/_remover.pyx":38
  *     # removal metrics
  *     property remove_types:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -2870,7 +2879,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_12remove_types___get__(stru
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_remover.pyx":41
+  /* "cedar/_remover.pyx":39
  *     property remove_types:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.remove_types, self.remove_count)             # <<<<<<<<<<<<<<
@@ -2878,13 +2887,13 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_12remove_types___get__(stru
  *     property remove_depths:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->remove_types, __pyx_v_self->remove_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->remove_types, __pyx_v_self->remove_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_remover.pyx":40
+  /* "cedar/_remover.pyx":38
  *     # removal metrics
  *     property remove_types:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -2903,7 +2912,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_12remove_types___get__(stru
   return __pyx_r;
 }
 
-/* "cedar/_remover.pyx":44
+/* "cedar/_remover.pyx":42
  * 
  *     property remove_depths:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -2930,7 +2939,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_13remove_depths___get__(str
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "cedar/_remover.pyx":45
+  /* "cedar/_remover.pyx":43
  *     property remove_depths:
  *         def __get__(self):
  *             return self._get_int_ndarray(self.remove_depths, self.remove_count)             # <<<<<<<<<<<<<<
@@ -2938,13 +2947,13 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_13remove_depths___get__(str
  *     def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->remove_depths, __pyx_v_self->remove_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_int_ndarray(__pyx_v_self, __pyx_v_self->remove_depths, __pyx_v_self->remove_count)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cedar/_remover.pyx":44
+  /* "cedar/_remover.pyx":42
  * 
  *     property remove_depths:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -2963,7 +2972,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_13remove_depths___get__(str
   return __pyx_r;
 }
 
-/* "cedar/_remover.pyx":47
+/* "cedar/_remover.pyx":45
  *             return self._get_int_ndarray(self.remove_depths, self.remove_count)
  * 
  *     def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,             # <<<<<<<<<<<<<<
@@ -3008,23 +3017,23 @@ static int __pyx_pw_5cedar_8_remover_8_Remover_1__cinit__(PyObject *__pyx_v_self
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_tree_builder)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 1); __PYX_ERR(0, 47, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 1); __PYX_ERR(0, 45, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_epsilon)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 2); __PYX_ERR(0, 47, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 2); __PYX_ERR(0, 45, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_lmbda)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 3); __PYX_ERR(0, 47, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 3); __PYX_ERR(0, 45, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 47, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 45, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3036,19 +3045,19 @@ static int __pyx_pw_5cedar_8_remover_8_Remover_1__cinit__(PyObject *__pyx_v_self
     }
     __pyx_v_manager = ((struct __pyx_obj_5cedar_8_manager__DataManager *)values[0]);
     __pyx_v_tree_builder = ((struct __pyx_obj_5cedar_5_tree__TreeBuilder *)values[1]);
-    __pyx_v_epsilon = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_epsilon == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L3_error)
-    __pyx_v_lmbda = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_lmbda == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L3_error)
+    __pyx_v_epsilon = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_epsilon == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L3_error)
+    __pyx_v_lmbda = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_lmbda == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 47, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 45, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._remover._Remover.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_manager), __pyx_ptype_5cedar_8_manager__DataManager, 1, "manager", 0))) __PYX_ERR(0, 47, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree_builder), __pyx_ptype_5cedar_5_tree__TreeBuilder, 1, "tree_builder", 0))) __PYX_ERR(0, 47, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_manager), __pyx_ptype_5cedar_8_manager__DataManager, 1, "manager", 0))) __PYX_ERR(0, 45, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree_builder), __pyx_ptype_5cedar_5_tree__TreeBuilder, 1, "tree_builder", 0))) __PYX_ERR(0, 45, __pyx_L1_error)
   __pyx_r = __pyx_pf_5cedar_8_remover_8_Remover___cinit__(((struct __pyx_obj_5cedar_8_remover__Remover *)__pyx_v_self), __pyx_v_manager, __pyx_v_tree_builder, __pyx_v_epsilon, __pyx_v_lmbda);
 
   /* function exit code */
@@ -3066,7 +3075,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cedar/_remover.pyx":52
+  /* "cedar/_remover.pyx":50
  *         Constructor.
  *         """
  *         self.manager = manager             # <<<<<<<<<<<<<<
@@ -3079,7 +3088,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
   __Pyx_DECREF(((PyObject *)__pyx_v_self->manager));
   __pyx_v_self->manager = __pyx_v_manager;
 
-  /* "cedar/_remover.pyx":53
+  /* "cedar/_remover.pyx":51
  *         """
  *         self.manager = manager
  *         self.tree_builder = tree_builder             # <<<<<<<<<<<<<<
@@ -3092,7 +3101,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
   __Pyx_DECREF(((PyObject *)__pyx_v_self->tree_builder));
   __pyx_v_self->tree_builder = __pyx_v_tree_builder;
 
-  /* "cedar/_remover.pyx":54
+  /* "cedar/_remover.pyx":52
  *         self.manager = manager
  *         self.tree_builder = tree_builder
  *         self.epsilon = epsilon             # <<<<<<<<<<<<<<
@@ -3101,7 +3110,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
  */
   __pyx_v_self->epsilon = __pyx_v_epsilon;
 
-  /* "cedar/_remover.pyx":55
+  /* "cedar/_remover.pyx":53
  *         self.tree_builder = tree_builder
  *         self.epsilon = epsilon
  *         self.lmbda = lmbda             # <<<<<<<<<<<<<<
@@ -3110,7 +3119,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
  */
   __pyx_v_self->lmbda = __pyx_v_lmbda;
 
-  /* "cedar/_remover.pyx":56
+  /* "cedar/_remover.pyx":54
  *         self.epsilon = epsilon
  *         self.lmbda = lmbda
  *         self.min_samples_leaf = tree_builder.min_samples_leaf             # <<<<<<<<<<<<<<
@@ -3120,7 +3129,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
   __pyx_t_1 = __pyx_v_tree_builder->min_samples_leaf;
   __pyx_v_self->min_samples_leaf = __pyx_t_1;
 
-  /* "cedar/_remover.pyx":57
+  /* "cedar/_remover.pyx":55
  *         self.lmbda = lmbda
  *         self.min_samples_leaf = tree_builder.min_samples_leaf
  *         self.min_samples_split = tree_builder.min_samples_split             # <<<<<<<<<<<<<<
@@ -3130,7 +3139,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
   __pyx_t_1 = __pyx_v_tree_builder->min_samples_split;
   __pyx_v_self->min_samples_split = __pyx_t_1;
 
-  /* "cedar/_remover.pyx":59
+  /* "cedar/_remover.pyx":57
  *         self.min_samples_split = tree_builder.min_samples_split
  * 
  *         self.capacity = 10             # <<<<<<<<<<<<<<
@@ -3139,7 +3148,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
  */
   __pyx_v_self->capacity = 10;
 
-  /* "cedar/_remover.pyx":60
+  /* "cedar/_remover.pyx":58
  * 
  *         self.capacity = 10
  *         self.remove_count = 0             # <<<<<<<<<<<<<<
@@ -3148,7 +3157,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
  */
   __pyx_v_self->remove_count = 0;
 
-  /* "cedar/_remover.pyx":61
+  /* "cedar/_remover.pyx":59
  *         self.capacity = 10
  *         self.remove_count = 0
  *         self.remove_types = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3157,7 +3166,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
  */
   __pyx_v_self->remove_types = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":62
+  /* "cedar/_remover.pyx":60
  *         self.remove_count = 0
  *         self.remove_types = <int *>malloc(self.capacity * sizeof(int))
  *         self.remove_depths = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3166,7 +3175,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
  */
   __pyx_v_self->remove_depths = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":47
+  /* "cedar/_remover.pyx":45
  *             return self._get_int_ndarray(self.remove_depths, self.remove_count)
  * 
  *     def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,             # <<<<<<<<<<<<<<
@@ -3180,7 +3189,7 @@ static int __pyx_pf_5cedar_8_remover_8_Remover___cinit__(struct __pyx_obj_5cedar
   return __pyx_r;
 }
 
-/* "cedar/_remover.pyx":64
+/* "cedar/_remover.pyx":62
  *         self.remove_depths = <int *>malloc(self.capacity * sizeof(int))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3204,7 +3213,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cedar/_remover.pyx":68
+  /* "cedar/_remover.pyx":66
  *         Destructor.
  *         """
  *         if self.remove_types:             # <<<<<<<<<<<<<<
@@ -3214,7 +3223,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
   __pyx_t_1 = (__pyx_v_self->remove_types != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_remover.pyx":69
+    /* "cedar/_remover.pyx":67
  *         """
  *         if self.remove_types:
  *             free(self.remove_types)             # <<<<<<<<<<<<<<
@@ -3223,7 +3232,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
  */
     free(__pyx_v_self->remove_types);
 
-    /* "cedar/_remover.pyx":68
+    /* "cedar/_remover.pyx":66
  *         Destructor.
  *         """
  *         if self.remove_types:             # <<<<<<<<<<<<<<
@@ -3232,7 +3241,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
  */
   }
 
-  /* "cedar/_remover.pyx":70
+  /* "cedar/_remover.pyx":68
  *         if self.remove_types:
  *             free(self.remove_types)
  *         if self.remove_depths:             # <<<<<<<<<<<<<<
@@ -3242,7 +3251,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
   __pyx_t_1 = (__pyx_v_self->remove_depths != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_remover.pyx":71
+    /* "cedar/_remover.pyx":69
  *             free(self.remove_types)
  *         if self.remove_depths:
  *             free(self.remove_depths)             # <<<<<<<<<<<<<<
@@ -3251,7 +3260,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
  */
     free(__pyx_v_self->remove_depths);
 
-    /* "cedar/_remover.pyx":70
+    /* "cedar/_remover.pyx":68
  *         if self.remove_types:
  *             free(self.remove_types)
  *         if self.remove_depths:             # <<<<<<<<<<<<<<
@@ -3260,7 +3269,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
  */
   }
 
-  /* "cedar/_remover.pyx":64
+  /* "cedar/_remover.pyx":62
  *         self.remove_depths = <int *>malloc(self.capacity * sizeof(int))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3272,7 +3281,7 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cedar/_remover.pyx":75
+/* "cedar/_remover.pyx":73
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef int remove(self, _Tree tree, np.ndarray remove_indices):             # <<<<<<<<<<<<<<
@@ -3282,7 +3291,6 @@ static void __pyx_pf_5cedar_8_remover_8_Remover_2__dealloc__(struct __pyx_obj_5c
 
 static PyObject *__pyx_pw_5cedar_8_remover_8_Remover_5remove(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_obj_5cedar_5_tree__Tree *__pyx_v_tree, PyArrayObject *__pyx_v_remove_indices, int __pyx_skip_dispatch) {
-  struct __pyx_obj_5cedar_8_manager__DataManager *__pyx_v_manager = 0;
   int **__pyx_v_X;
   int *__pyx_v_y;
   int *__pyx_v_samples;
@@ -3311,7 +3319,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_remove); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_remove); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_8_remover_8_Remover_5remove)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -3330,7 +3338,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[3] = {__pyx_t_4, ((PyObject *)__pyx_v_tree), ((PyObject *)__pyx_v_remove_indices)};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_GOTREF(__pyx_t_2);
         } else
@@ -3338,13 +3346,13 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[3] = {__pyx_t_4, ((PyObject *)__pyx_v_tree), ((PyObject *)__pyx_v_remove_indices)};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_GOTREF(__pyx_t_2);
         } else
         #endif
         {
-          __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 75, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 73, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           if (__pyx_t_4) {
             __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -3355,12 +3363,12 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
           __Pyx_INCREF(((PyObject *)__pyx_v_remove_indices));
           __Pyx_GIVEREF(((PyObject *)__pyx_v_remove_indices));
           PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, ((PyObject *)__pyx_v_remove_indices));
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 75, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 73, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3379,38 +3387,35 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
     #endif
   }
 
-  /* "cedar/_remover.pyx":81
+  /* "cedar/_remover.pyx":79
  * 
- *         # Parameters
- *         cdef _DataManager manager = self.manager             # <<<<<<<<<<<<<<
- * 
- *         # get data
- */
-  __pyx_t_1 = ((PyObject *)__pyx_v_self->manager);
-  __Pyx_INCREF(__pyx_t_1);
-  __pyx_v_manager = ((struct __pyx_obj_5cedar_8_manager__DataManager *)__pyx_t_1);
-  __pyx_t_1 = 0;
-
-  /* "cedar/_remover.pyx":84
- * 
- *         # get data
+ *         # Data containers
  *         cdef int** X = NULL             # <<<<<<<<<<<<<<
  *         cdef int* y = NULL
- * 
+ *         self.manager.get_data(&X, &y)
  */
   __pyx_v_X = NULL;
 
-  /* "cedar/_remover.pyx":85
- *         # get data
+  /* "cedar/_remover.pyx":80
+ *         # Data containers
  *         cdef int** X = NULL
  *         cdef int* y = NULL             # <<<<<<<<<<<<<<
+ *         self.manager.get_data(&X, &y)
  * 
- *         cdef int* samples = convert_int_ndarray(remove_indices)
  */
   __pyx_v_y = NULL;
 
-  /* "cedar/_remover.pyx":87
+  /* "cedar/_remover.pyx":81
+ *         cdef int** X = NULL
  *         cdef int* y = NULL
+ *         self.manager.get_data(&X, &y)             # <<<<<<<<<<<<<<
+ * 
+ *         cdef int* samples = convert_int_ndarray(remove_indices)
+ */
+  ((struct __pyx_vtabstruct_5cedar_8_manager__DataManager *)__pyx_v_self->manager->__pyx_vtab)->get_data(__pyx_v_self->manager, (&__pyx_v_X), (&__pyx_v_y));
+
+  /* "cedar/_remover.pyx":83
+ *         self.manager.get_data(&X, &y)
  * 
  *         cdef int* samples = convert_int_ndarray(remove_indices)             # <<<<<<<<<<<<<<
  *         cdef int  n_samples = remove_indices.shape[0]
@@ -3418,7 +3423,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   __pyx_v_samples = __pyx_f_5cedar_6_utils_convert_int_ndarray(__pyx_v_remove_indices);
 
-  /* "cedar/_remover.pyx":88
+  /* "cedar/_remover.pyx":84
  * 
  *         cdef int* samples = convert_int_ndarray(remove_indices)
  *         cdef int  n_samples = remove_indices.shape[0]             # <<<<<<<<<<<<<<
@@ -3427,7 +3432,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   __pyx_v_n_samples = (__pyx_v_remove_indices->dimensions[0]);
 
-  /* "cedar/_remover.pyx":89
+  /* "cedar/_remover.pyx":85
  *         cdef int* samples = convert_int_ndarray(remove_indices)
  *         cdef int  n_samples = remove_indices.shape[0]
  *         cdef int  result = 0             # <<<<<<<<<<<<<<
@@ -3436,7 +3441,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   __pyx_v_result = 0;
 
-  /* "cedar/_remover.pyx":91
+  /* "cedar/_remover.pyx":87
  *         cdef int  result = 0
  * 
  *         cdef int  remove_count = 0             # <<<<<<<<<<<<<<
@@ -3445,7 +3450,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   __pyx_v_remove_count = 0;
 
-  /* "cedar/_remover.pyx":92
+  /* "cedar/_remover.pyx":88
  * 
  *         cdef int  remove_count = 0
  *         cdef int* remove_types = <int *>malloc(n_samples * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3454,7 +3459,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   __pyx_v_remove_types = ((int *)malloc((__pyx_v_n_samples * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":93
+  /* "cedar/_remover.pyx":89
  *         cdef int  remove_count = 0
  *         cdef int* remove_types = <int *>malloc(n_samples * sizeof(int))
  *         cdef int* remove_depths = <int *>malloc(n_samples * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3463,7 +3468,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   __pyx_v_remove_depths = ((int *)malloc((__pyx_v_n_samples * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":96
+  /* "cedar/_remover.pyx":92
  * 
  *         # make room for new deletions
  *         self._resize_metrics(n_samples)             # <<<<<<<<<<<<<<
@@ -3474,55 +3479,46 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
   __pyx_t_7.capacity = __pyx_v_n_samples;
   ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_resize_metrics(__pyx_v_self, &__pyx_t_7); 
 
-  /* "cedar/_remover.pyx":99
+  /* "cedar/_remover.pyx":95
  * 
  *         # check if any sample has already been deleted
- *         result = manager.check_sample_validity(samples, n_samples)             # <<<<<<<<<<<<<<
+ *         result = self.manager.check_sample_validity(samples, n_samples)             # <<<<<<<<<<<<<<
  *         if result == -1:
  *             return -1
  */
-  __pyx_v_result = ((struct __pyx_vtabstruct_5cedar_8_manager__DataManager *)__pyx_v_manager->__pyx_vtab)->check_sample_validity(__pyx_v_manager, __pyx_v_samples, __pyx_v_n_samples);
+  __pyx_v_result = ((struct __pyx_vtabstruct_5cedar_8_manager__DataManager *)__pyx_v_self->manager->__pyx_vtab)->check_sample_validity(__pyx_v_self->manager, __pyx_v_samples, __pyx_v_n_samples);
 
-  /* "cedar/_remover.pyx":100
+  /* "cedar/_remover.pyx":96
  *         # check if any sample has already been deleted
- *         result = manager.check_sample_validity(samples, n_samples)
+ *         result = self.manager.check_sample_validity(samples, n_samples)
  *         if result == -1:             # <<<<<<<<<<<<<<
  *             return -1
- *         manager.get_data(&X, &y)
+ * 
  */
   __pyx_t_8 = ((__pyx_v_result == -1L) != 0);
   if (__pyx_t_8) {
 
-    /* "cedar/_remover.pyx":101
- *         result = manager.check_sample_validity(samples, n_samples)
+    /* "cedar/_remover.pyx":97
+ *         result = self.manager.check_sample_validity(samples, n_samples)
  *         if result == -1:
  *             return -1             # <<<<<<<<<<<<<<
- *         manager.get_data(&X, &y)
  * 
+ *         self._remove(&tree.root, X, y, samples, n_samples, 1.0)
  */
     __pyx_r = -1;
     goto __pyx_L0;
 
-    /* "cedar/_remover.pyx":100
+    /* "cedar/_remover.pyx":96
  *         # check if any sample has already been deleted
- *         result = manager.check_sample_validity(samples, n_samples)
+ *         result = self.manager.check_sample_validity(samples, n_samples)
  *         if result == -1:             # <<<<<<<<<<<<<<
  *             return -1
- *         manager.get_data(&X, &y)
+ * 
  */
   }
 
-  /* "cedar/_remover.pyx":102
- *         if result == -1:
+  /* "cedar/_remover.pyx":99
  *             return -1
- *         manager.get_data(&X, &y)             # <<<<<<<<<<<<<<
- * 
- *         self._remove(&tree.root, X, y, samples, n_samples, 1.0)
- */
-  ((struct __pyx_vtabstruct_5cedar_8_manager__DataManager *)__pyx_v_manager->__pyx_vtab)->get_data(__pyx_v_manager, (&__pyx_v_X), (&__pyx_v_y));
-
-  /* "cedar/_remover.pyx":104
- *         manager.get_data(&X, &y)
  * 
  *         self._remove(&tree.root, X, y, samples, n_samples, 1.0)             # <<<<<<<<<<<<<<
  * 
@@ -3530,7 +3526,7 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
  */
   ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_remove(__pyx_v_self, (&__pyx_v_tree->root), __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, 1.0);
 
-  /* "cedar/_remover.pyx":75
+  /* "cedar/_remover.pyx":73
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef int remove(self, _Tree tree, np.ndarray remove_indices):             # <<<<<<<<<<<<<<
@@ -3550,7 +3546,6 @@ static int __pyx_f_5cedar_8_remover_8_Remover_remove(struct __pyx_obj_5cedar_8_r
   __Pyx_WriteUnraisable("cedar._remover._Remover.remove", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_manager);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3587,11 +3582,11 @@ static PyObject *__pyx_pw_5cedar_8_remover_8_Remover_5remove(PyObject *__pyx_v_s
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_remove_indices)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("remove", 1, 2, 2, 1); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("remove", 1, 2, 2, 1); __PYX_ERR(0, 73, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "remove") < 0)) __PYX_ERR(0, 75, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "remove") < 0)) __PYX_ERR(0, 73, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3604,14 +3599,14 @@ static PyObject *__pyx_pw_5cedar_8_remover_8_Remover_5remove(PyObject *__pyx_v_s
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("remove", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 75, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("remove", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 73, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._remover._Remover.remove", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree), __pyx_ptype_5cedar_5_tree__Tree, 1, "tree", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_remove_indices), __pyx_ptype_5numpy_ndarray, 1, "remove_indices", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree), __pyx_ptype_5cedar_5_tree__Tree, 1, "tree", 0))) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_remove_indices), __pyx_ptype_5numpy_ndarray, 1, "remove_indices", 0))) __PYX_ERR(0, 73, __pyx_L1_error)
   __pyx_r = __pyx_pf_5cedar_8_remover_8_Remover_4remove(((struct __pyx_obj_5cedar_8_remover__Remover *)__pyx_v_self), __pyx_v_tree, __pyx_v_remove_indices);
 
   /* function exit code */
@@ -3629,7 +3624,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_4remove(struct __pyx_obj_5c
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("remove", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5cedar_8_remover_8_Remover_remove(__pyx_v_self, __pyx_v_tree, __pyx_v_remove_indices, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5cedar_8_remover_8_Remover_remove(__pyx_v_self, __pyx_v_tree, __pyx_v_remove_indices, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3646,7 +3641,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_4remove(struct __pyx_obj_5c
   return __pyx_r;
 }
 
-/* "cedar/_remover.pyx":108
+/* "cedar/_remover.pyx":103
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _remove(self, Node** node_ptr, int** X, int* y,             # <<<<<<<<<<<<<<
@@ -3660,9 +3655,16 @@ static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8
   int __pyx_v_result;
   int *__pyx_v_leaf_samples;
   int __pyx_v_leaf_samples_count;
+  int __pyx_v_is_bottom_leaf;
+  int __pyx_v_i;
+  int __pyx_v_pos_count;
   int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  int __pyx_t_5;
 
-  /* "cedar/_remover.pyx":114
+  /* "cedar/_remover.pyx":109
  *         """
  * 
  *         cdef Node *node = node_ptr[0]             # <<<<<<<<<<<<<<
@@ -3671,7 +3673,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8
  */
   __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-  /* "cedar/_remover.pyx":117
+  /* "cedar/_remover.pyx":112
  * 
  *         cdef SplitRecord split
  *         cdef int result = 0             # <<<<<<<<<<<<<<
@@ -3680,7 +3682,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8
  */
   __pyx_v_result = 0;
 
-  /* "cedar/_remover.pyx":119
+  /* "cedar/_remover.pyx":114
  *         cdef int result = 0
  * 
  *         cdef int* leaf_samples = NULL             # <<<<<<<<<<<<<<
@@ -3689,227 +3691,353 @@ static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8
  */
   __pyx_v_leaf_samples = NULL;
 
-  /* "cedar/_remover.pyx":126
+  /* "cedar/_remover.pyx":117
+ *         cdef int  leaf_samples_count
  * 
- *         # leaf
- *         if node.is_leaf:             # <<<<<<<<<<<<<<
- *             self._update_leaf(node_ptr, y, samples, n_samples)
- *             self._add_removal_type(result, node.depth)
+ *         cdef bint is_bottom_leaf = node.is_leaf and not node.features             # <<<<<<<<<<<<<<
+ *         cdef int i
+ * 
  */
-  __pyx_t_1 = (__pyx_v_node->is_leaf != 0);
+  __pyx_t_2 = (__pyx_v_node->is_leaf != 0);
+  if (__pyx_t_2) {
+  } else {
+    __pyx_t_1 = __pyx_t_2;
+    goto __pyx_L3_bool_binop_done;
+  }
+  __pyx_t_2 = ((!(__pyx_v_node->features != 0)) != 0);
+  __pyx_t_1 = __pyx_t_2;
+  __pyx_L3_bool_binop_done:;
+  __pyx_v_is_bottom_leaf = __pyx_t_1;
+
+  /* "cedar/_remover.pyx":123
+ *         #        parent_p, node.count, n_samples, node.features_count)
+ * 
+ *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
+ *         for i in range(n_samples):
+ *             if y[samples[i]] == 1:
+ */
+  __pyx_v_pos_count = 0;
+
+  /* "cedar/_remover.pyx":124
+ * 
+ *         cdef int pos_count = 0
+ *         for i in range(n_samples):             # <<<<<<<<<<<<<<
+ *             if y[samples[i]] == 1:
+ *                 pos_count += 1
+ */
+  __pyx_t_3 = __pyx_v_n_samples;
+  __pyx_t_4 = __pyx_t_3;
+  for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
+    __pyx_v_i = __pyx_t_5;
+
+    /* "cedar/_remover.pyx":125
+ *         cdef int pos_count = 0
+ *         for i in range(n_samples):
+ *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
+ *                 pos_count += 1
+ * 
+ */
+    __pyx_t_1 = (((__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]) == 1) != 0);
+    if (__pyx_t_1) {
+
+      /* "cedar/_remover.pyx":126
+ *         for i in range(n_samples):
+ *             if y[samples[i]] == 1:
+ *                 pos_count += 1             # <<<<<<<<<<<<<<
+ * 
+ *         if is_bottom_leaf:
+ */
+      __pyx_v_pos_count = (__pyx_v_pos_count + 1);
+
+      /* "cedar/_remover.pyx":125
+ *         cdef int pos_count = 0
+ *         for i in range(n_samples):
+ *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
+ *                 pos_count += 1
+ * 
+ */
+    }
+  }
+
+  /* "cedar/_remover.pyx":128
+ *                 pos_count += 1
+ * 
+ *         if is_bottom_leaf:             # <<<<<<<<<<<<<<
+ *             # printf('bottom leaf\n')
+ *             self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
+ */
+  __pyx_t_1 = (__pyx_v_is_bottom_leaf != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_remover.pyx":127
- *         # leaf
- *         if node.is_leaf:
- *             self._update_leaf(node_ptr, y, samples, n_samples)             # <<<<<<<<<<<<<<
+    /* "cedar/_remover.pyx":130
+ *         if is_bottom_leaf:
+ *             # printf('bottom leaf\n')
+ *             self._update_leaf(node_ptr, y, samples, n_samples, pos_count)             # <<<<<<<<<<<<<<
  *             self._add_removal_type(result, node.depth)
  * 
  */
-    ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_leaf(__pyx_v_self, __pyx_v_node_ptr, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples);
+    ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_leaf(__pyx_v_self, __pyx_v_node_ptr, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_pos_count);
 
-    /* "cedar/_remover.pyx":128
- *         if node.is_leaf:
- *             self._update_leaf(node_ptr, y, samples, n_samples)
+    /* "cedar/_remover.pyx":131
+ *             # printf('bottom leaf\n')
+ *             self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
  *             self._add_removal_type(result, node.depth)             # <<<<<<<<<<<<<<
  * 
- *         # decision node
+ *         else:
  */
     ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_add_removal_type(__pyx_v_self, __pyx_v_result, __pyx_v_node->depth);
 
-    /* "cedar/_remover.pyx":126
+    /* "cedar/_remover.pyx":128
+ *                 pos_count += 1
  * 
- *         # leaf
- *         if node.is_leaf:             # <<<<<<<<<<<<<<
- *             self._update_leaf(node_ptr, y, samples, n_samples)
- *             self._add_removal_type(result, node.depth)
+ *         if is_bottom_leaf:             # <<<<<<<<<<<<<<
+ *             # printf('bottom leaf\n')
+ *             self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
  */
-    goto __pyx_L3;
+    goto __pyx_L8;
   }
 
-  /* "cedar/_remover.pyx":134
+  /* "cedar/_remover.pyx":135
+ *         else:
+ *             # printf('update splits\n')
+ *             self._update_splits(&node, X, y, samples, n_samples, pos_count)             # <<<<<<<<<<<<<<
  * 
- *             # compute new statistics
- *             result = self._node_remove(node, X, y, samples, n_samples, parent_p, &split)             # <<<<<<<<<<<<<<
- *             # printf('result: %d\n', result)
- * 
+ *             if node.is_leaf:
  */
   /*else*/ {
-    __pyx_v_result = ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_node_remove(__pyx_v_self, __pyx_v_node, __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_parent_p, (&__pyx_v_split));
+    (void)(((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_splits(__pyx_v_self, (&__pyx_v_node), __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_pos_count));
 
-    /* "cedar/_remover.pyx":138
+    /* "cedar/_remover.pyx":137
+ *             self._update_splits(&node, X, y, samples, n_samples, pos_count)
  * 
- *             # convert to leaf
- *             if result == 1:             # <<<<<<<<<<<<<<
- *                 self._convert_to_leaf(node_ptr, samples, n_samples, &split)
- *                 self._add_removal_type(result, node.depth)
+ *             if node.is_leaf:             # <<<<<<<<<<<<<<
+ *                 # printf('leaf\n')
+ *                 self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
  */
-    switch (__pyx_v_result) {
-      case 1:
+    __pyx_t_1 = (__pyx_v_node->is_leaf != 0);
+    if (__pyx_t_1) {
 
       /* "cedar/_remover.pyx":139
- *             # convert to leaf
- *             if result == 1:
- *                 self._convert_to_leaf(node_ptr, samples, n_samples, &split)             # <<<<<<<<<<<<<<
+ *             if node.is_leaf:
+ *                 # printf('leaf\n')
+ *                 self._update_leaf(node_ptr, y, samples, n_samples, pos_count)             # <<<<<<<<<<<<<<
  *                 self._add_removal_type(result, node.depth)
  * 
  */
-      ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_convert_to_leaf(__pyx_v_self, __pyx_v_node_ptr, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_split));
+      ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_leaf(__pyx_v_self, __pyx_v_node_ptr, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_pos_count);
 
       /* "cedar/_remover.pyx":140
- *             if result == 1:
- *                 self._convert_to_leaf(node_ptr, samples, n_samples, &split)
+ *                 # printf('leaf\n')
+ *                 self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
  *                 self._add_removal_type(result, node.depth)             # <<<<<<<<<<<<<<
  * 
- *             # retrain
+ *             # decision node
  */
       ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_add_removal_type(__pyx_v_self, __pyx_v_result, __pyx_v_node->depth);
 
-      /* "cedar/_remover.pyx":138
+      /* "cedar/_remover.pyx":137
+ *             self._update_splits(&node, X, y, samples, n_samples, pos_count)
  * 
- *             # convert to leaf
- *             if result == 1:             # <<<<<<<<<<<<<<
- *                 self._convert_to_leaf(node_ptr, samples, n_samples, &split)
- *                 self._add_removal_type(result, node.depth)
+ *             if node.is_leaf:             # <<<<<<<<<<<<<<
+ *                 # printf('leaf\n')
+ *                 self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
  */
-      break;
-      case 2:
+      goto __pyx_L9;
+    }
 
-      /* "cedar/_remover.pyx":144
- *             # retrain
- *             elif result == 2:
- *                 leaf_samples = <int *>malloc(split.count * sizeof(int))             # <<<<<<<<<<<<<<
- *                 leaf_samples_count = 0
- *                 self._get_leaf_samples(node, samples, n_samples,
- */
-      __pyx_v_leaf_samples = ((int *)malloc((__pyx_v_split.count * (sizeof(int)))));
-
-      /* "cedar/_remover.pyx":145
- *             elif result == 2:
- *                 leaf_samples = <int *>malloc(split.count * sizeof(int))
- *                 leaf_samples_count = 0             # <<<<<<<<<<<<<<
- *                 self._get_leaf_samples(node, samples, n_samples,
- *                                        &leaf_samples, &leaf_samples_count)
- */
-      __pyx_v_leaf_samples_count = 0;
-
-      /* "cedar/_remover.pyx":146
- *                 leaf_samples = <int *>malloc(split.count * sizeof(int))
- *                 leaf_samples_count = 0
- *                 self._get_leaf_samples(node, samples, n_samples,             # <<<<<<<<<<<<<<
- *                                        &leaf_samples, &leaf_samples_count)
- *                 dealloc(node)
- */
-      ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_leaf_samples(__pyx_v_self, __pyx_v_node, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_leaf_samples), (&__pyx_v_leaf_samples_count));
-
-      /* "cedar/_remover.pyx":148
- *                 self._get_leaf_samples(node, samples, n_samples,
- *                                        &leaf_samples, &leaf_samples_count)
- *                 dealloc(node)             # <<<<<<<<<<<<<<
- *                 node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
- *                                                        split.valid_features, split.feature_count,
- */
-      __pyx_f_5cedar_6_utils_dealloc(__pyx_v_node);
-
-      /* "cedar/_remover.pyx":149
- *                                        &leaf_samples, &leaf_samples_count)
- *                 dealloc(node)
- *                 node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,             # <<<<<<<<<<<<<<
- *                                                        split.valid_features, split.feature_count,
- *                                                        node.depth, node.is_left, parent_p)
- */
-      (__pyx_v_node_ptr[0]) = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->tree_builder->__pyx_vtab)->_build(__pyx_v_self->tree_builder, __pyx_v_X, __pyx_v_y, __pyx_v_leaf_samples, __pyx_v_leaf_samples_count, __pyx_v_split.valid_features, __pyx_v_split.feature_count, __pyx_v_node->depth, __pyx_v_node->is_left, __pyx_v_parent_p);
-
-      /* "cedar/_remover.pyx":152
- *                                                        split.valid_features, split.feature_count,
- *                                                        node.depth, node.is_left, parent_p)
- *                 self._add_removal_type(result, node.depth)             # <<<<<<<<<<<<<<
+    /* "cedar/_remover.pyx":146
  * 
- *             # update and recurse
+ *                 # printf('check node\n')
+ *                 result = self._check_node(node, X, y, samples, n_samples,             # <<<<<<<<<<<<<<
+ *                                           pos_count, parent_p, &split)
+ *                 # printf('result: %d\n', result)
  */
-      ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_add_removal_type(__pyx_v_self, __pyx_v_result, __pyx_v_node->depth);
+    /*else*/ {
 
-      /* "cedar/_remover.pyx":143
- * 
- *             # retrain
- *             elif result == 2:             # <<<<<<<<<<<<<<
- *                 leaf_samples = <int *>malloc(split.count * sizeof(int))
- *                 leaf_samples_count = 0
- */
-      break;
-      default:
-
-      /* "cedar/_remover.pyx":156
- *             # update and recurse
- *             else:
- *                 self._update_decision_node(node_ptr, &split)             # <<<<<<<<<<<<<<
- * 
- *                 # traverse left
- */
-      ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_decision_node(__pyx_v_self, __pyx_v_node_ptr, (&__pyx_v_split));
-
-      /* "cedar/_remover.pyx":159
- * 
- *                 # traverse left
- *                 if split.left_count > 0:             # <<<<<<<<<<<<<<
- *                     self._remove(&node.left, X, y, split.left_indices,
- *                                  split.left_count, split.p)
- */
-      __pyx_t_1 = ((__pyx_v_split.left_count > 0) != 0);
-      if (__pyx_t_1) {
-
-        /* "cedar/_remover.pyx":160
- *                 # traverse left
- *                 if split.left_count > 0:
- *                     self._remove(&node.left, X, y, split.left_indices,             # <<<<<<<<<<<<<<
- *                                  split.left_count, split.p)
+      /* "cedar/_remover.pyx":147
+ *                 # printf('check node\n')
+ *                 result = self._check_node(node, X, y, samples, n_samples,
+ *                                           pos_count, parent_p, &split)             # <<<<<<<<<<<<<<
+ *                 # printf('result: %d\n', result)
  * 
  */
-        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_remove(__pyx_v_self, (&__pyx_v_node->left), __pyx_v_X, __pyx_v_y, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.p);
+      __pyx_v_result = ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_check_node(__pyx_v_self, __pyx_v_node, __pyx_v_X, __pyx_v_y, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_pos_count, __pyx_v_parent_p, (&__pyx_v_split));
+
+      /* "cedar/_remover.pyx":151
+ * 
+ *                 # convert to leaf
+ *                 if result == 1:             # <<<<<<<<<<<<<<
+ *                     self._convert_to_leaf(node_ptr, samples, n_samples, pos_count, &split)
+ *                     self._add_removal_type(result, node.depth)
+ */
+      switch (__pyx_v_result) {
+        case 1:
+
+        /* "cedar/_remover.pyx":152
+ *                 # convert to leaf
+ *                 if result == 1:
+ *                     self._convert_to_leaf(node_ptr, samples, n_samples, pos_count, &split)             # <<<<<<<<<<<<<<
+ *                     self._add_removal_type(result, node.depth)
+ *                     # printf('converted to leaf\n')
+ */
+        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_convert_to_leaf(__pyx_v_self, __pyx_v_node_ptr, __pyx_v_samples, __pyx_v_n_samples, __pyx_v_pos_count, (&__pyx_v_split));
+
+        /* "cedar/_remover.pyx":153
+ *                 if result == 1:
+ *                     self._convert_to_leaf(node_ptr, samples, n_samples, pos_count, &split)
+ *                     self._add_removal_type(result, node.depth)             # <<<<<<<<<<<<<<
+ *                     # printf('converted to leaf\n')
+ * 
+ */
+        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_add_removal_type(__pyx_v_self, __pyx_v_result, __pyx_v_node->depth);
+
+        /* "cedar/_remover.pyx":151
+ * 
+ *                 # convert to leaf
+ *                 if result == 1:             # <<<<<<<<<<<<<<
+ *                     self._convert_to_leaf(node_ptr, samples, n_samples, pos_count, &split)
+ *                     self._add_removal_type(result, node.depth)
+ */
+        break;
+        case 2:
+
+        /* "cedar/_remover.pyx":158
+ *                 # retrain
+ *                 elif result == 2:
+ *                     leaf_samples = <int *>malloc(split.count * sizeof(int))             # <<<<<<<<<<<<<<
+ *                     leaf_samples_count = 0
+ *                     self._get_leaf_samples(node, samples, n_samples,
+ */
+        __pyx_v_leaf_samples = ((int *)malloc((__pyx_v_split.count * (sizeof(int)))));
 
         /* "cedar/_remover.pyx":159
- * 
- *                 # traverse left
- *                 if split.left_count > 0:             # <<<<<<<<<<<<<<
- *                     self._remove(&node.left, X, y, split.left_indices,
- *                                  split.left_count, split.p)
+ *                 elif result == 2:
+ *                     leaf_samples = <int *>malloc(split.count * sizeof(int))
+ *                     leaf_samples_count = 0             # <<<<<<<<<<<<<<
+ *                     self._get_leaf_samples(node, samples, n_samples,
+ *                                            &leaf_samples, &leaf_samples_count)
  */
+        __pyx_v_leaf_samples_count = 0;
+
+        /* "cedar/_remover.pyx":160
+ *                     leaf_samples = <int *>malloc(split.count * sizeof(int))
+ *                     leaf_samples_count = 0
+ *                     self._get_leaf_samples(node, samples, n_samples,             # <<<<<<<<<<<<<<
+ *                                            &leaf_samples, &leaf_samples_count)
+ *                     dealloc(node)
+ */
+        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_leaf_samples(__pyx_v_self, __pyx_v_node, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_leaf_samples), (&__pyx_v_leaf_samples_count));
+
+        /* "cedar/_remover.pyx":162
+ *                     self._get_leaf_samples(node, samples, n_samples,
+ *                                            &leaf_samples, &leaf_samples_count)
+ *                     dealloc(node)             # <<<<<<<<<<<<<<
+ *                     node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
+ *                                                            node.features, node.features_count,
+ */
+        __pyx_f_5cedar_6_utils_dealloc(__pyx_v_node);
+
+        /* "cedar/_remover.pyx":163
+ *                                            &leaf_samples, &leaf_samples_count)
+ *                     dealloc(node)
+ *                     node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,             # <<<<<<<<<<<<<<
+ *                                                            node.features, node.features_count,
+ *                                                            node.depth, node.is_left, parent_p)
+ */
+        (__pyx_v_node_ptr[0]) = ((struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder *)__pyx_v_self->tree_builder->__pyx_vtab)->_build(__pyx_v_self->tree_builder, __pyx_v_X, __pyx_v_y, __pyx_v_leaf_samples, __pyx_v_leaf_samples_count, __pyx_v_node->features, __pyx_v_node->features_count, __pyx_v_node->depth, __pyx_v_node->is_left, __pyx_v_parent_p);
+
+        /* "cedar/_remover.pyx":166
+ *                                                            node.features, node.features_count,
+ *                                                            node.depth, node.is_left, parent_p)
+ *                     self._add_removal_type(result, node.depth)             # <<<<<<<<<<<<<<
+ * 
+ *                 # update and recurse
+ */
+        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_add_removal_type(__pyx_v_self, __pyx_v_result, __pyx_v_node->depth);
+
+        /* "cedar/_remover.pyx":157
+ * 
+ *                 # retrain
+ *                 elif result == 2:             # <<<<<<<<<<<<<<
+ *                     leaf_samples = <int *>malloc(split.count * sizeof(int))
+ *                     leaf_samples_count = 0
+ */
+        break;
+        default:
+
+        /* "cedar/_remover.pyx":171
+ *                 else:
+ *                     # printf('update decision\n')
+ *                     self._update_decision_node(&node, &split)             # <<<<<<<<<<<<<<
+ * 
+ *                     # traverse left
+ */
+        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_update_decision_node(__pyx_v_self, (&__pyx_v_node), (&__pyx_v_split));
+
+        /* "cedar/_remover.pyx":174
+ * 
+ *                     # traverse left
+ *                     if split.left_count > 0:             # <<<<<<<<<<<<<<
+ *                         self._remove(&node.left, X, y, split.left_indices,
+ *                                      split.left_count, split.p)
+ */
+        __pyx_t_1 = ((__pyx_v_split.left_count > 0) != 0);
+        if (__pyx_t_1) {
+
+          /* "cedar/_remover.pyx":175
+ *                     # traverse left
+ *                     if split.left_count > 0:
+ *                         self._remove(&node.left, X, y, split.left_indices,             # <<<<<<<<<<<<<<
+ *                                      split.left_count, split.p)
+ * 
+ */
+          ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_remove(__pyx_v_self, (&__pyx_v_node->left), __pyx_v_X, __pyx_v_y, __pyx_v_split.left_indices, __pyx_v_split.left_count, __pyx_v_split.p);
+
+          /* "cedar/_remover.pyx":174
+ * 
+ *                     # traverse left
+ *                     if split.left_count > 0:             # <<<<<<<<<<<<<<
+ *                         self._remove(&node.left, X, y, split.left_indices,
+ *                                      split.left_count, split.p)
+ */
+        }
+
+        /* "cedar/_remover.pyx":179
+ * 
+ *                     # traverse right
+ *                     if split.right_count > 0:             # <<<<<<<<<<<<<<
+ *                         self._remove(&node.right, X, y, split.right_indices,
+ *                                      split.right_count, split.p)
+ */
+        __pyx_t_1 = ((__pyx_v_split.right_count > 0) != 0);
+        if (__pyx_t_1) {
+
+          /* "cedar/_remover.pyx":180
+ *                     # traverse right
+ *                     if split.right_count > 0:
+ *                         self._remove(&node.right, X, y, split.right_indices,             # <<<<<<<<<<<<<<
+ *                                      split.right_count, split.p)
+ * 
+ */
+          ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_remove(__pyx_v_self, (&__pyx_v_node->right), __pyx_v_X, __pyx_v_y, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.p);
+
+          /* "cedar/_remover.pyx":179
+ * 
+ *                     # traverse right
+ *                     if split.right_count > 0:             # <<<<<<<<<<<<<<
+ *                         self._remove(&node.right, X, y, split.right_indices,
+ *                                      split.right_count, split.p)
+ */
+        }
+        break;
       }
-
-      /* "cedar/_remover.pyx":164
- * 
- *                 # traverse right
- *                 if split.right_count > 0:             # <<<<<<<<<<<<<<
- *                     self._remove(&node.right, X, y, split.right_indices,
- *                                  split.right_count, split.p)
- */
-      __pyx_t_1 = ((__pyx_v_split.right_count > 0) != 0);
-      if (__pyx_t_1) {
-
-        /* "cedar/_remover.pyx":165
- *                 # traverse right
- *                 if split.right_count > 0:
- *                     self._remove(&node.right, X, y, split.right_indices,             # <<<<<<<<<<<<<<
- *                                  split.right_count, split.p)
- * 
- */
-        ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_remove(__pyx_v_self, (&__pyx_v_node->right), __pyx_v_X, __pyx_v_y, __pyx_v_split.right_indices, __pyx_v_split.right_count, __pyx_v_split.p);
-
-        /* "cedar/_remover.pyx":164
- * 
- *                 # traverse right
- *                 if split.right_count > 0:             # <<<<<<<<<<<<<<
- *                     self._remove(&node.right, X, y, split.right_indices,
- *                                  split.right_count, split.p)
- */
-      }
-      break;
     }
+    __pyx_L9:;
   }
-  __pyx_L3:;
+  __pyx_L8:;
 
-  /* "cedar/_remover.pyx":168
- *                                  split.right_count, split.p)
+  /* "cedar/_remover.pyx":183
+ *                                      split.right_count, split.p)
  * 
  *         free(samples)             # <<<<<<<<<<<<<<
  * 
@@ -3917,7 +4045,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8
  */
   free(__pyx_v_samples);
 
-  /* "cedar/_remover.pyx":108
+  /* "cedar/_remover.pyx":103
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _remove(self, Node** node_ptr, int** X, int* y,             # <<<<<<<<<<<<<<
@@ -3928,85 +4056,29 @@ static void __pyx_f_5cedar_8_remover_8_Remover__remove(struct __pyx_obj_5cedar_8
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":174
+/* "cedar/_remover.pyx":189
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
- *     cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil:             # <<<<<<<<<<<<<<
+ *     cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples, int n_samples,             # <<<<<<<<<<<<<<
+ *                            int pos_count) nogil:
  *         """
- *         Update leaf node: count, pos_count, value, leaf_samples.
  */
 
-static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples) {
+static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, CYTHON_UNUSED int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count) {
   struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
-  int __pyx_v_pos_count;
-  int __pyx_v_i;
   int *__pyx_v_leaf_samples;
   int __pyx_v_leaf_samples_count;
-  int __pyx_t_1;
-  int __pyx_t_2;
-  int __pyx_t_3;
-  int __pyx_t_4;
 
-  /* "cedar/_remover.pyx":178
+  /* "cedar/_remover.pyx":194
  *         Update leaf node: count, pos_count, value, leaf_samples.
  *         """
  *         cdef Node* node = node_ptr[0]             # <<<<<<<<<<<<<<
- *         cdef int pos_count = 0
- * 
- */
-  __pyx_v_node = (__pyx_v_node_ptr[0]);
-
-  /* "cedar/_remover.pyx":179
- *         """
- *         cdef Node* node = node_ptr[0]
- *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
- * 
- *         # count number of pos labels in removal data
- */
-  __pyx_v_pos_count = 0;
-
-  /* "cedar/_remover.pyx":182
- * 
- *         # count number of pos labels in removal data
- *         for i in range(n_samples):             # <<<<<<<<<<<<<<
- *             if y[samples[i]] == 1:
- *                 pos_count += 1
- */
-  __pyx_t_1 = __pyx_v_n_samples;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "cedar/_remover.pyx":183
- *         # count number of pos labels in removal data
- *         for i in range(n_samples):
- *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
- *                 pos_count += 1
- * 
- */
-    __pyx_t_4 = (((__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]) == 1) != 0);
-    if (__pyx_t_4) {
-
-      /* "cedar/_remover.pyx":184
- *         for i in range(n_samples):
- *             if y[samples[i]] == 1:
- *                 pos_count += 1             # <<<<<<<<<<<<<<
  * 
  *         # remove samples from leaf
  */
-      __pyx_v_pos_count = (__pyx_v_pos_count + 1);
+  __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-      /* "cedar/_remover.pyx":183
- *         # count number of pos labels in removal data
- *         for i in range(n_samples):
- *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
- *                 pos_count += 1
- * 
- */
-    }
-  }
-
-  /* "cedar/_remover.pyx":187
+  /* "cedar/_remover.pyx":197
  * 
  *         # remove samples from leaf
  *         cdef int* leaf_samples = <int *>malloc((node.count - n_samples) * sizeof(int))             # <<<<<<<<<<<<<<
@@ -4015,7 +4087,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   __pyx_v_leaf_samples = ((int *)malloc(((__pyx_v_node->count - __pyx_v_n_samples) * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":188
+  /* "cedar/_remover.pyx":198
  *         # remove samples from leaf
  *         cdef int* leaf_samples = <int *>malloc((node.count - n_samples) * sizeof(int))
  *         cdef int  leaf_samples_count = 0             # <<<<<<<<<<<<<<
@@ -4024,7 +4096,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   __pyx_v_leaf_samples_count = 0;
 
-  /* "cedar/_remover.pyx":189
+  /* "cedar/_remover.pyx":199
  *         cdef int* leaf_samples = <int *>malloc((node.count - n_samples) * sizeof(int))
  *         cdef int  leaf_samples_count = 0
  *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)             # <<<<<<<<<<<<<<
@@ -4033,7 +4105,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_leaf_samples(__pyx_v_self, __pyx_v_node, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_leaf_samples), (&__pyx_v_leaf_samples_count));
 
-  /* "cedar/_remover.pyx":190
+  /* "cedar/_remover.pyx":200
  *         cdef int  leaf_samples_count = 0
  *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
  *         free(node.leaf_samples)             # <<<<<<<<<<<<<<
@@ -4042,7 +4114,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   free(__pyx_v_node->leaf_samples);
 
-  /* "cedar/_remover.pyx":192
+  /* "cedar/_remover.pyx":202
  *         free(node.leaf_samples)
  * 
  *         node.count -= n_samples             # <<<<<<<<<<<<<<
@@ -4051,7 +4123,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   __pyx_v_node->count = (__pyx_v_node->count - __pyx_v_n_samples);
 
-  /* "cedar/_remover.pyx":193
+  /* "cedar/_remover.pyx":203
  * 
  *         node.count -= n_samples
  *         node.pos_count -= pos_count             # <<<<<<<<<<<<<<
@@ -4060,7 +4132,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   __pyx_v_node->pos_count = (__pyx_v_node->pos_count - __pyx_v_pos_count);
 
-  /* "cedar/_remover.pyx":194
+  /* "cedar/_remover.pyx":204
  *         node.count -= n_samples
  *         node.pos_count -= pos_count
  *         node.value = node.pos_count / <double> node.count             # <<<<<<<<<<<<<<
@@ -4069,7 +4141,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   __pyx_v_node->value = (((double)__pyx_v_node->pos_count) / ((double)__pyx_v_node->count));
 
-  /* "cedar/_remover.pyx":195
+  /* "cedar/_remover.pyx":205
  *         node.pos_count -= pos_count
  *         node.value = node.pos_count / <double> node.count
  *         node.leaf_samples = leaf_samples             # <<<<<<<<<<<<<<
@@ -4078,98 +4150,133 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_leaf(struct __pyx_obj_5ce
  */
   __pyx_v_node->leaf_samples = __pyx_v_leaf_samples;
 
-  /* "cedar/_remover.pyx":174
+  /* "cedar/_remover.pyx":189
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
- *     cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil:             # <<<<<<<<<<<<<<
+ *     cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples, int n_samples,             # <<<<<<<<<<<<<<
+ *                            int pos_count) nogil:
  *         """
- *         Update leaf node: count, pos_count, value, leaf_samples.
  */
 
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":200
+/* "cedar/_remover.pyx":210
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
  *     cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,             # <<<<<<<<<<<<<<
- *                                SplitRecord *split) nogil:
+ *                                int pos_count, SplitRecord *split) nogil:
  *         """
  */
 
-static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_samples, int __pyx_v_n_samples, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split) {
+static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count, CYTHON_UNUSED struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split) {
   struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
+  int __pyx_v_updated_count;
+  int __pyx_v_updated_pos_count;
   int *__pyx_v_leaf_samples;
   int __pyx_v_leaf_samples_count;
-  int __pyx_t_1;
 
-  /* "cedar/_remover.pyx":205
+  /* "cedar/_remover.pyx":215
  *         Convert decision node to a leaf node.
  *         """
  *         cdef Node* node = node_ptr[0]             # <<<<<<<<<<<<<<
- * 
- *         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
+ *         cdef int updated_count = node.count - n_samples
+ *         cdef int updated_pos_count = node.pos_count - pos_count
  */
   __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-  /* "cedar/_remover.pyx":207
+  /* "cedar/_remover.pyx":216
+ *         """
  *         cdef Node* node = node_ptr[0]
+ *         cdef int updated_count = node.count - n_samples             # <<<<<<<<<<<<<<
+ *         cdef int updated_pos_count = node.pos_count - pos_count
  * 
- *         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))             # <<<<<<<<<<<<<<
+ */
+  __pyx_v_updated_count = (__pyx_v_node->count - __pyx_v_n_samples);
+
+  /* "cedar/_remover.pyx":217
+ *         cdef Node* node = node_ptr[0]
+ *         cdef int updated_count = node.count - n_samples
+ *         cdef int updated_pos_count = node.pos_count - pos_count             # <<<<<<<<<<<<<<
+ * 
+ *         cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))
+ */
+  __pyx_v_updated_pos_count = (__pyx_v_node->pos_count - __pyx_v_pos_count);
+
+  /* "cedar/_remover.pyx":219
+ *         cdef int updated_pos_count = node.pos_count - pos_count
+ * 
+ *         cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))             # <<<<<<<<<<<<<<
  *         cdef int  leaf_samples_count = 0
  *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
  */
-  __pyx_v_leaf_samples = ((int *)malloc((__pyx_v_split->count * (sizeof(int)))));
+  __pyx_v_leaf_samples = ((int *)malloc((__pyx_v_updated_count * (sizeof(int)))));
 
-  /* "cedar/_remover.pyx":208
+  /* "cedar/_remover.pyx":220
  * 
- *         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
+ *         cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))
  *         cdef int  leaf_samples_count = 0             # <<<<<<<<<<<<<<
  *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
- *         dealloc(node)
+ *         dealloc(node.left)
  */
   __pyx_v_leaf_samples_count = 0;
 
-  /* "cedar/_remover.pyx":209
- *         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
+  /* "cedar/_remover.pyx":221
+ *         cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))
  *         cdef int  leaf_samples_count = 0
  *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)             # <<<<<<<<<<<<<<
- *         dealloc(node)
- * 
+ *         dealloc(node.left)
+ *         dealloc(node.right)
  */
   ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_leaf_samples(__pyx_v_self, __pyx_v_node, __pyx_v_samples, __pyx_v_n_samples, (&__pyx_v_leaf_samples), (&__pyx_v_leaf_samples_count));
 
-  /* "cedar/_remover.pyx":210
+  /* "cedar/_remover.pyx":222
  *         cdef int  leaf_samples_count = 0
  *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
- *         dealloc(node)             # <<<<<<<<<<<<<<
- * 
- *         node.count = split.count
+ *         dealloc(node.left)             # <<<<<<<<<<<<<<
+ *         dealloc(node.right)
+ *         free(node.leaf_samples)
  */
-  __pyx_f_5cedar_6_utils_dealloc(__pyx_v_node);
+  __pyx_f_5cedar_6_utils_dealloc(__pyx_v_node->left);
 
-  /* "cedar/_remover.pyx":212
- *         dealloc(node)
- * 
- *         node.count = split.count             # <<<<<<<<<<<<<<
- *         node.pos_count = split.pos_count
+  /* "cedar/_remover.pyx":223
+ *         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
+ *         dealloc(node.left)
+ *         dealloc(node.right)             # <<<<<<<<<<<<<<
+ *         free(node.leaf_samples)
  * 
  */
-  __pyx_t_1 = __pyx_v_split->count;
-  __pyx_v_node->count = __pyx_t_1;
+  __pyx_f_5cedar_6_utils_dealloc(__pyx_v_node->right);
 
-  /* "cedar/_remover.pyx":213
+  /* "cedar/_remover.pyx":224
+ *         dealloc(node.left)
+ *         dealloc(node.right)
+ *         free(node.leaf_samples)             # <<<<<<<<<<<<<<
  * 
- *         node.count = split.count
- *         node.pos_count = split.pos_count             # <<<<<<<<<<<<<<
+ *         node.count = updated_count
+ */
+  free(__pyx_v_node->leaf_samples);
+
+  /* "cedar/_remover.pyx":226
+ *         free(node.leaf_samples)
+ * 
+ *         node.count = updated_count             # <<<<<<<<<<<<<<
+ *         node.pos_count = updated_pos_count
+ * 
+ */
+  __pyx_v_node->count = __pyx_v_updated_count;
+
+  /* "cedar/_remover.pyx":227
+ * 
+ *         node.count = updated_count
+ *         node.pos_count = updated_pos_count             # <<<<<<<<<<<<<<
  * 
  *         node.is_leaf = 1
  */
-  __pyx_t_1 = __pyx_v_split->pos_count;
-  __pyx_v_node->pos_count = __pyx_t_1;
+  __pyx_v_node->pos_count = __pyx_v_updated_pos_count;
 
-  /* "cedar/_remover.pyx":215
- *         node.pos_count = split.pos_count
+  /* "cedar/_remover.pyx":229
+ *         node.pos_count = updated_pos_count
  * 
  *         node.is_leaf = 1             # <<<<<<<<<<<<<<
  *         node.value = node.pos_count / <double> node.count
@@ -4177,7 +4284,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj
  */
   __pyx_v_node->is_leaf = 1;
 
-  /* "cedar/_remover.pyx":216
+  /* "cedar/_remover.pyx":230
  * 
  *         node.is_leaf = 1
  *         node.value = node.pos_count / <double> node.count             # <<<<<<<<<<<<<<
@@ -4186,7 +4293,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj
  */
   __pyx_v_node->value = (((double)__pyx_v_node->pos_count) / ((double)__pyx_v_node->count));
 
-  /* "cedar/_remover.pyx":217
+  /* "cedar/_remover.pyx":231
  *         node.is_leaf = 1
  *         node.value = node.pos_count / <double> node.count
  *         node.leaf_samples = leaf_samples             # <<<<<<<<<<<<<<
@@ -4195,80 +4302,26 @@ static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj
  */
   __pyx_v_node->leaf_samples = __pyx_v_leaf_samples;
 
-  /* "cedar/_remover.pyx":219
+  /* "cedar/_remover.pyx":233
  *         node.leaf_samples = leaf_samples
  * 
  *         node.p = UNDEF             # <<<<<<<<<<<<<<
  *         node.feature = UNDEF
- *         node.feature_count = UNDEF
+ * 
  */
   __pyx_v_node->p = __pyx_v_5cedar_8_remover_UNDEF;
 
-  /* "cedar/_remover.pyx":220
+  /* "cedar/_remover.pyx":234
  * 
  *         node.p = UNDEF
  *         node.feature = UNDEF             # <<<<<<<<<<<<<<
- *         node.feature_count = UNDEF
- *         node.valid_features = NULL
- */
-  __pyx_v_node->feature = __pyx_v_5cedar_8_remover_UNDEF;
-
-  /* "cedar/_remover.pyx":221
- *         node.p = UNDEF
- *         node.feature = UNDEF
- *         node.feature_count = UNDEF             # <<<<<<<<<<<<<<
- *         node.valid_features = NULL
- *         node.left_counts = NULL
- */
-  __pyx_v_node->feature_count = __pyx_v_5cedar_8_remover_UNDEF;
-
-  /* "cedar/_remover.pyx":222
- *         node.feature = UNDEF
- *         node.feature_count = UNDEF
- *         node.valid_features = NULL             # <<<<<<<<<<<<<<
- *         node.left_counts = NULL
- *         node.left_pos_counts = NULL
- */
-  __pyx_v_node->valid_features = NULL;
-
-  /* "cedar/_remover.pyx":223
- *         node.feature_count = UNDEF
- *         node.valid_features = NULL
- *         node.left_counts = NULL             # <<<<<<<<<<<<<<
- *         node.left_pos_counts = NULL
- *         node.right_counts = NULL
- */
-  __pyx_v_node->left_counts = NULL;
-
-  /* "cedar/_remover.pyx":224
- *         node.valid_features = NULL
- *         node.left_counts = NULL
- *         node.left_pos_counts = NULL             # <<<<<<<<<<<<<<
- *         node.right_counts = NULL
- *         node.right_pos_counts = NULL
- */
-  __pyx_v_node->left_pos_counts = NULL;
-
-  /* "cedar/_remover.pyx":225
- *         node.left_counts = NULL
- *         node.left_pos_counts = NULL
- *         node.right_counts = NULL             # <<<<<<<<<<<<<<
- *         node.right_pos_counts = NULL
- * 
- */
-  __pyx_v_node->right_counts = NULL;
-
-  /* "cedar/_remover.pyx":226
- *         node.left_pos_counts = NULL
- *         node.right_counts = NULL
- *         node.right_pos_counts = NULL             # <<<<<<<<<<<<<<
  * 
  *         node.left = NULL
  */
-  __pyx_v_node->right_pos_counts = NULL;
+  __pyx_v_node->feature = __pyx_v_5cedar_8_remover_UNDEF;
 
-  /* "cedar/_remover.pyx":228
- *         node.right_pos_counts = NULL
+  /* "cedar/_remover.pyx":236
+ *         node.feature = UNDEF
  * 
  *         node.left = NULL             # <<<<<<<<<<<<<<
  *         node.right = NULL
@@ -4276,7 +4329,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj
  */
   __pyx_v_node->left = NULL;
 
-  /* "cedar/_remover.pyx":229
+  /* "cedar/_remover.pyx":237
  * 
  *         node.left = NULL
  *         node.right = NULL             # <<<<<<<<<<<<<<
@@ -4285,18 +4338,18 @@ static void __pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf(struct __pyx_obj
  */
   __pyx_v_node->right = NULL;
 
-  /* "cedar/_remover.pyx":200
+  /* "cedar/_remover.pyx":210
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
  *     cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,             # <<<<<<<<<<<<<<
- *                                SplitRecord *split) nogil:
+ *                                int pos_count, SplitRecord *split) nogil:
  *         """
  */
 
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":233
+/* "cedar/_remover.pyx":241
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _get_leaf_samples(self, Node* node, int* remove_samples, int n_remove_samples,             # <<<<<<<<<<<<<<
@@ -4317,7 +4370,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
   int __pyx_t_7;
   long __pyx_t_8;
 
-  /* "cedar/_remover.pyx":240
+  /* "cedar/_remover.pyx":248
  *         cdef bint add_sample
  * 
  *         if node.is_leaf:             # <<<<<<<<<<<<<<
@@ -4327,7 +4380,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
   __pyx_t_1 = (__pyx_v_node->is_leaf != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_remover.pyx":241
+    /* "cedar/_remover.pyx":249
  * 
  *         if node.is_leaf:
  *             for i in range(node.count):             # <<<<<<<<<<<<<<
@@ -4339,7 +4392,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_i = __pyx_t_4;
 
-      /* "cedar/_remover.pyx":242
+      /* "cedar/_remover.pyx":250
  *         if node.is_leaf:
  *             for i in range(node.count):
  *                 add_sample = 1             # <<<<<<<<<<<<<<
@@ -4348,7 +4401,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
       __pyx_v_add_sample = 1;
 
-      /* "cedar/_remover.pyx":244
+      /* "cedar/_remover.pyx":252
  *                 add_sample = 1
  * 
  *                 for j in range(n_remove_samples):             # <<<<<<<<<<<<<<
@@ -4360,7 +4413,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
       for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
         __pyx_v_j = __pyx_t_7;
 
-        /* "cedar/_remover.pyx":245
+        /* "cedar/_remover.pyx":253
  * 
  *                 for j in range(n_remove_samples):
  *                     if node.leaf_samples[i] == remove_samples[j]:             # <<<<<<<<<<<<<<
@@ -4370,7 +4423,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
         __pyx_t_1 = (((__pyx_v_node->leaf_samples[__pyx_v_i]) == (__pyx_v_remove_samples[__pyx_v_j])) != 0);
         if (__pyx_t_1) {
 
-          /* "cedar/_remover.pyx":246
+          /* "cedar/_remover.pyx":254
  *                 for j in range(n_remove_samples):
  *                     if node.leaf_samples[i] == remove_samples[j]:
  *                         add_sample = 0             # <<<<<<<<<<<<<<
@@ -4379,7 +4432,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
           __pyx_v_add_sample = 0;
 
-          /* "cedar/_remover.pyx":247
+          /* "cedar/_remover.pyx":255
  *                     if node.leaf_samples[i] == remove_samples[j]:
  *                         add_sample = 0
  *                         break             # <<<<<<<<<<<<<<
@@ -4388,7 +4441,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
           goto __pyx_L7_break;
 
-          /* "cedar/_remover.pyx":245
+          /* "cedar/_remover.pyx":253
  * 
  *                 for j in range(n_remove_samples):
  *                     if node.leaf_samples[i] == remove_samples[j]:             # <<<<<<<<<<<<<<
@@ -4399,7 +4452,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
       }
       __pyx_L7_break:;
 
-      /* "cedar/_remover.pyx":249
+      /* "cedar/_remover.pyx":257
  *                         break
  * 
  *                 if add_sample:             # <<<<<<<<<<<<<<
@@ -4409,7 +4462,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
       __pyx_t_1 = (__pyx_v_add_sample != 0);
       if (__pyx_t_1) {
 
-        /* "cedar/_remover.pyx":250
+        /* "cedar/_remover.pyx":258
  * 
  *                 if add_sample:
  *                     leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]             # <<<<<<<<<<<<<<
@@ -4418,7 +4471,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
         ((__pyx_v_leaf_samples_ptr[0])[(__pyx_v_leaf_samples_count_ptr[0])]) = (__pyx_v_node->leaf_samples[__pyx_v_i]);
 
-        /* "cedar/_remover.pyx":251
+        /* "cedar/_remover.pyx":259
  *                 if add_sample:
  *                     leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]
  *                     leaf_samples_count_ptr[0] += 1             # <<<<<<<<<<<<<<
@@ -4428,7 +4481,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
         __pyx_t_8 = 0;
         (__pyx_v_leaf_samples_count_ptr[__pyx_t_8]) = ((__pyx_v_leaf_samples_count_ptr[__pyx_t_8]) + 1);
 
-        /* "cedar/_remover.pyx":249
+        /* "cedar/_remover.pyx":257
  *                         break
  * 
  *                 if add_sample:             # <<<<<<<<<<<<<<
@@ -4438,7 +4491,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
       }
     }
 
-    /* "cedar/_remover.pyx":240
+    /* "cedar/_remover.pyx":248
  *         cdef bint add_sample
  * 
  *         if node.is_leaf:             # <<<<<<<<<<<<<<
@@ -4448,7 +4501,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
     goto __pyx_L3;
   }
 
-  /* "cedar/_remover.pyx":254
+  /* "cedar/_remover.pyx":262
  * 
  *         else:
  *             if node.left:             # <<<<<<<<<<<<<<
@@ -4459,7 +4512,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
     __pyx_t_1 = (__pyx_v_node->left != 0);
     if (__pyx_t_1) {
 
-      /* "cedar/_remover.pyx":255
+      /* "cedar/_remover.pyx":263
  *         else:
  *             if node.left:
  *                 self._get_leaf_samples(node.left, remove_samples, n_remove_samples,             # <<<<<<<<<<<<<<
@@ -4468,7 +4521,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
       ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_leaf_samples(__pyx_v_self, __pyx_v_node->left, __pyx_v_remove_samples, __pyx_v_n_remove_samples, __pyx_v_leaf_samples_ptr, __pyx_v_leaf_samples_count_ptr);
 
-      /* "cedar/_remover.pyx":254
+      /* "cedar/_remover.pyx":262
  * 
  *         else:
  *             if node.left:             # <<<<<<<<<<<<<<
@@ -4477,7 +4530,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
     }
 
-    /* "cedar/_remover.pyx":258
+    /* "cedar/_remover.pyx":266
  *                                        leaf_samples_ptr, leaf_samples_count_ptr)
  * 
  *             if node.right:             # <<<<<<<<<<<<<<
@@ -4487,7 +4540,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
     __pyx_t_1 = (__pyx_v_node->right != 0);
     if (__pyx_t_1) {
 
-      /* "cedar/_remover.pyx":259
+      /* "cedar/_remover.pyx":267
  * 
  *             if node.right:
  *                 self._get_leaf_samples(node.right, remove_samples, n_remove_samples,             # <<<<<<<<<<<<<<
@@ -4496,7 +4549,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
  */
       ((struct __pyx_vtabstruct_5cedar_8_remover__Remover *)__pyx_v_self->__pyx_vtab)->_get_leaf_samples(__pyx_v_self, __pyx_v_node->right, __pyx_v_remove_samples, __pyx_v_n_remove_samples, __pyx_v_leaf_samples_ptr, __pyx_v_leaf_samples_count_ptr);
 
-      /* "cedar/_remover.pyx":258
+      /* "cedar/_remover.pyx":266
  *                                        leaf_samples_ptr, leaf_samples_count_ptr)
  * 
  *             if node.right:             # <<<<<<<<<<<<<<
@@ -4507,7 +4560,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
   }
   __pyx_L3:;
 
-  /* "cedar/_remover.pyx":233
+  /* "cedar/_remover.pyx":241
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _get_leaf_samples(self, Node* node, int* remove_samples, int n_remove_samples,             # <<<<<<<<<<<<<<
@@ -4518,7 +4571,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples(struct __pyx_ob
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":264
+/* "cedar/_remover.pyx":272
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil:             # <<<<<<<<<<<<<<
@@ -4530,9 +4583,8 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_decision_node(CYTHON_UNUS
   struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
   double __pyx_t_1;
   int __pyx_t_2;
-  int *__pyx_t_3;
 
-  /* "cedar/_remover.pyx":268
+  /* "cedar/_remover.pyx":276
  *         Update tree with node metadata.
  *         """
  *         cdef Node* node = node_ptr[0]             # <<<<<<<<<<<<<<
@@ -4541,7 +4593,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_decision_node(CYTHON_UNUS
  */
   __pyx_v_node = (__pyx_v_node_ptr[0]);
 
-  /* "cedar/_remover.pyx":269
+  /* "cedar/_remover.pyx":277
  *         """
  *         cdef Node* node = node_ptr[0]
  *         node.p = split.p             # <<<<<<<<<<<<<<
@@ -4551,87 +4603,27 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_decision_node(CYTHON_UNUS
   __pyx_t_1 = __pyx_v_split->p;
   __pyx_v_node->p = __pyx_t_1;
 
-  /* "cedar/_remover.pyx":270
+  /* "cedar/_remover.pyx":278
  *         cdef Node* node = node_ptr[0]
  *         node.p = split.p
  *         node.count = split.count             # <<<<<<<<<<<<<<
  *         node.pos_count = split.pos_count
- *         node.feature_count = split.feature_count
+ * 
  */
   __pyx_t_2 = __pyx_v_split->count;
   __pyx_v_node->count = __pyx_t_2;
 
-  /* "cedar/_remover.pyx":271
+  /* "cedar/_remover.pyx":279
  *         node.p = split.p
  *         node.count = split.count
  *         node.pos_count = split.pos_count             # <<<<<<<<<<<<<<
- *         node.feature_count = split.feature_count
- *         node.valid_features = split.valid_features
+ * 
+ *     @cython.boundscheck(False)
  */
   __pyx_t_2 = __pyx_v_split->pos_count;
   __pyx_v_node->pos_count = __pyx_t_2;
 
   /* "cedar/_remover.pyx":272
- *         node.count = split.count
- *         node.pos_count = split.pos_count
- *         node.feature_count = split.feature_count             # <<<<<<<<<<<<<<
- *         node.valid_features = split.valid_features
- *         node.left_counts = split.left_counts
- */
-  __pyx_t_2 = __pyx_v_split->feature_count;
-  __pyx_v_node->feature_count = __pyx_t_2;
-
-  /* "cedar/_remover.pyx":273
- *         node.pos_count = split.pos_count
- *         node.feature_count = split.feature_count
- *         node.valid_features = split.valid_features             # <<<<<<<<<<<<<<
- *         node.left_counts = split.left_counts
- *         node.left_pos_counts = split.left_pos_counts
- */
-  __pyx_t_3 = __pyx_v_split->valid_features;
-  __pyx_v_node->valid_features = __pyx_t_3;
-
-  /* "cedar/_remover.pyx":274
- *         node.feature_count = split.feature_count
- *         node.valid_features = split.valid_features
- *         node.left_counts = split.left_counts             # <<<<<<<<<<<<<<
- *         node.left_pos_counts = split.left_pos_counts
- *         node.right_counts = split.right_counts
- */
-  __pyx_t_3 = __pyx_v_split->left_counts;
-  __pyx_v_node->left_counts = __pyx_t_3;
-
-  /* "cedar/_remover.pyx":275
- *         node.valid_features = split.valid_features
- *         node.left_counts = split.left_counts
- *         node.left_pos_counts = split.left_pos_counts             # <<<<<<<<<<<<<<
- *         node.right_counts = split.right_counts
- *         node.right_pos_counts = split.right_pos_counts
- */
-  __pyx_t_3 = __pyx_v_split->left_pos_counts;
-  __pyx_v_node->left_pos_counts = __pyx_t_3;
-
-  /* "cedar/_remover.pyx":276
- *         node.left_counts = split.left_counts
- *         node.left_pos_counts = split.left_pos_counts
- *         node.right_counts = split.right_counts             # <<<<<<<<<<<<<<
- *         node.right_pos_counts = split.right_pos_counts
- * 
- */
-  __pyx_t_3 = __pyx_v_split->right_counts;
-  __pyx_v_node->right_counts = __pyx_t_3;
-
-  /* "cedar/_remover.pyx":277
- *         node.left_pos_counts = split.left_pos_counts
- *         node.right_counts = split.right_counts
- *         node.right_pos_counts = split.right_pos_counts             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __pyx_t_3 = __pyx_v_split->right_pos_counts;
-  __pyx_v_node->right_pos_counts = __pyx_t_3;
-
-  /* "cedar/_remover.pyx":264
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil:             # <<<<<<<<<<<<<<
@@ -4642,49 +4634,34 @@ static void __pyx_f_5cedar_8_remover_8_Remover__update_decision_node(CYTHON_UNUS
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":283
+/* "cedar/_remover.pyx":284
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
- *     cdef int _node_remove(self, Node* node, int** X, int* y,             # <<<<<<<<<<<<<<
- *                           int* samples, int n_samples,
+ *     cdef int _check_node(self, Node* node, int** X, int* y,             # <<<<<<<<<<<<<<
+ *                           int* samples, int n_samples, int pos_count,
  *                           double parent_p, SplitRecord *split) nogil:
  */
 
-static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, double __pyx_v_parent_p, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split) {
+static int __pyx_f_5cedar_8_remover_8_Remover__check_node(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node, int **__pyx_v_X, CYTHON_UNUSED int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count, double __pyx_v_parent_p, struct __pyx_t_5cedar_9_splitter_SplitRecord *__pyx_v_split) {
   double __pyx_v_epsilon;
   double __pyx_v_lmbda;
   int __pyx_v_min_samples_leaf;
-  CYTHON_UNUSED int __pyx_v_min_samples_split;
-  int __pyx_v_count;
-  int __pyx_v_pos_count;
-  int __pyx_v_left_count;
-  int __pyx_v_left_pos_count;
-  int __pyx_v_right_count;
-  int __pyx_v_right_pos_count;
-  int __pyx_v_updated_count;
-  int __pyx_v_updated_pos_count;
-  int __pyx_v_updated_left_count;
-  int __pyx_v_updated_left_pos_count;
-  int __pyx_v_updated_right_count;
-  int __pyx_v_updated_right_pos_count;
-  int __pyx_v_i;
-  int __pyx_v_j;
-  int __pyx_v_k;
-  int __pyx_v_feature_count;
-  int __pyx_v_result;
-  int __pyx_v_chosen_feature_validated;
-  int __pyx_v_chosen_ndx;
-  double __pyx_v_p;
-  double __pyx_v_ratio;
   double *__pyx_v_gini_indices;
   double *__pyx_v_distribution;
   int *__pyx_v_valid_features;
-  int __pyx_v_chosen_left_count;
-  int __pyx_v_chosen_right_count;
-  int *__pyx_v_updated_left_counts;
-  int *__pyx_v_updated_left_pos_counts;
-  int *__pyx_v_updated_right_counts;
-  int *__pyx_v_updated_right_pos_counts;
+  int __pyx_v_valid_features_count;
+  int __pyx_v_chosen_feature_validated;
+  int __pyx_v_chosen_ndx;
+  CYTHON_UNUSED int __pyx_v_chosen_left_count;
+  CYTHON_UNUSED int __pyx_v_chosen_right_count;
+  double __pyx_v_p;
+  double __pyx_v_ratio;
+  int __pyx_v_updated_count;
+  int __pyx_v_updated_pos_count;
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_k;
+  int __pyx_v_result;
   int __pyx_r;
   double __pyx_t_1;
   int __pyx_t_2;
@@ -4692,11 +4669,8 @@ static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5ced
   int __pyx_t_4;
   int __pyx_t_5;
   int __pyx_t_6;
-  int __pyx_t_7;
-  int __pyx_t_8;
-  int __pyx_t_9;
 
-  /* "cedar/_remover.pyx":293
+  /* "cedar/_remover.pyx":292
  * 
  *         # parameters
  *         cdef double epsilon = self.epsilon             # <<<<<<<<<<<<<<
@@ -4706,872 +4680,357 @@ static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5ced
   __pyx_t_1 = __pyx_v_self->epsilon;
   __pyx_v_epsilon = __pyx_t_1;
 
-  /* "cedar/_remover.pyx":294
+  /* "cedar/_remover.pyx":293
  *         # parameters
  *         cdef double epsilon = self.epsilon
  *         cdef double lmbda = self.lmbda             # <<<<<<<<<<<<<<
  *         cdef int min_samples_leaf = self.min_samples_leaf
- *         cdef int min_samples_split = self.min_samples_split
+ * 
  */
   __pyx_t_1 = __pyx_v_self->lmbda;
   __pyx_v_lmbda = __pyx_t_1;
 
-  /* "cedar/_remover.pyx":295
+  /* "cedar/_remover.pyx":294
  *         cdef double epsilon = self.epsilon
  *         cdef double lmbda = self.lmbda
  *         cdef int min_samples_leaf = self.min_samples_leaf             # <<<<<<<<<<<<<<
- *         cdef int min_samples_split = self.min_samples_split
  * 
+ *         cdef double* gini_indices = NULL
  */
   __pyx_t_2 = __pyx_v_self->min_samples_leaf;
   __pyx_v_min_samples_leaf = __pyx_t_2;
 
   /* "cedar/_remover.pyx":296
- *         cdef double lmbda = self.lmbda
  *         cdef int min_samples_leaf = self.min_samples_leaf
- *         cdef int min_samples_split = self.min_samples_split             # <<<<<<<<<<<<<<
  * 
- *         # removal data statistics
+ *         cdef double* gini_indices = NULL             # <<<<<<<<<<<<<<
+ *         cdef double* distribution = NULL
+ *         cdef int* valid_features = NULL
  */
-  __pyx_t_2 = __pyx_v_self->min_samples_split;
-  __pyx_v_min_samples_split = __pyx_t_2;
+  __pyx_v_gini_indices = NULL;
+
+  /* "cedar/_remover.pyx":297
+ * 
+ *         cdef double* gini_indices = NULL
+ *         cdef double* distribution = NULL             # <<<<<<<<<<<<<<
+ *         cdef int* valid_features = NULL
+ *         cdef int  valid_features_count = 0
+ */
+  __pyx_v_distribution = NULL;
+
+  /* "cedar/_remover.pyx":298
+ *         cdef double* gini_indices = NULL
+ *         cdef double* distribution = NULL
+ *         cdef int* valid_features = NULL             # <<<<<<<<<<<<<<
+ *         cdef int  valid_features_count = 0
+ * 
+ */
+  __pyx_v_valid_features = NULL;
 
   /* "cedar/_remover.pyx":299
- * 
- *         # removal data statistics
- *         cdef int count = n_samples             # <<<<<<<<<<<<<<
- *         cdef int pos_count = 0
- *         cdef int left_count
- */
-  __pyx_v_count = __pyx_v_n_samples;
-
-  /* "cedar/_remover.pyx":300
- *         # removal data statistics
- *         cdef int count = n_samples
- *         cdef int pos_count = 0             # <<<<<<<<<<<<<<
- *         cdef int left_count
- *         cdef int left_pos_count
- */
-  __pyx_v_pos_count = 0;
-
-  /* "cedar/_remover.pyx":318
- *         cdef int k
- * 
- *         cdef int feature_count = 0             # <<<<<<<<<<<<<<
- *         cdef int result = 0
- * 
- */
-  __pyx_v_feature_count = 0;
-
-  /* "cedar/_remover.pyx":319
- * 
- *         cdef int feature_count = 0
- *         cdef int result = 0             # <<<<<<<<<<<<<<
+ *         cdef double* distribution = NULL
+ *         cdef int* valid_features = NULL
+ *         cdef int  valid_features_count = 0             # <<<<<<<<<<<<<<
  * 
  *         cdef bint chosen_feature_validated = 0
  */
-  __pyx_v_result = 0;
+  __pyx_v_valid_features_count = 0;
 
-  /* "cedar/_remover.pyx":321
- *         cdef int result = 0
+  /* "cedar/_remover.pyx":301
+ *         cdef int  valid_features_count = 0
  * 
  *         cdef bint chosen_feature_validated = 0             # <<<<<<<<<<<<<<
- *         cdef int chosen_ndx
- * 
+ *         cdef int chosen_ndx = -1
+ *         cdef int chosen_left_count = 0
  */
   __pyx_v_chosen_feature_validated = 0;
 
-  /* "cedar/_remover.pyx":340
+  /* "cedar/_remover.pyx":302
  * 
- *         # count number of pos labels in removal data
- *         for i in range(n_samples):             # <<<<<<<<<<<<<<
- *             if y[samples[i]] == 1:
- *                 pos_count += 1
+ *         cdef bint chosen_feature_validated = 0
+ *         cdef int chosen_ndx = -1             # <<<<<<<<<<<<<<
+ *         cdef int chosen_left_count = 0
+ *         cdef int chosen_right_count = 0
  */
-  __pyx_t_2 = __pyx_v_n_samples;
-  __pyx_t_3 = __pyx_t_2;
-  for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-    __pyx_v_i = __pyx_t_4;
+  __pyx_v_chosen_ndx = -1;
 
-    /* "cedar/_remover.pyx":341
- *         # count number of pos labels in removal data
- *         for i in range(n_samples):
- *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
- *                 pos_count += 1
+  /* "cedar/_remover.pyx":303
+ *         cdef bint chosen_feature_validated = 0
+ *         cdef int chosen_ndx = -1
+ *         cdef int chosen_left_count = 0             # <<<<<<<<<<<<<<
+ *         cdef int chosen_right_count = 0
  * 
  */
-    __pyx_t_5 = (((__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]) == 1) != 0);
-    if (__pyx_t_5) {
+  __pyx_v_chosen_left_count = 0;
 
-      /* "cedar/_remover.pyx":342
- *         for i in range(n_samples):
- *             if y[samples[i]] == 1:
- *                 pos_count += 1             # <<<<<<<<<<<<<<
+  /* "cedar/_remover.pyx":304
+ *         cdef int chosen_ndx = -1
+ *         cdef int chosen_left_count = 0
+ *         cdef int chosen_right_count = 0             # <<<<<<<<<<<<<<
  * 
- *         updated_count = node.count - count
+ *         cdef double p
  */
-      __pyx_v_pos_count = (__pyx_v_pos_count + 1);
+  __pyx_v_chosen_right_count = 0;
 
-      /* "cedar/_remover.pyx":341
- *         # count number of pos labels in removal data
- *         for i in range(n_samples):
- *             if y[samples[i]] == 1:             # <<<<<<<<<<<<<<
- *                 pos_count += 1
+  /* "cedar/_remover.pyx":309
+ *         cdef double ratio
  * 
- */
-    }
-  }
-
-  /* "cedar/_remover.pyx":344
- *                 pos_count += 1
- * 
- *         updated_count = node.count - count             # <<<<<<<<<<<<<<
- *         updated_pos_count = node.pos_count - pos_count
+ *         cdef int updated_count = node.count - n_samples             # <<<<<<<<<<<<<<
+ *         cdef int updated_pos_count = node.pos_count - pos_count
  * 
  */
-  __pyx_v_updated_count = (__pyx_v_node->count - __pyx_v_count);
+  __pyx_v_updated_count = (__pyx_v_node->count - __pyx_v_n_samples);
 
-  /* "cedar/_remover.pyx":345
+  /* "cedar/_remover.pyx":310
  * 
- *         updated_count = node.count - count
- *         updated_pos_count = node.pos_count - pos_count             # <<<<<<<<<<<<<<
+ *         cdef int updated_count = node.count - n_samples
+ *         cdef int updated_pos_count = node.pos_count - pos_count             # <<<<<<<<<<<<<<
  * 
- *         # no samples left in this node => retrain
+ *         cdef int i
  */
   __pyx_v_updated_pos_count = (__pyx_v_node->pos_count - __pyx_v_pos_count);
 
-  /* "cedar/_remover.pyx":348
+  /* "cedar/_remover.pyx":316
+ *         cdef int k
  * 
- *         # no samples left in this node => retrain
- *         if updated_count <= 0:  # this branch will not be reached             # <<<<<<<<<<<<<<
- *             # printf('meta count <= count\n')
- *             result = 2
+ *         cdef int result = 0             # <<<<<<<<<<<<<<
+ * 
+ *         if updated_pos_count > 0 and updated_pos_count < updated_count:
  */
-  __pyx_t_5 = ((__pyx_v_updated_count <= 0) != 0);
-  if (__pyx_t_5) {
+  __pyx_v_result = 0;
 
-    /* "cedar/_remover.pyx":350
- *         if updated_count <= 0:  # this branch will not be reached
- *             # printf('meta count <= count\n')
- *             result = 2             # <<<<<<<<<<<<<<
+  /* "cedar/_remover.pyx":318
+ *         cdef int result = 0
  * 
- *         # only samples from one class are left in this node => create leaf
- */
-    __pyx_v_result = 2;
-
-    /* "cedar/_remover.pyx":348
+ *         if updated_pos_count > 0 and updated_pos_count < updated_count:             # <<<<<<<<<<<<<<
  * 
- *         # no samples left in this node => retrain
- *         if updated_count <= 0:  # this branch will not be reached             # <<<<<<<<<<<<<<
- *             # printf('meta count <= count\n')
- *             result = 2
+ *             gini_indices = <double *>malloc(node.features_count * sizeof(double))
  */
-    goto __pyx_L6;
-  }
-
-  /* "cedar/_remover.pyx":353
- * 
- *         # only samples from one class are left in this node => create leaf
- *         elif updated_pos_count == 0 or updated_pos_count == updated_count:             # <<<<<<<<<<<<<<
- *             # printf('only samples from one class\n')
- *             result = 1
- */
-  __pyx_t_6 = ((__pyx_v_updated_pos_count == 0) != 0);
-  if (!__pyx_t_6) {
+  __pyx_t_4 = ((__pyx_v_updated_pos_count > 0) != 0);
+  if (__pyx_t_4) {
   } else {
-    __pyx_t_5 = __pyx_t_6;
-    goto __pyx_L7_bool_binop_done;
+    __pyx_t_3 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_6 = ((__pyx_v_updated_pos_count == __pyx_v_updated_count) != 0);
-  __pyx_t_5 = __pyx_t_6;
-  __pyx_L7_bool_binop_done:;
-  if (__pyx_t_5) {
+  __pyx_t_4 = ((__pyx_v_updated_pos_count < __pyx_v_updated_count) != 0);
+  __pyx_t_3 = __pyx_t_4;
+  __pyx_L4_bool_binop_done:;
+  if (__pyx_t_3) {
 
-    /* "cedar/_remover.pyx":355
- *         elif updated_pos_count == 0 or updated_pos_count == updated_count:
- *             # printf('only samples from one class\n')
- *             result = 1             # <<<<<<<<<<<<<<
- *             split.count = updated_count
- *             split.pos_count = updated_pos_count
- */
-    __pyx_v_result = 1;
-
-    /* "cedar/_remover.pyx":356
- *             # printf('only samples from one class\n')
- *             result = 1
- *             split.count = updated_count             # <<<<<<<<<<<<<<
- *             split.pos_count = updated_pos_count
+    /* "cedar/_remover.pyx":320
+ *         if updated_pos_count > 0 and updated_pos_count < updated_count:
  * 
+ *             gini_indices = <double *>malloc(node.features_count * sizeof(double))             # <<<<<<<<<<<<<<
+ *             distribution = <double *>malloc(node.features_count * sizeof(double))
+ *             valid_features = <int *>malloc(node.features_count * sizeof(int))
  */
-    __pyx_v_split->count = __pyx_v_updated_count;
+    __pyx_v_gini_indices = ((double *)malloc((__pyx_v_node->features_count * (sizeof(double)))));
 
-    /* "cedar/_remover.pyx":357
- *             result = 1
- *             split.count = updated_count
- *             split.pos_count = updated_pos_count             # <<<<<<<<<<<<<<
+    /* "cedar/_remover.pyx":321
  * 
- *         else:
- */
-    __pyx_v_split->pos_count = __pyx_v_updated_pos_count;
-
-    /* "cedar/_remover.pyx":353
- * 
- *         # only samples from one class are left in this node => create leaf
- *         elif updated_pos_count == 0 or updated_pos_count == updated_count:             # <<<<<<<<<<<<<<
- *             # printf('only samples from one class\n')
- *             result = 1
- */
-    goto __pyx_L6;
-  }
-
-  /* "cedar/_remover.pyx":361
- *         else:
- * 
- *             gini_indices = <double *>malloc(node.feature_count * sizeof(double))             # <<<<<<<<<<<<<<
- *             distribution = <double *>malloc(node.feature_count * sizeof(double))
- *             valid_features = <int *>malloc(node.feature_count * sizeof(int))
- */
-  /*else*/ {
-    __pyx_v_gini_indices = ((double *)malloc((__pyx_v_node->feature_count * (sizeof(double)))));
-
-    /* "cedar/_remover.pyx":362
- * 
- *             gini_indices = <double *>malloc(node.feature_count * sizeof(double))
- *             distribution = <double *>malloc(node.feature_count * sizeof(double))             # <<<<<<<<<<<<<<
- *             valid_features = <int *>malloc(node.feature_count * sizeof(int))
+ *             gini_indices = <double *>malloc(node.features_count * sizeof(double))
+ *             distribution = <double *>malloc(node.features_count * sizeof(double))             # <<<<<<<<<<<<<<
+ *             valid_features = <int *>malloc(node.features_count * sizeof(int))
  * 
  */
-    __pyx_v_distribution = ((double *)malloc((__pyx_v_node->feature_count * (sizeof(double)))));
+    __pyx_v_distribution = ((double *)malloc((__pyx_v_node->features_count * (sizeof(double)))));
 
-    /* "cedar/_remover.pyx":363
- *             gini_indices = <double *>malloc(node.feature_count * sizeof(double))
- *             distribution = <double *>malloc(node.feature_count * sizeof(double))
- *             valid_features = <int *>malloc(node.feature_count * sizeof(int))             # <<<<<<<<<<<<<<
+    /* "cedar/_remover.pyx":322
+ *             gini_indices = <double *>malloc(node.features_count * sizeof(double))
+ *             distribution = <double *>malloc(node.features_count * sizeof(double))
+ *             valid_features = <int *>malloc(node.features_count * sizeof(int))             # <<<<<<<<<<<<<<
  * 
- *             updated_left_counts = <int *>malloc(node.feature_count * sizeof(int))
+ *             for j in range(node.features_count):
  */
-    __pyx_v_valid_features = ((int *)malloc((__pyx_v_node->feature_count * (sizeof(int)))));
+    __pyx_v_valid_features = ((int *)malloc((__pyx_v_node->features_count * (sizeof(int)))));
 
-    /* "cedar/_remover.pyx":365
- *             valid_features = <int *>malloc(node.feature_count * sizeof(int))
+    /* "cedar/_remover.pyx":324
+ *             valid_features = <int *>malloc(node.features_count * sizeof(int))
  * 
- *             updated_left_counts = <int *>malloc(node.feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *             updated_left_pos_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_right_counts = <int *>malloc(node.feature_count * sizeof(int))
- */
-    __pyx_v_updated_left_counts = ((int *)malloc((__pyx_v_node->feature_count * (sizeof(int)))));
-
-    /* "cedar/_remover.pyx":366
- * 
- *             updated_left_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_left_pos_counts = <int *>malloc(node.feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *             updated_right_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_right_pos_counts = <int *>malloc(node.feature_count * sizeof(int))
- */
-    __pyx_v_updated_left_pos_counts = ((int *)malloc((__pyx_v_node->feature_count * (sizeof(int)))));
-
-    /* "cedar/_remover.pyx":367
- *             updated_left_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_left_pos_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_right_counts = <int *>malloc(node.feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *             updated_right_pos_counts = <int *>malloc(node.feature_count * sizeof(int))
- * 
- */
-    __pyx_v_updated_right_counts = ((int *)malloc((__pyx_v_node->feature_count * (sizeof(int)))));
-
-    /* "cedar/_remover.pyx":368
- *             updated_left_pos_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_right_counts = <int *>malloc(node.feature_count * sizeof(int))
- *             updated_right_pos_counts = <int *>malloc(node.feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- * 
- *             # compute statistics of the removal data for each attribute
- */
-    __pyx_v_updated_right_pos_counts = ((int *)malloc((__pyx_v_node->feature_count * (sizeof(int)))));
-
-    /* "cedar/_remover.pyx":371
- * 
- *             # compute statistics of the removal data for each attribute
- *             for j in range(node.feature_count):             # <<<<<<<<<<<<<<
- * 
- *                 left_count = 0
- */
-    __pyx_t_2 = __pyx_v_node->feature_count;
-    __pyx_t_3 = __pyx_t_2;
-    for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-      __pyx_v_j = __pyx_t_4;
-
-      /* "cedar/_remover.pyx":373
- *             for j in range(node.feature_count):
- * 
- *                 left_count = 0             # <<<<<<<<<<<<<<
- *                 left_pos_count = 0
- * 
- */
-      __pyx_v_left_count = 0;
-
-      /* "cedar/_remover.pyx":374
- * 
- *                 left_count = 0
- *                 left_pos_count = 0             # <<<<<<<<<<<<<<
- * 
- *                 for i in range(n_samples):
- */
-      __pyx_v_left_pos_count = 0;
-
-      /* "cedar/_remover.pyx":376
- *                 left_pos_count = 0
- * 
- *                 for i in range(n_samples):             # <<<<<<<<<<<<<<
- * 
- *                     if X[samples[i]][node.valid_features[j]] == 1:
- */
-      __pyx_t_7 = __pyx_v_n_samples;
-      __pyx_t_8 = __pyx_t_7;
-      for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
-        __pyx_v_i = __pyx_t_9;
-
-        /* "cedar/_remover.pyx":378
- *                 for i in range(n_samples):
- * 
- *                     if X[samples[i]][node.valid_features[j]] == 1:             # <<<<<<<<<<<<<<
- *                         left_count += 1
- *                         left_pos_count += y[samples[i]]
- */
-        __pyx_t_5 = ((((__pyx_v_X[(__pyx_v_samples[__pyx_v_i])])[(__pyx_v_node->valid_features[__pyx_v_j])]) == 1) != 0);
-        if (__pyx_t_5) {
-
-          /* "cedar/_remover.pyx":379
- * 
- *                     if X[samples[i]][node.valid_features[j]] == 1:
- *                         left_count += 1             # <<<<<<<<<<<<<<
- *                         left_pos_count += y[samples[i]]
- * 
- */
-          __pyx_v_left_count = (__pyx_v_left_count + 1);
-
-          /* "cedar/_remover.pyx":380
- *                     if X[samples[i]][node.valid_features[j]] == 1:
- *                         left_count += 1
- *                         left_pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
- * 
- *                 right_count = count - left_count
- */
-          __pyx_v_left_pos_count = (__pyx_v_left_pos_count + (__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]));
-
-          /* "cedar/_remover.pyx":378
- *                 for i in range(n_samples):
- * 
- *                     if X[samples[i]][node.valid_features[j]] == 1:             # <<<<<<<<<<<<<<
- *                         left_count += 1
- *                         left_pos_count += y[samples[i]]
- */
-        }
-      }
-
-      /* "cedar/_remover.pyx":382
- *                         left_pos_count += y[samples[i]]
- * 
- *                 right_count = count - left_count             # <<<<<<<<<<<<<<
- *                 right_pos_count = pos_count - left_pos_count
- * 
- */
-      __pyx_v_right_count = (__pyx_v_count - __pyx_v_left_count);
-
-      /* "cedar/_remover.pyx":383
- * 
- *                 right_count = count - left_count
- *                 right_pos_count = pos_count - left_pos_count             # <<<<<<<<<<<<<<
- * 
- *                 updated_left_count = node.left_counts[j] - left_count
- */
-      __pyx_v_right_pos_count = (__pyx_v_pos_count - __pyx_v_left_pos_count);
-
-      /* "cedar/_remover.pyx":385
- *                 right_pos_count = pos_count - left_pos_count
- * 
- *                 updated_left_count = node.left_counts[j] - left_count             # <<<<<<<<<<<<<<
- *                 updated_left_pos_count = node.left_pos_counts[j] - left_pos_count
- *                 updated_right_count = node.right_counts[j] - right_count
- */
-      __pyx_v_updated_left_count = ((__pyx_v_node->left_counts[__pyx_v_j]) - __pyx_v_left_count);
-
-      /* "cedar/_remover.pyx":386
- * 
- *                 updated_left_count = node.left_counts[j] - left_count
- *                 updated_left_pos_count = node.left_pos_counts[j] - left_pos_count             # <<<<<<<<<<<<<<
- *                 updated_right_count = node.right_counts[j] - right_count
- *                 updated_right_pos_count = node.right_pos_counts[j] - right_pos_count
- */
-      __pyx_v_updated_left_pos_count = ((__pyx_v_node->left_pos_counts[__pyx_v_j]) - __pyx_v_left_pos_count);
-
-      /* "cedar/_remover.pyx":387
- *                 updated_left_count = node.left_counts[j] - left_count
- *                 updated_left_pos_count = node.left_pos_counts[j] - left_pos_count
- *                 updated_right_count = node.right_counts[j] - right_count             # <<<<<<<<<<<<<<
- *                 updated_right_pos_count = node.right_pos_counts[j] - right_pos_count
- * 
- */
-      __pyx_v_updated_right_count = ((__pyx_v_node->right_counts[__pyx_v_j]) - __pyx_v_right_count);
-
-      /* "cedar/_remover.pyx":388
- *                 updated_left_pos_count = node.left_pos_counts[j] - left_pos_count
- *                 updated_right_count = node.right_counts[j] - right_count
- *                 updated_right_pos_count = node.right_pos_counts[j] - right_pos_count             # <<<<<<<<<<<<<<
+ *             for j in range(node.features_count):             # <<<<<<<<<<<<<<
  * 
  *                 # validate split
  */
-      __pyx_v_updated_right_pos_count = ((__pyx_v_node->right_pos_counts[__pyx_v_j]) - __pyx_v_right_pos_count);
+    __pyx_t_2 = __pyx_v_node->features_count;
+    __pyx_t_5 = __pyx_t_2;
+    for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+      __pyx_v_j = __pyx_t_6;
 
-      /* "cedar/_remover.pyx":391
+      /* "cedar/_remover.pyx":327
  * 
  *                 # validate split
- *                 if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:             # <<<<<<<<<<<<<<
- *                     valid_features[feature_count] = node.valid_features[j]
- *                     gini_indices[feature_count] = compute_gini(updated_count, updated_left_count,
+ *                 if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:             # <<<<<<<<<<<<<<
+ *                     valid_features[valid_features_count] = node.features[j]
+ *                     gini_indices[valid_features_count] = compute_gini(updated_count,
  */
-      __pyx_t_6 = ((__pyx_v_updated_left_count >= __pyx_v_min_samples_leaf) != 0);
-      if (__pyx_t_6) {
+      __pyx_t_4 = (((__pyx_v_node->left_counts[__pyx_v_j]) >= __pyx_v_min_samples_leaf) != 0);
+      if (__pyx_t_4) {
       } else {
-        __pyx_t_5 = __pyx_t_6;
-        goto __pyx_L15_bool_binop_done;
+        __pyx_t_3 = __pyx_t_4;
+        goto __pyx_L9_bool_binop_done;
       }
-      __pyx_t_6 = ((__pyx_v_updated_right_count >= __pyx_v_min_samples_leaf) != 0);
-      __pyx_t_5 = __pyx_t_6;
-      __pyx_L15_bool_binop_done:;
-      if (__pyx_t_5) {
+      __pyx_t_4 = (((__pyx_v_node->right_counts[__pyx_v_j]) >= __pyx_v_min_samples_leaf) != 0);
+      __pyx_t_3 = __pyx_t_4;
+      __pyx_L9_bool_binop_done:;
+      if (__pyx_t_3) {
 
-        /* "cedar/_remover.pyx":392
+        /* "cedar/_remover.pyx":328
  *                 # validate split
- *                 if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:
- *                     valid_features[feature_count] = node.valid_features[j]             # <<<<<<<<<<<<<<
- *                     gini_indices[feature_count] = compute_gini(updated_count, updated_left_count,
- *                         updated_right_count, updated_left_pos_count, updated_right_pos_count)
+ *                 if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
+ *                     valid_features[valid_features_count] = node.features[j]             # <<<<<<<<<<<<<<
+ *                     gini_indices[valid_features_count] = compute_gini(updated_count,
+ *                                                                       node.left_counts[j],
  */
-        (__pyx_v_valid_features[__pyx_v_feature_count]) = (__pyx_v_node->valid_features[__pyx_v_j]);
+        (__pyx_v_valid_features[__pyx_v_valid_features_count]) = (__pyx_v_node->features[__pyx_v_j]);
 
-        /* "cedar/_remover.pyx":393
- *                 if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:
- *                     valid_features[feature_count] = node.valid_features[j]
- *                     gini_indices[feature_count] = compute_gini(updated_count, updated_left_count,             # <<<<<<<<<<<<<<
- *                         updated_right_count, updated_left_pos_count, updated_right_pos_count)
- * 
+        /* "cedar/_remover.pyx":329
+ *                 if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
+ *                     valid_features[valid_features_count] = node.features[j]
+ *                     gini_indices[valid_features_count] = compute_gini(updated_count,             # <<<<<<<<<<<<<<
+ *                                                                       node.left_counts[j],
+ *                                                                       node.right_counts[j],
  */
-        (__pyx_v_gini_indices[__pyx_v_feature_count]) = __pyx_f_5cedar_6_utils_compute_gini(__pyx_v_updated_count, __pyx_v_updated_left_count, __pyx_v_updated_right_count, __pyx_v_updated_left_pos_count, __pyx_v_updated_right_pos_count);
+        (__pyx_v_gini_indices[__pyx_v_valid_features_count]) = __pyx_f_5cedar_6_utils_compute_gini(__pyx_v_updated_count, (__pyx_v_node->left_counts[__pyx_v_j]), (__pyx_v_node->right_counts[__pyx_v_j]), (__pyx_v_node->left_pos_counts[__pyx_v_j]), (__pyx_v_node->right_pos_counts[__pyx_v_j]));
 
-        /* "cedar/_remover.pyx":397
- * 
- *                     # update metadata
- *                     updated_left_counts[feature_count] = updated_left_count             # <<<<<<<<<<<<<<
- *                     updated_left_pos_counts[feature_count] = updated_left_pos_count
- *                     updated_right_counts[feature_count] = updated_right_count
- */
-        (__pyx_v_updated_left_counts[__pyx_v_feature_count]) = __pyx_v_updated_left_count;
-
-        /* "cedar/_remover.pyx":398
- *                     # update metadata
- *                     updated_left_counts[feature_count] = updated_left_count
- *                     updated_left_pos_counts[feature_count] = updated_left_pos_count             # <<<<<<<<<<<<<<
- *                     updated_right_counts[feature_count] = updated_right_count
- *                     updated_right_pos_counts[feature_count] = updated_right_pos_count
- */
-        (__pyx_v_updated_left_pos_counts[__pyx_v_feature_count]) = __pyx_v_updated_left_pos_count;
-
-        /* "cedar/_remover.pyx":399
- *                     updated_left_counts[feature_count] = updated_left_count
- *                     updated_left_pos_counts[feature_count] = updated_left_pos_count
- *                     updated_right_counts[feature_count] = updated_right_count             # <<<<<<<<<<<<<<
- *                     updated_right_pos_counts[feature_count] = updated_right_pos_count
- * 
- */
-        (__pyx_v_updated_right_counts[__pyx_v_feature_count]) = __pyx_v_updated_right_count;
-
-        /* "cedar/_remover.pyx":400
- *                     updated_left_pos_counts[feature_count] = updated_left_pos_count
- *                     updated_right_counts[feature_count] = updated_right_count
- *                     updated_right_pos_counts[feature_count] = updated_right_pos_count             # <<<<<<<<<<<<<<
- * 
- *                     if node.valid_features[j] == node.feature:
- */
-        (__pyx_v_updated_right_pos_counts[__pyx_v_feature_count]) = __pyx_v_updated_right_pos_count;
-
-        /* "cedar/_remover.pyx":402
- *                     updated_right_pos_counts[feature_count] = updated_right_pos_count
- * 
- *                     if node.valid_features[j] == node.feature:             # <<<<<<<<<<<<<<
+        /* "cedar/_remover.pyx":334
+ *                                                                       node.left_pos_counts[j],
+ *                                                                       node.right_pos_counts[j])
+ *                     if node.features[j] == node.feature:             # <<<<<<<<<<<<<<
  *                         chosen_feature_validated = 1
- *                         chosen_ndx = feature_count
+ *                         chosen_ndx = valid_features_count
  */
-        __pyx_t_5 = (((__pyx_v_node->valid_features[__pyx_v_j]) == __pyx_v_node->feature) != 0);
-        if (__pyx_t_5) {
+        __pyx_t_3 = (((__pyx_v_node->features[__pyx_v_j]) == __pyx_v_node->feature) != 0);
+        if (__pyx_t_3) {
 
-          /* "cedar/_remover.pyx":403
- * 
- *                     if node.valid_features[j] == node.feature:
+          /* "cedar/_remover.pyx":335
+ *                                                                       node.right_pos_counts[j])
+ *                     if node.features[j] == node.feature:
  *                         chosen_feature_validated = 1             # <<<<<<<<<<<<<<
- *                         chosen_ndx = feature_count
- *                         chosen_left_count = left_count
+ *                         chosen_ndx = valid_features_count
+ *                         chosen_left_count = node.left_counts[j]
  */
           __pyx_v_chosen_feature_validated = 1;
 
-          /* "cedar/_remover.pyx":404
- *                     if node.valid_features[j] == node.feature:
+          /* "cedar/_remover.pyx":336
+ *                     if node.features[j] == node.feature:
  *                         chosen_feature_validated = 1
- *                         chosen_ndx = feature_count             # <<<<<<<<<<<<<<
- *                         chosen_left_count = left_count
- *                         chosen_right_count = right_count
+ *                         chosen_ndx = valid_features_count             # <<<<<<<<<<<<<<
+ *                         chosen_left_count = node.left_counts[j]
+ *                         chosen_right_count = node.right_counts[j]
  */
-          __pyx_v_chosen_ndx = __pyx_v_feature_count;
+          __pyx_v_chosen_ndx = __pyx_v_valid_features_count;
 
-          /* "cedar/_remover.pyx":405
+          /* "cedar/_remover.pyx":337
  *                         chosen_feature_validated = 1
- *                         chosen_ndx = feature_count
- *                         chosen_left_count = left_count             # <<<<<<<<<<<<<<
- *                         chosen_right_count = right_count
+ *                         chosen_ndx = valid_features_count
+ *                         chosen_left_count = node.left_counts[j]             # <<<<<<<<<<<<<<
+ *                         chosen_right_count = node.right_counts[j]
  * 
  */
-          __pyx_v_chosen_left_count = __pyx_v_left_count;
+          __pyx_v_chosen_left_count = (__pyx_v_node->left_counts[__pyx_v_j]);
 
-          /* "cedar/_remover.pyx":406
- *                         chosen_ndx = feature_count
- *                         chosen_left_count = left_count
- *                         chosen_right_count = right_count             # <<<<<<<<<<<<<<
+          /* "cedar/_remover.pyx":338
+ *                         chosen_ndx = valid_features_count
+ *                         chosen_left_count = node.left_counts[j]
+ *                         chosen_right_count = node.right_counts[j]             # <<<<<<<<<<<<<<
  * 
- *                     feature_count += 1
+ *                     valid_features_count += 1
  */
-          __pyx_v_chosen_right_count = __pyx_v_right_count;
+          __pyx_v_chosen_right_count = (__pyx_v_node->right_counts[__pyx_v_j]);
 
-          /* "cedar/_remover.pyx":402
- *                     updated_right_pos_counts[feature_count] = updated_right_pos_count
- * 
- *                     if node.valid_features[j] == node.feature:             # <<<<<<<<<<<<<<
+          /* "cedar/_remover.pyx":334
+ *                                                                       node.left_pos_counts[j],
+ *                                                                       node.right_pos_counts[j])
+ *                     if node.features[j] == node.feature:             # <<<<<<<<<<<<<<
  *                         chosen_feature_validated = 1
- *                         chosen_ndx = feature_count
+ *                         chosen_ndx = valid_features_count
  */
         }
 
-        /* "cedar/_remover.pyx":408
- *                         chosen_right_count = right_count
+        /* "cedar/_remover.pyx":340
+ *                         chosen_right_count = node.right_counts[j]
  * 
- *                     feature_count += 1             # <<<<<<<<<<<<<<
+ *                     valid_features_count += 1             # <<<<<<<<<<<<<<
  * 
- *             # no valid features after data removal => create leaf
+ *             if valid_features_count > 0 and chosen_feature_validated:
  */
-        __pyx_v_feature_count = (__pyx_v_feature_count + 1);
+        __pyx_v_valid_features_count = (__pyx_v_valid_features_count + 1);
 
-        /* "cedar/_remover.pyx":391
+        /* "cedar/_remover.pyx":327
  * 
  *                 # validate split
- *                 if updated_left_count >= min_samples_leaf and updated_right_count >= min_samples_leaf:             # <<<<<<<<<<<<<<
- *                     valid_features[feature_count] = node.valid_features[j]
- *                     gini_indices[feature_count] = compute_gini(updated_count, updated_left_count,
+ *                 if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:             # <<<<<<<<<<<<<<
+ *                     valid_features[valid_features_count] = node.features[j]
+ *                     gini_indices[valid_features_count] = compute_gini(updated_count,
  */
       }
     }
 
-    /* "cedar/_remover.pyx":411
+    /* "cedar/_remover.pyx":342
+ *                     valid_features_count += 1
  * 
- *             # no valid features after data removal => create leaf
- *             if feature_count == 0:             # <<<<<<<<<<<<<<
- *                 # printf('feature_count is zero\n')
- *                 result = 1
- */
-    __pyx_t_5 = ((__pyx_v_feature_count == 0) != 0);
-    if (__pyx_t_5) {
-
-      /* "cedar/_remover.pyx":413
- *             if feature_count == 0:
- *                 # printf('feature_count is zero\n')
- *                 result = 1             # <<<<<<<<<<<<<<
- *                 free(gini_indices)
- *                 free(distribution)
- */
-      __pyx_v_result = 1;
-
-      /* "cedar/_remover.pyx":414
- *                 # printf('feature_count is zero\n')
- *                 result = 1
- *                 free(gini_indices)             # <<<<<<<<<<<<<<
- *                 free(distribution)
- *                 free(valid_features)
- */
-      free(__pyx_v_gini_indices);
-
-      /* "cedar/_remover.pyx":415
- *                 result = 1
- *                 free(gini_indices)
- *                 free(distribution)             # <<<<<<<<<<<<<<
- *                 free(valid_features)
- * 
- */
-      free(__pyx_v_distribution);
-
-      /* "cedar/_remover.pyx":416
- *                 free(gini_indices)
- *                 free(distribution)
- *                 free(valid_features)             # <<<<<<<<<<<<<<
- * 
- *                 free(updated_left_counts)
- */
-      free(__pyx_v_valid_features);
-
-      /* "cedar/_remover.pyx":418
- *                 free(valid_features)
- * 
- *                 free(updated_left_counts)             # <<<<<<<<<<<<<<
- *                 free(updated_left_pos_counts)
- *                 free(updated_right_counts)
- */
-      free(__pyx_v_updated_left_counts);
-
-      /* "cedar/_remover.pyx":419
- * 
- *                 free(updated_left_counts)
- *                 free(updated_left_pos_counts)             # <<<<<<<<<<<<<<
- *                 free(updated_right_counts)
- *                 free(updated_right_pos_counts)
- */
-      free(__pyx_v_updated_left_pos_counts);
-
-      /* "cedar/_remover.pyx":420
- *                 free(updated_left_counts)
- *                 free(updated_left_pos_counts)
- *                 free(updated_right_counts)             # <<<<<<<<<<<<<<
- *                 free(updated_right_pos_counts)
- * 
- */
-      free(__pyx_v_updated_right_counts);
-
-      /* "cedar/_remover.pyx":421
- *                 free(updated_left_pos_counts)
- *                 free(updated_right_counts)
- *                 free(updated_right_pos_counts)             # <<<<<<<<<<<<<<
- * 
- *                 split.count = updated_count
- */
-      free(__pyx_v_updated_right_pos_counts);
-
-      /* "cedar/_remover.pyx":423
- *                 free(updated_right_pos_counts)
- * 
- *                 split.count = updated_count             # <<<<<<<<<<<<<<
- *                 split.pos_count = updated_pos_count
- * 
- */
-      __pyx_v_split->count = __pyx_v_updated_count;
-
-      /* "cedar/_remover.pyx":424
- * 
- *                 split.count = updated_count
- *                 split.pos_count = updated_pos_count             # <<<<<<<<<<<<<<
- * 
- *             # current feature no longer valid => retrain
- */
-      __pyx_v_split->pos_count = __pyx_v_updated_pos_count;
-
-      /* "cedar/_remover.pyx":411
- * 
- *             # no valid features after data removal => create leaf
- *             if feature_count == 0:             # <<<<<<<<<<<<<<
- *                 # printf('feature_count is zero\n')
- *                 result = 1
- */
-      goto __pyx_L18;
-    }
-
-    /* "cedar/_remover.pyx":427
- * 
- *             # current feature no longer valid => retrain
- *             elif not chosen_feature_validated:             # <<<<<<<<<<<<<<
- *                 # printf('chosen feature not validated\n')
- *                 result = 2
- */
-    __pyx_t_5 = ((!(__pyx_v_chosen_feature_validated != 0)) != 0);
-    if (__pyx_t_5) {
-
-      /* "cedar/_remover.pyx":429
- *             elif not chosen_feature_validated:
- *                 # printf('chosen feature not validated\n')
- *                 result = 2             # <<<<<<<<<<<<<<
- *                 free(gini_indices)
- *                 free(distribution)
- */
-      __pyx_v_result = 2;
-
-      /* "cedar/_remover.pyx":430
- *                 # printf('chosen feature not validated\n')
- *                 result = 2
- *                 free(gini_indices)             # <<<<<<<<<<<<<<
- *                 free(distribution)
- * 
- */
-      free(__pyx_v_gini_indices);
-
-      /* "cedar/_remover.pyx":431
- *                 result = 2
- *                 free(gini_indices)
- *                 free(distribution)             # <<<<<<<<<<<<<<
- * 
- *                 free(updated_left_counts)
- */
-      free(__pyx_v_distribution);
-
-      /* "cedar/_remover.pyx":433
- *                 free(distribution)
- * 
- *                 free(updated_left_counts)             # <<<<<<<<<<<<<<
- *                 free(updated_left_pos_counts)
- *                 free(updated_right_counts)
- */
-      free(__pyx_v_updated_left_counts);
-
-      /* "cedar/_remover.pyx":434
- * 
- *                 free(updated_left_counts)
- *                 free(updated_left_pos_counts)             # <<<<<<<<<<<<<<
- *                 free(updated_right_counts)
- *                 free(updated_right_pos_counts)
- */
-      free(__pyx_v_updated_left_pos_counts);
-
-      /* "cedar/_remover.pyx":435
- *                 free(updated_left_counts)
- *                 free(updated_left_pos_counts)
- *                 free(updated_right_counts)             # <<<<<<<<<<<<<<
- *                 free(updated_right_pos_counts)
- * 
- */
-      free(__pyx_v_updated_right_counts);
-
-      /* "cedar/_remover.pyx":436
- *                 free(updated_left_pos_counts)
- *                 free(updated_right_counts)
- *                 free(updated_right_pos_counts)             # <<<<<<<<<<<<<<
- * 
- *                 split.count = updated_count
- */
-      free(__pyx_v_updated_right_pos_counts);
-
-      /* "cedar/_remover.pyx":438
- *                 free(updated_right_pos_counts)
- * 
- *                 split.count = updated_count             # <<<<<<<<<<<<<<
- *                 split.feature_count = feature_count
- *                 split.valid_features = valid_features
- */
-      __pyx_v_split->count = __pyx_v_updated_count;
-
-      /* "cedar/_remover.pyx":439
- * 
- *                 split.count = updated_count
- *                 split.feature_count = feature_count             # <<<<<<<<<<<<<<
- *                 split.valid_features = valid_features
- * 
- */
-      __pyx_v_split->feature_count = __pyx_v_feature_count;
-
-      /* "cedar/_remover.pyx":440
- *                 split.count = updated_count
- *                 split.feature_count = feature_count
- *                 split.valid_features = valid_features             # <<<<<<<<<<<<<<
- * 
- *             else:
- */
-      __pyx_v_split->valid_features = __pyx_v_valid_features;
-
-      /* "cedar/_remover.pyx":427
- * 
- *             # current feature no longer valid => retrain
- *             elif not chosen_feature_validated:             # <<<<<<<<<<<<<<
- *                 # printf('chosen feature not validated\n')
- *                 result = 2
- */
-      goto __pyx_L18;
-    }
-
-    /* "cedar/_remover.pyx":445
+ *             if valid_features_count > 0 and chosen_feature_validated:             # <<<<<<<<<<<<<<
  * 
  *                 # remove invalid features
- *                 gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))             # <<<<<<<<<<<<<<
- *                 distribution = <double *>realloc(distribution, feature_count * sizeof(double))
- *                 valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
  */
-    /*else*/ {
-      __pyx_v_gini_indices = ((double *)realloc(__pyx_v_gini_indices, (__pyx_v_feature_count * (sizeof(double)))));
+    __pyx_t_4 = ((__pyx_v_valid_features_count > 0) != 0);
+    if (__pyx_t_4) {
+    } else {
+      __pyx_t_3 = __pyx_t_4;
+      goto __pyx_L13_bool_binop_done;
+    }
+    __pyx_t_4 = (__pyx_v_chosen_feature_validated != 0);
+    __pyx_t_3 = __pyx_t_4;
+    __pyx_L13_bool_binop_done:;
+    if (__pyx_t_3) {
 
-      /* "cedar/_remover.pyx":446
+      /* "cedar/_remover.pyx":345
+ * 
  *                 # remove invalid features
- *                 gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
- *                 distribution = <double *>realloc(distribution, feature_count * sizeof(double))             # <<<<<<<<<<<<<<
- *                 valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
+ *                 gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))             # <<<<<<<<<<<<<<
+ *                 distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
+ *                 valid_features = <int *>realloc(valid_features, valid_features_count * sizeof(int))
+ */
+      __pyx_v_gini_indices = ((double *)realloc(__pyx_v_gini_indices, (__pyx_v_valid_features_count * (sizeof(double)))));
+
+      /* "cedar/_remover.pyx":346
+ *                 # remove invalid features
+ *                 gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
+ *                 distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))             # <<<<<<<<<<<<<<
+ *                 valid_features = <int *>realloc(valid_features, valid_features_count * sizeof(int))
  * 
  */
-      __pyx_v_distribution = ((double *)realloc(__pyx_v_distribution, (__pyx_v_feature_count * (sizeof(double)))));
+      __pyx_v_distribution = ((double *)realloc(__pyx_v_distribution, (__pyx_v_valid_features_count * (sizeof(double)))));
 
-      /* "cedar/_remover.pyx":447
- *                 gini_indices = <double *>realloc(gini_indices, feature_count * sizeof(double))
- *                 distribution = <double *>realloc(distribution, feature_count * sizeof(double))
- *                 valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
+      /* "cedar/_remover.pyx":347
+ *                 gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
+ *                 distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
+ *                 valid_features = <int *>realloc(valid_features, valid_features_count * sizeof(int))             # <<<<<<<<<<<<<<
  * 
- *                 updated_left_counts = <int *>realloc(updated_left_counts, feature_count * sizeof(int))
+ *                 # generate and sample from the distribution
  */
-      __pyx_v_valid_features = ((int *)realloc(__pyx_v_valid_features, (__pyx_v_feature_count * (sizeof(int)))));
+      __pyx_v_valid_features = ((int *)realloc(__pyx_v_valid_features, (__pyx_v_valid_features_count * (sizeof(int)))));
 
-      /* "cedar/_remover.pyx":449
- *                 valid_features = <int *>realloc(valid_features, feature_count * sizeof(int))
+      /* "cedar/_remover.pyx":350
  * 
- *                 updated_left_counts = <int *>realloc(updated_left_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *                 updated_left_pos_counts = <int *>realloc(updated_left_pos_counts, feature_count * sizeof(int))
- *                 updated_right_counts = <int *>realloc(updated_right_counts, feature_count * sizeof(int))
- */
-      __pyx_v_updated_left_counts = ((int *)realloc(__pyx_v_updated_left_counts, (__pyx_v_feature_count * (sizeof(int)))));
-
-      /* "cedar/_remover.pyx":450
- * 
- *                 updated_left_counts = <int *>realloc(updated_left_counts, feature_count * sizeof(int))
- *                 updated_left_pos_counts = <int *>realloc(updated_left_pos_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *                 updated_right_counts = <int *>realloc(updated_right_counts, feature_count * sizeof(int))
- *                 updated_right_pos_counts = <int *>realloc(updated_right_pos_counts, feature_count * sizeof(int))
- */
-      __pyx_v_updated_left_pos_counts = ((int *)realloc(__pyx_v_updated_left_pos_counts, (__pyx_v_feature_count * (sizeof(int)))));
-
-      /* "cedar/_remover.pyx":451
- *                 updated_left_counts = <int *>realloc(updated_left_counts, feature_count * sizeof(int))
- *                 updated_left_pos_counts = <int *>realloc(updated_left_pos_counts, feature_count * sizeof(int))
- *                 updated_right_counts = <int *>realloc(updated_right_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- *                 updated_right_pos_counts = <int *>realloc(updated_right_pos_counts, feature_count * sizeof(int))
- * 
- */
-      __pyx_v_updated_right_counts = ((int *)realloc(__pyx_v_updated_right_counts, (__pyx_v_feature_count * (sizeof(int)))));
-
-      /* "cedar/_remover.pyx":452
- *                 updated_left_pos_counts = <int *>realloc(updated_left_pos_counts, feature_count * sizeof(int))
- *                 updated_right_counts = <int *>realloc(updated_right_counts, feature_count * sizeof(int))
- *                 updated_right_pos_counts = <int *>realloc(updated_right_pos_counts, feature_count * sizeof(int))             # <<<<<<<<<<<<<<
- * 
- *                 # compute new probability for the chosen feature
- */
-      __pyx_v_updated_right_pos_counts = ((int *)realloc(__pyx_v_updated_right_pos_counts, (__pyx_v_feature_count * (sizeof(int)))));
-
-      /* "cedar/_remover.pyx":455
- * 
- *                 # compute new probability for the chosen feature
- *                 generate_distribution(lmbda, distribution, gini_indices, feature_count)             # <<<<<<<<<<<<<<
+ *                 # generate and sample from the distribution
+ *                 generate_distribution(lmbda, distribution, gini_indices, valid_features_count)             # <<<<<<<<<<<<<<
  *                 p = parent_p * distribution[chosen_ndx]
  *                 ratio = p / node.p
  */
-      (void)(__pyx_f_5cedar_6_utils_generate_distribution(__pyx_v_lmbda, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_feature_count));
+      (void)(__pyx_f_5cedar_6_utils_generate_distribution(__pyx_v_lmbda, __pyx_v_distribution, __pyx_v_gini_indices, __pyx_v_valid_features_count));
 
-      /* "cedar/_remover.pyx":456
- *                 # compute new probability for the chosen feature
- *                 generate_distribution(lmbda, distribution, gini_indices, feature_count)
+      /* "cedar/_remover.pyx":351
+ *                 # generate and sample from the distribution
+ *                 generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
  *                 p = parent_p * distribution[chosen_ndx]             # <<<<<<<<<<<<<<
  *                 ratio = p / node.p
  * 
  */
       __pyx_v_p = (__pyx_v_parent_p * (__pyx_v_distribution[__pyx_v_chosen_ndx]));
 
-      /* "cedar/_remover.pyx":457
- *                 generate_distribution(lmbda, distribution, gini_indices, feature_count)
+      /* "cedar/_remover.pyx":352
+ *                 generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
  *                 p = parent_p * distribution[chosen_ndx]
  *                 ratio = p / node.p             # <<<<<<<<<<<<<<
  * 
@@ -5579,194 +5038,93 @@ static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5ced
  */
       __pyx_v_ratio = (__pyx_v_p / __pyx_v_node->p);
 
-      /* "cedar/_remover.pyx":462
+      /* "cedar/_remover.pyx":356
+ *                 # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
  * 
- *                 # compare with previous probability => retrain if necessary
- *                 if ratio < exp(-epsilon) or ratio > exp(epsilon):             # <<<<<<<<<<<<<<
- *                     # printf('bounds exceeded\n')
- *                     result = 2
+ *                 if exp(-epsilon) <= ratio or ratio <= exp(epsilon):             # <<<<<<<<<<<<<<
+ * 
+ *                     # assign results from chosen feature
  */
-      __pyx_t_6 = ((__pyx_v_ratio < exp((-__pyx_v_epsilon))) != 0);
-      if (!__pyx_t_6) {
+      __pyx_t_4 = ((exp((-__pyx_v_epsilon)) <= __pyx_v_ratio) != 0);
+      if (!__pyx_t_4) {
       } else {
-        __pyx_t_5 = __pyx_t_6;
-        goto __pyx_L20_bool_binop_done;
+        __pyx_t_3 = __pyx_t_4;
+        goto __pyx_L16_bool_binop_done;
       }
-      __pyx_t_6 = ((__pyx_v_ratio > exp(__pyx_v_epsilon)) != 0);
-      __pyx_t_5 = __pyx_t_6;
-      __pyx_L20_bool_binop_done:;
-      if (__pyx_t_5) {
+      __pyx_t_4 = ((__pyx_v_ratio <= exp(__pyx_v_epsilon)) != 0);
+      __pyx_t_3 = __pyx_t_4;
+      __pyx_L16_bool_binop_done:;
+      if (__pyx_t_3) {
 
-        /* "cedar/_remover.pyx":464
- *                 if ratio < exp(-epsilon) or ratio > exp(epsilon):
- *                     # printf('bounds exceeded\n')
- *                     result = 2             # <<<<<<<<<<<<<<
- *                     free(gini_indices)
- *                     free(distribution)
- */
-        __pyx_v_result = 2;
-
-        /* "cedar/_remover.pyx":465
- *                     # printf('bounds exceeded\n')
- *                     result = 2
- *                     free(gini_indices)             # <<<<<<<<<<<<<<
- *                     free(distribution)
+        /* "cedar/_remover.pyx":359
  * 
- */
-        free(__pyx_v_gini_indices);
-
-        /* "cedar/_remover.pyx":466
- *                     result = 2
- *                     free(gini_indices)
- *                     free(distribution)             # <<<<<<<<<<<<<<
- * 
- *                     free(updated_left_counts)
- */
-        free(__pyx_v_distribution);
-
-        /* "cedar/_remover.pyx":468
- *                     free(distribution)
- * 
- *                     free(updated_left_counts)             # <<<<<<<<<<<<<<
- *                     free(updated_left_pos_counts)
- *                     free(updated_right_counts)
- */
-        free(__pyx_v_updated_left_counts);
-
-        /* "cedar/_remover.pyx":469
- * 
- *                     free(updated_left_counts)
- *                     free(updated_left_pos_counts)             # <<<<<<<<<<<<<<
- *                     free(updated_right_counts)
- *                     free(updated_right_pos_counts)
- */
-        free(__pyx_v_updated_left_pos_counts);
-
-        /* "cedar/_remover.pyx":470
- *                     free(updated_left_counts)
- *                     free(updated_left_pos_counts)
- *                     free(updated_right_counts)             # <<<<<<<<<<<<<<
- *                     free(updated_right_pos_counts)
- * 
- */
-        free(__pyx_v_updated_right_counts);
-
-        /* "cedar/_remover.pyx":471
- *                     free(updated_left_pos_counts)
- *                     free(updated_right_counts)
- *                     free(updated_right_pos_counts)             # <<<<<<<<<<<<<<
- * 
- *                     split.count = updated_count
- */
-        free(__pyx_v_updated_right_pos_counts);
-
-        /* "cedar/_remover.pyx":473
- *                     free(updated_right_pos_counts)
- * 
- *                     split.count = updated_count             # <<<<<<<<<<<<<<
- *                     split.feature_count = feature_count
- *                     split.valid_features = valid_features
- */
-        __pyx_v_split->count = __pyx_v_updated_count;
-
-        /* "cedar/_remover.pyx":474
- * 
- *                     split.count = updated_count
- *                     split.feature_count = feature_count             # <<<<<<<<<<<<<<
- *                     split.valid_features = valid_features
- * 
- */
-        __pyx_v_split->feature_count = __pyx_v_feature_count;
-
-        /* "cedar/_remover.pyx":475
- *                     split.count = updated_count
- *                     split.feature_count = feature_count
- *                     split.valid_features = valid_features             # <<<<<<<<<<<<<<
- * 
- *                 else:
- */
-        __pyx_v_split->valid_features = __pyx_v_valid_features;
-
-        /* "cedar/_remover.pyx":462
- * 
- *                 # compare with previous probability => retrain if necessary
- *                 if ratio < exp(-epsilon) or ratio > exp(epsilon):             # <<<<<<<<<<<<<<
- *                     # printf('bounds exceeded\n')
- *                     result = 2
- */
-        goto __pyx_L19;
-      }
-
-      /* "cedar/_remover.pyx":480
- * 
- *                     # split removal data based on the chosen feature
- *                     split.left_indices = <int *>malloc(chosen_left_count * sizeof(int))             # <<<<<<<<<<<<<<
- *                     split.right_indices = <int *>malloc(chosen_right_count * sizeof(int))
+ *                     # assign results from chosen feature
+ *                     split.left_indices = <int *>malloc(n_samples * sizeof(int))             # <<<<<<<<<<<<<<
+ *                     split.right_indices = <int *>malloc(n_samples * sizeof(int))
  *                     j = 0
  */
-      /*else*/ {
-        __pyx_v_split->left_indices = ((int *)malloc((__pyx_v_chosen_left_count * (sizeof(int)))));
+        __pyx_v_split->left_indices = ((int *)malloc((__pyx_v_n_samples * (sizeof(int)))));
 
-        /* "cedar/_remover.pyx":481
- *                     # split removal data based on the chosen feature
- *                     split.left_indices = <int *>malloc(chosen_left_count * sizeof(int))
- *                     split.right_indices = <int *>malloc(chosen_right_count * sizeof(int))             # <<<<<<<<<<<<<<
+        /* "cedar/_remover.pyx":360
+ *                     # assign results from chosen feature
+ *                     split.left_indices = <int *>malloc(n_samples * sizeof(int))
+ *                     split.right_indices = <int *>malloc(n_samples * sizeof(int))             # <<<<<<<<<<<<<<
  *                     j = 0
  *                     k = 0
  */
-        __pyx_v_split->right_indices = ((int *)malloc((__pyx_v_chosen_right_count * (sizeof(int)))));
+        __pyx_v_split->right_indices = ((int *)malloc((__pyx_v_n_samples * (sizeof(int)))));
 
-        /* "cedar/_remover.pyx":482
- *                     split.left_indices = <int *>malloc(chosen_left_count * sizeof(int))
- *                     split.right_indices = <int *>malloc(chosen_right_count * sizeof(int))
+        /* "cedar/_remover.pyx":361
+ *                     split.left_indices = <int *>malloc(n_samples * sizeof(int))
+ *                     split.right_indices = <int *>malloc(n_samples * sizeof(int))
  *                     j = 0             # <<<<<<<<<<<<<<
  *                     k = 0
  *                     for i in range(n_samples):
  */
         __pyx_v_j = 0;
 
-        /* "cedar/_remover.pyx":483
- *                     split.right_indices = <int *>malloc(chosen_right_count * sizeof(int))
+        /* "cedar/_remover.pyx":362
+ *                     split.right_indices = <int *>malloc(n_samples * sizeof(int))
  *                     j = 0
  *                     k = 0             # <<<<<<<<<<<<<<
  *                     for i in range(n_samples):
- *                         if X[samples[i]][valid_features[chosen_ndx]] == 1:
+ *                         if X[samples[i]][node.feature] == 1:
  */
         __pyx_v_k = 0;
 
-        /* "cedar/_remover.pyx":484
+        /* "cedar/_remover.pyx":363
  *                     j = 0
  *                     k = 0
  *                     for i in range(n_samples):             # <<<<<<<<<<<<<<
- *                         if X[samples[i]][valid_features[chosen_ndx]] == 1:
+ *                         if X[samples[i]][node.feature] == 1:
  *                             split.left_indices[j] = samples[i]
  */
         __pyx_t_2 = __pyx_v_n_samples;
-        __pyx_t_3 = __pyx_t_2;
-        for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-          __pyx_v_i = __pyx_t_4;
+        __pyx_t_5 = __pyx_t_2;
+        for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+          __pyx_v_i = __pyx_t_6;
 
-          /* "cedar/_remover.pyx":485
+          /* "cedar/_remover.pyx":364
  *                     k = 0
  *                     for i in range(n_samples):
- *                         if X[samples[i]][valid_features[chosen_ndx]] == 1:             # <<<<<<<<<<<<<<
+ *                         if X[samples[i]][node.feature] == 1:             # <<<<<<<<<<<<<<
  *                             split.left_indices[j] = samples[i]
  *                             j += 1
  */
-          __pyx_t_5 = ((((__pyx_v_X[(__pyx_v_samples[__pyx_v_i])])[(__pyx_v_valid_features[__pyx_v_chosen_ndx])]) == 1) != 0);
-          if (__pyx_t_5) {
+          __pyx_t_3 = ((((__pyx_v_X[(__pyx_v_samples[__pyx_v_i])])[__pyx_v_node->feature]) == 1) != 0);
+          if (__pyx_t_3) {
 
-            /* "cedar/_remover.pyx":486
+            /* "cedar/_remover.pyx":365
  *                     for i in range(n_samples):
- *                         if X[samples[i]][valid_features[chosen_ndx]] == 1:
+ *                         if X[samples[i]][node.feature] == 1:
  *                             split.left_indices[j] = samples[i]             # <<<<<<<<<<<<<<
  *                             j += 1
  *                         else:
  */
             (__pyx_v_split->left_indices[__pyx_v_j]) = (__pyx_v_samples[__pyx_v_i]);
 
-            /* "cedar/_remover.pyx":487
- *                         if X[samples[i]][valid_features[chosen_ndx]] == 1:
+            /* "cedar/_remover.pyx":366
+ *                         if X[samples[i]][node.feature] == 1:
  *                             split.left_indices[j] = samples[i]
  *                             j += 1             # <<<<<<<<<<<<<<
  *                         else:
@@ -5774,176 +5132,274 @@ static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5ced
  */
             __pyx_v_j = (__pyx_v_j + 1);
 
-            /* "cedar/_remover.pyx":485
+            /* "cedar/_remover.pyx":364
  *                     k = 0
  *                     for i in range(n_samples):
- *                         if X[samples[i]][valid_features[chosen_ndx]] == 1:             # <<<<<<<<<<<<<<
+ *                         if X[samples[i]][node.feature] == 1:             # <<<<<<<<<<<<<<
  *                             split.left_indices[j] = samples[i]
  *                             j += 1
  */
-            goto __pyx_L24;
+            goto __pyx_L20;
           }
 
-          /* "cedar/_remover.pyx":489
+          /* "cedar/_remover.pyx":368
  *                             j += 1
  *                         else:
  *                             split.right_indices[k] = samples[i]             # <<<<<<<<<<<<<<
  *                             k += 1
- *                     split.left_count = j
+ *                     split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
  */
           /*else*/ {
             (__pyx_v_split->right_indices[__pyx_v_k]) = (__pyx_v_samples[__pyx_v_i]);
 
-            /* "cedar/_remover.pyx":490
+            /* "cedar/_remover.pyx":369
  *                         else:
  *                             split.right_indices[k] = samples[i]
  *                             k += 1             # <<<<<<<<<<<<<<
- *                     split.left_count = j
- *                     split.right_count = k
+ *                     split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+ *                     split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
  */
             __pyx_v_k = (__pyx_v_k + 1);
           }
-          __pyx_L24:;
+          __pyx_L20:;
         }
 
-        /* "cedar/_remover.pyx":491
+        /* "cedar/_remover.pyx":370
  *                             split.right_indices[k] = samples[i]
  *                             k += 1
+ *                     split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))             # <<<<<<<<<<<<<<
+ *                     split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
+ *                     split.left_count = j
+ */
+        __pyx_v_split->left_indices = ((int *)realloc(__pyx_v_split->left_indices, (__pyx_v_j * (sizeof(int)))));
+
+        /* "cedar/_remover.pyx":371
+ *                             k += 1
+ *                     split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+ *                     split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))             # <<<<<<<<<<<<<<
+ *                     split.left_count = j
+ *                     split.right_count = k
+ */
+        __pyx_v_split->right_indices = ((int *)realloc(__pyx_v_split->right_indices, (__pyx_v_k * (sizeof(int)))));
+
+        /* "cedar/_remover.pyx":372
+ *                     split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+ *                     split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
  *                     split.left_count = j             # <<<<<<<<<<<<<<
  *                     split.right_count = k
- * 
+ *                     split.p = p
  */
         __pyx_v_split->left_count = __pyx_v_j;
 
-        /* "cedar/_remover.pyx":492
- *                             k += 1
+        /* "cedar/_remover.pyx":373
+ *                     split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
  *                     split.left_count = j
  *                     split.right_count = k             # <<<<<<<<<<<<<<
- * 
- *                     # cleanup
+ *                     split.p = p
+ *                     split.count = updated_count
  */
         __pyx_v_split->right_count = __pyx_v_k;
 
-        /* "cedar/_remover.pyx":495
- * 
- *                     # cleanup
- *                     free(gini_indices)             # <<<<<<<<<<<<<<
- *                     free(distribution)
- * 
- */
-        free(__pyx_v_gini_indices);
-
-        /* "cedar/_remover.pyx":496
- *                     # cleanup
- *                     free(gini_indices)
- *                     free(distribution)             # <<<<<<<<<<<<<<
- * 
- *                     split.p = p
- */
-        free(__pyx_v_distribution);
-
-        /* "cedar/_remover.pyx":498
- *                     free(distribution)
- * 
+        /* "cedar/_remover.pyx":374
+ *                     split.left_count = j
+ *                     split.right_count = k
  *                     split.p = p             # <<<<<<<<<<<<<<
  *                     split.count = updated_count
  *                     split.pos_count = updated_pos_count
  */
         __pyx_v_split->p = __pyx_v_p;
 
-        /* "cedar/_remover.pyx":499
- * 
+        /* "cedar/_remover.pyx":375
+ *                     split.right_count = k
  *                     split.p = p
  *                     split.count = updated_count             # <<<<<<<<<<<<<<
  *                     split.pos_count = updated_pos_count
- *                     split.feature_count = feature_count
+ * 
  */
         __pyx_v_split->count = __pyx_v_updated_count;
 
-        /* "cedar/_remover.pyx":500
+        /* "cedar/_remover.pyx":376
  *                     split.p = p
  *                     split.count = updated_count
  *                     split.pos_count = updated_pos_count             # <<<<<<<<<<<<<<
- *                     split.feature_count = feature_count
- *                     split.valid_features = valid_features
+ * 
+ *                 else:
  */
         __pyx_v_split->pos_count = __pyx_v_updated_pos_count;
 
-        /* "cedar/_remover.pyx":501
- *                     split.count = updated_count
- *                     split.pos_count = updated_pos_count
- *                     split.feature_count = feature_count             # <<<<<<<<<<<<<<
- *                     split.valid_features = valid_features
- *                     split.left_counts = updated_left_counts
+        /* "cedar/_remover.pyx":356
+ *                 # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
+ * 
+ *                 if exp(-epsilon) <= ratio or ratio <= exp(epsilon):             # <<<<<<<<<<<<<<
+ * 
+ *                     # assign results from chosen feature
  */
-        __pyx_v_split->feature_count = __pyx_v_feature_count;
+        goto __pyx_L15;
+      }
 
-        /* "cedar/_remover.pyx":502
- *                     split.pos_count = updated_pos_count
- *                     split.feature_count = feature_count
- *                     split.valid_features = valid_features             # <<<<<<<<<<<<<<
- *                     split.left_counts = updated_left_counts
- *                     split.left_pos_counts = updated_left_pos_counts
- */
-        __pyx_v_split->valid_features = __pyx_v_valid_features;
-
-        /* "cedar/_remover.pyx":503
- *                     split.feature_count = feature_count
- *                     split.valid_features = valid_features
- *                     split.left_counts = updated_left_counts             # <<<<<<<<<<<<<<
- *                     split.left_pos_counts = updated_left_pos_counts
- *                     split.right_counts = updated_right_counts
- */
-        __pyx_v_split->left_counts = __pyx_v_updated_left_counts;
-
-        /* "cedar/_remover.pyx":504
- *                     split.valid_features = valid_features
- *                     split.left_counts = updated_left_counts
- *                     split.left_pos_counts = updated_left_pos_counts             # <<<<<<<<<<<<<<
- *                     split.right_counts = updated_right_counts
- *                     split.right_pos_counts = updated_right_pos_counts
- */
-        __pyx_v_split->left_pos_counts = __pyx_v_updated_left_pos_counts;
-
-        /* "cedar/_remover.pyx":505
- *                     split.left_counts = updated_left_counts
- *                     split.left_pos_counts = updated_left_pos_counts
- *                     split.right_counts = updated_right_counts             # <<<<<<<<<<<<<<
- *                     split.right_pos_counts = updated_right_pos_counts
+      /* "cedar/_remover.pyx":379
+ * 
+ *                 else:
+ *                     printf('bounds exceeded\n')             # <<<<<<<<<<<<<<
+ *                     result = 2
  * 
  */
-        __pyx_v_split->right_counts = __pyx_v_updated_right_counts;
+      /*else*/ {
+        (void)(printf(((char const *)"bounds exceeded\n")));
 
-        /* "cedar/_remover.pyx":506
- *                     split.left_pos_counts = updated_left_pos_counts
- *                     split.right_counts = updated_right_counts
- *                     split.right_pos_counts = updated_right_pos_counts             # <<<<<<<<<<<<<<
+        /* "cedar/_remover.pyx":380
+ *                 else:
+ *                     printf('bounds exceeded\n')
+ *                     result = 2             # <<<<<<<<<<<<<<
+ * 
+ *             elif valid_features_count == 0:
+ */
+        __pyx_v_result = 2;
+      }
+      __pyx_L15:;
+
+      /* "cedar/_remover.pyx":342
+ *                     valid_features_count += 1
+ * 
+ *             if valid_features_count > 0 and chosen_feature_validated:             # <<<<<<<<<<<<<<
+ * 
+ *                 # remove invalid features
+ */
+      goto __pyx_L12;
+    }
+
+    /* "cedar/_remover.pyx":382
+ *                     result = 2
+ * 
+ *             elif valid_features_count == 0:             # <<<<<<<<<<<<<<
+ *                 printf('valid_features_count is zero!\n')
+ *                 result = 1
+ */
+    __pyx_t_3 = ((__pyx_v_valid_features_count == 0) != 0);
+    if (__pyx_t_3) {
+
+      /* "cedar/_remover.pyx":383
+ * 
+ *             elif valid_features_count == 0:
+ *                 printf('valid_features_count is zero!\n')             # <<<<<<<<<<<<<<
+ *                 result = 1
+ * 
+ */
+      (void)(printf(((char const *)"valid_features_count is zero!\n")));
+
+      /* "cedar/_remover.pyx":384
+ *             elif valid_features_count == 0:
+ *                 printf('valid_features_count is zero!\n')
+ *                 result = 1             # <<<<<<<<<<<<<<
+ * 
+ *             else:
+ */
+      __pyx_v_result = 1;
+
+      /* "cedar/_remover.pyx":382
+ *                     result = 2
+ * 
+ *             elif valid_features_count == 0:             # <<<<<<<<<<<<<<
+ *                 printf('valid_features_count is zero!\n')
+ *                 result = 1
+ */
+      goto __pyx_L12;
+    }
+
+    /* "cedar/_remover.pyx":387
+ * 
+ *             else:
+ *                 printf('chosen_feature not validated\n')             # <<<<<<<<<<<<<<
+ *                 result = 2
+ * 
+ */
+    /*else*/ {
+      (void)(printf(((char const *)"chosen_feature not validated\n")));
+
+      /* "cedar/_remover.pyx":388
+ *             else:
+ *                 printf('chosen_feature not validated\n')
+ *                 result = 2             # <<<<<<<<<<<<<<
+ * 
+ *             free(gini_indices)
+ */
+      __pyx_v_result = 2;
+    }
+    __pyx_L12:;
+
+    /* "cedar/_remover.pyx":390
+ *                 result = 2
+ * 
+ *             free(gini_indices)             # <<<<<<<<<<<<<<
+ *             free(distribution)
+ *             free(valid_features)
+ */
+    free(__pyx_v_gini_indices);
+
+    /* "cedar/_remover.pyx":391
+ * 
+ *             free(gini_indices)
+ *             free(distribution)             # <<<<<<<<<<<<<<
+ *             free(valid_features)
+ * 
+ */
+    free(__pyx_v_distribution);
+
+    /* "cedar/_remover.pyx":392
+ *             free(gini_indices)
+ *             free(distribution)
+ *             free(valid_features)             # <<<<<<<<<<<<<<
+ * 
+ *         else:
+ */
+    free(__pyx_v_valid_features);
+
+    /* "cedar/_remover.pyx":318
+ *         cdef int result = 0
+ * 
+ *         if updated_pos_count > 0 and updated_pos_count < updated_count:             # <<<<<<<<<<<<<<
+ * 
+ *             gini_indices = <double *>malloc(node.features_count * sizeof(double))
+ */
+    goto __pyx_L3;
+  }
+
+  /* "cedar/_remover.pyx":395
+ * 
+ *         else:
+ *             printf('all samples in one class\n')             # <<<<<<<<<<<<<<
+ *             result = 1
+ * 
+ */
+  /*else*/ {
+    (void)(printf(((char const *)"all samples in one class\n")));
+
+    /* "cedar/_remover.pyx":396
+ *         else:
+ *             printf('all samples in one class\n')
+ *             result = 1             # <<<<<<<<<<<<<<
  * 
  *         return result
  */
-        __pyx_v_split->right_pos_counts = __pyx_v_updated_right_pos_counts;
-      }
-      __pyx_L19:;
-    }
-    __pyx_L18:;
+    __pyx_v_result = 1;
   }
-  __pyx_L6:;
+  __pyx_L3:;
 
-  /* "cedar/_remover.pyx":508
- *                     split.right_pos_counts = updated_right_pos_counts
+  /* "cedar/_remover.pyx":398
+ *             result = 1
  * 
  *         return result             # <<<<<<<<<<<<<<
  * 
- *     cdef void _resize_metrics(self, int capacity=0) nogil:
+ *     @cython.boundscheck(False)
  */
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cedar/_remover.pyx":283
+  /* "cedar/_remover.pyx":284
  *     @cython.wraparound(False)
  *     @cython.cdivision(True)
- *     cdef int _node_remove(self, Node* node, int** X, int* y,             # <<<<<<<<<<<<<<
- *                           int* samples, int n_samples,
+ *     cdef int _check_node(self, Node* node, int** X, int* y,             # <<<<<<<<<<<<<<
+ *                           int* samples, int n_samples, int pos_count,
  *                           double parent_p, SplitRecord *split) nogil:
  */
 
@@ -5952,8 +5408,174 @@ static int __pyx_f_5cedar_8_remover_8_Remover__node_remove(struct __pyx_obj_5ced
   return __pyx_r;
 }
 
-/* "cedar/_remover.pyx":510
- *         return result
+/* "cedar/_remover.pyx":402
+ *     @cython.boundscheck(False)
+ *     @cython.wraparound(False)
+ *     cdef int _update_splits(self, Node** node_ptr, int** X, int* y,             # <<<<<<<<<<<<<<
+ *                             int* samples, int n_samples, int pos_count) nogil:
+ *         """
+ */
+
+static int __pyx_f_5cedar_8_remover_8_Remover__update_splits(CYTHON_UNUSED struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, struct __pyx_t_5cedar_5_tree_Node **__pyx_v_node_ptr, int **__pyx_v_X, int *__pyx_v_y, int *__pyx_v_samples, int __pyx_v_n_samples, int __pyx_v_pos_count) {
+  struct __pyx_t_5cedar_5_tree_Node *__pyx_v_node;
+  int __pyx_v_left_count;
+  int __pyx_v_left_pos_count;
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_r;
+  int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  int __pyx_t_5;
+  int __pyx_t_6;
+  int __pyx_t_7;
+
+  /* "cedar/_remover.pyx":407
+ *         Update the metadata of this node.
+ *         """
+ *         cdef Node* node = node_ptr[0]             # <<<<<<<<<<<<<<
+ * 
+ *         cdef int left_count
+ */
+  __pyx_v_node = (__pyx_v_node_ptr[0]);
+
+  /* "cedar/_remover.pyx":415
+ * 
+ *         # compute statistics for each attribute
+ *         for j in range(node.features_count):             # <<<<<<<<<<<<<<
+ * 
+ *             left_count = 0
+ */
+  __pyx_t_1 = __pyx_v_node->features_count;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_j = __pyx_t_3;
+
+    /* "cedar/_remover.pyx":417
+ *         for j in range(node.features_count):
+ * 
+ *             left_count = 0             # <<<<<<<<<<<<<<
+ *             left_pos_count = 0
+ * 
+ */
+    __pyx_v_left_count = 0;
+
+    /* "cedar/_remover.pyx":418
+ * 
+ *             left_count = 0
+ *             left_pos_count = 0             # <<<<<<<<<<<<<<
+ * 
+ *             for i in range(n_samples):
+ */
+    __pyx_v_left_pos_count = 0;
+
+    /* "cedar/_remover.pyx":420
+ *             left_pos_count = 0
+ * 
+ *             for i in range(n_samples):             # <<<<<<<<<<<<<<
+ * 
+ *                 if X[samples[i]][node.features[j]] == 1:
+ */
+    __pyx_t_4 = __pyx_v_n_samples;
+    __pyx_t_5 = __pyx_t_4;
+    for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+      __pyx_v_i = __pyx_t_6;
+
+      /* "cedar/_remover.pyx":422
+ *             for i in range(n_samples):
+ * 
+ *                 if X[samples[i]][node.features[j]] == 1:             # <<<<<<<<<<<<<<
+ *                     left_count += 1
+ *                     left_pos_count += y[samples[i]]
+ */
+      __pyx_t_7 = ((((__pyx_v_X[(__pyx_v_samples[__pyx_v_i])])[(__pyx_v_node->features[__pyx_v_j])]) == 1) != 0);
+      if (__pyx_t_7) {
+
+        /* "cedar/_remover.pyx":423
+ * 
+ *                 if X[samples[i]][node.features[j]] == 1:
+ *                     left_count += 1             # <<<<<<<<<<<<<<
+ *                     left_pos_count += y[samples[i]]
+ * 
+ */
+        __pyx_v_left_count = (__pyx_v_left_count + 1);
+
+        /* "cedar/_remover.pyx":424
+ *                 if X[samples[i]][node.features[j]] == 1:
+ *                     left_count += 1
+ *                     left_pos_count += y[samples[i]]             # <<<<<<<<<<<<<<
+ * 
+ *             node.left_counts[j] -= left_count
+ */
+        __pyx_v_left_pos_count = (__pyx_v_left_pos_count + (__pyx_v_y[(__pyx_v_samples[__pyx_v_i])]));
+
+        /* "cedar/_remover.pyx":422
+ *             for i in range(n_samples):
+ * 
+ *                 if X[samples[i]][node.features[j]] == 1:             # <<<<<<<<<<<<<<
+ *                     left_count += 1
+ *                     left_pos_count += y[samples[i]]
+ */
+      }
+    }
+
+    /* "cedar/_remover.pyx":426
+ *                     left_pos_count += y[samples[i]]
+ * 
+ *             node.left_counts[j] -= left_count             # <<<<<<<<<<<<<<
+ *             node.left_pos_counts[j] -= left_pos_count
+ *             node.right_counts[j] -= (n_samples - left_count)
+ */
+    __pyx_t_4 = __pyx_v_j;
+    (__pyx_v_node->left_counts[__pyx_t_4]) = ((__pyx_v_node->left_counts[__pyx_t_4]) - __pyx_v_left_count);
+
+    /* "cedar/_remover.pyx":427
+ * 
+ *             node.left_counts[j] -= left_count
+ *             node.left_pos_counts[j] -= left_pos_count             # <<<<<<<<<<<<<<
+ *             node.right_counts[j] -= (n_samples - left_count)
+ *             node.right_pos_counts[j] -= (pos_count - left_pos_count)
+ */
+    __pyx_t_4 = __pyx_v_j;
+    (__pyx_v_node->left_pos_counts[__pyx_t_4]) = ((__pyx_v_node->left_pos_counts[__pyx_t_4]) - __pyx_v_left_pos_count);
+
+    /* "cedar/_remover.pyx":428
+ *             node.left_counts[j] -= left_count
+ *             node.left_pos_counts[j] -= left_pos_count
+ *             node.right_counts[j] -= (n_samples - left_count)             # <<<<<<<<<<<<<<
+ *             node.right_pos_counts[j] -= (pos_count - left_pos_count)
+ * 
+ */
+    __pyx_t_4 = __pyx_v_j;
+    (__pyx_v_node->right_counts[__pyx_t_4]) = ((__pyx_v_node->right_counts[__pyx_t_4]) - (__pyx_v_n_samples - __pyx_v_left_count));
+
+    /* "cedar/_remover.pyx":429
+ *             node.left_pos_counts[j] -= left_pos_count
+ *             node.right_counts[j] -= (n_samples - left_count)
+ *             node.right_pos_counts[j] -= (pos_count - left_pos_count)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef void _resize_metrics(self, int capacity=0) nogil:
+ */
+    __pyx_t_4 = __pyx_v_j;
+    (__pyx_v_node->right_pos_counts[__pyx_t_4]) = ((__pyx_v_node->right_pos_counts[__pyx_t_4]) - (__pyx_v_pos_count - __pyx_v_left_pos_count));
+  }
+
+  /* "cedar/_remover.pyx":402
+ *     @cython.boundscheck(False)
+ *     @cython.wraparound(False)
+ *     cdef int _update_splits(self, Node** node_ptr, int** X, int* y,             # <<<<<<<<<<<<<<
+ *                             int* samples, int n_samples, int pos_count) nogil:
+ *         """
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  return __pyx_r;
+}
+
+/* "cedar/_remover.pyx":431
+ *             node.right_pos_counts[j] -= (pos_count - left_pos_count)
  * 
  *     cdef void _resize_metrics(self, int capacity=0) nogil:             # <<<<<<<<<<<<<<
  *         """
@@ -5970,7 +5592,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
     }
   }
 
-  /* "cedar/_remover.pyx":514
+  /* "cedar/_remover.pyx":435
  *         Increase size of removal allocations.
  *         """
  *         if capacity > self.capacity - self.remove_count:             # <<<<<<<<<<<<<<
@@ -5980,7 +5602,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
   __pyx_t_1 = ((__pyx_v_capacity > (__pyx_v_self->capacity - __pyx_v_self->remove_count)) != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_remover.pyx":515
+    /* "cedar/_remover.pyx":436
  *         """
  *         if capacity > self.capacity - self.remove_count:
  *             if self.capacity * 2 - self.remove_count > capacity:             # <<<<<<<<<<<<<<
@@ -5990,7 +5612,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
     __pyx_t_1 = ((((__pyx_v_self->capacity * 2) - __pyx_v_self->remove_count) > __pyx_v_capacity) != 0);
     if (__pyx_t_1) {
 
-      /* "cedar/_remover.pyx":516
+      /* "cedar/_remover.pyx":437
  *         if capacity > self.capacity - self.remove_count:
  *             if self.capacity * 2 - self.remove_count > capacity:
  *                 self.capacity *= 2             # <<<<<<<<<<<<<<
@@ -5999,7 +5621,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
  */
       __pyx_v_self->capacity = (__pyx_v_self->capacity * 2);
 
-      /* "cedar/_remover.pyx":515
+      /* "cedar/_remover.pyx":436
  *         """
  *         if capacity > self.capacity - self.remove_count:
  *             if self.capacity * 2 - self.remove_count > capacity:             # <<<<<<<<<<<<<<
@@ -6009,7 +5631,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
       goto __pyx_L4;
     }
 
-    /* "cedar/_remover.pyx":518
+    /* "cedar/_remover.pyx":439
  *                 self.capacity *= 2
  *             else:
  *                 self.capacity = int(capacity)             # <<<<<<<<<<<<<<
@@ -6021,7 +5643,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
     }
     __pyx_L4:;
 
-    /* "cedar/_remover.pyx":514
+    /* "cedar/_remover.pyx":435
  *         Increase size of removal allocations.
  *         """
  *         if capacity > self.capacity - self.remove_count:             # <<<<<<<<<<<<<<
@@ -6030,7 +5652,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
  */
   }
 
-  /* "cedar/_remover.pyx":521
+  /* "cedar/_remover.pyx":442
  * 
  *         # removal info
  *         if self.remove_types and self.remove_depths:             # <<<<<<<<<<<<<<
@@ -6048,7 +5670,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
   __pyx_L6_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "cedar/_remover.pyx":522
+    /* "cedar/_remover.pyx":443
  *         # removal info
  *         if self.remove_types and self.remove_depths:
  *             self.remove_types = <int *>realloc(self.remove_types, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6057,7 +5679,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
  */
     __pyx_v_self->remove_types = ((int *)realloc(__pyx_v_self->remove_types, (__pyx_v_self->capacity * (sizeof(int)))));
 
-    /* "cedar/_remover.pyx":523
+    /* "cedar/_remover.pyx":444
  *         if self.remove_types and self.remove_depths:
  *             self.remove_types = <int *>realloc(self.remove_types, self.capacity * sizeof(int))
  *             self.remove_depths = <int *>realloc(self.remove_depths, self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6066,7 +5688,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
  */
     __pyx_v_self->remove_depths = ((int *)realloc(__pyx_v_self->remove_depths, (__pyx_v_self->capacity * (sizeof(int)))));
 
-    /* "cedar/_remover.pyx":521
+    /* "cedar/_remover.pyx":442
  * 
  *         # removal info
  *         if self.remove_types and self.remove_depths:             # <<<<<<<<<<<<<<
@@ -6076,7 +5698,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
     goto __pyx_L5;
   }
 
-  /* "cedar/_remover.pyx":525
+  /* "cedar/_remover.pyx":446
  *             self.remove_depths = <int *>realloc(self.remove_depths, self.capacity * sizeof(int))
  *         else:
  *             self.remove_types = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6086,7 +5708,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
   /*else*/ {
     __pyx_v_self->remove_types = ((int *)malloc((__pyx_v_self->capacity * (sizeof(int)))));
 
-    /* "cedar/_remover.pyx":526
+    /* "cedar/_remover.pyx":447
  *         else:
  *             self.remove_types = <int *>malloc(self.capacity * sizeof(int))
  *             self.remove_depths = <int *>malloc(self.capacity * sizeof(int))             # <<<<<<<<<<<<<<
@@ -6097,8 +5719,8 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
   }
   __pyx_L5:;
 
-  /* "cedar/_remover.pyx":510
- *         return result
+  /* "cedar/_remover.pyx":431
+ *             node.right_pos_counts[j] -= (pos_count - left_pos_count)
  * 
  *     cdef void _resize_metrics(self, int capacity=0) nogil:             # <<<<<<<<<<<<<<
  *         """
@@ -6108,7 +5730,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":530
+/* "cedar/_remover.pyx":451
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil:             # <<<<<<<<<<<<<<
@@ -6118,7 +5740,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__resize_metrics(struct __pyx_obj_
 
 static void __pyx_f_5cedar_8_remover_8_Remover__add_removal_type(struct __pyx_obj_5cedar_8_remover__Remover *__pyx_v_self, int __pyx_v_remove_type, int __pyx_v_remove_depth) {
 
-  /* "cedar/_remover.pyx":534
+  /* "cedar/_remover.pyx":455
  *         Adds to the removal metrics.
  *         """
  *         self.remove_types[self.remove_count] = remove_type             # <<<<<<<<<<<<<<
@@ -6127,7 +5749,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__add_removal_type(struct __pyx_ob
  */
   (__pyx_v_self->remove_types[__pyx_v_self->remove_count]) = __pyx_v_remove_type;
 
-  /* "cedar/_remover.pyx":535
+  /* "cedar/_remover.pyx":456
  *         """
  *         self.remove_types[self.remove_count] = remove_type
  *         self.remove_depths[self.remove_count] = remove_depth             # <<<<<<<<<<<<<<
@@ -6136,7 +5758,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__add_removal_type(struct __pyx_ob
  */
   (__pyx_v_self->remove_depths[__pyx_v_self->remove_count]) = __pyx_v_remove_depth;
 
-  /* "cedar/_remover.pyx":536
+  /* "cedar/_remover.pyx":457
  *         self.remove_types[self.remove_count] = remove_type
  *         self.remove_depths[self.remove_count] = remove_depth
  *         self.remove_count += 1             # <<<<<<<<<<<<<<
@@ -6145,7 +5767,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__add_removal_type(struct __pyx_ob
  */
   __pyx_v_self->remove_count = (__pyx_v_self->remove_count + 1);
 
-  /* "cedar/_remover.pyx":530
+  /* "cedar/_remover.pyx":451
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil:             # <<<<<<<<<<<<<<
@@ -6156,7 +5778,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover__add_removal_type(struct __pyx_ob
   /* function exit code */
 }
 
-/* "cedar/_remover.pyx":538
+/* "cedar/_remover.pyx":459
  *         self.remove_count += 1
  * 
  *     cpdef void clear_removal_metrics(self):             # <<<<<<<<<<<<<<
@@ -6181,7 +5803,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_clear_removal_metrics); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_clear_removal_metrics); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_8_remover_8_Remover_7clear_removal_metrics)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -6197,7 +5819,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 538, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -6217,7 +5839,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
     #endif
   }
 
-  /* "cedar/_remover.pyx":542
+  /* "cedar/_remover.pyx":463
  *         Resets deletion statistics.
  *         """
  *         free(self.remove_types)             # <<<<<<<<<<<<<<
@@ -6226,7 +5848,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
  */
   free(__pyx_v_self->remove_types);
 
-  /* "cedar/_remover.pyx":543
+  /* "cedar/_remover.pyx":464
  *         """
  *         free(self.remove_types)
  *         free(self.remove_depths)             # <<<<<<<<<<<<<<
@@ -6235,7 +5857,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
  */
   free(__pyx_v_self->remove_depths);
 
-  /* "cedar/_remover.pyx":544
+  /* "cedar/_remover.pyx":465
  *         free(self.remove_types)
  *         free(self.remove_depths)
  *         self.remove_count = 0             # <<<<<<<<<<<<<<
@@ -6244,7 +5866,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
  */
   __pyx_v_self->remove_count = 0;
 
-  /* "cedar/_remover.pyx":545
+  /* "cedar/_remover.pyx":466
  *         free(self.remove_depths)
  *         self.remove_count = 0
  *         self.remove_types = NULL             # <<<<<<<<<<<<<<
@@ -6253,7 +5875,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
  */
   __pyx_v_self->remove_types = NULL;
 
-  /* "cedar/_remover.pyx":546
+  /* "cedar/_remover.pyx":467
  *         self.remove_count = 0
  *         self.remove_types = NULL
  *         self.remove_depths = NULL             # <<<<<<<<<<<<<<
@@ -6262,7 +5884,7 @@ static void __pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(struct __py
  */
   __pyx_v_self->remove_depths = NULL;
 
-  /* "cedar/_remover.pyx":538
+  /* "cedar/_remover.pyx":459
  *         self.remove_count += 1
  * 
  *     cpdef void clear_removal_metrics(self):             # <<<<<<<<<<<<<<
@@ -6302,7 +5924,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_6clear_removal_metrics(stru
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("clear_removal_metrics", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6319,7 +5941,7 @@ static PyObject *__pyx_pf_5cedar_8_remover_8_Remover_6clear_removal_metrics(stru
   return __pyx_r;
 }
 
-/* "cedar/_remover.pyx":548
+/* "cedar/_remover.pyx":469
  *         self.remove_depths = NULL
  * 
  *     cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):             # <<<<<<<<<<<<<<
@@ -6335,7 +5957,7 @@ static PyArrayObject *__pyx_f_5cedar_8_remover_8_Remover__get_int_ndarray(struct
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("_get_int_ndarray", 0);
 
-  /* "cedar/_remover.pyx":554
+  /* "cedar/_remover.pyx":475
  *         """
  *         cdef np.npy_intp shape[1]
  *         shape[0] = n_elem             # <<<<<<<<<<<<<<
@@ -6344,20 +5966,20 @@ static PyArrayObject *__pyx_f_5cedar_8_remover_8_Remover__get_int_ndarray(struct
  */
   (__pyx_v_shape[0]) = __pyx_v_n_elem;
 
-  /* "cedar/_remover.pyx":555
+  /* "cedar/_remover.pyx":476
  *         cdef np.npy_intp shape[1]
  *         shape[0] = n_elem
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)             # <<<<<<<<<<<<<<
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self
  */
-  __pyx_t_1 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_INT, __pyx_v_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 555, __pyx_L1_error)
+  __pyx_t_1 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_INT, __pyx_v_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 555, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 476, __pyx_L1_error)
   __pyx_v_arr = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "cedar/_remover.pyx":556
+  /* "cedar/_remover.pyx":477
  *         shape[0] = n_elem
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
  *         Py_INCREF(self)             # <<<<<<<<<<<<<<
@@ -6366,7 +5988,7 @@ static PyArrayObject *__pyx_f_5cedar_8_remover_8_Remover__get_int_ndarray(struct
  */
   Py_INCREF(((PyObject *)__pyx_v_self));
 
-  /* "cedar/_remover.pyx":557
+  /* "cedar/_remover.pyx":478
  *         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self             # <<<<<<<<<<<<<<
@@ -6374,7 +5996,7 @@ static PyArrayObject *__pyx_f_5cedar_8_remover_8_Remover__get_int_ndarray(struct
  */
   __pyx_v_arr->base = ((PyObject *)__pyx_v_self);
 
-  /* "cedar/_remover.pyx":558
+  /* "cedar/_remover.pyx":479
  *         Py_INCREF(self)
  *         arr.base = <PyObject*> self
  *         return arr             # <<<<<<<<<<<<<<
@@ -6384,7 +6006,7 @@ static PyArrayObject *__pyx_f_5cedar_8_remover_8_Remover__get_int_ndarray(struct
   __pyx_r = __pyx_v_arr;
   goto __pyx_L0;
 
-  /* "cedar/_remover.pyx":548
+  /* "cedar/_remover.pyx":469
  *         self.remove_depths = NULL
  * 
  *     cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):             # <<<<<<<<<<<<<<
@@ -22642,7 +22264,7 @@ static PyModuleDef_Slot __pyx_moduledef_slots[] = {
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
     "_remover",
-    __pyx_k_CeDAR_binary_tree_implementatio, /* m_doc */
+    __pyx_k_CeDAR_data_remover, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
   #else
@@ -22780,7 +22402,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 124, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(2, 272, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(2, 856, __pyx_L1_error)
@@ -23214,24 +22836,25 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5cedar_8_remover__Remover.remove = (int (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_obj_5cedar_5_tree__Tree *, PyArrayObject *, int __pyx_skip_dispatch))__pyx_f_5cedar_8_remover_8_Remover_remove;
   __pyx_vtable_5cedar_8_remover__Remover.clear_removal_metrics = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, int __pyx_skip_dispatch))__pyx_f_5cedar_8_remover_8_Remover_clear_removal_metrics;
   __pyx_vtable_5cedar_8_remover__Remover._remove = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int **, int *, int *, int, double))__pyx_f_5cedar_8_remover_8_Remover__remove;
-  __pyx_vtable_5cedar_8_remover__Remover._node_remove = (int (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node *, int **, int *, int *, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *))__pyx_f_5cedar_8_remover_8_Remover__node_remove;
-  __pyx_vtable_5cedar_8_remover__Remover._update_leaf = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int))__pyx_f_5cedar_8_remover_8_Remover__update_leaf;
-  __pyx_vtable_5cedar_8_remover__Remover._convert_to_leaf = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int, struct __pyx_t_5cedar_9_splitter_SplitRecord *))__pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf;
+  __pyx_vtable_5cedar_8_remover__Remover._check_node = (int (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node *, int **, int *, int *, int, int, double, struct __pyx_t_5cedar_9_splitter_SplitRecord *))__pyx_f_5cedar_8_remover_8_Remover__check_node;
+  __pyx_vtable_5cedar_8_remover__Remover._update_splits = (int (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int **, int *, int *, int, int))__pyx_f_5cedar_8_remover_8_Remover__update_splits;
+  __pyx_vtable_5cedar_8_remover__Remover._update_leaf = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int *, int, int))__pyx_f_5cedar_8_remover_8_Remover__update_leaf;
+  __pyx_vtable_5cedar_8_remover__Remover._convert_to_leaf = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, int *, int, int, struct __pyx_t_5cedar_9_splitter_SplitRecord *))__pyx_f_5cedar_8_remover_8_Remover__convert_to_leaf;
   __pyx_vtable_5cedar_8_remover__Remover._get_leaf_samples = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node *, int *, int, int **, int *))__pyx_f_5cedar_8_remover_8_Remover__get_leaf_samples;
   __pyx_vtable_5cedar_8_remover__Remover._update_decision_node = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_t_5cedar_5_tree_Node **, struct __pyx_t_5cedar_9_splitter_SplitRecord *))__pyx_f_5cedar_8_remover_8_Remover__update_decision_node;
   __pyx_vtable_5cedar_8_remover__Remover._resize_metrics = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, struct __pyx_opt_args_5cedar_8_remover_8_Remover__resize_metrics *__pyx_optional_args))__pyx_f_5cedar_8_remover_8_Remover__resize_metrics;
   __pyx_vtable_5cedar_8_remover__Remover._add_removal_type = (void (*)(struct __pyx_obj_5cedar_8_remover__Remover *, int, int))__pyx_f_5cedar_8_remover_8_Remover__add_removal_type;
   __pyx_vtable_5cedar_8_remover__Remover._get_int_ndarray = (PyArrayObject *(*)(struct __pyx_obj_5cedar_8_remover__Remover *, int *, int))__pyx_f_5cedar_8_remover_8_Remover__get_int_ndarray;
-  if (PyType_Ready(&__pyx_type_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5cedar_8_remover__Remover.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5cedar_8_remover__Remover.tp_dictoffset && __pyx_type_5cedar_8_remover__Remover.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5cedar_8_remover__Remover.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5cedar_8_remover__Remover.tp_dict, __pyx_vtabptr_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Remover, (PyObject *)&__pyx_type_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5cedar_8_remover__Remover.tp_dict, __pyx_vtabptr_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Remover, (PyObject *)&__pyx_type_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5cedar_8_remover__Remover) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
   __pyx_ptype_5cedar_8_remover__Remover = &__pyx_type_5cedar_8_remover__Remover;
   __pyx_vtabptr_array = &__pyx_vtable_array;
   __pyx_vtable_array.get_memview = (PyObject *(*)(struct __pyx_array_obj *))__pyx_array_get_memview;
@@ -23336,20 +22959,20 @@ static int __Pyx_modinit_type_import_code(void) {
    if (!__pyx_ptype_5cedar_8_manager__DataManager) __PYX_ERR(6, 4, __pyx_L1_error)
   __pyx_vtabptr_5cedar_8_manager__DataManager = (struct __pyx_vtabstruct_5cedar_8_manager__DataManager*)__Pyx_GetVtable(__pyx_ptype_5cedar_8_manager__DataManager->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_8_manager__DataManager)) __PYX_ERR(6, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 25, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(7, 25, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(7, 25, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 33, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_5_tree__Tree = __Pyx_ImportType(__pyx_t_1, "cedar._tree", "_Tree", sizeof(struct __pyx_obj_5cedar_5_tree__Tree), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_5_tree__Tree) __PYX_ERR(8, 33, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_5_tree__Tree = (struct __pyx_vtabstruct_5cedar_5_tree__Tree*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__Tree->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__Tree)) __PYX_ERR(8, 33, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_5_tree__Tree) __PYX_ERR(7, 33, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_5_tree__Tree = (struct __pyx_vtabstruct_5cedar_5_tree__Tree*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__Tree->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__Tree)) __PYX_ERR(7, 33, __pyx_L1_error)
   __pyx_ptype_5cedar_5_tree__TreeBuilder = __Pyx_ImportType(__pyx_t_1, "cedar._tree", "_TreeBuilder", sizeof(struct __pyx_obj_5cedar_5_tree__TreeBuilder), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_5_tree__TreeBuilder) __PYX_ERR(8, 56, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_5_tree__TreeBuilder = (struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__TreeBuilder)) __PYX_ERR(8, 56, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_5_tree__TreeBuilder) __PYX_ERR(7, 56, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_5_tree__TreeBuilder = (struct __pyx_vtabstruct_5cedar_5_tree__TreeBuilder*)__Pyx_GetVtable(__pyx_ptype_5cedar_5_tree__TreeBuilder->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_5_tree__TreeBuilder)) __PYX_ERR(7, 56, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(8, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
+   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(8, 27, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(8, 27, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -23539,7 +23162,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("_remover", __pyx_methods, __pyx_k_CeDAR_binary_tree_implementatio, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("_remover", __pyx_methods, __pyx_k_CeDAR_data_remover, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -23585,28 +23208,28 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "cedar/_remover.pyx":18
+  /* "cedar/_remover.pyx":16
  * from libc.time cimport time
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
  * cimport numpy as np
  * np.import_array()
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cedar/_remover.pyx":20
+  /* "cedar/_remover.pyx":18
  * import numpy as np
  * cimport numpy as np
  * np.import_array()             # <<<<<<<<<<<<<<
  * 
  * from ._utils cimport compute_gini
  */
-  __pyx_t_2 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 18, __pyx_L1_error)
 
-  /* "cedar/_remover.pyx":27
+  /* "cedar/_remover.pyx":25
  * from ._utils cimport dealloc
  * 
  * cdef int UNDEF = -1             # <<<<<<<<<<<<<<
@@ -23617,8 +23240,8 @@ if (!__Pyx_RefNanny) {
 
   /* "cedar/_remover.pyx":1
  * """             # <<<<<<<<<<<<<<
- * CeDAR binary tree implementation; only supports binary attributes and a binary label.
- * Represenation is a number of parllel arrays.
+ * CeDAR data remover.
+ * """
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
