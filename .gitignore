@@ -1,3 +1,9 @@
 data
 output
 myenv
+notes
+cedar/__pycache__
+cedar/build
+cedar/*.c
+cedar/*.so
+cedar/*.html
