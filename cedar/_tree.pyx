@@ -185,7 +185,6 @@ cdef class _Tree:
         self.feature_indices = convert_int_ndarray(features)
 
         # internal data structures
-        self.node_count = 0
         self.root = NULL
 
     def __dealloc__(self):

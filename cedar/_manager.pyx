@@ -84,7 +84,7 @@ cdef class _DataManager:
     cdef int check_sample_validity(self, int *samples, int n_samples) nogil:
         """
         Checks to make sure `samples` are in the database.
-        Returns -1 if one a sample is not available; 0 otherwise.
+        Returns -1 if a sample is not available; 0 otherwise.
         """
         cdef int *vacant = self.vacant
         cdef int n_vacant = self.n_vacant
@@ -119,6 +119,9 @@ cdef class _DataManager:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef void remove_data(self, int[:] samples):
+        """
+        Remove selected samples from the database.
+        """
 
         # parameters
         cdef int** X = self.X

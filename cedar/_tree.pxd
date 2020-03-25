@@ -42,7 +42,6 @@ cdef class _Tree:
 
     # Inner structures
     cdef Node* root                      # Root node
-    cdef int node_count                  # Counter for node IDs
 
     # Python/C API
     cpdef np.ndarray predict(self, int[:, :] X)
@@ -59,7 +58,7 @@ cdef class _TreeBuilder:
     using a Splitter object for splitting internal nodes and assigning values to leaves.
 
     This class controls the various stopping criteria and the node splitting
-    evaluation order, e.g. depth-first or breadth-first.
+    evaluation order, e.g. depth-first.
     """
 
     cdef _DataManager manager        # Database manager
@@ -78,5 +77,4 @@ cdef class _TreeBuilder:
                       int depth, bint is_left, double parent_p) nogil
     cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,
                         bint is_bottom_leaf) nogil
-    # cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples) nogil
     cdef void _set_decision_node(self, Node** node_ptr, SplitRecord* split) nogil
