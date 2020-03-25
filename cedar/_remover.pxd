@@ -24,7 +24,7 @@ cdef class _Remover:
     # Metric structures
     cdef int capacity           # Number of removal allocations for space
     cdef int  remove_count      # Number of removals
-    cdef int* remove_types      # Removal type: retrain / no retrain
+    cdef int* remove_types      # Removal type
     cdef int* remove_depths     # Depth of leaf or node needing retraining
 
     # Python API

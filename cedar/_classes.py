@@ -5,6 +5,7 @@ import numpy as np
 
 from ._manager import _DataManager
 from ._splitter import _Splitter
+from ._adder import _Adder
 from ._remover import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
@@ -140,35 +141,32 @@ class Forest(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
-    # TODO: adding samples can turn a leaf into a decision node
-    # def add(self, X, y):
-    #     """
-    #     Adds instances to the training data and updates the model.
-    #     """
-    #     assert X.ndim == 2 and y.ndim == 1
+    def add(self, X, y):
+        """
+        Adds instances to the database and updates the model.
+        """
+        assert X.ndim == 2 and y.ndim == 1
+        assert X.shape[1] == self.n_features_
 
-    #     # assign index numbers to the new instances
-    #     current_keys = np.fromiter(self.X_train_.keys(), dtype=np.int64)
-    #     gaps = np.setdiff1d(np.arange(current_keys.max()), current_keys)
-    #     if len(X) > len(gaps):
-    #         extra = np.arange(current_keys.max() + 1, current_keys.max() + 1 + len(X) - len(gaps))
-    #     keys = np.concatenate([gaps, extra])
+        if X.dtype != np.int32:
+            X = X.astype(np.int32)
 
-    #     # add instances to the data
-    #     for i, key in enumerate(keys):
-    #         self.X_train_[key] = X[i]
-    #         self.y_train_[key] = y[i]
+        if y.dtype != np.int32:
+            y = y.astype(np.int32)
 
-    #     # add instances to each tree
-    #     addition_types = []
-    #     for tree in self.trees_:
-    #         addition_types += tree.add(X, y, keys)
+        # add data to the database
+        self.manager_.add_data(X, y)
 
-    #     return addition_types
+        # update trees
+        for i in range(len(self.trees_)):
+            self.trees_[i].add()
+
+        # cleanup
+        self.manager_.clear_add_indices()
 
     def delete(self, remove_indices):
         """
-        Removes instances from the training data and updates the model.
+        Removes instances from the database and updates the model.
         """
 
         # copy indices to an int array
@@ -184,7 +182,7 @@ class Forest(object):
         for i in range(len(self.trees_)):
             self.trees_[i].delete(remove_indices)
 
-        # remove data from tree
+        # remove data from the database
         self.manager_.remove_data(remove_indices)
 
     def print(self, show_nodes=False, show_metadata=False):
@@ -194,6 +192,23 @@ class Forest(object):
         for tree in self.trees_:
             tree.print(show_nodes=show_nodes, show_metadata=show_metadata)
 
+    def get_add_statistics(self):
+        """
+        Retrieve addition statistics.
+        """
+        types_list, depths_list = [], []
+
+        for tree in self.trees_:
+            types, depths = tree.get_addition_statistics()
+            types_list.append(types)
+            depths_list.append(depths)
+
+        types = np.concatenate(types_list)
+        depths = np.concatenate(depths_list)
+
+        return types, depths
+
+    # TODO: clear metrics after receiving them?
     def get_removal_statistics(self):
         """
         Retrieve deletion statistics.
@@ -311,6 +326,7 @@ class Tree(object):
                                           self.min_samples_split, self.min_samples_leaf,
                                           self.max_depth, self.random_state)
         self.remover_ = _Remover(self.manager_, self.tree_builder_, self.epsilon, self.lmbda)
+        self.adder_ = _Adder(self.manager_, self.tree_builder_, self.epsilon, self.lmbda)
         self.tree_builder_.build(self.tree_)
 
         return self
@@ -342,22 +358,23 @@ class Tree(object):
             self.tree_.print_depth()
         print()
 
-    def add(self, X, y, add_indices=None):
+    def add(self, X=None, y=None):
         """
-        Adds instances to the training data and updates the model.
+        Adds instances to the database and updates the model.
         """
 
-        if add_indices is not None:
+        if X is None:
             assert not self.single_tree_
 
         else:
             assert self.single_tree_
             assert X.ndim == 2 and y.ndim == 1
             assert X.shape[1] == self.n_features_
-
-            # add data
-            if self.single_tree_:
-                add_indices = self.manager_.add_data(X, y)
+            if X.dtype != np.int32:
+                X = X.astype(np.int32)
+            if y.dtype != np.int32:
+                y = y.astype(np.int32)
+            self.manager_.add_data(X, y)
 
         # update model
         self.adder_.add(self.tree_)
@@ -368,7 +385,7 @@ class Tree(object):
 
     def delete(self, remove_indices):
         """
-        Removes instance remove_ndx from the training data and updates the model.
+        Removes instances from the database and updates the model.
         """
 
         # copy remove indices to int array
@@ -390,6 +407,14 @@ class Tree(object):
         # remove data
         if self.single_tree_:
             self.manager_.remove_data(remove_indices)
+
+    # TODO: clear statistics after retrieving them?
+    def get_add_statistics(self):
+        """
+        Retrieve addition statistics.
+        """
+        result = self.adder_.add_types, self.adder_.add_depths
+        return result
 
     def get_removal_statistics(self):
         """

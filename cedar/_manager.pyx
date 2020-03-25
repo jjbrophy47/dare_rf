@@ -15,7 +15,7 @@ np.import_array()
 
 from ._utils cimport copy_int_array
 
-cdef int _UNDEFINED = -2
+cdef int UNDEF = -1
 
 # =====================================
 # Manager
@@ -65,8 +65,9 @@ cdef class _DataManager:
 
         self.X = X
         self.y = y
-        self.vacant = vacant
         self.n_samples = n_samples
+        self.n_features = n_features
+        self.vacant = vacant
         self.n_vacant = 0
 
     def __dealloc__(self):
@@ -140,7 +141,7 @@ cdef class _DataManager:
         # remove data and save the deleted indices
         for i in range(n_samples):
             free(X[samples[i]])
-            y[samples[i]] = _UNDEFINED
+            y[samples[i]] = UNDEF
             vacant[n_vacant + i] = samples[i]
 
         self.n_samples -= n_samples
@@ -153,6 +154,7 @@ cdef class _DataManager:
         """
         Adds data to the database.
         """
+
         # parameters
         cdef int** X = self.X
         cdef int*  y = self.y
@@ -171,7 +173,7 @@ cdef class _DataManager:
 
         # grow database
         if updated_n_samples > n_samples + n_vacant:
-            X = <int **>realloc(X, updated_n_samples * sizeof(int))
+            X = <int **>realloc(X, updated_n_samples * sizeof(int *))
             y = <int *>realloc(y, updated_n_samples * sizeof(int))
 
         # copy samples to the database

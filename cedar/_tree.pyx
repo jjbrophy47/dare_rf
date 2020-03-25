@@ -193,9 +193,7 @@ cdef class _Tree:
         Destructor.
         """
         if self.root:
-            # printf('freeing tree\n')
             dealloc(self.root)
-            # printf('freeing root\n')
             free(self.root)
 
     @cython.boundscheck(False)

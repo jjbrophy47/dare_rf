@@ -1246,7 +1246,8 @@ struct __pyx_t_5cedar_9_splitter_SplitRecord {
   int left_count;
   int *right_indices;
   int right_count;
-  int *features;
+  int *left_features;
+  int *right_features;
   int features_count;
   double p;
   int count;
@@ -1285,7 +1286,7 @@ struct __pyx_t_5cedar_5_tree_Node {
   int *leaf_samples;
 };
 
-/* "_splitter.pxd":27
+/* "_splitter.pxd":28
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -1436,7 +1437,7 @@ struct __pyx_memoryviewslice_obj {
 
 
 
-/* "_splitter.pxd":27
+/* "_splitter.pxd":28
  *     int*   right_pos_counts    # Number of right positive samples for each attribute
  * 
  * cdef class _Splitter:             # <<<<<<<<<<<<<<
@@ -2375,7 +2376,7 @@ static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
 static PyTypeObject *__pyx_memoryviewslice_type = 0;
-static int __pyx_v_5cedar_8_manager__UNDEFINED;
+static int __pyx_v_5cedar_8_manager_UNDEF;
 static PyObject *generic = 0;
 static PyObject *strided = 0;
 static PyObject *indirect = 0;
@@ -3114,7 +3115,7 @@ static int __pyx_pf_5cedar_8_manager_12_DataManager___cinit__(struct __pyx_obj_5
  * 
  *         self.X = X             # <<<<<<<<<<<<<<
  *         self.y = y
- *         self.vacant = vacant
+ *         self.n_samples = n_samples
  */
   __pyx_v_self->X = __pyx_v_X;
 
@@ -3122,32 +3123,41 @@ static int __pyx_pf_5cedar_8_manager_12_DataManager___cinit__(struct __pyx_obj_5
  * 
  *         self.X = X
  *         self.y = y             # <<<<<<<<<<<<<<
- *         self.vacant = vacant
  *         self.n_samples = n_samples
+ *         self.n_features = n_features
  */
   __pyx_v_self->y = __pyx_v_y;
 
   /* "cedar/_manager.pyx":68
  *         self.X = X
  *         self.y = y
- *         self.vacant = vacant             # <<<<<<<<<<<<<<
- *         self.n_samples = n_samples
- *         self.n_vacant = 0
- */
-  __pyx_v_self->vacant = __pyx_v_vacant;
-
-  /* "cedar/_manager.pyx":69
- *         self.y = y
- *         self.vacant = vacant
  *         self.n_samples = n_samples             # <<<<<<<<<<<<<<
- *         self.n_vacant = 0
- * 
+ *         self.n_features = n_features
+ *         self.vacant = vacant
  */
   __pyx_v_self->n_samples = __pyx_v_n_samples;
 
-  /* "cedar/_manager.pyx":70
- *         self.vacant = vacant
+  /* "cedar/_manager.pyx":69
+ *         self.y = y
  *         self.n_samples = n_samples
+ *         self.n_features = n_features             # <<<<<<<<<<<<<<
+ *         self.vacant = vacant
+ *         self.n_vacant = 0
+ */
+  __pyx_v_self->n_features = __pyx_v_n_features;
+
+  /* "cedar/_manager.pyx":70
+ *         self.n_samples = n_samples
+ *         self.n_features = n_features
+ *         self.vacant = vacant             # <<<<<<<<<<<<<<
+ *         self.n_vacant = 0
+ * 
+ */
+  __pyx_v_self->vacant = __pyx_v_vacant;
+
+  /* "cedar/_manager.pyx":71
+ *         self.n_features = n_features
+ *         self.vacant = vacant
  *         self.n_vacant = 0             # <<<<<<<<<<<<<<
  * 
  *     def __dealloc__(self):
@@ -3170,7 +3180,7 @@ static int __pyx_pf_5cedar_8_manager_12_DataManager___cinit__(struct __pyx_obj_5
   return __pyx_r;
 }
 
-/* "cedar/_manager.pyx":72
+/* "cedar/_manager.pyx":73
  *         self.n_vacant = 0
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3194,7 +3204,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cedar/_manager.pyx":76
+  /* "cedar/_manager.pyx":77
  *         Destructor.
  *         """
  *         free(self.X)             # <<<<<<<<<<<<<<
@@ -3203,7 +3213,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
  */
   free(__pyx_v_self->X);
 
-  /* "cedar/_manager.pyx":77
+  /* "cedar/_manager.pyx":78
  *         """
  *         free(self.X)
  *         free(self.y)             # <<<<<<<<<<<<<<
@@ -3212,7 +3222,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
  */
   free(__pyx_v_self->y);
 
-  /* "cedar/_manager.pyx":78
+  /* "cedar/_manager.pyx":79
  *         free(self.X)
  *         free(self.y)
  *         if self.vacant:             # <<<<<<<<<<<<<<
@@ -3222,7 +3232,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
   __pyx_t_1 = (__pyx_v_self->vacant != 0);
   if (__pyx_t_1) {
 
-    /* "cedar/_manager.pyx":79
+    /* "cedar/_manager.pyx":80
  *         free(self.y)
  *         if self.vacant:
  *             free(self.vacant)             # <<<<<<<<<<<<<<
@@ -3231,7 +3241,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
  */
     free(__pyx_v_self->vacant);
 
-    /* "cedar/_manager.pyx":78
+    /* "cedar/_manager.pyx":79
  *         free(self.X)
  *         free(self.y)
  *         if self.vacant:             # <<<<<<<<<<<<<<
@@ -3240,7 +3250,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
  */
   }
 
-  /* "cedar/_manager.pyx":72
+  /* "cedar/_manager.pyx":73
  *         self.n_vacant = 0
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3252,7 +3262,7 @@ static void __pyx_pf_5cedar_8_manager_12_DataManager_2__dealloc__(struct __pyx_o
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cedar/_manager.pyx":83
+/* "cedar/_manager.pyx":84
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef int check_sample_validity(self, int *samples, int n_samples) nogil:             # <<<<<<<<<<<<<<
@@ -3276,7 +3286,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
   int __pyx_t_7;
   int __pyx_t_8;
 
-  /* "cedar/_manager.pyx":88
+  /* "cedar/_manager.pyx":89
  *         Returns -1 if one a sample is not available; 0 otherwise.
  *         """
  *         cdef int *vacant = self.vacant             # <<<<<<<<<<<<<<
@@ -3286,7 +3296,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
   __pyx_t_1 = __pyx_v_self->vacant;
   __pyx_v_vacant = __pyx_t_1;
 
-  /* "cedar/_manager.pyx":89
+  /* "cedar/_manager.pyx":90
  *         """
  *         cdef int *vacant = self.vacant
  *         cdef int n_vacant = self.n_vacant             # <<<<<<<<<<<<<<
@@ -3296,7 +3306,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
   __pyx_t_2 = __pyx_v_self->n_vacant;
   __pyx_v_n_vacant = __pyx_t_2;
 
-  /* "cedar/_manager.pyx":91
+  /* "cedar/_manager.pyx":92
  *         cdef int n_vacant = self.n_vacant
  * 
  *         cdef int result = 0             # <<<<<<<<<<<<<<
@@ -3305,7 +3315,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
  */
   __pyx_v_result = 0;
 
-  /* "cedar/_manager.pyx":95
+  /* "cedar/_manager.pyx":96
  *         cdef int j
  * 
  *         if n_vacant > 0:             # <<<<<<<<<<<<<<
@@ -3315,7 +3325,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
   __pyx_t_3 = ((__pyx_v_n_vacant > 0) != 0);
   if (__pyx_t_3) {
 
-    /* "cedar/_manager.pyx":97
+    /* "cedar/_manager.pyx":98
  *         if n_vacant > 0:
  * 
  *             for i in range(n_samples):             # <<<<<<<<<<<<<<
@@ -3327,7 +3337,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
     for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
       __pyx_v_i = __pyx_t_5;
 
-      /* "cedar/_manager.pyx":98
+      /* "cedar/_manager.pyx":99
  * 
  *             for i in range(n_samples):
  *                 for j in range(n_vacant):             # <<<<<<<<<<<<<<
@@ -3339,7 +3349,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
       for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
         __pyx_v_j = __pyx_t_8;
 
-        /* "cedar/_manager.pyx":100
+        /* "cedar/_manager.pyx":101
  *                 for j in range(n_vacant):
  * 
  *                     if samples[i] == vacant[j]:             # <<<<<<<<<<<<<<
@@ -3349,7 +3359,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
         __pyx_t_3 = (((__pyx_v_samples[__pyx_v_i]) == (__pyx_v_vacant[__pyx_v_j])) != 0);
         if (__pyx_t_3) {
 
-          /* "cedar/_manager.pyx":101
+          /* "cedar/_manager.pyx":102
  * 
  *                     if samples[i] == vacant[j]:
  *                         result = -1             # <<<<<<<<<<<<<<
@@ -3358,7 +3368,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
  */
           __pyx_v_result = -1;
 
-          /* "cedar/_manager.pyx":102
+          /* "cedar/_manager.pyx":103
  *                     if samples[i] == vacant[j]:
  *                         result = -1
  *                         break             # <<<<<<<<<<<<<<
@@ -3367,7 +3377,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
  */
           goto __pyx_L7_break;
 
-          /* "cedar/_manager.pyx":100
+          /* "cedar/_manager.pyx":101
  *                 for j in range(n_vacant):
  * 
  *                     if samples[i] == vacant[j]:             # <<<<<<<<<<<<<<
@@ -3378,7 +3388,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
       }
       __pyx_L7_break:;
 
-      /* "cedar/_manager.pyx":104
+      /* "cedar/_manager.pyx":105
  *                         break
  * 
  *                 if result == -1:             # <<<<<<<<<<<<<<
@@ -3388,7 +3398,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
       __pyx_t_3 = ((__pyx_v_result == -1L) != 0);
       if (__pyx_t_3) {
 
-        /* "cedar/_manager.pyx":105
+        /* "cedar/_manager.pyx":106
  * 
  *                 if result == -1:
  *                     break             # <<<<<<<<<<<<<<
@@ -3397,7 +3407,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
  */
         goto __pyx_L5_break;
 
-        /* "cedar/_manager.pyx":104
+        /* "cedar/_manager.pyx":105
  *                         break
  * 
  *                 if result == -1:             # <<<<<<<<<<<<<<
@@ -3408,7 +3418,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
     }
     __pyx_L5_break:;
 
-    /* "cedar/_manager.pyx":95
+    /* "cedar/_manager.pyx":96
  *         cdef int j
  * 
  *         if n_vacant > 0:             # <<<<<<<<<<<<<<
@@ -3417,7 +3427,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
  */
   }
 
-  /* "cedar/_manager.pyx":107
+  /* "cedar/_manager.pyx":108
  *                     break
  * 
  *         return result             # <<<<<<<<<<<<<<
@@ -3427,7 +3437,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
   __pyx_r = __pyx_v_result;
   goto __pyx_L0;
 
-  /* "cedar/_manager.pyx":83
+  /* "cedar/_manager.pyx":84
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef int check_sample_validity(self, int *samples, int n_samples) nogil:             # <<<<<<<<<<<<<<
@@ -3440,7 +3450,7 @@ static int __pyx_f_5cedar_8_manager_12_DataManager_check_sample_validity(struct 
   return __pyx_r;
 }
 
-/* "cedar/_manager.pyx":111
+/* "cedar/_manager.pyx":112
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void get_data(self, int*** X_ptr, int** y_ptr) nogil:             # <<<<<<<<<<<<<<
@@ -3452,7 +3462,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_get_data(struct __pyx_obj_5c
   int **__pyx_t_1;
   int *__pyx_t_2;
 
-  /* "cedar/_manager.pyx":115
+  /* "cedar/_manager.pyx":116
  *         Receive pointers to the data.
  *         """
  *         X_ptr[0] = self.X             # <<<<<<<<<<<<<<
@@ -3462,7 +3472,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_get_data(struct __pyx_obj_5c
   __pyx_t_1 = __pyx_v_self->X;
   (__pyx_v_X_ptr[0]) = __pyx_t_1;
 
-  /* "cedar/_manager.pyx":116
+  /* "cedar/_manager.pyx":117
  *         """
  *         X_ptr[0] = self.X
  *         y_ptr[0] = self.y             # <<<<<<<<<<<<<<
@@ -3472,7 +3482,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_get_data(struct __pyx_obj_5c
   __pyx_t_2 = __pyx_v_self->y;
   (__pyx_v_y_ptr[0]) = __pyx_t_2;
 
-  /* "cedar/_manager.pyx":111
+  /* "cedar/_manager.pyx":112
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cdef void get_data(self, int*** X_ptr, int** y_ptr) nogil:             # <<<<<<<<<<<<<<
@@ -3483,7 +3493,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_get_data(struct __pyx_obj_5c
   /* function exit code */
 }
 
-/* "cedar/_manager.pyx":120
+/* "cedar/_manager.pyx":121
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef void remove_data(self, int[:] samples):             # <<<<<<<<<<<<<<
@@ -3525,11 +3535,11 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_remove_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_remove_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_8_manager_12_DataManager_5remove_data)) {
-        if (unlikely(!__pyx_v_samples.memview)) { __Pyx_RaiseUnboundLocalError("samples"); __PYX_ERR(0, 120, __pyx_L1_error) }
-        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_samples, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 120, __pyx_L1_error)
+        if (unlikely(!__pyx_v_samples.memview)) { __Pyx_RaiseUnboundLocalError("samples"); __PYX_ERR(0, 121, __pyx_L1_error) }
+        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_samples, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -3545,7 +3555,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3565,7 +3575,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
     #endif
   }
 
-  /* "cedar/_manager.pyx":123
+  /* "cedar/_manager.pyx":124
  * 
  *         # parameters
  *         cdef int** X = self.X             # <<<<<<<<<<<<<<
@@ -3575,7 +3585,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   __pyx_t_6 = __pyx_v_self->X;
   __pyx_v_X = __pyx_t_6;
 
-  /* "cedar/_manager.pyx":124
+  /* "cedar/_manager.pyx":125
  *         # parameters
  *         cdef int** X = self.X
  *         cdef int* y = self.y             # <<<<<<<<<<<<<<
@@ -3585,7 +3595,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   __pyx_t_7 = __pyx_v_self->y;
   __pyx_v_y = __pyx_t_7;
 
-  /* "cedar/_manager.pyx":125
+  /* "cedar/_manager.pyx":126
  *         cdef int** X = self.X
  *         cdef int* y = self.y
  *         cdef int *vacant = self.vacant             # <<<<<<<<<<<<<<
@@ -3595,7 +3605,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   __pyx_t_7 = __pyx_v_self->vacant;
   __pyx_v_vacant = __pyx_t_7;
 
-  /* "cedar/_manager.pyx":126
+  /* "cedar/_manager.pyx":127
  *         cdef int* y = self.y
  *         cdef int *vacant = self.vacant
  *         cdef int n_vacant = self.n_vacant             # <<<<<<<<<<<<<<
@@ -3605,7 +3615,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   __pyx_t_8 = __pyx_v_self->n_vacant;
   __pyx_v_n_vacant = __pyx_t_8;
 
-  /* "cedar/_manager.pyx":128
+  /* "cedar/_manager.pyx":129
  *         cdef int n_vacant = self.n_vacant
  * 
  *         cdef int n_samples = samples.shape[0]             # <<<<<<<<<<<<<<
@@ -3614,7 +3624,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
   __pyx_v_n_samples = (__pyx_v_samples.shape[0]);
 
-  /* "cedar/_manager.pyx":129
+  /* "cedar/_manager.pyx":130
  * 
  *         cdef int n_samples = samples.shape[0]
  *         cdef int updated_n_vacant = n_vacant + n_samples             # <<<<<<<<<<<<<<
@@ -3623,7 +3633,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
   __pyx_v_updated_n_vacant = (__pyx_v_n_vacant + __pyx_v_n_samples);
 
-  /* "cedar/_manager.pyx":134
+  /* "cedar/_manager.pyx":135
  * 
  *         # realloc vacant array
  *         if n_vacant == 0:             # <<<<<<<<<<<<<<
@@ -3633,7 +3643,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   __pyx_t_9 = ((__pyx_v_n_vacant == 0) != 0);
   if (__pyx_t_9) {
 
-    /* "cedar/_manager.pyx":135
+    /* "cedar/_manager.pyx":136
  *         # realloc vacant array
  *         if n_vacant == 0:
  *             vacant = <int *>malloc(updated_n_vacant * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3642,7 +3652,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
     __pyx_v_vacant = ((int *)malloc((__pyx_v_updated_n_vacant * (sizeof(int)))));
 
-    /* "cedar/_manager.pyx":134
+    /* "cedar/_manager.pyx":135
  * 
  *         # realloc vacant array
  *         if n_vacant == 0:             # <<<<<<<<<<<<<<
@@ -3652,7 +3662,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
     goto __pyx_L3;
   }
 
-  /* "cedar/_manager.pyx":137
+  /* "cedar/_manager.pyx":138
  *             vacant = <int *>malloc(updated_n_vacant * sizeof(int))
  * 
  *         elif updated_n_vacant > n_vacant:             # <<<<<<<<<<<<<<
@@ -3662,7 +3672,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   __pyx_t_9 = ((__pyx_v_updated_n_vacant > __pyx_v_n_vacant) != 0);
   if (__pyx_t_9) {
 
-    /* "cedar/_manager.pyx":138
+    /* "cedar/_manager.pyx":139
  * 
  *         elif updated_n_vacant > n_vacant:
  *             vacant = <int *>realloc(vacant, updated_n_vacant * sizeof(int))             # <<<<<<<<<<<<<<
@@ -3671,7 +3681,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
     __pyx_v_vacant = ((int *)realloc(__pyx_v_vacant, (__pyx_v_updated_n_vacant * (sizeof(int)))));
 
-    /* "cedar/_manager.pyx":137
+    /* "cedar/_manager.pyx":138
  *             vacant = <int *>malloc(updated_n_vacant * sizeof(int))
  * 
  *         elif updated_n_vacant > n_vacant:             # <<<<<<<<<<<<<<
@@ -3681,41 +3691,41 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
   }
   __pyx_L3:;
 
-  /* "cedar/_manager.pyx":141
+  /* "cedar/_manager.pyx":142
  * 
  *         # remove data and save the deleted indices
  *         for i in range(n_samples):             # <<<<<<<<<<<<<<
  *             free(X[samples[i]])
- *             y[samples[i]] = _UNDEFINED
+ *             y[samples[i]] = UNDEF
  */
   __pyx_t_8 = __pyx_v_n_samples;
   __pyx_t_10 = __pyx_t_8;
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "cedar/_manager.pyx":142
+    /* "cedar/_manager.pyx":143
  *         # remove data and save the deleted indices
  *         for i in range(n_samples):
  *             free(X[samples[i]])             # <<<<<<<<<<<<<<
- *             y[samples[i]] = _UNDEFINED
+ *             y[samples[i]] = UNDEF
  *             vacant[n_vacant + i] = samples[i]
  */
     __pyx_t_12 = __pyx_v_i;
     free((__pyx_v_X[(*((int *) ( /* dim=0 */ (__pyx_v_samples.data + __pyx_t_12 * __pyx_v_samples.strides[0]) )))]));
 
-    /* "cedar/_manager.pyx":143
+    /* "cedar/_manager.pyx":144
  *         for i in range(n_samples):
  *             free(X[samples[i]])
- *             y[samples[i]] = _UNDEFINED             # <<<<<<<<<<<<<<
+ *             y[samples[i]] = UNDEF             # <<<<<<<<<<<<<<
  *             vacant[n_vacant + i] = samples[i]
  * 
  */
     __pyx_t_13 = __pyx_v_i;
-    (__pyx_v_y[(*((int *) ( /* dim=0 */ (__pyx_v_samples.data + __pyx_t_13 * __pyx_v_samples.strides[0]) )))]) = __pyx_v_5cedar_8_manager__UNDEFINED;
+    (__pyx_v_y[(*((int *) ( /* dim=0 */ (__pyx_v_samples.data + __pyx_t_13 * __pyx_v_samples.strides[0]) )))]) = __pyx_v_5cedar_8_manager_UNDEF;
 
-    /* "cedar/_manager.pyx":144
+    /* "cedar/_manager.pyx":145
  *             free(X[samples[i]])
- *             y[samples[i]] = _UNDEFINED
+ *             y[samples[i]] = UNDEF
  *             vacant[n_vacant + i] = samples[i]             # <<<<<<<<<<<<<<
  * 
  *         self.n_samples -= n_samples
@@ -3724,7 +3734,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
     (__pyx_v_vacant[(__pyx_v_n_vacant + __pyx_v_i)]) = (*((int *) ( /* dim=0 */ (__pyx_v_samples.data + __pyx_t_14 * __pyx_v_samples.strides[0]) )));
   }
 
-  /* "cedar/_manager.pyx":146
+  /* "cedar/_manager.pyx":147
  *             vacant[n_vacant + i] = samples[i]
  * 
  *         self.n_samples -= n_samples             # <<<<<<<<<<<<<<
@@ -3733,7 +3743,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
   __pyx_v_self->n_samples = (__pyx_v_self->n_samples - __pyx_v_n_samples);
 
-  /* "cedar/_manager.pyx":147
+  /* "cedar/_manager.pyx":148
  * 
  *         self.n_samples -= n_samples
  *         self.n_vacant = updated_n_vacant             # <<<<<<<<<<<<<<
@@ -3742,7 +3752,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
   __pyx_v_self->n_vacant = __pyx_v_updated_n_vacant;
 
-  /* "cedar/_manager.pyx":148
+  /* "cedar/_manager.pyx":149
  *         self.n_samples -= n_samples
  *         self.n_vacant = updated_n_vacant
  *         self.vacant = vacant             # <<<<<<<<<<<<<<
@@ -3751,7 +3761,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_remove_data(struct __pyx_obj
  */
   __pyx_v_self->vacant = __pyx_v_vacant;
 
-  /* "cedar/_manager.pyx":120
+  /* "cedar/_manager.pyx":121
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef void remove_data(self, int[:] samples):             # <<<<<<<<<<<<<<
@@ -3780,7 +3790,7 @@ static PyObject *__pyx_pw_5cedar_8_manager_12_DataManager_5remove_data(PyObject 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("remove_data (wrapper)", 0);
   assert(__pyx_arg_samples); {
-    __pyx_v_samples = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_arg_samples, PyBUF_WRITABLE); if (unlikely(!__pyx_v_samples.memview)) __PYX_ERR(0, 120, __pyx_L3_error)
+    __pyx_v_samples = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_arg_samples, PyBUF_WRITABLE); if (unlikely(!__pyx_v_samples.memview)) __PYX_ERR(0, 121, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3801,8 +3811,8 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_4remove_data(struct __
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("remove_data", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_samples.memview)) { __Pyx_RaiseUnboundLocalError("samples"); __PYX_ERR(0, 120, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_manager_12_DataManager_remove_data(__pyx_v_self, __pyx_v_samples, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (unlikely(!__pyx_v_samples.memview)) { __Pyx_RaiseUnboundLocalError("samples"); __PYX_ERR(0, 121, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_manager_12_DataManager_remove_data(__pyx_v_self, __pyx_v_samples, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3820,7 +3830,7 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_4remove_data(struct __
   return __pyx_r;
 }
 
-/* "cedar/_manager.pyx":152
+/* "cedar/_manager.pyx":153
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef void add_data(self, int[:, :] X_in, int[:] y_in):             # <<<<<<<<<<<<<<
@@ -3872,14 +3882,14 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_8_manager_12_DataManager_7add_data)) {
-        if (unlikely(!__pyx_v_X_in.memview)) { __Pyx_RaiseUnboundLocalError("X_in"); __PYX_ERR(0, 152, __pyx_L1_error) }
-        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X_in, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+        if (unlikely(!__pyx_v_X_in.memview)) { __Pyx_RaiseUnboundLocalError("X_in"); __PYX_ERR(0, 153, __pyx_L1_error) }
+        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_X_in, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        if (unlikely(!__pyx_v_y_in.memview)) { __Pyx_RaiseUnboundLocalError("y_in"); __PYX_ERR(0, 152, __pyx_L1_error) }
-        __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_y_in, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
+        if (unlikely(!__pyx_v_y_in.memview)) { __Pyx_RaiseUnboundLocalError("y_in"); __PYX_ERR(0, 153, __pyx_L1_error) }
+        __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_y_in, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_5 = __pyx_t_1; __pyx_t_6 = NULL;
@@ -3897,7 +3907,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_5)) {
           PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_3, __pyx_t_4};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3907,7 +3917,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
           PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_3, __pyx_t_4};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3915,7 +3925,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
         } else
         #endif
         {
-          __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 152, __pyx_L1_error)
+          __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 153, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           if (__pyx_t_6) {
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -3926,7 +3936,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
           PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_4);
           __pyx_t_3 = 0;
           __pyx_t_4 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -3948,8 +3958,8 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     #endif
   }
 
-  /* "cedar/_manager.pyx":157
- *         """
+  /* "cedar/_manager.pyx":159
+ * 
  *         # parameters
  *         cdef int** X = self.X             # <<<<<<<<<<<<<<
  *         cdef int*  y = self.y
@@ -3958,7 +3968,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_9 = __pyx_v_self->X;
   __pyx_v_X = __pyx_t_9;
 
-  /* "cedar/_manager.pyx":158
+  /* "cedar/_manager.pyx":160
  *         # parameters
  *         cdef int** X = self.X
  *         cdef int*  y = self.y             # <<<<<<<<<<<<<<
@@ -3968,7 +3978,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_10 = __pyx_v_self->y;
   __pyx_v_y = __pyx_t_10;
 
-  /* "cedar/_manager.pyx":159
+  /* "cedar/_manager.pyx":161
  *         cdef int** X = self.X
  *         cdef int*  y = self.y
  *         cdef int*  vacant = self.vacant             # <<<<<<<<<<<<<<
@@ -3978,7 +3988,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_10 = __pyx_v_self->vacant;
   __pyx_v_vacant = __pyx_t_10;
 
-  /* "cedar/_manager.pyx":160
+  /* "cedar/_manager.pyx":162
  *         cdef int*  y = self.y
  *         cdef int*  vacant = self.vacant
  *         cdef int   n_vacant = self.n_vacant             # <<<<<<<<<<<<<<
@@ -3988,7 +3998,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_7 = __pyx_v_self->n_vacant;
   __pyx_v_n_vacant = __pyx_t_7;
 
-  /* "cedar/_manager.pyx":161
+  /* "cedar/_manager.pyx":163
  *         cdef int*  vacant = self.vacant
  *         cdef int   n_vacant = self.n_vacant
  *         cdef int   n_samples = self.n_samples             # <<<<<<<<<<<<<<
@@ -3998,7 +4008,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_7 = __pyx_v_self->n_samples;
   __pyx_v_n_samples = __pyx_t_7;
 
-  /* "cedar/_manager.pyx":162
+  /* "cedar/_manager.pyx":164
  *         cdef int   n_vacant = self.n_vacant
  *         cdef int   n_samples = self.n_samples
  *         cdef int   n_features = self.n_features             # <<<<<<<<<<<<<<
@@ -4008,7 +4018,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_7 = __pyx_v_self->n_features;
   __pyx_v_n_features = __pyx_t_7;
 
-  /* "cedar/_manager.pyx":164
+  /* "cedar/_manager.pyx":166
  *         cdef int   n_features = self.n_features
  * 
  *         cdef int  n_new_samples = X_in.shape[0]             # <<<<<<<<<<<<<<
@@ -4017,7 +4027,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_n_new_samples = (__pyx_v_X_in.shape[0]);
 
-  /* "cedar/_manager.pyx":165
+  /* "cedar/_manager.pyx":167
  * 
  *         cdef int  n_new_samples = X_in.shape[0]
  *         cdef int  updated_n_samples = n_samples + n_new_samples             # <<<<<<<<<<<<<<
@@ -4026,7 +4036,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_updated_n_samples = (__pyx_v_n_samples + __pyx_v_n_new_samples);
 
-  /* "cedar/_manager.pyx":166
+  /* "cedar/_manager.pyx":168
  *         cdef int  n_new_samples = X_in.shape[0]
  *         cdef int  updated_n_samples = n_samples + n_new_samples
  *         cdef int* add_indices = <int *>malloc(n_new_samples * sizeof(int))             # <<<<<<<<<<<<<<
@@ -4035,44 +4045,44 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_add_indices = ((int *)malloc((__pyx_v_n_new_samples * (sizeof(int)))));
 
-  /* "cedar/_manager.pyx":173
+  /* "cedar/_manager.pyx":175
  * 
  *         # grow database
  *         if updated_n_samples > n_samples + n_vacant:             # <<<<<<<<<<<<<<
- *             X = <int **>realloc(X, updated_n_samples * sizeof(int))
+ *             X = <int **>realloc(X, updated_n_samples * sizeof(int *))
  *             y = <int *>realloc(y, updated_n_samples * sizeof(int))
  */
   __pyx_t_11 = ((__pyx_v_updated_n_samples > (__pyx_v_n_samples + __pyx_v_n_vacant)) != 0);
   if (__pyx_t_11) {
 
-    /* "cedar/_manager.pyx":174
+    /* "cedar/_manager.pyx":176
  *         # grow database
  *         if updated_n_samples > n_samples + n_vacant:
- *             X = <int **>realloc(X, updated_n_samples * sizeof(int))             # <<<<<<<<<<<<<<
+ *             X = <int **>realloc(X, updated_n_samples * sizeof(int *))             # <<<<<<<<<<<<<<
  *             y = <int *>realloc(y, updated_n_samples * sizeof(int))
  * 
  */
-    __pyx_v_X = ((int **)realloc(__pyx_v_X, (__pyx_v_updated_n_samples * (sizeof(int)))));
+    __pyx_v_X = ((int **)realloc(__pyx_v_X, (__pyx_v_updated_n_samples * (sizeof(int *)))));
 
-    /* "cedar/_manager.pyx":175
+    /* "cedar/_manager.pyx":177
  *         if updated_n_samples > n_samples + n_vacant:
- *             X = <int **>realloc(X, updated_n_samples * sizeof(int))
+ *             X = <int **>realloc(X, updated_n_samples * sizeof(int *))
  *             y = <int *>realloc(y, updated_n_samples * sizeof(int))             # <<<<<<<<<<<<<<
  * 
  *         # copy samples to the database
  */
     __pyx_v_y = ((int *)realloc(__pyx_v_y, (__pyx_v_updated_n_samples * (sizeof(int)))));
 
-    /* "cedar/_manager.pyx":173
+    /* "cedar/_manager.pyx":175
  * 
  *         # grow database
  *         if updated_n_samples > n_samples + n_vacant:             # <<<<<<<<<<<<<<
- *             X = <int **>realloc(X, updated_n_samples * sizeof(int))
+ *             X = <int **>realloc(X, updated_n_samples * sizeof(int *))
  *             y = <int *>realloc(y, updated_n_samples * sizeof(int))
  */
   }
 
-  /* "cedar/_manager.pyx":178
+  /* "cedar/_manager.pyx":180
  * 
  *         # copy samples to the database
  *         for i in range(n_new_samples):             # <<<<<<<<<<<<<<
@@ -4084,7 +4094,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
     __pyx_v_i = __pyx_t_13;
 
-    /* "cedar/_manager.pyx":181
+    /* "cedar/_manager.pyx":183
  * 
  *             # recycle available ID
  *             if n_vacant > 0:             # <<<<<<<<<<<<<<
@@ -4094,7 +4104,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     __pyx_t_11 = ((__pyx_v_n_vacant > 0) != 0);
     if (__pyx_t_11) {
 
-      /* "cedar/_manager.pyx":182
+      /* "cedar/_manager.pyx":184
  *             # recycle available ID
  *             if n_vacant > 0:
  *                 n_vacant -= 1             # <<<<<<<<<<<<<<
@@ -4103,7 +4113,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
       __pyx_v_n_vacant = (__pyx_v_n_vacant - 1);
 
-      /* "cedar/_manager.pyx":183
+      /* "cedar/_manager.pyx":185
  *             if n_vacant > 0:
  *                 n_vacant -= 1
  *                 j = vacant[n_vacant]             # <<<<<<<<<<<<<<
@@ -4112,7 +4122,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
       __pyx_v_j = (__pyx_v_vacant[__pyx_v_n_vacant]);
 
-      /* "cedar/_manager.pyx":181
+      /* "cedar/_manager.pyx":183
  * 
  *             # recycle available ID
  *             if n_vacant > 0:             # <<<<<<<<<<<<<<
@@ -4122,7 +4132,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
       goto __pyx_L6;
     }
 
-    /* "cedar/_manager.pyx":187
+    /* "cedar/_manager.pyx":189
  *             # use a new sample ID
  *             else:
  *                 j = n_samples             # <<<<<<<<<<<<<<
@@ -4134,7 +4144,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     }
     __pyx_L6:;
 
-    /* "cedar/_manager.pyx":190
+    /* "cedar/_manager.pyx":192
  * 
  *             # copy sample
  *             X[j] = <int *>malloc(n_features * sizeof(int))             # <<<<<<<<<<<<<<
@@ -4143,7 +4153,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
     (__pyx_v_X[__pyx_v_j]) = ((int *)malloc((__pyx_v_n_features * (sizeof(int)))));
 
-    /* "cedar/_manager.pyx":191
+    /* "cedar/_manager.pyx":193
  *             # copy sample
  *             X[j] = <int *>malloc(n_features * sizeof(int))
  *             for k in range(n_features):             # <<<<<<<<<<<<<<
@@ -4155,7 +4165,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
       __pyx_v_k = __pyx_t_16;
 
-      /* "cedar/_manager.pyx":192
+      /* "cedar/_manager.pyx":194
  *             X[j] = <int *>malloc(n_features * sizeof(int))
  *             for k in range(n_features):
  *                 X[j][k] = X_in[i][k]             # <<<<<<<<<<<<<<
@@ -4167,7 +4177,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
       ((__pyx_v_X[__pyx_v_j])[__pyx_v_k]) = (*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X_in.data + __pyx_t_17 * __pyx_v_X_in.strides[0]) ) + __pyx_t_18 * __pyx_v_X_in.strides[1]) )));
     }
 
-    /* "cedar/_manager.pyx":193
+    /* "cedar/_manager.pyx":195
  *             for k in range(n_features):
  *                 X[j][k] = X_in[i][k]
  *             y[j] = y_in[i]             # <<<<<<<<<<<<<<
@@ -4177,7 +4187,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     __pyx_t_19 = __pyx_v_i;
     (__pyx_v_y[__pyx_v_j]) = (*((int *) ( /* dim=0 */ (__pyx_v_y_in.data + __pyx_t_19 * __pyx_v_y_in.strides[0]) )));
 
-    /* "cedar/_manager.pyx":195
+    /* "cedar/_manager.pyx":197
  *             y[j] = y_in[i]
  * 
  *             add_indices[i] = j             # <<<<<<<<<<<<<<
@@ -4186,7 +4196,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
     (__pyx_v_add_indices[__pyx_v_i]) = __pyx_v_j;
 
-    /* "cedar/_manager.pyx":196
+    /* "cedar/_manager.pyx":198
  * 
  *             add_indices[i] = j
  *             n_samples += 1             # <<<<<<<<<<<<<<
@@ -4196,7 +4206,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     __pyx_v_n_samples = (__pyx_v_n_samples + 1);
   }
 
-  /* "cedar/_manager.pyx":199
+  /* "cedar/_manager.pyx":201
  * 
  *         # adjust vacant array
  *         if n_vacant == 0:             # <<<<<<<<<<<<<<
@@ -4206,7 +4216,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_11 = ((__pyx_v_n_vacant == 0) != 0);
   if (__pyx_t_11) {
 
-    /* "cedar/_manager.pyx":200
+    /* "cedar/_manager.pyx":202
  *         # adjust vacant array
  *         if n_vacant == 0:
  *             free(vacant)             # <<<<<<<<<<<<<<
@@ -4215,7 +4225,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
     free(__pyx_v_vacant);
 
-    /* "cedar/_manager.pyx":201
+    /* "cedar/_manager.pyx":203
  *         if n_vacant == 0:
  *             free(vacant)
  *             vacant = NULL             # <<<<<<<<<<<<<<
@@ -4224,7 +4234,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
     __pyx_v_vacant = NULL;
 
-    /* "cedar/_manager.pyx":199
+    /* "cedar/_manager.pyx":201
  * 
  *         # adjust vacant array
  *         if n_vacant == 0:             # <<<<<<<<<<<<<<
@@ -4234,7 +4244,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
     goto __pyx_L9;
   }
 
-  /* "cedar/_manager.pyx":202
+  /* "cedar/_manager.pyx":204
  *             free(vacant)
  *             vacant = NULL
  *         elif n_vacant > 0:             # <<<<<<<<<<<<<<
@@ -4244,7 +4254,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   __pyx_t_11 = ((__pyx_v_n_vacant > 0) != 0);
   if (__pyx_t_11) {
 
-    /* "cedar/_manager.pyx":203
+    /* "cedar/_manager.pyx":205
  *             vacant = NULL
  *         elif n_vacant > 0:
  *             vacant = <int *>realloc(vacant, n_vacant * sizeof(int))             # <<<<<<<<<<<<<<
@@ -4253,7 +4263,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
     __pyx_v_vacant = ((int *)realloc(__pyx_v_vacant, (__pyx_v_n_vacant * (sizeof(int)))));
 
-    /* "cedar/_manager.pyx":202
+    /* "cedar/_manager.pyx":204
  *             free(vacant)
  *             vacant = NULL
  *         elif n_vacant > 0:             # <<<<<<<<<<<<<<
@@ -4263,7 +4273,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
   }
   __pyx_L9:;
 
-  /* "cedar/_manager.pyx":205
+  /* "cedar/_manager.pyx":207
  *             vacant = <int *>realloc(vacant, n_vacant * sizeof(int))
  * 
  *         self.X = X             # <<<<<<<<<<<<<<
@@ -4272,7 +4282,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->X = __pyx_v_X;
 
-  /* "cedar/_manager.pyx":206
+  /* "cedar/_manager.pyx":208
  * 
  *         self.X = X
  *         self.y = y             # <<<<<<<<<<<<<<
@@ -4281,7 +4291,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->y = __pyx_v_y;
 
-  /* "cedar/_manager.pyx":207
+  /* "cedar/_manager.pyx":209
  *         self.X = X
  *         self.y = y
  *         self.vacant = vacant             # <<<<<<<<<<<<<<
@@ -4290,7 +4300,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->vacant = __pyx_v_vacant;
 
-  /* "cedar/_manager.pyx":208
+  /* "cedar/_manager.pyx":210
  *         self.y = y
  *         self.vacant = vacant
  *         self.add_indices = add_indices             # <<<<<<<<<<<<<<
@@ -4299,7 +4309,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->add_indices = __pyx_v_add_indices;
 
-  /* "cedar/_manager.pyx":209
+  /* "cedar/_manager.pyx":211
  *         self.vacant = vacant
  *         self.add_indices = add_indices
  *         self.n_vacant = n_vacant             # <<<<<<<<<<<<<<
@@ -4308,7 +4318,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->n_vacant = __pyx_v_n_vacant;
 
-  /* "cedar/_manager.pyx":210
+  /* "cedar/_manager.pyx":212
  *         self.add_indices = add_indices
  *         self.n_vacant = n_vacant
  *         self.n_samples = n_samples             # <<<<<<<<<<<<<<
@@ -4317,7 +4327,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->n_samples = __pyx_v_n_samples;
 
-  /* "cedar/_manager.pyx":211
+  /* "cedar/_manager.pyx":213
  *         self.n_vacant = n_vacant
  *         self.n_samples = n_samples
  *         self.n_features = n_features             # <<<<<<<<<<<<<<
@@ -4326,7 +4336,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->n_features = __pyx_v_n_features;
 
-  /* "cedar/_manager.pyx":212
+  /* "cedar/_manager.pyx":214
  *         self.n_samples = n_samples
  *         self.n_features = n_features
  *         self.n_add_indices = n_new_samples             # <<<<<<<<<<<<<<
@@ -4335,7 +4345,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_add_data(struct __pyx_obj_5c
  */
   __pyx_v_self->n_add_indices = __pyx_v_n_new_samples;
 
-  /* "cedar/_manager.pyx":152
+  /* "cedar/_manager.pyx":153
  *     @cython.boundscheck(False)
  *     @cython.wraparound(False)
  *     cpdef void add_data(self, int[:, :] X_in, int[:] y_in):             # <<<<<<<<<<<<<<
@@ -4390,11 +4400,11 @@ static PyObject *__pyx_pw_5cedar_8_manager_12_DataManager_7add_data(PyObject *__
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_data", 1, 2, 2, 1); __PYX_ERR(0, 152, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_data", 1, 2, 2, 1); __PYX_ERR(0, 153, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_data") < 0)) __PYX_ERR(0, 152, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_data") < 0)) __PYX_ERR(0, 153, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4402,12 +4412,12 @@ static PyObject *__pyx_pw_5cedar_8_manager_12_DataManager_7add_data(PyObject *__
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_X_in = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X_in.memview)) __PYX_ERR(0, 152, __pyx_L3_error)
-    __pyx_v_y_in = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y_in.memview)) __PYX_ERR(0, 152, __pyx_L3_error)
+    __pyx_v_X_in = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X_in.memview)) __PYX_ERR(0, 153, __pyx_L3_error)
+    __pyx_v_y_in = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y_in.memview)) __PYX_ERR(0, 153, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_data", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 152, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_data", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 153, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cedar._manager._DataManager.add_data", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4426,9 +4436,9 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_6add_data(struct __pyx
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("add_data", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_X_in.memview)) { __Pyx_RaiseUnboundLocalError("X_in"); __PYX_ERR(0, 152, __pyx_L1_error) }
-  if (unlikely(!__pyx_v_y_in.memview)) { __Pyx_RaiseUnboundLocalError("y_in"); __PYX_ERR(0, 152, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_manager_12_DataManager_add_data(__pyx_v_self, __pyx_v_X_in, __pyx_v_y_in, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  if (unlikely(!__pyx_v_X_in.memview)) { __Pyx_RaiseUnboundLocalError("X_in"); __PYX_ERR(0, 153, __pyx_L1_error) }
+  if (unlikely(!__pyx_v_y_in.memview)) { __Pyx_RaiseUnboundLocalError("y_in"); __PYX_ERR(0, 153, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_manager_12_DataManager_add_data(__pyx_v_self, __pyx_v_X_in, __pyx_v_y_in, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4447,7 +4457,7 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_6add_data(struct __pyx
   return __pyx_r;
 }
 
-/* "cedar/_manager.pyx":214
+/* "cedar/_manager.pyx":216
  *         self.n_add_indices = n_new_samples
  * 
  *     cpdef void clear_add_indices(self):             # <<<<<<<<<<<<<<
@@ -4472,7 +4482,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(struct __p
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_clear_add_indices); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_clear_add_indices); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5cedar_8_manager_12_DataManager_9clear_add_indices)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4488,7 +4498,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(struct __p
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 216, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4508,7 +4518,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(struct __p
     #endif
   }
 
-  /* "cedar/_manager.pyx":218
+  /* "cedar/_manager.pyx":220
  *         Clear the indices that have been added to the database.
  *         """
  *         free(self.add_indices)             # <<<<<<<<<<<<<<
@@ -4517,7 +4527,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(struct __p
  */
   free(__pyx_v_self->add_indices);
 
-  /* "cedar/_manager.pyx":219
+  /* "cedar/_manager.pyx":221
  *         """
  *         free(self.add_indices)
  *         self.n_add_indices = 0             # <<<<<<<<<<<<<<
@@ -4526,7 +4536,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(struct __p
  */
   __pyx_v_self->n_add_indices = 0;
 
-  /* "cedar/_manager.pyx":220
+  /* "cedar/_manager.pyx":222
  *         free(self.add_indices)
  *         self.n_add_indices = 0
  *         self.add_indices = NULL             # <<<<<<<<<<<<<<
@@ -4535,7 +4545,7 @@ static void __pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(struct __p
  */
   __pyx_v_self->add_indices = NULL;
 
-  /* "cedar/_manager.pyx":214
+  /* "cedar/_manager.pyx":216
  *         self.n_add_indices = n_new_samples
  * 
  *     cpdef void clear_add_indices(self):             # <<<<<<<<<<<<<<
@@ -4575,7 +4585,7 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_8clear_add_indices(str
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("clear_add_indices", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_5cedar_8_manager_12_DataManager_clear_add_indices(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4592,7 +4602,7 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_8clear_add_indices(str
   return __pyx_r;
 }
 
-/* "cedar/_manager.pyx":222
+/* "cedar/_manager.pyx":224
  *         self.add_indices = NULL
  * 
  *     cdef int* get_add_indices(self) nogil:             # <<<<<<<<<<<<<<
@@ -4603,7 +4613,7 @@ static PyObject *__pyx_pf_5cedar_8_manager_12_DataManager_8clear_add_indices(str
 static int *__pyx_f_5cedar_8_manager_12_DataManager_get_add_indices(struct __pyx_obj_5cedar_8_manager__DataManager *__pyx_v_self) {
   int *__pyx_r;
 
-  /* "cedar/_manager.pyx":226
+  /* "cedar/_manager.pyx":228
  *         Return a copy of the add indices.
  *         """
  *         return copy_int_array(self.add_indices, self.n_add_indices)             # <<<<<<<<<<<<<<
@@ -4611,7 +4621,7 @@ static int *__pyx_f_5cedar_8_manager_12_DataManager_get_add_indices(struct __pyx
   __pyx_r = __pyx_f_5cedar_6_utils_copy_int_array(__pyx_v_self->add_indices, __pyx_v_self->n_add_indices);
   goto __pyx_L0;
 
-  /* "cedar/_manager.pyx":222
+  /* "cedar/_manager.pyx":224
  *         self.add_indices = NULL
  * 
  *     cdef int* get_add_indices(self) nogil:             # <<<<<<<<<<<<<<
@@ -21508,11 +21518,11 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5numpy_ufunc = __Pyx_ImportType(__pyx_t_1, "numpy", "ufunc", sizeof(PyUFuncObject), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5numpy_ufunc) __PYX_ERR(2, 918, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 27, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("cedar._splitter"); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5cedar_9_splitter__Splitter = __Pyx_ImportType(__pyx_t_1, "cedar._splitter", "_Splitter", sizeof(struct __pyx_obj_5cedar_9_splitter__Splitter), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(4, 27, __pyx_L1_error)
-  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(4, 27, __pyx_L1_error)
+   if (!__pyx_ptype_5cedar_9_splitter__Splitter) __PYX_ERR(4, 28, __pyx_L1_error)
+  __pyx_vtabptr_5cedar_9_splitter__Splitter = (struct __pyx_vtabstruct_5cedar_9_splitter__Splitter*)__Pyx_GetVtable(__pyx_ptype_5cedar_9_splitter__Splitter->tp_dict); if (unlikely(!__pyx_vtabptr_5cedar_9_splitter__Splitter)) __PYX_ERR(4, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("cedar._tree"); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -21778,11 +21788,11 @@ if (!__Pyx_RefNanny) {
   /* "cedar/_manager.pyx":18
  * from ._utils cimport copy_int_array
  * 
- * cdef int _UNDEFINED = -2             # <<<<<<<<<<<<<<
+ * cdef int UNDEF = -1             # <<<<<<<<<<<<<<
  * 
  * # =====================================
  */
-  __pyx_v_5cedar_8_manager__UNDEFINED = -2;
+  __pyx_v_5cedar_8_manager_UNDEF = -1;
 
   /* "cedar/_manager.pyx":1
  * """             # <<<<<<<<<<<<<<
