@@ -12,7 +12,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
-from model import cedar
+import cedar
 from utility import data_util, exp_util, print_util, exact_adv_util, cert_adv_util
 
 
@@ -67,7 +67,7 @@ def remove_sample(args, logger, out_dir, seed):
         start = time.time()
         rf = cedar.RF(epsilon=0, lmbda=10**8,
                       n_estimators=args.n_estimators, max_features=args.max_features,
-                      max_samples=args.max_samples, max_depth=args.max_depth,
+                      max_depth=args.max_depth,
                       verbose=args.verbose, random_state=seed)
         rf = rf.fit(X_train, y_train)
         end_time = time.time() - start
@@ -85,10 +85,10 @@ def remove_sample(args, logger, out_dir, seed):
                 y_train_new = np.delete(y_train_new, delete_ndx)
 
                 start = time.time()
-                rf = cedar.RF(epsilon=0, lmbda=10**8,
-                              n_estimators=args.n_estimators, max_features=args.max_features,
-                              max_samples=args.max_samples, max_depth=args.max_depth,
-                              verbose=args.verbose, random_state=seed)
+                rf = cedar.Forest(epsilon=0, lmbda=-1,
+                                  n_estimators=args.n_estimators, max_features=args.max_features,
+                                  max_depth=args.max_depth,
+                                  verbose=args.verbose, random_state=seed)
                 rf = rf.fit(X_train, y_train)
                 end_time = time.time() - start
                 delete_times.append(end_time)
@@ -99,10 +99,10 @@ def remove_sample(args, logger, out_dir, seed):
         else:
             X_train_new = np.delete(X_train, delete_indices, axis=0)
             y_train_new = np.delete(y_train, delete_indices)
-            rf = cedar.RF(epsilon=0, lmbda=10**8,
-                          n_estimators=args.n_estimators, max_features=args.max_features,
-                          max_samples=args.max_samples, max_depth=args.max_depth,
-                          verbose=args.verbose, random_state=seed)
+            rf = cedar.Forest(epsilon=0, lmbda=-1,
+                              n_estimators=args.n_estimators, max_features=args.max_features,
+                              max_depth=args.max_depth,
+                              verbose=args.verbose, random_state=seed)
             rf = rf.fit(X_train, y_train)
             delete_times = [end_time] * (n_remove + 1)
 
@@ -118,10 +118,10 @@ def remove_sample(args, logger, out_dir, seed):
         # exact unlearning model - training
         logger.info('\nExact')
         start = time.time()
-        rf = cedar.RF(epsilon=0, lmbda=10**8,
-                      n_estimators=args.n_estimators, max_features=args.max_features,
-                      max_samples=args.max_samples, max_depth=args.max_depth,
-                      verbose=args.verbose, random_state=seed)
+        rf = cedar.Forest(epsilon=0, lmbda=-1,
+                          n_estimators=args.n_estimators, max_features=args.max_features,
+                          max_depth=args.max_depth,
+                          verbose=args.verbose, random_state=seed)
         rf = rf.fit(X_train, y_train)
         end_time = time.time() - start
         logger.info('[exact] train time: {:.3f}s'.format(end_time))
@@ -152,10 +152,10 @@ def remove_sample(args, logger, out_dir, seed):
     # removal-enabled model - training
     logger.info('\nCeDAR (ep={}, lmbda={})'.format(args.epsilon, args.lmbda))
     start = time.time()
-    rf = cedar.RF(epsilon=args.epsilon, lmbda=args.lmbda,
-                  n_estimators=args.n_estimators, max_features=args.max_features,
-                  max_samples=args.max_samples, max_depth=args.max_depth,
-                  verbose=args.verbose, random_state=seed)
+    rf = cedar.Forest(epsilon=args.epsilon, lmbda=args.lmbda,
+                      n_estimators=args.n_estimators, max_features=args.max_features,
+                      max_depth=args.max_depth,
+                      verbose=args.verbose, random_state=seed)
     rf = rf.fit(X_train, y_train)
     end_time = time.time() - start
     logger.info('[cedar] train time: {:.3f}s'.format(end_time))
@@ -225,7 +225,6 @@ if __name__ == '__main__':
     parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
-    parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
     parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the tree.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     parser.add_argument('--save_results', action='store_true', default=False, help='save results.')

@@ -9,6 +9,7 @@ sys.path.insert(0, here + '/..')
 
 import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.tree import DecisionTreeClassifier
 
 import cedar
 from experiments.utility import data_util, exact_adv_util
@@ -17,16 +18,16 @@ seed = 1
 n_remove = 1000
 n_add = 7
 
-add = True
-delete = True
+add = False
+delete = False
 adv = False
 batch = True
 
-n_samples = -1
-n_features = 20
+n_samples = 100
+n_features = 10
 
 if n_samples == -1:
-    X_train, X_test, y_train, y_test = data_util.get_data('mfc18', seed, data_dir='data')
+    X_train, X_test, y_train, y_test = data_util.get_data('mfc19', seed, data_dir='data')
     np.random.seed(seed)
     delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed, verbose=1)
 
@@ -46,14 +47,28 @@ print(data, data.shape)
 print('data assembled')
 
 t1 = time.time()
-model = cedar.Tree(epsilon=0, lmbda=-1, max_depth=20, random_state=1).fit(X_train, y_train)
-print('build time: {:.7f}s'.format(time.time() - t1))
-model.print(show_nodes=True)
-
+model = DecisionTreeClassifier(max_depth=50, random_state=1).fit(X_train, y_train)
+print('\nbuild time: {:.7f}s'.format(time.time() - t1))
 preds = model.predict(X_test)
 print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 proba = model.predict_proba(X_test)[:, 1]
 print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
+
+print('\n[SK] TREE')
+print('node_count: {}'.format(model.tree_.node_count))
+print('max_depth: {}'.format(model.tree_.max_depth))
+print('feature: {}'.format(model.tree_.feature))
+print('threshold: {}'.format(model.tree_.threshold))
+# print('value: {}'.format(model.tree_.value))
+
+t1 = time.time()
+model = cedar.Tree(epsilon=0, lmbda=-1, max_depth=50, random_state=1).fit(X_train, y_train)
+print('\nbuild time: {:.7f}s'.format(time.time() - t1))
+preds = model.predict(X_test)
+print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
+proba = model.predict_proba(X_test)[:, 1]
+print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
+model.print(show_nodes=True)
 
 if delete:
     if adv:

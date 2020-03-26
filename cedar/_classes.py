@@ -3,6 +3,8 @@ CeDAR (CErtified Data Addition and Removal) Trees.
 """
 import numpy as np
 
+# TODO: make a method to convert input to np.int32, also add this to data util.
+
 from ._manager import _DataManager
 from ._splitter import _Splitter
 from ._adder import _Adder
@@ -79,6 +81,12 @@ class Forest(object):
         assert y.ndim == 1
         self.n_samples_ = X.shape[0]
         self.n_features_ = X.shape[1]
+
+        if X.dtype != np.int32:
+            X = X.astype(np.int32)
+
+        if y.dtype != np.int32:
+            y = y.astype(np.int32)
 
         # set max_features
         if not self.max_features:
@@ -233,7 +241,6 @@ class Forest(object):
         d['lmbda'] = self.lmbda
         d['n_estimators'] = self.n_estimators
         d['max_features'] = self.max_features
-        d['max_samples'] = self.max_samples
         d['max_depth'] = self.max_depth
         d['min_samples_split'] = self.min_samples_split
         d['min_samples_leaf'] = self.min_samples_leaf
@@ -343,6 +350,8 @@ class Tree(object):
         Classify samples one by one and return the set of labels.
         """
         assert X.ndim == 2
+        if X.dtype != np.int32:
+            X = X.astype(np.int32)
         y_pos = self.tree_.predict(X).reshape(-1, 1)
         y_proba = np.hstack([1 - y_pos, y_pos])
         return y_proba
@@ -355,6 +364,7 @@ class Tree(object):
         self.tree_.print_node_count()
         if show_nodes:
             self.tree_.print_depth()
+            self.tree_.print_feature()
             self.tree_.print_value()
         print()
 

@@ -235,6 +235,14 @@ cdef class _Tree:
         self._print_depth(self.root)
         printf(']\n')
 
+    cpdef void print_feature(self):
+        """
+        Print depth of each node.
+        """
+        printf('feature: [ ')
+        self._print_feature(self.root)
+        printf(']\n')
+
     cpdef void print_value(self):
         """
         Print value of each node.
@@ -256,8 +264,14 @@ cdef class _Tree:
             self._print_depth(node.left)
             self._print_depth(node.right)
 
+    cdef void _print_feature(self, Node* node) nogil:
+        if node:
+            printf('%d ', node.feature)
+            self._print_feature(node.left)
+            self._print_feature(node.right)
+
     cdef void _print_value(self, Node* node) nogil:
         if node:
-            printf('%.20f ', node.value)
+            printf('%.3f ', node.value)
             self._print_value(node.left)
             self._print_value(node.right)

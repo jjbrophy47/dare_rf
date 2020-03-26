@@ -18,10 +18,10 @@ seed = 1
 n_remove = 1000
 n_add = 1000
 
-n_estimators = 1000
+n_estimators = 100
 
-add = True
-delete = True
+add = False
+delete = False
 adv = True
 batch = True
 
@@ -29,7 +29,7 @@ n_samples = -1
 n_features = 200
 
 if n_samples == -1:
-    X_train, X_test, y_train, y_test = data_util.get_data('mfc18', seed, data_dir='data')
+    X_train, X_test, y_train, y_test = data_util.get_data('mfc19', seed, data_dir='data')
     np.random.seed(seed)
 
 else:
@@ -48,16 +48,18 @@ print(data.shape)
 print('data assembled')
 
 t1 = time.time()
-m1 = RandomForestClassifier(n_estimators=n_estimators, max_depth=5, random_state=1).fit(X_train, y_train)
+m1 = RandomForestClassifier(n_estimators=n_estimators, max_depth=20, max_features=0.3,
+                            bootstrap=False, random_state=1).fit(X_train, y_train)
 print('\n[SK] build time: {:.7f}s'.format(time.time() - t1))
 preds = m1.predict(X_test)
 print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
 proba = m1.predict_proba(X_test)[:, 1]
 print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
 
+mf = int(np.sqrt(X_train.shape[1] * 4))
 t1 = time.time()
 model = cedar.Forest(epsilon=0.5, lmbda=-1, n_estimators=n_estimators,
-                     max_depth=5, max_features='sqrt', random_state=1).fit(X_train, y_train)
+                     max_depth=20, max_features=0.3, random_state=1).fit(X_train, y_train)
 print('\n[CeDAR] build time: {:.7f}s'.format(time.time() - t1))
 
 preds = model.predict(X_test)

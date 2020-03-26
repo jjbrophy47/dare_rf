@@ -18,6 +18,10 @@ from utility import data_util, exp_util, print_util
 
 def performance(args, logger, seed):
 
+    n_estimators = [10, 50, 100, 250, 500, 1000]
+    max_depths = [2, 5, 10, 20, 50]
+    max_features = ['sqrt', 0.1, 0.2, 0.3]
+
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
 
@@ -31,13 +35,12 @@ def performance(args, logger, seed):
     sk_rf = RandomForestClassifier(n_estimators=args.n_estimators, max_depth=args.max_depth,
                                    max_features=args.max_features, max_samples=args.max_samples,
                                    verbose=args.verbose, random_state=seed, bootstrap=args.bootstrap)
-    if args.tune:  # default is 5-fold
-        sk_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None], 'bootstrap': [True, False]}
-        # sk_param_grid = {'n_estimators': [1000], 'max_depth': [None]}
+    if args.tune:
+        sk_param_grid = {'n_estimators': n_estimators, 'max_depth': max_depths, 'max_features': max_features,
+                         'bootstrap': [True, False]}
         gs = GridSearchCV(sk_rf, sk_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
         gs = gs.fit(X_train, y_train)
         sk_rf = gs.best_estimator_
-        print([estimator.get_depth() for estimator in sk_rf.estimators_])
         logger.info('best_params: {}'.format(gs.best_params_))
     else:
         sk_rf = sk_rf.fit(X_train, y_train)
@@ -49,8 +52,7 @@ def performance(args, logger, seed):
                         max_features=args.max_features, max_depth=args.max_depth,
                         verbose=args.verbose, random_state=seed)
     if args.tune:
-        d_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None]}
-        # d_param_grid = {'n_estimators': [20], 'max_depth': [None]}
+        d_param_grid = {'n_estimators': n_estimators, 'max_depth': max_depths, 'max_features': max_features}
         gs = GridSearchCV(d_rf, d_param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
         gs = gs.fit(X_train, y_train)
         d_rf = gs.best_estimator_
@@ -59,15 +61,13 @@ def performance(args, logger, seed):
         d_rf = d_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
-    # d_rf.print(show_nodes=True)
-
     logger.info('building cedar_rf...')
     start = time.time()
     cedar_rf = cedar.Forest(lmbda=args.lmbda, n_estimators=args.n_estimators,
                             max_features=args.max_features, max_depth=args.max_depth,
                             verbose=args.verbose, random_state=seed)
     if args.tune:
-        cedar_param_grid = {'n_estimators': [10, 100, 1000], 'max_depth': [2, 4, None]}
+        cedar_param_grid = {'n_estimators': n_estimators, 'max_depth': max_depths, 'max_features': max_features}
         gs = GridSearchCV(cedar_rf, cedar_param_grid, scoring=args.scoring, cv=args.cv,
                           verbose=args.verbose)
         gs = gs.fit(X_train, y_train)
@@ -76,8 +76,6 @@ def performance(args, logger, seed):
     else:
         cedar_rf = cedar_rf.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
-
-    # cedar_rf.print(show_nodes=True)
 
     # display performance
     exp_util.performance(sk_rf, X_test, y_test, name='sk_rf', logger=logger)
@@ -103,9 +101,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--out_dir', type=str, default='output/forest/performance', help='output directory.')
-    parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
+    parser.add_argument('--dataset', default='mfc19', help='dataset to use for the experiment.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--lmbda', type=float, default=0.1, help='amount of noise to add to the model.')
+    parser.add_argument('--lmbda', type=float, default=100, help='amount of noise to add to the model.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')

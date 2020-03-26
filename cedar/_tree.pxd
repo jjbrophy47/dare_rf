@@ -47,11 +47,13 @@ cdef class _Tree:
     cpdef np.ndarray predict(self, int[:, :] X)
     cpdef void print_node_count(self)
     cpdef void print_depth(self)
+    cpdef void print_feature(self)
     cpdef void print_value(self)
 
     # C API
     cdef int _get_node_count(self, Node* node) nogil
     cdef void _print_depth(self, Node* node) nogil
+    cdef void _print_feature(self, Node* node) nogil
     cdef void _print_value(self, Node* node) nogil
 
 cdef class _TreeBuilder:
