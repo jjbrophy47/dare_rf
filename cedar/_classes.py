@@ -3,7 +3,7 @@ CeDAR (CErtified Data Addition and Removal) Trees.
 """
 import numpy as np
 
-# TODO: make a method to convert input to np.int32, also add this to data util.
+# TODO: divide lambda or epsilon by max_depth?
 
 from ._manager import _DataManager
 from ._splitter import _Splitter
@@ -11,6 +11,25 @@ from ._adder import _Adder
 from ._remover import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
+
+
+def check_data(X, y=None):
+    """
+    Makes sure data is an integer type.
+    """
+    result = None
+
+    if X.dtype != np.int32:
+        X = X.astype(np.int32)
+
+    if y is not None:
+        if y.dtype != np.int32:
+            y = y.astype(np.int32)
+        result = X, y
+    else:
+        result = X
+
+    return result
 
 
 class Forest(object):
@@ -68,7 +87,6 @@ class Forest(object):
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
         s += '\nmin_samples_leaf={}'.format(self.min_samples_leaf)
-        # s += '\nmin_impurity_decrease={}'.format(self.min_impurity_decrease)
         s += '\nrandom_state={}'.format(self.random_state)
         s += '\nverbose={}'.format(self.verbose)
         return s
@@ -81,12 +99,7 @@ class Forest(object):
         assert y.ndim == 1
         self.n_samples_ = X.shape[0]
         self.n_features_ = X.shape[1]
-
-        if X.dtype != np.int32:
-            X = X.astype(np.int32)
-
-        if y.dtype != np.int32:
-            y = y.astype(np.int32)
+        X, y = check_data(X, y)
 
         # set max_features
         if not self.max_features:
@@ -139,6 +152,7 @@ class Forest(object):
         Classify samples one by one and return the set of labels.
         """
         assert X.ndim == 2
+        X = check_data(X)
 
         # sum all predictions instead of storing them
         forest_preds = np.zeros(X.shape[0])
@@ -155,12 +169,7 @@ class Forest(object):
         """
         assert X.ndim == 2 and y.ndim == 1
         assert X.shape[1] == self.n_features_
-
-        if X.dtype != np.int32:
-            X = X.astype(np.int32)
-
-        if y.dtype != np.int32:
-            y = y.astype(np.int32)
+        X, y = check_data(X, y)
 
         # add data to the database
         self.manager_.add_data(X, y)
@@ -350,8 +359,7 @@ class Tree(object):
         Classify samples one by one and return the set of labels.
         """
         assert X.ndim == 2
-        if X.dtype != np.int32:
-            X = X.astype(np.int32)
+        X = check_data(X)
         y_pos = self.tree_.predict(X).reshape(-1, 1)
         y_proba = np.hstack([1 - y_pos, y_pos])
         return y_proba
@@ -380,10 +388,7 @@ class Tree(object):
             assert self.single_tree_
             assert X.ndim == 2 and y.ndim == 1
             assert X.shape[1] == self.n_features_
-            if X.dtype != np.int32:
-                X = X.astype(np.int32)
-            if y.dtype != np.int32:
-                y = y.astype(np.int32)
+            X, y = check_data(X, y)
             self.manager_.add_data(X, y)
 
         # update model

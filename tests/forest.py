@@ -48,7 +48,7 @@ print(data.shape)
 print('data assembled')
 
 t1 = time.time()
-m1 = RandomForestClassifier(n_estimators=n_estimators, max_depth=20, max_features=0.3,
+m1 = RandomForestClassifier(n_estimators=n_estimators, max_depth=20, max_features=0.2,
                             bootstrap=False, random_state=1).fit(X_train, y_train)
 print('\n[SK] build time: {:.7f}s'.format(time.time() - t1))
 preds = m1.predict(X_test)
@@ -59,7 +59,7 @@ print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
 mf = int(np.sqrt(X_train.shape[1] * 4))
 t1 = time.time()
 model = cedar.Forest(epsilon=0.5, lmbda=-1, n_estimators=n_estimators,
-                     max_depth=20, max_features=0.3, random_state=1).fit(X_train, y_train)
+                     max_depth=20, max_features=0.2, random_state=1).fit(X_train, y_train)
 print('\n[CeDAR] build time: {:.7f}s'.format(time.time() - t1))
 
 preds = model.predict(X_test)
