@@ -79,29 +79,22 @@ cdef class _TreeBuilder:
         node.depth = depth
         node.is_left = is_left
 
-        # printf('\n(%d, %d, %.7f, %d, %d)\n', depth, is_left, parent_p, n_samples, n_features)
-
         cdef bint is_bottom_leaf = (depth >= self.max_depth or n_features < 1)
         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
                                     n_samples < 2 * self.min_samples_leaf)
 
         if is_bottom_leaf:
-            # printf('bottom leaf!\n')
             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
 
         else:
-            # printf('compute splits\n')
             self.splitter.compute_splits(&node, X, y, samples, n_samples, features,
                                          n_features)
 
             if not is_middle_leaf:
-                # printf('split node\n')
                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
                                                        parent_p, &split)
-                # printf('result: %d\n', is_middle_leaf)
 
             if is_middle_leaf:
-                # printf('middle leaf\n')
                 self._set_leaf_node(&node, y, samples, n_samples, 0)
 
             else:

@@ -19,7 +19,6 @@ np.import_array()
 
 from ._utils cimport compute_gini
 from ._utils cimport generate_distribution
-from ._utils cimport convert_int_ndarray
 from ._utils cimport copy_int_array
 from ._utils cimport dealloc
 
