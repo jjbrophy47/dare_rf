@@ -2,6 +2,9 @@ data
 output
 myenv
 notes
+
+experiments/scripts/other
+
 cedar/__pycache__
 cedar/build
 cedar/*.c

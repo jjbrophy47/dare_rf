@@ -103,43 +103,35 @@ cdef class _Adder:
 
         cdef bint is_bottom_leaf = node.is_leaf and not node.features
 
-        # printf("\npopping_a (%d, %d, %.7f, %d, %d, %d)\n", node.depth, node.is_left,
-        #        parent_p, node.count, n_samples, node.features_count)
-
         cdef int pos_count = 0
+
         for i in range(n_samples):
             if y[samples[i]] == 1:
                 pos_count += 1
 
         if is_bottom_leaf:
-            # printf('bottom leaf\n')
             self._update_leaf(&node, y, samples, n_samples, pos_count)
             self._add_add_type(result, node.depth)
 
         else:
-            # printf('update splits\n')
             self._update_splits(&node, X, y, samples, n_samples, pos_count)
 
             result = self._check_node(node, X, y, samples, n_samples,
                                       pos_count, parent_p, &split)
-            # printf('result: %d\n', result)
 
             # retrain
             if result > 0:
-                # printf('retrain\n')
                 self._add_add_type(result, node.depth)
                 self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
 
             else:
 
                 if node.is_leaf:
-                    # printf('leaf\n')
                     self._update_leaf(&node, y, samples, n_samples, pos_count)
                     self._add_add_type(result, node.depth)
 
                 # decision node
                 else:
-                    # printf('update decision node\n')
                     self._update_decision_node(&node, &split)
 
                     # traverse left
@@ -269,7 +261,6 @@ cdef class _Adder:
 
         cdef double* gini_indices = NULL
         cdef double* distribution = NULL
-        cdef int* valid_features = NULL
         cdef int  valid_features_count = 0
 
         cdef int chosen_ndx = -1
@@ -290,13 +281,11 @@ cdef class _Adder:
 
             gini_indices = <double *>malloc(node.features_count * sizeof(double))
             distribution = <double *>malloc(node.features_count * sizeof(double))
-            valid_features = <int *>malloc(node.features_count * sizeof(int))
 
             for j in range(node.features_count):
 
                 # validate split
                 if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
-                    valid_features[valid_features_count] = node.features[j]
                     gini_indices[valid_features_count] = compute_gini(updated_count,
                                                                       node.left_counts[j],
                                                                       node.right_counts[j],
@@ -314,9 +303,8 @@ cdef class _Adder:
                     # remove invalid features
                     gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
                     distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
-                    valid_features = <int *>realloc(valid_features, valid_features_count * sizeof(int))
 
-                    # generate and sample from the distribution
+                    # generate new probability and compare to previous probability
                     generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
                     p = parent_p * distribution[chosen_ndx]
                     ratio = p / node.p
@@ -357,7 +345,6 @@ cdef class _Adder:
 
             free(gini_indices)
             free(distribution)
-            free(valid_features)
 
         # all samples in one class => leaf (should already be a leaf)
         else:

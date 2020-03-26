@@ -100,7 +100,7 @@ cdef class _Remover:
     cdef void _remove(self, Node** node_ptr, int** X, int* y,
                       int* samples, int n_samples, double parent_p) nogil:
         """
-        Recusrively remove the samples from this subtree.
+        Recursively remove the samples from this subtree.
         """
 
         cdef Node *node = node_ptr[0]
@@ -111,25 +111,20 @@ cdef class _Remover:
         cdef bint is_bottom_leaf = node.is_leaf and not node.features
         cdef int i = UNDEF
 
-        # printf("\npopping_r (%d, %d, %.7f, %d, %d, %d)\n", node.depth, node.is_left,
-        #        parent_p, node.count, n_samples, node.features_count)
-
         cdef int pos_count = 0
+
         for i in range(n_samples):
             if y[samples[i]] == 1:
                 pos_count += 1
 
         if is_bottom_leaf:
-            # printf('bottom leaf\n')
             self._update_leaf(&node, y, samples, n_samples, pos_count)
             self._add_removal_type(result, node.depth)
 
         else:
-            # printf('update splits\n')
             self._update_splits(&node, X, y, samples, n_samples, pos_count)
 
             if node.is_leaf:
-                # printf('leaf\n')
                 self._update_leaf(&node, y, samples, n_samples, pos_count)
                 self._add_removal_type(result, node.depth)
 
@@ -138,23 +133,19 @@ cdef class _Remover:
 
                 result = self._check_node(node, X, y, samples, n_samples,
                                           pos_count, parent_p, &split)
-                # printf('result: %d\n', result)
 
                 # convert to leaf
                 if result == 1:
-                    # printf('convert to leaf\n')
                     self._convert_to_leaf(&node, samples, n_samples, &split)
                     self._add_removal_type(result, node.depth)
 
                 # retrain
                 elif result == 2:
-                    # printf('retrain\n')
                     self._add_removal_type(result, node.depth)
                     self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
 
                 # update and recurse
                 else:
-                    # printf('update decision\n')
                     self._update_decision_node(&node, &split)
 
                     # traverse left
@@ -310,7 +301,6 @@ cdef class _Remover:
 
         cdef double* gini_indices = NULL
         cdef double* distribution = NULL
-        cdef int* valid_features = NULL
         cdef int  valid_features_count = 0
 
         cdef bint chosen_feature_validated = 0
@@ -332,13 +322,11 @@ cdef class _Remover:
 
             gini_indices = <double *>malloc(node.features_count * sizeof(double))
             distribution = <double *>malloc(node.features_count * sizeof(double))
-            valid_features = <int *>malloc(node.features_count * sizeof(int))
 
             for j in range(node.features_count):
 
                 # validate split
                 if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
-                    valid_features[valid_features_count] = node.features[j]
                     gini_indices[valid_features_count] = compute_gini(updated_count,
                                                                       node.left_counts[j],
                                                                       node.right_counts[j],
@@ -355,9 +343,8 @@ cdef class _Remover:
                 # remove invalid features
                 gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
                 distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
-                valid_features = <int *>realloc(valid_features, valid_features_count * sizeof(int))
 
-                # generate and sample from the distribution
+                # generate new probability and compare to previous probability
                 generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
                 p = parent_p * distribution[chosen_ndx]
                 ratio = p / node.p
@@ -398,7 +385,6 @@ cdef class _Remover:
 
             free(gini_indices)
             free(distribution)
-            free(valid_features)
 
         # all samples in one class => leaf
         else:

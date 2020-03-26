@@ -1,5 +1,3 @@
-# from cpython.object cimport PyObject
-# from cpython.ref cimport Py_INCREF
 
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
@@ -87,7 +85,6 @@ cdef int generate_distribution(double lmbda, double* distribution,
 
         for i in range(n_gini_indices):
             distribution[i] /= normalizing_constant
-            # printf('distribution[%d]: %.7f\n', i, distribution[i])
 
     return 0
 
@@ -170,36 +167,3 @@ cdef void dealloc(Node *node) nogil:
     else:
         free(node.left)
         free(node.right)
-
-# cdef np.ndarray get_int_array(int* ptr, int n_elem):
-#     """
-#     Returns a numpy array that can be transferred to Python.
-#     """
-#     cdef np.npy_intp shape[1]
-#     shape[0] = n_elem
-#     cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
-#     nanny = MemoryNanny.create(ptr)
-#     Py_INCREF(nanny) # a reference will get stolen, so prepare nanny
-#     PyArray_SetBaseObject(arr, <PyObject*>nanny) 
-#     return arr
-
-
-# cdef class MemoryNanny:
-#     """
-#     Memory manager, to transfer arrays back to Python.
-#     """
-#     cdef void* ptr # set to NULL by "constructor"
-
-#     def __cinit__(self):
-#         self.ptr = NULL
-
-#     def __dealloc__(self):
-#         printf('freeing ptr=%ld\n', <unsigned long long>(self.ptr))
-#         free(self.ptr)
-
-#     @staticmethod
-#     cdef MemoryNanny create(void* ptr):
-#         cdef MemoryNanny result = MemoryNanny()
-#         result.ptr = ptr
-#         print('nanny for ptr=%ld\n', <unsigned long long>(result.ptr))
-#         return result
