@@ -199,7 +199,7 @@ class Forest(object):
         types_list, depths_list = [], []
 
         for tree in self.trees_:
-            types, depths = tree.get_addition_statistics()
+            types, depths = tree.get_add_statistics()
             types_list.append(types)
             depths_list.append(depths)
 
@@ -208,7 +208,6 @@ class Forest(object):
 
         return types, depths
 
-    # TODO: clear metrics after receiving them?
     def get_removal_statistics(self):
         """
         Retrieve deletion statistics.
@@ -352,10 +351,11 @@ class Tree(object):
         """
         Shows a representation of the tree.
         """
-        print('\nTree:')
+        print('\nTREE:')
         self.tree_.print_node_count()
         if show_nodes:
             self.tree_.print_depth()
+            self.tree_.print_value()
         print()
 
     def add(self, X=None, y=None):
@@ -408,20 +408,23 @@ class Tree(object):
         if self.single_tree_:
             self.manager_.remove_data(remove_indices)
 
-    # TODO: clear statistics after retrieving them?
     def get_add_statistics(self):
         """
         Retrieve addition statistics.
         """
-        result = self.adder_.add_types, self.adder_.add_depths
-        return result
+        add_types = np.array(self.adder_.add_types, dtype=np.int32)
+        add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
+        self.adder_.clear_add_metrics()
+        return add_types, add_depths
 
     def get_removal_statistics(self):
         """
         Retrieve deletion statistics.
         """
-        result = self.remover_.remove_types, self.remover_.remove_depths
-        return result
+        remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
+        remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
+        self.remover_.clear_remove_metrics()
+        return remove_types, remove_depths
 
     def get_params(self, deep=False):
         """
@@ -447,100 +450,3 @@ class Tree(object):
         for key, value in params.items():
             setattr(self, key, value)
         return self
-
-    # TODO: revise
-    # def _add(self, X, y, add_indices, tree=None, current_depth=0, parent_p=None):
-
-    #     # get root node of the tree
-    #     if tree is None:
-    #         tree = self.root_
-
-    #     # type 1: leaf node, update its metadata
-    #     if tree.value is not None:
-    #         self._increment_leaf_node(tree, y, add_indices)
-
-    #         if self.verbose > 1:
-    #             print('tree check complete, ended at depth {}'.format(current_depth))
-
-    #         self.addition_types_.append('1')
-    #         return tree
-
-    #     # decision node, update the high-level metadata
-    #     tree.meta['count'] += len(y)
-    #     tree.meta['pos_count'] += np.sum(y)
-
-    #     # udpate gini_index for each attribute in this node
-    #     gini_indexes = []
-    #     p_ndx = None
-
-    #     for i, attr_ndx in enumerate(tree.meta['attr']):
-
-    #         left_indices = np.where(X[:, attr_ndx] == 1)[0]
-    #         right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
-    #         y_left, y_right = y[left_indices], y[right_indices]
-
-    #         if len(y_left) > 0:
-    #             self._increment_decision_node(tree.meta, attr_ndx, 'left', y_left)
-
-    #         if len(y_right) > 0:
-    #             self._increment_decision_node(tree.meta, attr_ndx, 'right', y_right)
-
-    #         # recompute the gini index for this attribute
-    #         attr_dict = tree.meta['attr'][attr_ndx]
-    #         gini_index = self._compute_gini_index(attr_dict)
-    #         gini_indexes.append(gini_index)
-    #         attr_dict['gini_index'] = gini_index
-
-    #         # get mapping from chosen attribute to distribution index
-    #         if tree.feature_i == attr_ndx:
-    #             p_ndx = i
-
-    #     # get old and updated probability distributions
-    #     old_p = tree.meta['p']
-    #     p_dist = self._generate_distribution(gini_indexes, cur_ndx=np.argmax(old_p))
-    #     p = p_dist[p_ndx] if parent_p is None else p_dist[p_ndx] * parent_p
-    #     ratio = self._div1(p, old_p)
-
-    #     # retrain if probability ratio of the chosen attribute is outside the range [e^-ep, e^ep]
-    #     if ratio > np.exp(self.epsilon) or ratio < np.exp(-self.epsilon):
-
-    #         if self.verbose > 1:
-    #             print('rebuilding at depth {}'.format(current_depth))
-
-    #         indices = self._get_indices(tree, current_depth)
-    #         indices = self._add_elements(indices, add_indices)
-    #         Xa, ya, keys = self.get_data(indices, self.feature_indices)
-    #         self.deletion_types_.append('{}_{}'.format('2', current_depth))
-
-    #         return self._build(Xa, ya, keys, current_depth)
-
-    #     # continue checking the tree
-    #     else:
-
-    #         left_indices = np.where(X[:, tree.feature_i] == 1)[0]
-    #         right_indices = np.setdiff1d(np.arange(X.shape[0]), left_indices)
-    #         y_left, y_right = y[left_indices], y[right_indices]
-
-    #         if len(left_indices) > 0:
-
-    #             if self.verbose > 1:
-    #                 print('check complete at depth {}, traversing left'.format(current_depth))
-
-    #             X_left = X[left_indices]
-    #             left_add_indices = add_indices[left_indices]
-    #             left_branch = self._add(X_left, y_left, left_add_indices, tree=tree.left_branch,
-    #                                     current_depth=current_depth + 1, parent_p=p)
-    #             tree.left_branch = left_branch
-
-    #         if len(right_indices) > 0:
-
-    #             if self.verbose > 1:
-    #                 print('check complete at depth {}, traversing right'.format(current_depth))
-
-    #             X_right = X[right_indices]
-    #             right_add_indices = add_indices[right_indices]
-    #             right_branch = self._add(X_right, y_right, right_add_indices, tree=tree.right_branch,
-    #                                      current_depth=current_depth + 1, parent_p=p)
-    #             tree.right_branch = right_branch
-
-    #         return tree

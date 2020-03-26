@@ -29,7 +29,7 @@ cdef class _Remover:
 
     # Python API
     cpdef int remove(self, _Tree tree, np.ndarray remove_indices)
-    cpdef void clear_removal_metrics(self)
+    cpdef void clear_remove_metrics(self)
 
     # C API
     cdef void _remove(self, Node** node_ptr, int** X, int* y,
@@ -44,7 +44,7 @@ cdef class _Remover:
                            int n_samples, int pos_count) nogil
     cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
                                SplitRecord *split) nogil
-    cdef void _retrain(self, Node** node_ptr, int** X, int* y, int* samples,
+    cdef void _retrain(self, Node*** node_ptr, int** X, int* y, int* samples,
                        int n_samples, double parent_p, SplitRecord *split) nogil
     cdef void _get_leaf_samples(self, Node* node, int* remove_samples,
                                 int n_remove_samples, int** leaf_samples_ptr,

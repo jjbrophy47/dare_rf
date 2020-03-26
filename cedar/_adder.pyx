@@ -113,12 +113,12 @@ cdef class _Adder:
 
         if is_bottom_leaf:
             # printf('bottom leaf\n')
-            self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
+            self._update_leaf(&node, y, samples, n_samples, pos_count)
             self._add_add_type(result, node.depth)
 
         else:
             # printf('update splits\n')
-            self._update_splits(node_ptr, X, y, samples, n_samples, pos_count)
+            self._update_splits(&node, X, y, samples, n_samples, pos_count)
 
             result = self._check_node(node, X, y, samples, n_samples,
                                       pos_count, parent_p, &split)
@@ -127,20 +127,20 @@ cdef class _Adder:
             # retrain
             if result > 0:
                 # printf('retrain\n')
-                self._retrain(node_ptr, X, y, samples, n_samples, parent_p, &split)
                 self._add_add_type(result, node.depth)
+                self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
 
             else:
 
                 if node.is_leaf:
                     # printf('leaf\n')
-                    self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
+                    self._update_leaf(&node, y, samples, n_samples, pos_count)
                     self._add_add_type(result, node.depth)
 
                 # decision node
                 else:
                     # printf('update decision node\n')
-                    self._update_decision_node(node_ptr, &split)
+                    self._update_decision_node(&node, &split)
 
                     # traverse left
                     if split.left_count > 0:
@@ -179,17 +179,22 @@ cdef class _Adder:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _retrain(self, Node** node_ptr, int** X, int* y, int* samples,
+    cdef void _retrain(self, Node*** node_pp, int** X, int* y, int* samples,
                        int n_samples, double parent_p, SplitRecord *split) nogil:
         """
         Rebuild subtree at this node.
         """
-        cdef Node* node = node_ptr[0]
+        cdef Node*  node = node_pp[0][0]
+        cdef Node** node_ptr = node_pp[0]
 
         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
         cdef int  leaf_samples_count = 0
 
         cdef int* rebuild_features = NULL
+
+        cdef int depth = node.depth
+        cdef int is_left = node.is_left
+        cdef int features_count = node.features_count
 
         self._get_leaf_samples(node, &leaf_samples, &leaf_samples_count)
         self._add_leaf_samples(samples, n_samples, &leaf_samples, &leaf_samples_count)
@@ -199,8 +204,8 @@ cdef class _Adder:
         free(node)
 
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
-                                               rebuild_features, node.features_count,
-                                               node.depth, node.is_left, parent_p)
+                                               rebuild_features, features_count,
+                                               depth, is_left, parent_p)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -338,23 +343,24 @@ cdef class _Adder:
                         split.right_count = k
                         split.p = p
 
+                    # bounds exceeded => retrain
                     else:
-                        # printf('bounds exceeded\n')
                         result = 2
+
+                # leaf now has valid features => retrain
                 else:
-                    # printf('leaf to decision\n')
                     result = 2
 
-            else:  # should already be a leaf
-                # printf('valid_features_count is zero!\n')
+            # no valid features => leaf (should already be a leaf)
+            else:
                 result = 0
 
             free(gini_indices)
             free(distribution)
             free(valid_features)
 
-        else:  # should already be a leaf
-            # printf('all samples in one class\n')
+        # all samples in one class => leaf (should already be a leaf)
+        else:
             result = 0
 
         split.count = updated_count

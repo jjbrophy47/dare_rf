@@ -146,7 +146,7 @@ cdef class _TreeBuilder:
             node.pos_count = pos_count
 
         node.is_leaf = 1
-        node.value = pos_count / <double> n_samples
+        node.value = node.pos_count / <double> node.count
         node.leaf_samples = samples
 
         node.p = UNDEF
@@ -225,30 +225,46 @@ cdef class _Tree:
 
         return out
 
+    # tree information
+    cpdef void print_node_count(self):
+        """
+        Get number of nodes total.
+        """
+        cdef int node_count = self._get_node_count(self.root)
+        printf('node_count: %d\n', node_count)
+
+    # node information
     cpdef void print_depth(self):
+        """
+        Print depth of each node.
+        """
         printf('depth: [ ')
         self._print_depth(self.root)
         printf(']\n')
 
-    cpdef void print_node_count(self):
-        cdef int node_count = self._get_node_count(self.root)
-        printf('node_count: %d\n', node_count)
+    cpdef void print_value(self):
+        """
+        Print value of each node.
+        """
+        printf('value: [ ')
+        self._print_value(self.root)
+        printf(']\n')
 
     # private
+    cdef int _get_node_count(self, Node* node) nogil:
+        if not node:
+            return 0
+        else:
+            return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)
+
     cdef void _print_depth(self, Node* node) nogil:
-        """
-        Print depth of each node.
-        """
         if node:
             printf('%d ', node.depth)
             self._print_depth(node.left)
             self._print_depth(node.right)
 
-    cdef int _get_node_count(self, Node* node) nogil:
-        """
-        Get number of nodes total.
-        """
-        if not node:
-            return 0
-        else:
-            return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)
+    cdef void _print_value(self, Node* node) nogil:
+        if node:
+            printf('%.20f ', node.value)
+            self._print_value(node.left)
+            self._print_value(node.right)

@@ -121,7 +121,7 @@ cdef class _Remover:
 
         if is_bottom_leaf:
             # printf('bottom leaf\n')
-            self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
+            self._update_leaf(&node, y, samples, n_samples, pos_count)
             self._add_removal_type(result, node.depth)
 
         else:
@@ -130,7 +130,7 @@ cdef class _Remover:
 
             if node.is_leaf:
                 # printf('leaf\n')
-                self._update_leaf(node_ptr, y, samples, n_samples, pos_count)
+                self._update_leaf(&node, y, samples, n_samples, pos_count)
                 self._add_removal_type(result, node.depth)
 
             # decision node
@@ -143,14 +143,14 @@ cdef class _Remover:
                 # convert to leaf
                 if result == 1:
                     # printf('convert to leaf\n')
-                    self._convert_to_leaf(node_ptr, samples, n_samples, &split)
+                    self._convert_to_leaf(&node, samples, n_samples, &split)
                     self._add_removal_type(result, node.depth)
 
                 # retrain
                 elif result == 2:
                     # printf('retrain\n')
-                    self._retrain(node_ptr, X, y, samples, n_samples, parent_p, &split)
                     self._add_removal_type(result, node.depth)
+                    self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
 
                 # update and recurse
                 else:
@@ -223,17 +223,22 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _retrain(self, Node** node_ptr, int** X, int* y, int* samples,
+    cdef void _retrain(self, Node*** node_pp, int** X, int* y, int* samples,
                        int n_samples, double parent_p, SplitRecord *split) nogil:
         """
         Rebuild subtree at this node.
         """
-        cdef Node* node = node_ptr[0]
+        cdef Node*  node = node_pp[0][0]
+        cdef Node** node_ptr = node_pp[0]
 
         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
         cdef int  leaf_samples_count = 0
 
         cdef int* rebuild_features = NULL
+
+        cdef int depth = node.depth
+        cdef int is_left = node.is_left
+        cdef int features_count = node.features_count
 
         self._get_leaf_samples(node, samples, n_samples,
                                &leaf_samples, &leaf_samples_count)
@@ -243,8 +248,8 @@ cdef class _Remover:
         free(node)
 
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
-                                               rebuild_features, node.features_count,
-                                               node.depth, node.is_left, parent_p)
+                                               rebuild_features, features_count,
+                                               depth, is_left, parent_p)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -379,24 +384,24 @@ cdef class _Remover:
                     split.right_count = k
                     split.p = p
 
+                # bounds exceeded => retrain
                 else:
-                    # printf('bounds exceeded\n')
                     result = 2
 
+            # no valid features => leaf
             elif valid_features_count == 0:
-                # printf('valid_features_count is zero!\n')
                 result = 1
 
+            # chosen feature no longer valid => retrain
             else:
-                # printf('chosen_feature not validated\n')
                 result = 2
 
             free(gini_indices)
             free(distribution)
             free(valid_features)
 
+        # all samples in one class => leaf
         else:
-            # printf('all samples in one class\n')
             result = 1
 
         split.count = updated_count
@@ -463,7 +468,7 @@ cdef class _Remover:
         self.remove_depths[self.remove_count] = remove_depth
         self.remove_count += 1
 
-    cpdef void clear_removal_metrics(self):
+    cpdef void clear_remove_metrics(self):
         """
         Resets deletion statistics.
         """
