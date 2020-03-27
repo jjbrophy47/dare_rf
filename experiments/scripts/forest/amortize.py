@@ -66,7 +66,7 @@ def unlearning_method(args, seed, out_dir, logger, X_train, y_train, X_test, y_t
             accs.append(acc)
 
             if args.verbose > 0:
-                logger.info('cumulative run time: {:.3f}s'.format(time.time() - start1))
+                logger.info('{}: cumulative run time: {:.3f}s'.format(i, time.time() - start1))
 
     types, depths = model.get_removal_statistics()
     types_counter = Counter(types)
