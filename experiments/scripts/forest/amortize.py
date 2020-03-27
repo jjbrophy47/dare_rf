@@ -40,12 +40,12 @@ def unlearning_method(args, seed, out_dir, logger, X_train, y_train, X_test, y_t
 
     # train
     logger.info('\n{}'.format(name.capitalize()))
-    start = time.time()
+    start1 = time.time()
     model = cedar.Forest(epsilon=epsilon, lmbda=lmbda,
                          n_estimators=args.n_estimators, max_features=args.max_features,
                          max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
     model = model.fit(X_train, y_train)
-    end_time = time.time() - start
+    end_time = time.time() - start1
     logger.info('[{}] train time: {:.3f}s'.format(name, end_time))
     auc, acc = exp_util.performance(model, X_test, y_test, logger=logger, name=name)
     performance_markers = [int(x) for x in np.linspace(0, len(delete_indices) - 1, 10)]
@@ -66,7 +66,7 @@ def unlearning_method(args, seed, out_dir, logger, X_train, y_train, X_test, y_t
             accs.append(acc)
 
             if args.verbose > 0:
-                logger.info('{}. [{}] delete time: {:.3f}s'.format(i, delete_ndx, end_time))
+                logger.info('cumulative run time: {:.3f}s'.format(time.time() - start1))
 
     types, depths = model.get_removal_statistics()
     types_counter = Counter(types)
