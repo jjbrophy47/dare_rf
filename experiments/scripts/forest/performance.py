@@ -114,5 +114,4 @@ if __name__ == '__main__':
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
-    args = exp_util.check_args(args)
     main(args)
