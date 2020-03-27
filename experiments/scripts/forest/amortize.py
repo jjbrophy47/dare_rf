@@ -143,6 +143,8 @@ def naive_method(args, seed, out_dir, logger, X_train, y_train, X_test, y_test, 
     if args.save_results:
         d = model.get_params()
         d['time'] = np.array(times)
+        d['n_train'] = X_train.shape[0]
+        d['n_features'] = X_train.shape[1]
         np.save(os.path.join(out_dir, 'naive.npy'), d)
 
 
