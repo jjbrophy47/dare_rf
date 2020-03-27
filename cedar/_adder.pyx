@@ -336,7 +336,7 @@ cdef class _Adder:
 
                 # leaf now has valid features => retrain
                 else:
-                    result = 2
+                    result = 3
 
             # no valid features => leaf (should already be a leaf)
             else:

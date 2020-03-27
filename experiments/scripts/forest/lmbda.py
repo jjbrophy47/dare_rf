@@ -1,5 +1,5 @@
 """
-Experiment: Show how the tst accuracy changes as epsilon and lmbda vary.
+Experiment: Show how the test accuracy changes as epsilon and lmbda vary.
 """
 import os
 import sys

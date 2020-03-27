@@ -140,7 +140,7 @@ cdef class _Remover:
                     self._add_removal_type(result, node.depth)
 
                 # retrain
-                elif result == 2:
+                elif result > 1:
                     self._add_removal_type(result, node.depth)
                     self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
 
@@ -381,7 +381,7 @@ cdef class _Remover:
 
             # chosen feature no longer valid => retrain
             else:
-                result = 2
+                result = 3
 
             free(gini_indices)
             free(distribution)

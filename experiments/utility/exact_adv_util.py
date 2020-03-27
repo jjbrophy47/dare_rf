@@ -24,19 +24,19 @@ def exact_adversary(X, y, n_samples=None, seed=None, verbose=0, logger=None):
 
     # find best two attributes
     ndx_a, ndx_b, meta_a, meta_b = _find_best_attributes(X, y)
-    if logger and verbose > 0:
+    if logger and verbose > 1:
         logger.info('1st: x{}, 2nd: x{}'.format(ndx_a, ndx_b))
 
     # get instance counts based on the two attributes and the label
     counts, indices = _type_counts(X[:, ndx_a], X[:, ndx_b], y)
-    if logger and verbose > 0:
+    if logger and verbose > 1:
         logger.info(counts)
 
     for i in range(n_samples):
 
         # brute force check which instance type reduces the gini index gap the most
         meta_a, meta_b, bin_str, index_gap = _find_instance(meta_a, meta_b, counts, a_is_better)
-        if logger and verbose > 0:
+        if logger and verbose > 1:
             logger.info('{}, {}, {}'.format(i, bin_str, index_gap))
 
         # attributes have switched position!

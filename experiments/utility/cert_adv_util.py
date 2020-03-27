@@ -33,7 +33,7 @@ def certified_adversary(X, Y, epsilon, lmbda, n_samples=None, seed=None, verbose
     np.random.seed(seed)
     ndx = np.random.choice(list(pk.keys()))
     counts, indices = _type_counts(X, Y, ndx)
-    if logger and verbose > 0:
+    if logger and verbose > 1:
         logger.info('chosen: x{}, gini index: {:.3f}'.format(ndx, gini_indices[ndx]))
         logger.info(counts)
 
@@ -51,7 +51,7 @@ def certified_adversary(X, Y, epsilon, lmbda, n_samples=None, seed=None, verbose
             retrains += 1
             delete_types['hanging'] += 1
             p = new_p
-            if logger and verbose > 0:
+            if logger and verbose > 1:
                 logger.info('hanging branch, retrain')
 
         # delete instance and recheck
@@ -66,12 +66,12 @@ def certified_adversary(X, Y, epsilon, lmbda, n_samples=None, seed=None, verbose
                 retrains += 1
                 delete_types['differing'] += 1
                 p = new_p
-                if logger and verbose > 0:
+                if logger and verbose > 1:
                     logger.info('{} differing distributions, retrain'.format(i))
 
             # show progress
             else:
-                if logger and verbose > 0:
+                if logger and verbose > 1:
                     logger.info('{}, {}, {}'.format(i, delete_ndx, ratio[ndx]))
 
         # put that instance in the ordering
@@ -88,7 +88,7 @@ def certified_adversary(X, Y, epsilon, lmbda, n_samples=None, seed=None, verbose
             np.random.seed(seed)
             ndx = np.random.choice(list(new_pk.keys()))
             counts, indices = _type_counts(X, Y, ndx)
-            if logger and verbose > 0:
+            if logger and verbose > 1:
                 logger.info('new attribute: x{}'.format(ndx))
 
     if logger:

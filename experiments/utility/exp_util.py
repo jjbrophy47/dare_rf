@@ -1,10 +1,13 @@
 """
 Utility methods to make epxeriments easier.
 """
+import pickle
+
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 
-def performance(model, X_test, y_test, display=True, logger=None, name=''):
+def performance(model, X_test, y_test, display=True, logger=None,
+                name='', do_print=False):
     """
     Returns AUROC and accuracy scores.
     """
@@ -15,30 +18,24 @@ def performance(model, X_test, y_test, display=True, logger=None, name=''):
 
     if logger:
         logger.info('[{}] roc_auc: {:.3f}, acc: {:.3f}'.format(name, auc, acc))
-    else:
+    elif do_print:
         print('[{}] roc_auc: {:.3f}, acc: {:.3f}'.format(name, auc, acc))
 
     return auc, acc
 
 
-def check_args(args):
+def save_info(path, model):
     """
-    Checks specific args thta support multiple dtypes.
+    Saves tree mode info such as: epsilon, lambda, n_estimators,
+    max_features, and max_depth.
     """
-    if hasattr(args, 'max_features'):
-        if args.max_features == 'sqrt':
-            return args
-        elif '.' in args.max_features:
-            args.max_features = float(args.max_features)
-        else:
-            args.max_features = int(args.max_features)
+    with open(path, 'wb') as f:
+        pickle.dump(model.get_params(), f, pickle.HIGHEST_PROTOCOL)
 
-    if hasattr(args, 'max_samples'):
-        if args.max_samples is None:
-            return args
-        elif '.' in args.max_samples:
-            args.max_samples = float(args.max_samples)
-        else:
-            args.max_samples = int(args.max_samples)
 
-    return args
+def load_info(path):
+    """
+    Loads dictonary containing model information.
+    """
+    with open(path, 'rb') as f:
+        return pickle.load(f)

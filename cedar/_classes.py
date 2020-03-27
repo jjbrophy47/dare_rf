@@ -49,8 +49,7 @@ class Forest(object):
     max_features: int float, or str (default='sqrt')
         If int, then max_features at each split.
         If float, then max_features=int(max_features * n_features) at each split.
-        If 'sqrt', then max_features=sqrt(n_features).
-        If None, max_features=n_features.
+        If None or 'sqrt', then max_features=sqrt(n_features).
     max_depth: int (default=None)
         The maximum depth of a tree.
     min_samples_split: int (default=2)
@@ -65,13 +64,13 @@ class Forest(object):
         Verbosity level.
     """
     def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt',
-                 max_depth=4, min_samples_split=2, min_samples_leaf=1,
+                 max_depth=50, min_samples_split=2, min_samples_leaf=1,
                  min_impurity_decrease=1e-8, random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
         self.max_features = max_features
-        self.max_depth = max_depth
+        self.max_depth = 1000 if max_depth is None else max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.min_impurity_decrease = min_impurity_decrease
@@ -102,10 +101,7 @@ class Forest(object):
         X, y = check_data(X, y)
 
         # set max_features
-        if not self.max_features:
-            self.max_features_ = self.n_features_
-
-        elif self.max_features == 'sqrt':
+        if not self.max_features or self.max_features == 'sqrt':
             self.max_features_ = int(np.sqrt(self.n_features_))
 
         elif isinstance(self.max_features, int):
@@ -130,7 +126,8 @@ class Forest(object):
             feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
             feature_indices = feature_indices.astype(np.int32)
 
-            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators,
+            # tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators,
+            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators / self.max_depth,
                         max_depth=self.max_depth, min_samples_split=self.min_samples_split,
                         min_samples_leaf=self.min_samples_leaf, random_state=self.random_state + i,
                         verbose=self.verbose)
