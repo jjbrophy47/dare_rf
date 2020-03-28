@@ -1,5 +1,6 @@
 """
-Experiment: Show how the test accuracy changes as epsilon and lmbda vary.
+Experiment: Keeping the forest hyperparameters fixed, show how the test
+            prediction performance changes as epsilon and lmbda vary.
 """
 import os
 import sys
@@ -12,8 +13,15 @@ from sklearn.metrics import roc_auc_score, accuracy_score
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
 sys.path.insert(0, here + '/../..')
-from model import cedar
+import cedar
 from utility import data_util, exp_util, print_util
+
+MAX_INT = 2147483647
+
+
+def _get_random_state(seed):
+    np.random.seed(seed)
+    return np.random.randint(MAX_INT)
 
 
 def vary_lmbda(args, logger, out_dir, seed):
@@ -26,51 +34,61 @@ def vary_lmbda(args, logger, out_dir, seed):
     logger.info('test instances: {}'.format(X_test.shape[0]))
     logger.info('attributes: {}'.format(X_train.shape[1]))
 
-    logger.info('building d_rf...')
+    logger.info('\nExact')
     start = time.time()
-    d_rf = cedar.RF(lmbda=10**8,
-                    n_estimators=args.n_estimators, max_features=args.max_features,
-                    max_samples=args.max_samples, max_depth=args.max_depth,
-                    verbose=args.verbose, random_state=seed)
-    d_rf = d_rf.fit(X_train, y_train)
+    model = cedar.Forest(lmbda=-1, n_estimators=args.n_estimators,
+                         max_features=args.max_features, max_depth=args.max_depth,
+                         verbose=args.verbose, random_state=_get_random_state(seed))
+    model = model.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
-    exp_util.performance(d_rf, X_test, y_test, name='d_rf')
+    exp_util.performance(model, X_test, y_test, name='exact')
 
-    # save deterministic results
+    # save exact results
     if args.save_results:
-        proba = d_rf.predict_proba(X_test)[:, 1]
-        pred = d_rf.predict(X_test)
+        proba = model.predict_proba(X_test)[:, 1]
+        pred = model.predict(X_test)
         auc = roc_auc_score(y_test, proba)
         acc = accuracy_score(y_test, pred)
-        np.save(os.path.join(out_dir, 'd_auc.npy'), auc)
-        np.save(os.path.join(out_dir, 'd_acc.npy'), acc)
 
-    # observe change in test acuracy as lambda varies
-    aucs, accs = [], []
+        d = model.get_params()
+        d['auc'] = auc
+        d['acc'] = acc
+        d['n_train'] = X_train.shape[0]
+        d['n_features'] = X_train.shape[1]
+        np.save(os.path.join(out_dir, 'exact.npy'), d)
+
+    # observe change in test performance as lambda varies
+    logger.info('\nCeDAR')
     lmbdas = np.linspace(args.min_lmbda, args.max_lmbda, args.n_lmbda)
     logger.info('lmbdas: {}'.format(len(lmbdas)))
+
+    aucs, accs = [], []
+    random_state = _get_random_state(seed)
     for i, lmbda in enumerate(lmbdas):
         logger.info('[{}] lmbda: {:.2f}...'.format(i, lmbda))
         start = time.time()
-        dt_rf = cedar.RF(lmbda=lmbda,
-                         n_estimators=args.n_estimators, max_features=args.max_features,
-                         max_samples=args.max_samples, max_depth=args.max_depth,
-                         verbose=args.verbose, random_state=seed)
-        dt_rf = dt_rf.fit(X_train, y_train)
+        model = cedar.Forest(lmbda=lmbda, n_estimators=args.n_estimators,
+                             max_features=args.max_features, max_depth=args.max_depth,
+                             verbose=args.verbose, random_state=random_state)
+        model = model.fit(X_train, y_train)
 
-        proba = dt_rf.predict_proba(X_test)[:, 1]
-        pred = dt_rf.predict(X_test)
+        proba = model.predict_proba(X_test)[:, 1]
+        pred = model.predict(X_test)
         aucs.append(roc_auc_score(y_test, proba))
         accs.append(accuracy_score(y_test, pred))
 
         if args.verbose > 0:
-            exp_util.performance(dt_rf, X_test, y_test, name='dt_rf', logger=logger)
+            exp_util.performance(model, X_test, y_test, name='cedar', logger=logger)
 
     if args.save_results:
-        np.save(os.path.join(out_dir, 'auc.npy'), aucs)
-        np.save(os.path.join(out_dir, 'acc.npy'), accs)
-        np.save(os.path.join(out_dir, 'lmbda.npy'), lmbdas)
+        d = model.get_params()
+        d['auc'] = aucs
+        d['acc'] = accs
+        d['lmbda'] = lmbdas
+        d['n_train'] = X_train.shape[0]
+        d['n_features'] = X_train.shape[1]
+        np.save(os.path.join(out_dir, 'cedar.npy'), d)
 
 
 def main(args):
@@ -79,8 +97,7 @@ def main(args):
     for i in range(args.repeats):
 
         # create output dir
-        ep_dir = os.path.join(args.out_dir, args.dataset, 't{}'.format(args.n_estimators), 'rs{}'.format(args.rs))
-        print(ep_dir)
+        ep_dir = os.path.join(args.out_dir, args.dataset, 'rs{}'.format(args.rs))
         os.makedirs(ep_dir, exist_ok=True)
 
         # create logger
@@ -103,9 +120,8 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
-    parser.add_argument('--max_samples', type=str, default=None, help='maximum samples to use.')
-    parser.add_argument('--max_depth', type=int, default=4, help='maximum depth of the trees.')
+    parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
+    parser.add_argument('--max_depth', type=int, default=20, help='maximum depth of the trees.')
     parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
     parser.add_argument('--min_lmbda', type=float, default=1, help='minimum lambda.')

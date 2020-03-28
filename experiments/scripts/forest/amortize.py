@@ -160,7 +160,7 @@ def remove_sample(args, logger, out_dir, seed):
 
     # choose instances to delete
     n_remove = args.n_remove if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
-    if args.adversary == 'exact':
+    if args.adversary == 'root':
         delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed,
                                                         verbose=args.verbose, logger=logger)
     elif args.adversary == 'certified':

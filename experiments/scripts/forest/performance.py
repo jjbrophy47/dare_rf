@@ -19,7 +19,7 @@ from utility import data_util, exp_util, print_util
 def performance(args, logger, seed):
 
     n_estimators = [10, 50, 100, 250, 500, 1000]
-    max_depths = [2, 5, 10, 20, 50]
+    max_depths = [5, 10, 20, 35, 50]
     max_features = ['sqrt', 0.1, 0.2, 0.3]
 
     # obtain data
