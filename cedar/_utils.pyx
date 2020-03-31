@@ -34,20 +34,22 @@ cdef double compute_gini(double count, double left_count, double right_count,
     cdef double neg_prob
 
     cdef double index
-    cdef double left_weighted_index
-    cdef double right_weighted_index
+    cdef double left_weighted_index = 0
+    cdef double right_weighted_index = 0
 
-    weight = left_count / count
-    pos_prob = left_pos_count / left_count
-    neg_prob = 1 - pos_prob
-    index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)
-    left_weighted_index = weight * index
+    if left_count > 0:
+        weight = left_count / count
+        pos_prob = left_pos_count / left_count
+        neg_prob = 1 - pos_prob
+        index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)
+        left_weighted_index = weight * index
 
-    weight = right_count / count
-    pos_prob = right_pos_count / right_count
-    neg_prob = 1 - pos_prob
-    index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)
-    right_weighted_index = weight * index
+    if right_count > 0:
+        weight = right_count / count
+        pos_prob = right_pos_count / right_count
+        neg_prob = 1 - pos_prob
+        index = 1 - (pos_prob * pos_prob) - (neg_prob * neg_prob)
+        right_weighted_index = weight * index
 
     return left_weighted_index + right_weighted_index
 

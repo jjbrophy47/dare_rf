@@ -3,7 +3,6 @@ CeDAR (CErtified Data Addition and Removal) Trees.
 """
 import numpy as np
 
-# TODO: divide lambda or epsilon by max_depth?
 
 from ._manager import _DataManager
 from ._splitter import _Splitter
@@ -69,7 +68,7 @@ class Forest(object):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
-        self.max_features = max_features
+        self.max_features = 'sqrt' if not max_features else max_features
         self.max_depth = 1000 if max_depth is None else max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf

@@ -256,11 +256,9 @@ cdef class _Adder:
         # parameters
         cdef double epsilon = self.epsilon
         cdef double lmbda = self.lmbda
-        cdef int min_samples_leaf = self.min_samples_leaf
 
         cdef double* gini_indices = NULL
         cdef double* distribution = NULL
-        cdef int  valid_features_count = 0
 
         cdef int chosen_ndx = -1
 
@@ -278,72 +276,56 @@ cdef class _Adder:
 
         if updated_pos_count > 0 and updated_pos_count < updated_count:
 
-            gini_indices = <double *>malloc(node.features_count * sizeof(double))
-            distribution = <double *>malloc(node.features_count * sizeof(double))
+            if node.p != UNDEF:
 
-            for j in range(node.features_count):
+                gini_indices = <double *>malloc(node.features_count * sizeof(double))
+                distribution = <double *>malloc(node.features_count * sizeof(double))
 
-                # validate split
-                if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
-                    gini_indices[valid_features_count] = compute_gini(updated_count,
-                                                                      node.left_counts[j],
-                                                                      node.right_counts[j],
-                                                                      node.left_pos_counts[j],
-                                                                      node.right_pos_counts[j])
+                for j in range(node.features_count):
+
+                    gini_indices[j] = compute_gini(updated_count, node.left_counts[j], node.right_counts[j],
+                                                   node.left_pos_counts[j], node.right_pos_counts[j])
+
                     if node.features[j] == node.feature:
-                        chosen_ndx = valid_features_count
+                        chosen_ndx = j
 
-                    valid_features_count += 1
+                # generate new probability and compare to previous probability
+                generate_distribution(lmbda, distribution, gini_indices, node.features_count)
+                p = parent_p * distribution[chosen_ndx]
+                ratio = p / node.p
 
-            if valid_features_count > 0:
+                # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
-                if node.p != UNDEF:
+                if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
 
-                    # remove invalid features
-                    gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
-                    distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
+                    # assign results from chosen feature
+                    split.left_indices = <int *>malloc(n_samples * sizeof(int))
+                    split.right_indices = <int *>malloc(n_samples * sizeof(int))
+                    j = 0
+                    k = 0
+                    for i in range(n_samples):
+                        if X[samples[i]][node.feature] == 1:
+                            split.left_indices[j] = samples[i]
+                            j += 1
+                        else:
+                            split.right_indices[k] = samples[i]
+                            k += 1
+                    split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+                    split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
+                    split.left_count = j
+                    split.right_count = k
+                    split.p = p
 
-                    # generate new probability and compare to previous probability
-                    generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
-                    p = parent_p * distribution[chosen_ndx]
-                    ratio = p / node.p
-
-                    # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
-
-                    if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
-
-                        # assign results from chosen feature
-                        split.left_indices = <int *>malloc(n_samples * sizeof(int))
-                        split.right_indices = <int *>malloc(n_samples * sizeof(int))
-                        j = 0
-                        k = 0
-                        for i in range(n_samples):
-                            if X[samples[i]][node.feature] == 1:
-                                split.left_indices[j] = samples[i]
-                                j += 1
-                            else:
-                                split.right_indices[k] = samples[i]
-                                k += 1
-                        split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
-                        split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
-                        split.left_count = j
-                        split.right_count = k
-                        split.p = p
-
-                    # bounds exceeded => retrain
-                    else:
-                        result = 2
-
-                # leaf now has valid features => retrain
+                # bounds exceeded => retrain
                 else:
-                    result = 3
+                    result = 2
 
-            # no valid features => leaf (should already be a leaf)
+                free(gini_indices)
+                free(distribution)
+
+            # leaf now has samples => retrain
             else:
-                result = 0
-
-            free(gini_indices)
-            free(distribution)
+                result = 3
 
         # all samples in one class => leaf (should already be a leaf)
         else:

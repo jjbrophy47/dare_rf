@@ -53,11 +53,7 @@ cdef class _Splitter:
 
         cdef double* gini_indices = NULL
         cdef double* distribution = NULL
-        cdef int* valid_features = NULL
-        cdef int* valid_indices = NULL
-        cdef int  valid_features_count = 0
         cdef int  chosen_ndx
-        cdef int  chosen_feature_ndx
 
         cdef int i
         cdef int j
@@ -69,71 +65,46 @@ cdef class _Splitter:
 
             gini_indices = <double *>malloc(node.features_count * sizeof(double))
             distribution = <double *>malloc(node.features_count * sizeof(double))
-            valid_features = <int *>malloc(node.features_count * sizeof(int))
-            valid_indices = <int *>malloc(node.features_count * sizeof(int))
 
             for j in range(node.features_count):
+                gini_indices[j] = compute_gini(node.count, node.left_counts[j], node.right_counts[j], 
+                                               node.left_pos_counts[j], node.right_pos_counts[j])
 
-                # validate split
-                if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
-                    valid_indices[valid_features_count] = j
-                    valid_features[valid_features_count] = node.features[j]
-                    gini_indices[valid_features_count] = compute_gini(node.count,
-                                                                      node.left_counts[j],
-                                                                      node.right_counts[j],
-                                                                      node.left_pos_counts[j],
-                                                                      node.right_pos_counts[j])
-                    valid_features_count += 1
+            # generate and sample from the distribution
+            generate_distribution(lmbda, distribution, gini_indices, node.features_count)
+            chosen_ndx = sample_distribution(distribution, node.features_count)
+            chosen_feature = node.features[chosen_ndx]
 
-            if valid_features_count > 0:
+            # assign results from chosen feature
+            split.left_indices = <int *>malloc(node.left_counts[chosen_ndx] * sizeof(int))
+            split.right_indices = <int *>malloc(node.right_counts[chosen_ndx] * sizeof(int))
+            j = 0
+            k = 0
+            for i in range(n_samples):
+                if X[samples[i]][chosen_feature] == 1:
+                    split.left_indices[j] = samples[i]
+                    j += 1
+                else:
+                    split.right_indices[k] = samples[i]
+                    k += 1
+            split.left_count = j
+            split.right_count = k
+            split.feature = chosen_feature
+            split.p = parent_p * distribution[chosen_ndx]
 
-                # remove invalid features
-                gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
-                distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
-                valid_features = <int *>realloc(valid_features, valid_features_count * sizeof(int))
-                valid_indices = <int *>realloc(valid_indices, valid_features_count * sizeof(int))
-
-                # generate and sample from the distribution
-                generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
-                chosen_ndx = sample_distribution(distribution, valid_features_count)
-                chosen_feature = valid_features[chosen_ndx]
-                chosen_feature_ndx = valid_indices[chosen_ndx]
-
-                # assign results from chosen feature
-                split.left_indices = <int *>malloc(node.left_counts[chosen_feature_ndx] * sizeof(int))
-                split.right_indices = <int *>malloc(node.right_counts[chosen_feature_ndx] * sizeof(int))
-                j = 0
-                k = 0
-                for i in range(n_samples):
-                    if X[samples[i]][chosen_feature] == 1:
-                        split.left_indices[j] = samples[i]
-                        j += 1
-                    else:
-                        split.right_indices[k] = samples[i]
-                        k += 1
-                split.left_count = j
-                split.right_count = k
-                split.feature = chosen_feature
-                split.p = parent_p * distribution[chosen_ndx]
-
-                # remove chosen feature from descendent nodes
-                split.features_count = node.features_count - 1
-                split.left_features = <int *>malloc(split.features_count * sizeof(int))
-                split.right_features = <int *>malloc(split.features_count * sizeof(int))
-                j = 0
-                for i in range(node.features_count):
-                    if node.features[i] != split.feature:
-                        split.left_features[j] = node.features[i]
-                        split.right_features[j] = node.features[i]
-                        j += 1
-
-            else:
-                result = 1
+            # remove chosen feature from descendent nodes
+            split.features_count = node.features_count - 1
+            split.left_features = <int *>malloc(split.features_count * sizeof(int))
+            split.right_features = <int *>malloc(split.features_count * sizeof(int))
+            j = 0
+            for i in range(node.features_count):
+                if node.features[i] != split.feature:
+                    split.left_features[j] = node.features[i]
+                    split.right_features[j] = node.features[i]
+                    j += 1
 
             free(gini_indices)
             free(distribution)
-            free(valid_features)
-            free(valid_indices)
 
         else:
             result = 1

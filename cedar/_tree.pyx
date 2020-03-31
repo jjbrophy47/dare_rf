@@ -23,6 +23,7 @@ from ._utils cimport dealloc
 from numpy import int32 as INT
 
 cdef int UNDEF = -1
+cdef double UNDEF_LEAF_VAL = 0.5
 
 # =====================================
 # TreeBuilder
@@ -92,7 +93,7 @@ cdef class _TreeBuilder:
 
             if not is_middle_leaf:
                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
-                                                       parent_p, &split)
+                                                          parent_p, &split)
 
             if is_middle_leaf:
                 self._set_leaf_node(&node, y, samples, n_samples, 0)
@@ -139,8 +140,12 @@ cdef class _TreeBuilder:
             node.pos_count = pos_count
 
         node.is_leaf = 1
-        node.value = node.pos_count / <double> node.count
         node.leaf_samples = samples
+        if node.count > 0:
+            node.value = node.pos_count / <double> node.count
+        else:
+            # printf('depth: %d, is_left: %d, undefined leaf!\n', node.depth, node.is_left)
+            node.value = UNDEF_LEAF_VAL
 
         node.p = UNDEF
         node.feature = UNDEF

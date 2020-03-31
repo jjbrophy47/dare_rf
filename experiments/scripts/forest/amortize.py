@@ -160,6 +160,9 @@ def remove_sample(args, logger, out_dir, seed):
 
     # choose instances to delete
     n_remove = args.n_remove if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
+    if args.adversary == 'random':
+        np.random.seed(seed)
+        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
     if args.adversary == 'root':
         delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed,
                                                         verbose=args.verbose, logger=logger)
@@ -168,8 +171,7 @@ def remove_sample(args, logger, out_dir, seed):
                                                            n_samples=n_remove, seed=seed,
                                                            verbose=args.verbose, logger=logger)
     else:
-        np.random.seed(seed)
-        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
+        exit('unknown adversary: {}'.format(args.adversary))
 
     logger.info('instances to delete: {}'.format(len(delete_indices)))
     logger.info('adversary: {}'.format(args.adversary))

@@ -24,6 +24,7 @@ from ._utils cimport copy_int_array
 from ._utils cimport dealloc
 
 cdef int UNDEF = -1
+cdef double UNDEF_LEAF_VAL = 0.5
 
 # =====================================
 # Remover
@@ -179,8 +180,12 @@ cdef class _Remover:
 
         node.count -= n_samples
         node.pos_count -= pos_count
-        node.value = node.pos_count / <double> node.count
         node.leaf_samples = leaf_samples
+        if node.count > 0:
+            node.value = node.pos_count / <double> node.count
+        else:
+            printf('leaf undefined!\n')
+            node.value = UNDEF_LEAF_VAL
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -297,13 +302,10 @@ cdef class _Remover:
         # parameters
         cdef double epsilon = self.epsilon
         cdef double lmbda = self.lmbda
-        cdef int min_samples_leaf = self.min_samples_leaf
 
         cdef double* gini_indices = NULL
         cdef double* distribution = NULL
-        cdef int  valid_features_count = 0
 
-        cdef bint chosen_feature_validated = 0
         cdef int chosen_ndx = -1
 
         cdef double p
@@ -325,63 +327,42 @@ cdef class _Remover:
 
             for j in range(node.features_count):
 
-                # validate split
-                if node.left_counts[j] >= min_samples_leaf and node.right_counts[j] >= min_samples_leaf:
-                    gini_indices[valid_features_count] = compute_gini(updated_count,
-                                                                      node.left_counts[j],
-                                                                      node.right_counts[j],
-                                                                      node.left_pos_counts[j],
-                                                                      node.right_pos_counts[j])
-                    if node.features[j] == node.feature:
-                        chosen_feature_validated = 1
-                        chosen_ndx = valid_features_count
+                gini_indices[j] = compute_gini(updated_count, node.left_counts[j], node.right_counts[j],
+                                               node.left_pos_counts[j], node.right_pos_counts[j])
 
-                    valid_features_count += 1
+                if node.features[j] == node.feature:
+                    chosen_ndx = j
 
-            if valid_features_count > 0 and chosen_feature_validated:
+            # generate new probability and compare to previous probability
+            generate_distribution(lmbda, distribution, gini_indices, node.features_count)
+            p = parent_p * distribution[chosen_ndx]
+            ratio = p / node.p
 
-                # remove invalid features
-                gini_indices = <double *>realloc(gini_indices, valid_features_count * sizeof(double))
-                distribution = <double *>realloc(distribution, valid_features_count * sizeof(double))
+            # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
-                # generate new probability and compare to previous probability
-                generate_distribution(lmbda, distribution, gini_indices, valid_features_count)
-                p = parent_p * distribution[chosen_ndx]
-                ratio = p / node.p
+            if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
 
-                # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
+                # assign results from chosen feature
+                split.left_indices = <int *>malloc(n_samples * sizeof(int))
+                split.right_indices = <int *>malloc(n_samples * sizeof(int))
+                j = 0
+                k = 0
+                for i in range(n_samples):
+                    if X[samples[i]][node.feature] == 1:
+                        split.left_indices[j] = samples[i]
+                        j += 1
+                    else:
+                        split.right_indices[k] = samples[i]
+                        k += 1
+                split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+                split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
+                split.left_count = j
+                split.right_count = k
+                split.p = p
 
-                if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
-
-                    # assign results from chosen feature
-                    split.left_indices = <int *>malloc(n_samples * sizeof(int))
-                    split.right_indices = <int *>malloc(n_samples * sizeof(int))
-                    j = 0
-                    k = 0
-                    for i in range(n_samples):
-                        if X[samples[i]][node.feature] == 1:
-                            split.left_indices[j] = samples[i]
-                            j += 1
-                        else:
-                            split.right_indices[k] = samples[i]
-                            k += 1
-                    split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
-                    split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
-                    split.left_count = j
-                    split.right_count = k
-                    split.p = p
-
-                # bounds exceeded => retrain
-                else:
-                    result = 2
-
-            # no valid features => leaf
-            elif valid_features_count == 0:
-                result = 1
-
-            # chosen feature no longer valid => retrain
+            # bounds exceeded => retrain
             else:
-                result = 3
+                result = 2
 
             free(gini_indices)
             free(distribution)

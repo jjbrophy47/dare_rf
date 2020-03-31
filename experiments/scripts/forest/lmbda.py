@@ -83,6 +83,7 @@ def vary_lmbda(args, logger, out_dir, seed):
 
     if args.save_results:
         d = model.get_params()
+        print(d)
         d['auc'] = aucs
         d['acc'] = accs
         d['lmbda'] = lmbdas
