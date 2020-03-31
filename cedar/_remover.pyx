@@ -184,7 +184,6 @@ cdef class _Remover:
         if node.count > 0:
             node.value = node.pos_count / <double> node.count
         else:
-            printf('leaf undefined!\n')
             node.value = UNDEF_LEAF_VAL
 
     @cython.boundscheck(False)

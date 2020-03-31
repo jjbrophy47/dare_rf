@@ -144,7 +144,6 @@ cdef class _TreeBuilder:
         if node.count > 0:
             node.value = node.pos_count / <double> node.count
         else:
-            # printf('depth: %d, is_left: %d, undefined leaf!\n', node.depth, node.is_left)
             node.value = UNDEF_LEAF_VAL
 
         node.p = UNDEF

@@ -1,7 +1,10 @@
 """
 Utility methods to make epxeriments easier.
 """
+import numpy as np
 from sklearn.metrics import roc_auc_score, accuracy_score
+
+MAX_INT = 2147483647
 
 
 def performance(model, X_test, y_test, display=True, logger=None,
@@ -20,3 +23,8 @@ def performance(model, X_test, y_test, display=True, logger=None,
         print('[{}] roc_auc: {:.3f}, acc: {:.3f}'.format(name, auc, acc))
 
     return auc, acc
+
+
+def get_random_state(seed):
+    np.random.seed(seed)
+    return np.random.randint(MAX_INT)

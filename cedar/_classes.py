@@ -449,9 +449,6 @@ class Tree(object):
         d['min_samples_leaf'] = self.min_samples_leaf
         d['random_state'] = self.random_state
         d['verbose'] = self.verbose
-        d['feature_indices'] = self.feature_indices
-        d['get_data'] = self.get_data
-
         return d
 
     def set_params(self, **params):
