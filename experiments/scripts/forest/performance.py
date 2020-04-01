@@ -19,9 +19,9 @@ from utility import data_util, exp_util, print_util
 def performance(args, logger, seed):
 
     # hyperparameters
-    n_estimators = [10, 50, 100, 250, 500, 1000]
-    max_depth = [2, 5, 10, 20, 35, 50]
-    max_features = ['sqrt', 0.1, 0.2, 0.3]
+    n_estimators = [10, 100, 1000]
+    max_depth = [1, 3, 5, 10, 20]
+    max_features = ['sqrt', 0.25]
 
     logger.info('n_estimators: {:,}'.format(n_estimators))
     logger.info('max_depth: {:,}'.format(max_depth))
