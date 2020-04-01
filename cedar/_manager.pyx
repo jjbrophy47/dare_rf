@@ -40,7 +40,7 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def __cinit__(self, int[:,:] X_in, int[:] y_in):
+    def __cinit__(self, int[:, :] X_in, int[:] y_in):
         """
         Constructor.
         """
@@ -74,6 +74,9 @@ cdef class _DataManager:
         """
         Destructor.
         """
+        for i in range(self.n_samples + self.n_vacant):
+            if self.X[i]:
+                free(self.X[i])
         free(self.X)
         free(self.y)
         if self.vacant:
