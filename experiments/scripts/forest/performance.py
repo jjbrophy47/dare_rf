@@ -6,6 +6,7 @@ import sys
 import time
 import argparse
 
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 
@@ -16,6 +17,30 @@ import cedar
 from utility import data_util, exp_util, print_util
 
 
+def _get_best_params(gs, param_grid, logger, tol=0.0):
+    """
+    Chooses the set of hyperparameters whose `mean_fit_score` is within
+    `tol` of the best `mean_fit_score` and has the lowest `mean_fit_time`.
+    """
+    cols = ['mean_fit_time', 'mean_test_score', 'rank_test_score']
+    cols += ['param_{}'.format(param) for param in param_grid.keys()]
+
+    df = pd.DataFrame(gs.cv_results_)
+    logger.info('gridsearch results:')
+    logger.info(df[cols].sort_values('rank_test_score'))
+
+    # filter the parameters with the highest performances
+    logger.info('tolerance: {}'.format(args.tol))
+    df = df[df['mean_test_score'].max() - df['mean_test_score'] <= tol]
+
+    best_df = df.sort_values('mean_fit_time').reset_index().loc[0]
+    best_ndx = best_df['index']
+    best_params = best_df['params']
+    logger.info('best_index: {}, best_params: {}'.format(best_ndx, best_params))
+
+    return best_params
+
+
 def performance(args, logger, seed):
 
     # hyperparameters
@@ -23,14 +48,16 @@ def performance(args, logger, seed):
     max_depth = [1, 3, 5, 10, 20]
     max_features = ['sqrt', 0.25]
 
-    logger.info('n_estimators: {:,}'.format(n_estimators))
-    logger.info('max_depth: {:,}'.format(max_depth))
-    logger.info('max_features: {:,}'.format(max_features))
+    logger.info('\nHyperparameters')
+    logger.info('n_estimators: {}'.format(n_estimators))
+    logger.info('max_depth: {}'.format(max_depth))
+    logger.info('max_features: {}'.format(max_features))
 
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
 
     # dataset statistics
+    logger.info('\nData')
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
@@ -47,17 +74,19 @@ def performance(args, logger, seed):
                                        random_state=seed, bootstrap=args.bootstrap)
 
         if args.tune:
-            sk_param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
-                             'max_features': max_features, 'bootstrap': [True, False]}
-            gs = GridSearchCV(model, sk_param_grid, scoring=args.scoring, cv=args.cv,
-                              verbose=args.verbose)
+            param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
+                          'max_features': max_features, 'bootstrap': [True, False]}
+            gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
+                              verbose=args.verbose, refit=False)
             gs = gs.fit(X_train, y_train)
-            model = gs.best_estimator_
-            logger.info('best_params: {}'.format(gs.best_params_))
+            best_params = _get_best_params(gs, param_grid, logger, args.tol)
+            model = RandomForestClassifier(n_estimators=best_params['n_estimators'],
+                                           max_depth=best_params['max_depth'],
+                                           max_features=best_params['max_features'],
+                                           bootstrap=best_params['bootstrap'],
+                                           verbose=args.verbose, random_state=seed)
 
-        else:
-            model = model.fit(X_train, y_train)
-
+        model = model.fit(X_train, y_train)
         logger.info('{:.3f}s'.format(time.time() - start))
         exp_util.performance(model, X_test, y_test, name='sklearn', logger=logger)
 
@@ -71,14 +100,15 @@ def performance(args, logger, seed):
         param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
                       'max_features': max_features}
         gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
-                          verbose=args.verbose)
+                          verbose=args.verbose, refit=False)
         gs = gs.fit(X_train, y_train)
-        model = gs.best_estimator_
-        logger.info('best_params: {}'.format(gs.best_params_))
+        best_params = _get_best_params(gs, param_grid, logger, args.tol)
+        model = cedar.Forest(lmbda=-1, n_estimators=best_params['n_estimators'],
+                             max_features=best_params['max_features'],
+                             max_depth=best_params['max_depth'],
+                             verbose=args.verbose, random_state=seed)
 
-    else:
-        model = model.fit(X_train, y_train)
-
+    model = model.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
     exp_util.performance(model, X_test, y_test, name='exact', logger=logger)
 
@@ -95,14 +125,15 @@ def performance(args, logger, seed):
             param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
                           'max_features': max_features}
             gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
-                              verbose=args.verbose)
+                              verbose=args.verbose, refit=False)
             gs = gs.fit(X_train, y_train)
-            model = gs.best_estimator_
-            logger.info('best_params: {}'.format(gs.best_params_))
+            best_params = _get_best_params(gs, param_grid, logger, args.tol)
+            model = cedar.Forest(lmbda=args.lmbda, n_estimators=best_params['n_estimators'],
+                                 max_features=best_params['max_features'],
+                                 max_depth=best_params['max_depth'],
+                                 verbose=args.verbose, random_state=seed)
 
-        else:
-            model = model.fit(X_train, y_train)
-
+        model = model.fit(X_train, y_train)
         logger.info('{:.3f}s'.format(time.time() - start))
         exp_util.performance(model, X_test, y_test, name='model', logger=logger)
 
@@ -138,9 +169,10 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
-    parser.add_argument('--tune', action='store_true', default=False, help='tune models.')
+    parser.add_argument('--tune', action='store_true', default=True, help='tune models.')
     parser.add_argument('--cv', type=int, default=3, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
+    parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
     main(args)
