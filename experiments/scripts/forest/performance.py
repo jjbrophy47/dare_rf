@@ -1,5 +1,5 @@
 """
-This experiment tests the accuracy of the decision trees.
+This experiment tests the accuracy of the forest.
 """
 import os
 import sys
@@ -23,17 +23,17 @@ def performance(args, logger, seed):
     max_depth = [2, 5, 10, 20, 35, 50]
     max_features = ['sqrt', 0.1, 0.2, 0.3]
 
-    logger.info('n_estimators: {}'.format(n_estimators))
-    logger.info('max_depth: {}'.format(max_depth))
-    logger.info('max_features: {}'.format(max_features))
+    logger.info('n_estimators: {:,}'.format(n_estimators))
+    logger.info('max_depth: {:,}'.format(max_depth))
+    logger.info('max_features: {:,}'.format(max_features))
 
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
 
     # dataset statistics
-    logger.info('train instances: {}'.format(X_train.shape[0]))
-    logger.info('test instances: {}'.format(X_test.shape[0]))
-    logger.info('attributes: {}'.format(X_train.shape[1]))
+    logger.info('train instances: {:,}'.format(X_train.shape[0]))
+    logger.info('test instances: {:,}'.format(X_test.shape[0]))
+    logger.info('attributes: {:,}'.format(X_train.shape[1]))
 
     # SKLearn
     if args.sklearn:
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     parser.add_argument('--cedar', action='store_true', default=False, help='compare to a CeDAR model.')
 
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=str, default=None, help='maximum features to sample.')
+    parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
