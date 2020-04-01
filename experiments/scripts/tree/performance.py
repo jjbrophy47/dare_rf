@@ -30,20 +30,21 @@ def performance(args, logger, seed):
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
 
     # SKLearn
-    logger.info('\nSKLearn')
-    start = time.time()
-    model = DecisionTreeClassifier(max_depth=args.max_depth, random_state=seed)
+    if args.sklearn:
+        logger.info('\nSKLearn')
+        start = time.time()
+        model = DecisionTreeClassifier(max_depth=args.max_depth, random_state=seed)
 
-    if args.tune:
-        gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
-        gs = gs.fit(X_train, y_train)
-        model = gs.best_estimator_
-        logger.info('best_params: {}'.format(gs.best_params_))
-    else:
-        model = model.fit(X_train, y_train)
+        if args.tune:
+            gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv, verbose=args.verbose)
+            gs = gs.fit(X_train, y_train)
+            model = gs.best_estimator_
+            logger.info('best_params: {}'.format(gs.best_params_))
+        else:
+            model = model.fit(X_train, y_train)
 
-    logger.info('{:.3f}s'.format(time.time() - start))
-    exp_util.performance(model, X_test, y_test, name='sklearn', logger=logger)
+        logger.info('{:.3f}s'.format(time.time() - start))
+        exp_util.performance(model, X_test, y_test, name='sklearn', logger=logger)
 
     # Exact
     logger.info('\nExact')
@@ -107,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--cv', type=int, default=3, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
 
+    parser.add_argument('--sklearn', action='store_true', default=False, help='run sklearn model.')
     parser.add_argument('--cedar', action='store_true', default=False, help='run CeDAR model.')
     parser.add_argument('--epsilon', type=float, default=1.0, help='indistinguishability parameter.')
     parser.add_argument('--lmbda', type=float, default=100, help='amount of noise to add.')
