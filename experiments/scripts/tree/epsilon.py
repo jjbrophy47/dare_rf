@@ -33,7 +33,7 @@ def vary_epsilon(args, logger, out_dir, seed):
     model = model.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
-    exp_util.performance(model, X_test, y_test, name='exact')
+    exp_util.performance(model, X_test, y_test, name='exact', logger=logger)
 
     # save deterministic results
     if args.save_results:
