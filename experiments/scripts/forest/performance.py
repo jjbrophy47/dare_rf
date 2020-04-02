@@ -170,7 +170,7 @@ if __name__ == '__main__':
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
     parser.add_argument('--tune', action='store_true', default=True, help='tune models.')
-    parser.add_argument('--cv', type=int, default=3, help='number of cross-validation folds for tuning.')
+    parser.add_argument('--cv', type=int, default=2, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')

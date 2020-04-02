@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--rs', type=int, default=1, help='random state.')
 
     parser.add_argument('--tune', action='store_true', default=True, help='tune models.')
-    parser.add_argument('--cv', type=int, default=3, help='number of cross-validation folds for tuning.')
+    parser.add_argument('--cv', type=int, default=2, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
 
     parser.add_argument('--sklearn', action='store_true', default=False, help='run sklearn model.')
