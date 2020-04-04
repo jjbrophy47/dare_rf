@@ -147,6 +147,7 @@ cdef class _DataManager:
         # remove data and save the deleted indices
         for i in range(n_samples):
             free(X[samples[i]])
+            X[samples[i]] = NULL
             y[samples[i]] = UNDEF
             vacant[n_vacant + i] = samples[i]
 

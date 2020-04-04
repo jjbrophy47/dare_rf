@@ -59,8 +59,6 @@ def remove_sample(args, logger, out_dir, seed):
     logger.info('instances to delete: {}'.format(len(delete_indices)))
     logger.info('adversary: {}'.format(args.adversary))
 
-    print(delete_indices)
-
     # naive retraining method
     if args.retrain:
 

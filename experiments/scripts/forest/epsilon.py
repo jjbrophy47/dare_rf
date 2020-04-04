@@ -130,8 +130,8 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
 
-    parser.add_argument('--min_epsilon', type=float, default=0, help='minimum lambda.')
-    parser.add_argument('--max_epsilon', type=float, default=2, help='maximum lambda.')
+    parser.add_argument('--min_epsilon', type=float, default=0, help='minimum epsilon.')
+    parser.add_argument('--max_epsilon', type=float, default=2, help='maximum epsilon.')
     parser.add_argument('--n_epsilon', type=int, default=10, help='number of data points.')
 
     parser.add_argument('--n_remove', type=int, default=1, help='number of instances to sequentially delete.')

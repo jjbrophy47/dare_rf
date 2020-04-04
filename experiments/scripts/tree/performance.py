@@ -60,6 +60,7 @@ def performance(args, logger, seed):
     else:
         model = model.fit(X_train, y_train)
 
+    model.print(show_nodes=True)
     logger.info('{:.3f}s'.format(time.time() - start))
     exp_util.performance(model, X_test, y_test, name='exact', logger=logger)
 
