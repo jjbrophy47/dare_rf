@@ -38,13 +38,13 @@ def first_retrain(args, logger, out_dir, seed):
     else:
         exit('uknown adversary: {}'.format(args.adversary))
 
-    logger.info('instances to delete: {}'.format(len(delete_indices)))
+    logger.info('num delete instances: {:,}'.format(len(delete_indices)))
     logger.info('adversary: {}'.format(args.adversary))
 
     # dataset statistics
-    logger.info('train instances: {:,}'.format(X_train.shape[0]))
-    logger.info('test instances: {:,}'.format(X_test.shape[0]))
-    logger.info('attributes: {:,}'.format(X_train.shape[1]))
+    logger.info('num train instances: {:,}'.format(X_train.shape[0]))
+    logger.info('num test instances: {:,}'.format(X_test.shape[0]))
+    logger.info('num features: {:,}'.format(X_train.shape[1]))
 
     logger.info('\nExact')
     start = time.time()
@@ -74,7 +74,7 @@ def first_retrain(args, logger, out_dir, seed):
     epsilons = [0.01, 0.1, 1.0]
     lmbdas = np.linspace(args.min_lmbda, args.max_lmbda, args.n_lmbda)
 
-    logger.info('n_remove: {}'.format(n_remove))
+    logger.info('n_remove: {:,}'.format(n_remove))
     logger.info('epsilons: {}'.format(epsilons))
 
     random_state = exp_util.get_random_state(seed)
