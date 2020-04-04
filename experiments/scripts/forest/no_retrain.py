@@ -29,7 +29,9 @@ def vary_epsilon(args, logger, out_dir, seed):
 
     logger.info('\nExact')
     start = time.time()
-    model = cedar.Tree(lmbda=-1, max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
+    model = cedar.Forest(lmbda=-1, n_estimators=args.n_estimators,
+                         max_features=args.max_features, max_depth=args.max_depth,
+                         verbose=args.verbose, random_state=seed)
     model = model.fit(X_train, y_train)
     logger.info('{:.3f}s'.format(time.time() - start))
 
@@ -64,8 +66,9 @@ def vary_epsilon(args, logger, out_dir, seed):
         lmbda = epsilon / gamma
 
         start = time.time()
-        model = cedar.Tree(epsilon=epsilon, lmbda=lmbda, max_depth=args.max_depth,
-                           verbose=args.verbose, random_state=random_state)
+        model = cedar.Forest(epsilon=epsilon, lmbda=lmbda, n_estimators=args.n_estimators,
+                             max_features=args.max_features, max_depth=args.max_depth,
+                             verbose=args.verbose, random_state=random_state)
         model = model.fit(X_train, y_train)
 
         proba = model.predict_proba(X_test)[:, 1]
@@ -119,7 +122,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/tree/epsilon', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/forest/no_retrain', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
 
@@ -127,14 +130,17 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
 
-    parser.add_argument('--min_epsilon', type=float, default=0, help='minimum lambda.')
-    parser.add_argument('--max_epsilon', type=float, default=2, help='maximum lambda.')
+    parser.add_argument('--min_epsilon', type=float, default=0, help='minimum epsilon.')
+    parser.add_argument('--max_epsilon', type=float, default=2, help='maximum epsilon.')
     parser.add_argument('--n_epsilon', type=int, default=10, help='number of data points.')
 
     parser.add_argument('--n_remove', type=int, default=1, help='number of instances to sequentially delete.')
     parser.add_argument('--frac_remove', type=float, default=None, help='fraction of instances to delete.')
 
-    parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
+    parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
+    parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
+
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
     main(args)
