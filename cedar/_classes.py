@@ -55,8 +55,6 @@ class Forest(object):
         The minimum number of samples needed to make a split when building a tree.
     min_samples_leaf: int (default=1)
         The minimum number of samples needed to make a leaf.
-    min_impurity_decrease: float (default=1e-8)
-        The minimum impurity decrease to be considered for a split.
     random_state: int (default=None)
         Random state for reproducibility.
     verbose: int (default=0)
@@ -64,7 +62,7 @@ class Forest(object):
     """
     def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt',
                  max_depth=50, min_samples_split=2, min_samples_leaf=1,
-                 min_impurity_decrease=1e-8, random_state=None, verbose=0):
+                 random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
@@ -72,7 +70,6 @@ class Forest(object):
         self.max_depth = 1000 if max_depth is None else max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
-        self.min_impurity_decrease = min_impurity_decrease
         self.random_state = random_state
         self.verbose = verbose
 
@@ -125,10 +122,12 @@ class Forest(object):
             feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
             feature_indices = feature_indices.astype(np.int32)
 
-            # tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators,
-            tree = Tree(epsilon=self.epsilon, lmbda=self.lmbda / self.n_estimators / self.max_depth,
-                        max_depth=self.max_depth, min_samples_split=self.min_samples_split,
-                        min_samples_leaf=self.min_samples_leaf, random_state=self.random_state + i,
+            tree = Tree(epsilon=self.epsilon,
+                        lmbda=self.lmbda / self.n_estimators / self.max_depth,
+                        max_depth=self.max_depth,
+                        min_samples_split=self.min_samples_split,
+                        min_samples_leaf=self.min_samples_leaf,
+                        random_state=self.random_state + i,
                         verbose=self.verbose)
             tree = tree.fit(X, y, features=feature_indices, manager=self.manager_)
             self.trees_.append(tree)
@@ -332,12 +331,22 @@ class Tree(object):
             self.single_tree_ = True
 
         self.tree_ = _Tree(features)
-        self.splitter_ = _Splitter(self.min_samples_leaf, self.lmbda)
-        self.tree_builder_ = _TreeBuilder(self.manager_, self.splitter_,
-                                          self.min_samples_split, self.min_samples_leaf,
-                                          self.max_depth, self.random_state)
-        self.remover_ = _Remover(self.manager_, self.tree_builder_, self.epsilon, self.lmbda)
-        self.adder_ = _Adder(self.manager_, self.tree_builder_, self.epsilon, self.lmbda)
+        self.splitter_ = _Splitter(self.min_samples_leaf,
+                                   self.lmbda)
+        self.tree_builder_ = _TreeBuilder(self.manager_,
+                                          self.splitter_,
+                                          self.min_samples_split,
+                                          self.min_samples_leaf,
+                                          self.max_depth,
+                                          self.random_state)
+        self.remover_ = _Remover(self.manager_,
+                                 self.tree_builder_,
+                                 self.epsilon,
+                                 self.lmbda)
+        self.adder_ = _Adder(self.manager_,
+                             self.tree_builder_,
+                             self.epsilon,
+                             self.lmbda)
         self.tree_builder_.build(self.tree_)
 
         return self
