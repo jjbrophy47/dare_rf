@@ -1,5 +1,6 @@
 """
 This experiment tests the accuracy of the forest.
+TODO: Tune/train on a subet of the training data.
 """
 import os
 import sys
@@ -73,7 +74,7 @@ def performance(args, logger, seed):
                                        max_features=mf, verbose=args.verbose,
                                        random_state=seed, bootstrap=args.bootstrap)
 
-        if args.tune:
+        if not args.no_tune:
             param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
                           'max_features': max_features, 'bootstrap': [True, False]}
             gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
@@ -96,7 +97,7 @@ def performance(args, logger, seed):
     model = cedar.Forest(lmbda=-1, n_estimators=args.n_estimators,
                          max_features=args.max_features, max_depth=args.max_depth,
                          verbose=args.verbose, random_state=seed)
-    if args.tune:
+    if not args.no_tune:
         param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
                       'max_features': max_features}
         gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
@@ -121,7 +122,7 @@ def performance(args, logger, seed):
                              max_features=args.max_features, max_depth=args.max_depth,
                              verbose=args.verbose, random_state=seed)
 
-        if args.tune:
+        if not args.no_tune:
             param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
                           'max_features': max_features}
             gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
@@ -169,7 +170,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
-    parser.add_argument('--tune', action='store_true', default=True, help='tune models.')
+    parser.add_argument('--no_tune', action='store_true', default=True, help='tune models.')
     parser.add_argument('--cv', type=int, default=2, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')

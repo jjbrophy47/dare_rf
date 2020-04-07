@@ -94,7 +94,8 @@ def no_retrain(args, logger, out_dir, seed):
                         finished = True
                         break
 
-        lmbda += args.increment_lmbda
+        if not finished:
+            lmbda += args.increment_lmbda
 
     model = model.fit(X_train, y_train)
     exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
