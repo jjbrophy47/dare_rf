@@ -73,6 +73,8 @@ def performance(args, logger, seed):
             tune_indices, _ = list(sss.split(X_train, y_train))[0]
             X_train_sub, y_train_sub = X_train[tune_indices], y_train[tune_indices]
             logger.info('tune instances: {:,}'.format(X_train_sub.shape[0]))
+        else:
+            X_train_sub, y_train_sub = X_train, y_train
 
     # SKLearn
     if args.sklearn:
