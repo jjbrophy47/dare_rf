@@ -1,6 +1,6 @@
 """
-Experiment: Show how test accuracy changes when there are
-            no retrainings (epsilon = lambda).
+Experiment: Find smallest epsilon/lmbda that gives a predictive performance
+            within a tolerance % of the deterministic model.
 """
 import os
 import sys
@@ -8,7 +8,7 @@ import time
 import argparse
 
 import numpy as np
-from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.model_selection import cross_val_score
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../..')
@@ -17,7 +17,7 @@ import cedar
 from utility import data_util, exp_util, print_util
 
 
-def vary_epsilon(args, logger, out_dir, seed):
+def no_retrain(args, logger, out_dir, seed):
 
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
@@ -30,69 +30,65 @@ def vary_epsilon(args, logger, out_dir, seed):
     logger.info('\nExact')
     start = time.time()
     model = cedar.Tree(lmbda=-1, max_depth=args.max_depth, verbose=args.verbose, random_state=seed)
+
+    exact_score = cross_val_score(model, X_train, y_train, scoring=args.scoring, cv=args.cv).mean()
+    logger.info('[CV] {}: {:.3f}'.format(args.scoring, exact_score))
+
     model = model.fit(X_train, y_train)
-    logger.info('{:.3f}s'.format(time.time() - start))
-
-    exp_util.performance(model, X_test, y_test, name='exact', logger=logger)
-
-    # save deterministic results
-    if args.save_results:
-        proba = model.predict_proba(X_test)[:, 1]
-        pred = model.predict(X_test)
-        auc = roc_auc_score(y_test, proba)
-        acc = accuracy_score(y_test, pred)
-
-        d = model.get_params()
-        d['auc'] = auc
-        d['acc'] = acc
-        d['n_train'] = X_train.shape[0]
-        d['n_features'] = X_train.shape[1]
-        np.save(os.path.join(out_dir, 'exact.npy'), d)
+    exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
+    logger.info('total time: {:.3f}s'.format(time.time() - start))
 
     # observe change in test acuracy as lambda varies
     logger.info('\nCeDAR')
-    epsilons = np.linspace(args.min_epsilon, args.max_epsilon, args.n_epsilon)
 
-    n_remove = args.n_remove if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
-    gamma = n_remove / X_train.shape[0]
-    logger.info('n_remove: {}, gamma: {:e}'.format(n_remove, gamma))
+    max_depths = [1]
+    if args.max_depth > 1:
+        max_depths = [3, 5, 10, 20]
 
-    aucs, accs = [], []
-    lmbdas = []
     random_state = exp_util.get_random_state(seed)
-    for i, epsilon in enumerate(epsilons):
-        lmbda = epsilon / gamma
 
-        start = time.time()
-        model = cedar.Tree(epsilon=epsilon, lmbda=lmbda, max_depth=args.max_depth,
-                           verbose=args.verbose, random_state=random_state)
-        model = model.fit(X_train, y_train)
+    cedar_score = 0
+    lmbda = 0
+    finished = False
 
-        proba = model.predict_proba(X_test)[:, 1]
-        pred = model.predict(X_test)
-        auc = roc_auc_score(y_test, proba)
-        acc = accuracy_score(y_test, pred)
+    while not finished:
 
-        out_str = '[{}] epsilon: {:e}, lmbda: {:e} => acc: {:.3f}, auc: {:.3f}'
-        logger.info(out_str.format(i, epsilon, lmbda, acc, auc))
+        for max_depth in max_depths:
 
-        aucs.append(auc)
-        accs.append(acc)
-        lmbdas.append(lmbda)
+            start = time.time()
+            model = cedar.Tree(lmbda=lmbda, max_depth=max_depth,
+                               verbose=args.verbose, random_state=random_state)
+            cedar_score = cross_val_score(model, X_train, y_train, scoring=args.scoring, cv=args.cv).mean()
 
-        if args.verbose > 0:
-            exp_util.performance(model, X_test, y_test, name='cedar', logger=logger)
+            end = time.time() - start
+            out_str = '[{:.3f}s] max_depth: {}, lmbda: {:.2e} => {}: {:.3f}'
+            logger.info(out_str.format(end, max_depth, lmbda, args.scoring, cedar_score))
+
+            if exact_score - cedar_score <= args.tol:
+                finished = True
+                break
+
+            lmbda += args.increment_lmbda
+
+    model = model.fit(X_train, y_train)
+    exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
+    logger.info('lmbda: {}'.format(lmbda))
+
+    n_removes = [1, 10, 100, 1000, int(0.005 * X_train.shape[0]), int(0.01 * X_train.shape[0])]
+    epsilons = [lmbda * (n_remove / X_train.shape[0]) for n_remove in n_removes]
+
+    logger.info('n_removes: {}'.format(n_removes))
+    logger.info('epsilons: {}'.format(epsilons))
 
     if args.save_results:
         d = model.get_params()
-        d['auc'] = aucs
-        d['acc'] = accs
+        d['max_depth'] = max_depth
+        d['lmbda'] = lmbda
         d['epsilon'] = epsilons
-        d['lmbda'] = lmbdas
+        d['n_remove'] = n_removes
         d['n_train'] = X_train.shape[0]
         d['n_features'] = X_train.shape[1]
-        d['n_remove'] = n_remove
-        np.save(os.path.join(out_dir, 'cedar.npy'), d)
+        np.save(os.path.join(out_dir, 'results.npy'), d)
 
 
 def main(args):
@@ -110,7 +106,7 @@ def main(args):
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment
-        vary_epsilon(args, logger, ep_dir, seed=args.rs)
+        no_retrain(args, logger, ep_dir, seed=args.rs)
         args.rs += 1
 
         # remove logger
@@ -127,14 +123,13 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
 
-    parser.add_argument('--min_epsilon', type=float, default=0, help='minimum lambda.')
-    parser.add_argument('--max_epsilon', type=float, default=2, help='maximum lambda.')
-    parser.add_argument('--n_epsilon', type=int, default=10, help='number of data points.')
-
-    parser.add_argument('--n_remove', type=int, default=1, help='number of instances to sequentially delete.')
-    parser.add_argument('--frac_remove', type=float, default=None, help='fraction of instances to delete.')
-
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--increment_lmbda', type=float, default=100, help='value to increment lmbda by.')
+
+    parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
+    parser.add_argument('--scoring', type=str, default='accuracy', help='Predictive performance metric.')
+    parser.add_argument('--tol', type=float, default=0.01, help='Predictive performance tolerance.')
+
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()
     main(args)
