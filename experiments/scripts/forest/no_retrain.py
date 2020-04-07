@@ -61,13 +61,16 @@ def no_retrain(args, logger, out_dir, seed):
     logger.info('n_estimators: {}'.format(n_estimators_list))
     logger.info('max_features: {}'.format(max_features_list))
 
-    random_state = exp_util.get_random_state(seed)
-
     cedar_score = 0
     lmbda = 0
     finished = False
 
+    i = 0
+
     while not finished:
+
+        i += 1
+        random_state = exp_util.get_random_state(seed + i)
 
         for n_estimators in n_estimators_list:
             for max_depth in max_depths_list:
