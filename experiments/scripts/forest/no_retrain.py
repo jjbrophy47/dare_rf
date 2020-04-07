@@ -69,15 +69,15 @@ def no_retrain(args, logger, out_dir, seed):
 
     while not finished:
 
-        for max_depth in max_depths_list:
-            for n_estimators in n_estimators_list:
+        for n_estimators in n_estimators_list:
+            for max_depth in max_depths_list:
                 for max_features in max_features_list:
 
                     start = time.time()
                     model = cedar.Forest(lmbda=lmbda,
                                          max_depth=max_depth,
                                          n_estimators=n_estimators,
-                                         max_features=None,
+                                         max_features=max_features,
                                          verbose=args.verbose,
                                          random_state=random_state)
                     cedar_score = cross_val_score(model, X_train, y_train,
