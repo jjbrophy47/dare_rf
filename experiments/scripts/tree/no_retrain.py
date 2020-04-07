@@ -44,6 +44,7 @@ def no_retrain(args, logger, out_dir, seed):
     max_depths = [1]
     if args.max_depth > 1:
         max_depths = [3, 5, 10, 20]
+        max_depths = [x for x in max_depths if x <= args.max_depth]
 
     random_state = exp_util.get_random_state(seed)
 

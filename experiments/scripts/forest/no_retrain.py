@@ -49,7 +49,13 @@ def no_retrain(args, logger, out_dir, seed):
     # hyperparameters
     max_depths_list = [3, 5, 10, 20]
     n_estimators_list = [10, 100, 1000]
-    max_features_list = ['sqrt', 0.25]
+    max_features_list = [0.25]
+
+    max_depths_list = [x for x in max_depths_list if x <= args.max_depth]
+    n_estimators_list = [x for x in n_estimators_list if x <= args.n_estimators]
+    max_features_list = [x for x in max_features_list if x <= args.max_features]
+
+    max_features_list.insert(0, 'sqrt')
 
     logger.info('max_depths: {}'.format(max_depths_list))
     logger.info('n_estimators: {}'.format(n_estimators_list))
