@@ -147,7 +147,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out_dir', type=str, default='output/tree/no_retrain', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/forest/no_retrain', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
 
