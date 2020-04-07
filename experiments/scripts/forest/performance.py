@@ -10,6 +10,7 @@ import argparse
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import StratifiedShuffleSplit
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../../')
@@ -63,6 +64,16 @@ def performance(args, logger, seed):
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
 
+    # tune on a fraction of the training data
+    if not args.no_tune:
+        if args.tune_frac < 1.0:
+            sss = StratifiedShuffleSplit(n_splits=1, test_size=2,
+                                         train_size=args.tune_frac,
+                                         random_state=seed)
+            tune_indices, _ = list(sss.split(X_train, y_train))[0]
+            X_train_sub, y_train_sub = X_train[tune_indices], y_train[tune_indices]
+            logger.info('tune instances: {:,}'.format(X_train_sub.shape[0]))
+
     # SKLearn
     if args.sklearn:
         logger.info('\nSKLearn')
@@ -79,7 +90,7 @@ def performance(args, logger, seed):
                           'max_features': max_features, 'bootstrap': [True, False]}
             gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
                               verbose=args.verbose, refit=False)
-            gs = gs.fit(X_train, y_train)
+            gs = gs.fit(X_train_sub, y_train_sub)
             best_params = _get_best_params(gs, param_grid, logger, args.tol)
             model = RandomForestClassifier(n_estimators=best_params['n_estimators'],
                                            max_depth=best_params['max_depth'],
@@ -97,12 +108,13 @@ def performance(args, logger, seed):
     model = cedar.Forest(lmbda=-1, n_estimators=args.n_estimators,
                          max_features=args.max_features, max_depth=args.max_depth,
                          verbose=args.verbose, random_state=seed)
+
     if not args.no_tune:
         param_grid = {'n_estimators': n_estimators, 'max_depth': max_depth,
                       'max_features': max_features}
         gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
                           verbose=args.verbose, refit=False)
-        gs = gs.fit(X_train, y_train)
+        gs = gs.fit(X_train_sub, y_train_sub)
         best_params = _get_best_params(gs, param_grid, logger, args.tol)
         model = cedar.Forest(lmbda=-1, n_estimators=best_params['n_estimators'],
                              max_features=best_params['max_features'],
@@ -127,7 +139,8 @@ def performance(args, logger, seed):
                           'max_features': max_features}
             gs = GridSearchCV(model, param_grid, scoring=args.scoring, cv=args.cv,
                               verbose=args.verbose, refit=False)
-            gs = gs.fit(X_train, y_train)
+            gs = gs.fit(X_train_sub, y_train_sub)
+
             best_params = _get_best_params(gs, param_grid, logger, args.tol)
             model = cedar.Forest(lmbda=args.lmbda, n_estimators=best_params['n_estimators'],
                                  max_features=best_params['max_features'],
@@ -170,7 +183,8 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=None, help='maximum depth of the tree.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
-    parser.add_argument('--no_tune', action='store_true', default=True, help='tune models.')
+    parser.add_argument('--no_tune', action='store_true', default=False, help='do not tune.')
+    parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
     parser.add_argument('--cv', type=int, default=2, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')
