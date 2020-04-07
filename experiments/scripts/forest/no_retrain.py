@@ -47,7 +47,7 @@ def no_retrain(args, logger, out_dir, seed):
     logger.info('\nCeDAR')
 
     # hyperparameters
-    max_depths_list = [3, 5, 10, 20]
+    max_depths_list = [1, 3, 5, 10, 20]
     n_estimators_list = [10, 100, 1000]
     max_features_list = [0.25]
 
