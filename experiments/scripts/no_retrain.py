@@ -110,14 +110,16 @@ def experiment(args, logger, out_dir, seed):
         values_list = list(product(max_depths_list, n_estimators_list, max_features_list))
         param_grid = [dict(zip(names, values)) for values in values_list]
 
-    random_state = exp_util.get_random_state(seed)
-
     cedar_score = 0
     lmbda = -args.increment_lmbda
     finished = False
 
+    i = -1
     while not finished:
         lmbda += args.increment_lmbda
+        i += 1
+
+        random_state = exp_util.get_random_state(seed + i)
 
         for params in param_grid:
 
