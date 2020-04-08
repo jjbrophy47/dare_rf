@@ -146,7 +146,6 @@ def performance(args, logger, seed):
 
         best_params = _get_best_params(gs, param_grid, logger, args.tol)
         model.set_params(**best_params)
-        logger.info('best_params: {}'.format(gs.best_params_))
 
     model = model.fit(X_train, y_train)
     exp_util.performance(model, X_test, y_test, name='deterministic', logger=logger)

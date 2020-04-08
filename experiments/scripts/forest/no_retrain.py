@@ -27,8 +27,29 @@ def no_retrain(args, logger, out_dir, seed):
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
 
-    logger.info('\nExact')
+    logger.info('\nDeterministic')
     start = time.time()
+
+    if args.model_type == 'stump':
+        model = cedar.Tree(lmbda=-1,
+                           max_depth=1,
+                           verbose=args.verbose,
+                           random_state=seed)
+
+    elif args.model_type == 'tree':
+        model = cedar.Tree(lmbda=-1,
+                           max_depth=args.max_depth,
+                           verbose=args.verbose,
+                           random_state=seed)
+
+    elif args.model_type == 'forest':
+        model = cedar.Forest(lmbda=-1,
+                             max_depth=args.max_depth,
+                             n_estimators=args.n_estimators,
+                             max_features=args.max_features,
+                             verbose=args.verbose,
+                             random_state=seed)
+
     model = cedar.Forest(lmbda=-1,
                          n_estimators=args.n_estimators,
                          max_depth=args.max_depth,
