@@ -66,8 +66,8 @@ class Forest(object):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
-        self.max_features = 'sqrt' if not max_features else max_features
-        self.max_depth = 1000 if max_depth is None else max_depth
+        self.max_features = max_features
+        self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.random_state = random_state
@@ -108,6 +108,10 @@ class Forest(object):
             assert self.max_features > 0 and self.max_features <= 1.0
             self.max_features_ = int(self.max_features * self.n_features_)
 
+        # set max_depth and lmbda
+        self.max_depth_ = 1000 if not max_depth else max_depth
+        self.lmbda_ = self.lmbda / self.n_estimators
+
         # one central location for the data
         self.manager_ = _DataManager(X, y)
 
@@ -123,8 +127,8 @@ class Forest(object):
             feature_indices = feature_indices.astype(np.int32)
 
             tree = Tree(epsilon=self.epsilon,
-                        lmbda=self.lmbda / self.n_estimators / self.max_depth,
-                        max_depth=self.max_depth,
+                        lmbda=self.lmbda_,
+                        max_depth=self.max_depth_,
                         min_samples_split=self.min_samples_split,
                         min_samples_leaf=self.min_samples_leaf,
                         random_state=self.random_state + i,
@@ -293,8 +297,8 @@ class Tree(object):
     def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, min_samples_split=2,
                  min_samples_leaf=1, random_state=None, verbose=0):
         self.epsilon = epsilon
+        self.max_depth = max_depth
         self.lmbda = lmbda
-        self.max_depth = -1 if max_depth is None else max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.random_state = random_state
@@ -330,23 +334,27 @@ class Tree(object):
             self.manager_ = _DataManager(X, y)
             self.single_tree_ = True
 
+        # set max_depth and lmbda
+        self.max_depth_ = 1000 if not self.max_depth else self.max_depth
+        self.lmbda_ = self.lmbda / self.max_depth_
+
         self.tree_ = _Tree(features)
         self.splitter_ = _Splitter(self.min_samples_leaf,
-                                   self.lmbda)
+                                   self.lmbda_)
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
                                           self.min_samples_split,
                                           self.min_samples_leaf,
-                                          self.max_depth,
+                                          self.max_depth_,
                                           self.random_state)
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
                                  self.epsilon,
-                                 self.lmbda)
+                                 self.lmbda_)
         self.adder_ = _Adder(self.manager_,
                              self.tree_builder_,
                              self.epsilon,
-                             self.lmbda)
+                             self.lmbda_)
         self.tree_builder_.build(self.tree_)
 
         return self

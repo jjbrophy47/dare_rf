@@ -40,7 +40,7 @@ cdef class _TreeBuilder:
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
-        self.max_depth = 1000 if max_depth == -1 else max_depth
+        self.max_depth = max_depth
         self.random_state = random_state
         set_srand(self.random_state)
 

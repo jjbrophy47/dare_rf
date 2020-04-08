@@ -87,7 +87,6 @@ cdef int generate_distribution(double lmbda, double* distribution,
 
         for i in range(n_gini_indices):
             distribution[i] /= normalizing_constant
-            # printf('distribution[%d]: %.20f\n', i, distribution[i])
 
     return 0
 

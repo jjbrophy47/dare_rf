@@ -219,7 +219,7 @@ def main(args):
     for i in range(args.repeats):
 
         # create output dir
-        rs_dir = os.path.join(args.out_dir, args.dataset, '{}'.format(args.adversary), 'rs{}'.format(args.rs))
+        rs_dir = os.path.join(args.out_dir, args.dataset, args.adversary, 'rs{}'.format(args.rs))
         os.makedirs(rs_dir, exist_ok=True)
 
         # create logger
