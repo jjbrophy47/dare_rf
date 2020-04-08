@@ -61,7 +61,7 @@ class Forest(object):
         Verbosity level.
     """
     def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt',
-                 max_depth=50, min_samples_split=2, min_samples_leaf=1,
+                 max_depth=10, min_samples_split=2, min_samples_leaf=1,
                  random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
@@ -109,7 +109,7 @@ class Forest(object):
             self.max_features_ = int(self.max_features * self.n_features_)
 
         # set max_depth and lmbda
-        self.max_depth_ = 1000 if not max_depth else max_depth
+        self.max_depth_ = 1000 if not self.max_depth else self.max_depth
         self.lmbda_ = self.lmbda / self.n_estimators
 
         # one central location for the data

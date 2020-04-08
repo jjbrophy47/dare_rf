@@ -1,5 +1,5 @@
 """
-This experiment tests the predictive performance of CeDAR.
+This experiment tests the accuracy of a single decision tree.
 """
 import os
 import sys
