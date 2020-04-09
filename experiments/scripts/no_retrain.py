@@ -126,7 +126,7 @@ def experiment(args, logger, out_dir, seed):
             start = time.time()
             model = _get_model(args, lmbda=lmbda, seed=random_state)
             model.set_params(**params)
-            cedar_score = cross_val_score(model, X_train, y_train,
+            cedar_score = cross_val_score(model, X_train_sub, y_train_sub,
                                           scoring=args.scoring, cv=args.cv).mean()
 
             end = time.time() - start
