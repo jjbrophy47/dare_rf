@@ -1,5 +1,6 @@
 """
 CeDAR (CErtified Data Addition and Removal) Trees.
+TODO: set random state if None is given.
 """
 import numpy as np
 
