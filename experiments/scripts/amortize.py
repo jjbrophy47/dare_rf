@@ -66,11 +66,10 @@ def unlearning_method(args, random_state, out_dir, logger, X_train, y_train, X_t
     model = model.fit(X_train, y_train)
     train_time = time.time() - start
     logger.info('[{}] train time: {:.3f}s'.format(name, train_time))
-
     auc, acc = exp_util.performance(model, X_test, y_test, logger=logger, name=name)
-    performance_markers = [int(x) for x in np.linspace(0, len(delete_indices) - 1, 10)]
 
-    # delete
+    # result containers
+    performance_markers = [int(x) for x in np.linspace(0, len(delete_indices) - 1, 10)]
     times = [train_time]
     aucs, accs = [auc], [acc]
 
@@ -119,8 +118,9 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
 
     # train
     logger.info('\n{}'.format(name.capitalize()))
-    start = time.time()
     model = _get_model(args, epsilon=0, lmbda=-1, seed=random_state)
+
+    start = time.time()
     model = model.fit(X_train, y_train)
     initial_train_time = time.time() - start
     logger.info('[{}] train time: {:.3f}s'.format(name, initial_train_time))
@@ -199,7 +199,8 @@ def main(args):
 
         # create output dir
         rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                              args.adversary, 'rs{}'.format(args.rs))
+                              'ep{}'.format(args.epsilon), args.adversary,
+                              'rs{}'.format(args.rs))
         os.makedirs(rs_dir, exist_ok=True)
 
         # create logger

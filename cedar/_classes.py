@@ -1,6 +1,5 @@
 """
 CeDAR (CErtified Data Addition and Removal) Trees.
-TODO: set random state if None is given.
 """
 import numpy as np
 
@@ -11,6 +10,10 @@ from ._adder import _Adder
 from ._remover import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
+
+
+RAND_INT_LIMIT = 1000000
+MAX_DEPTH_LIMIT = 1000
 
 
 def check_data(X, y=None):
@@ -97,6 +100,12 @@ class Forest(object):
         self.n_features_ = X.shape[1]
         X, y = check_data(X, y)
 
+        # set random state
+        if not self.random_state:
+            self.random_state_ = np.random.randint(RAND_INT_LIMIT)
+        else:
+            self.random_state_ = self.random_state
+
         # set max_features
         if not self.max_features or self.max_features == 'sqrt':
             self.max_features_ = int(np.sqrt(self.n_features_))
@@ -110,7 +119,7 @@ class Forest(object):
             self.max_features_ = int(self.max_features * self.n_features_)
 
         # set max_depth and lmbda
-        self.max_depth_ = 1000 if not self.max_depth else self.max_depth
+        self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
         self.lmbda_ = self.lmbda / self.n_estimators
 
         # one central location for the data
@@ -123,7 +132,7 @@ class Forest(object):
             if self.verbose > 2:
                 print('tree {}'.format(i))
 
-            np.random.seed(self.random_state + i)
+            np.random.seed(self.random_state_ + i)
             feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
             feature_indices = feature_indices.astype(np.int32)
 
@@ -132,7 +141,7 @@ class Forest(object):
                         max_depth=self.max_depth_,
                         min_samples_split=self.min_samples_split,
                         min_samples_leaf=self.min_samples_leaf,
-                        random_state=self.random_state + i,
+                        random_state=self.random_state_ + i,
                         verbose=self.verbose)
             tree = tree.fit(X, y, features=feature_indices, manager=self.manager_)
             self.trees_.append(tree)
@@ -323,6 +332,13 @@ class Tree(object):
         assert X.ndim == 2
         assert y.ndim == 1
 
+        # set random state
+        if not self.random_state:
+            self.random_state_ = np.random.randint(RAND_INT_LIMIT)
+        else:
+            self.random_state_ = self.random_state
+
+        # configure data manager
         if features is not None:
             assert manager is not None
             self.n_features_ = features.shape[0]
@@ -336,7 +352,7 @@ class Tree(object):
             self.single_tree_ = True
 
         # set max_depth and lmbda
-        self.max_depth_ = 1000 if not self.max_depth else self.max_depth
+        self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
         self.lmbda_ = self.lmbda / self.max_depth_
 
         self.tree_ = _Tree(features)
@@ -347,7 +363,7 @@ class Tree(object):
                                           self.min_samples_split,
                                           self.min_samples_leaf,
                                           self.max_depth_,
-                                          self.random_state)
+                                          self.random_state_)
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
                                  self.epsilon,
