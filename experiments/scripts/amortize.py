@@ -108,7 +108,9 @@ def unlearning_method(args, random_state, out_dir, logger, X_train, y_train, X_t
         d['depth'] = np.array(depths)
         d['auc'] = np.array(aucs)
         d['acc'] = np.array(accs)
-        np.save(os.path.join(out_dir, '{}.npy'.format(name)), d)
+
+        fname = name if name == 'exact' else '{}_ep{}'.format(name, args.epsilon)
+        np.save(os.path.join(out_dir, '{}.npy'.format(fname)), d)
 
 
 def naive_method(args, random_state, out_dir, logger, X_train, y_train,
@@ -199,12 +201,12 @@ def main(args):
 
         # create output dir
         rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                              'ep{}'.format(args.epsilon), args.adversary,
-                              'rs{}'.format(args.rs))
+                              args.adversary, 'rs{}'.format(args.rs))
         os.makedirs(rs_dir, exist_ok=True)
 
         # create logger
-        logger = print_util.get_logger(os.path.join(rs_dir, 'log.txt'.format(args.dataset)))
+        logger_name = 'log_ep{}.txt'.format(args.epsilon)
+        logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
         logger.info(args)
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
