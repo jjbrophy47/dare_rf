@@ -100,9 +100,11 @@ def unlearning_method(args, random_state, out_dir, logger, X_train, y_train, X_t
     logger.info('[{}] types: {}'.format(name, types_counter))
     logger.info('[{}] depths: {}'.format(name, depths_counter))
     auc, acc = exp_util.performance(model, X_test, y_test, logger=logger, name=name)
+    logger.info('[{}] total time: {:.3f}s'.format(name, time.time() - experiment_start))
 
     if args.save_results:
         d = model.get_params()
+        d['train_time'] = train_time
         d['time'] = np.array(times)
         d['type'] = np.array(types)
         d['depth'] = np.array(depths)
@@ -143,6 +145,7 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
 
     if args.save_results:
         d = model.get_params()
+        d['train_time'] = initial_train_time
         d['time'] = np.array(times)
         d['n_train'] = X_train.shape[0]
         d['n_features'] = X_train.shape[1]
