@@ -11,7 +11,6 @@ cdef enum:
     # particularly tiny on Windows/MSVC.
     RAND_R_MAX = 0x7FFFFFFF
 
-# cdef double get_random() nogil
 cdef UINT32_t our_rand_r(UINT32_t* seed) nogil
 cdef double rand_uniform(double low, double high, UINT32_t* random_state) nogil
 cdef double compute_gini(double count, double left_count, double right_count,
@@ -22,5 +21,4 @@ cdef int sample_distribution(double* distribution, int n_distribution,
                              UINT32_t* random_state) nogil
 cdef int* convert_int_ndarray(np.ndarray arr)
 cdef int* copy_int_array(int* arr, int n_elem) nogil
-cdef void set_srand(int random_state) nogil
 cdef void dealloc(Node *node) nogil

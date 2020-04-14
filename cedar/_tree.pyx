@@ -16,12 +16,9 @@ cimport numpy as np
 np.import_array()
 
 from ._utils cimport convert_int_ndarray
-# from ._utils cimport set_srand
 from ._utils cimport dealloc
 
 # constants
-# from numpy import int32 as INT
-
 cdef int UNDEF = -1
 cdef double UNDEF_LEAF_VAL = 0.5
 

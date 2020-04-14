@@ -15,21 +15,7 @@ cimport numpy as np
 np.import_array()
 
 # constants
-# from numpy import int32 as INT
-# ctypedef np.npy_uint32 UINT32_t
 cdef inline UINT32_t DEFAULT_SEED = 1
-
-# cdef enum:
-#     # Max value for our rand_r replacement (near the bottom).
-#     # We don't use RAND_MAX because it's different across platforms and
-#     # particularly tiny on Windows/MSVC.
-#     RAND_R_MAX = 0x7FFFFFFF
-
-# cdef inline double get_random() nogil:
-#     """
-#     Generate a random number between 0 and 1 sampled uniformly.
-#     """
-#     return rand() / RAND_MAX
 
 cdef inline double rand_uniform(double low, double high,
                                 UINT32_t* random_state) nogil:
@@ -142,7 +128,6 @@ cdef int sample_distribution(double* distribution, int n_distribution,
     cdef double weight = 0
 
     weight = rand_uniform(0, 1, random_state)
-    printf('weight: %.10f\n', weight)
 
     for i in range(n_distribution):
         if weight < distribution[i]:
@@ -177,16 +162,6 @@ cdef int* copy_int_array(int* arr, int n_elem) nogil:
         new_arr[i] = arr[i]
 
     return new_arr
-
-cdef void set_srand(int random_state) nogil:
-    """
-    Sets srand given a random state.
-    """
-    srand(random_state)
-
-    # get rid of garbage first value:
-    # https://stackoverflow.com/questions/30430137/first-random-number-is-always-smaller-than-rest
-    rand()
 
 cdef void dealloc(Node *node) nogil:
     """

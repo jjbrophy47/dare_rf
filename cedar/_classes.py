@@ -13,7 +13,6 @@ from ._tree import _Tree
 from ._tree import _TreeBuilder
 
 
-RAND_INT_LIMIT = 1000000
 MAX_DEPTH_LIMIT = 1000
 
 
