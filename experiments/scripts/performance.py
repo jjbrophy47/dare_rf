@@ -88,12 +88,12 @@ def performance(args, logger, seed):
             param_grid = [{'max_depth': max_depth,
                            'n_estimators': [1, 100],
                            'max_features': max_features},
-                           {'max_depth': [1, 3, 5, 10],
-                            'n_estimators': [1000],
-                            'max_features': max_features}
+                          {'max_depth': [1, 3, 5, 10],
+                           'n_estimators': [1000],
+                           'max_features': max_features},
                           {'max_depth': [20],
                            'n_estimators': [1000],
-                           'max_features': ['sqrt']}
+                           'max_features': ['sqrt']}]
 
     # SKLearn
     if args.sklearn:
