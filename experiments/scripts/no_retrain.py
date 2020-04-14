@@ -77,7 +77,7 @@ def experiment(args, logger, out_dir, seed):
     # Deterministic performance
     logger.info('\nDeterministic')
     start = time.time()
-    model = _get_model(args, lmbda=-1, seed=seed)
+    model = _get_model(args, lmbda=-1, random_state=random_state)
     exact_score = cross_val_score(model, X_train_sub, y_train_sub,
                                   scoring=args.scoring, cv=args.cv).mean()
     logger.info('[CV] {}: {:.3f}'.format(args.scoring, exact_score))
@@ -99,7 +99,7 @@ def experiment(args, logger, out_dir, seed):
         i += 1
 
         start = time.time()
-        model = _get_model(args, lmbda=lmbda, seed=random_state)
+        model = _get_model(args, lmbda=lmbda, random_state=random_state)
         cedar_score = cross_val_score(model, X_train_sub, y_train_sub,
                                       scoring=args.scoring, cv=args.cv).mean()
 
@@ -155,8 +155,8 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--repeats', type=int, default=1, help='number of times to perform the experiment.')
-    parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
+    parser.add_argument('--repeats', type=int, default=10, help='number of times to perform the experiment.')
+    parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
