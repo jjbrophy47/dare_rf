@@ -83,7 +83,7 @@ def performance(args, logger, seed):
                       'n_estimators': n_estimators,
                       'max_features': max_features}
 
-        # excludes the combination: 1000, 20, 0.25
+        # excludes combination: {n_estimators: 1000, max_depth: 20, max_features: 0.25}
         if args.reduce_search:
             param_grid = [{'max_depth': max_depth,
                            'n_estimators': [1, 100],
