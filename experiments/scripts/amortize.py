@@ -16,7 +16,7 @@ import cedar
 from utility import data_util, exp_util, print_util, exact_adv_util
 
 
-def _get_model(args, epsilon=0, lmbda=-1, seed=None):
+def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
     """
     Return the appropriate model CeDAR model.
     """
@@ -26,14 +26,14 @@ def _get_model(args, epsilon=0, lmbda=-1, seed=None):
                            lmbda=lmbda,
                            max_depth=1,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'tree':
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=args.max_depth,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'forest':
         model = cedar.Forest(epsilon=epsilon,
@@ -42,7 +42,7 @@ def _get_model(args, epsilon=0, lmbda=-1, seed=None):
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
-                             random_state=seed)
+                             random_state=random_state)
 
     else:
         exit('model_type {} unknown!'.format(args.model_type))
@@ -88,7 +88,10 @@ def unlearning_method(args, random_state, out_dir, logger, X_train, y_train, X_t
             accs.append(acc)
 
             if args.verbose > 0:
-                logger.info('{:.2f}%: amortized time: {:.3f}s'.format(i / len(delete_indices) * 100, np.mean(times)))
+                experiment_time = time.time() - experiment_start
+                percent_complete = i / len(delete_indices) * 100
+                status_str = '[{:.2f}%] experiment time: {:.3f}s, amortized time: {:.3f}s'
+                logger.info(status_str.format(percent_complete, experiment_time, np.mean(times)))
 
         i += 1
 
@@ -155,7 +158,7 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
 def experiment(args, logger, out_dir, seed):
 
     # obtain data
-    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {:,}'.format(X_train.shape[0]))

@@ -4,6 +4,7 @@ myenv
 notes
 
 experiments/scripts/other
+experiments/utility/__pycache__
 
 cedar/__pycache__
 cedar/build

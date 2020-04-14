@@ -16,7 +16,7 @@ import cedar
 from utility import data_util, exp_util, print_util, exact_adv_util
 
 
-def _get_model(args, epsilon, seed=None):
+def _get_model(args, epsilon, random_state=None):
     """
     Return the appropriate model CeDAR model.
     """
@@ -26,14 +26,14 @@ def _get_model(args, epsilon, seed=None):
                            lmbda=args.lmbda,
                            max_depth=1,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'tree':
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=args.lmbda,
                            max_depth=args.max_depth,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'forest':
         model = cedar.Forest(epsilon=epsilon,
@@ -42,7 +42,7 @@ def _get_model(args, epsilon, seed=None):
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
-                             random_state=seed)
+                             random_state=random_state)
 
     else:
         exit('model_type {} unknown!'.format(args.model_type))
@@ -53,34 +53,35 @@ def _get_model(args, epsilon, seed=None):
 def experiment(args, logger, out_dir, seed):
 
     # obtain data
-    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
-
-    # choose instances to delete
-    n_remove = X_train.shape[0] - 1 if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
-
-    if args.adversary == 'random':
-        np.random.seed(seed)
-        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
-
-    elif args.adversary == 'root':
-        delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed,
-                                                        verbose=args.verbose, logger=logger)
-    else:
-        exit('uknown adversary: {}'.format(args.adversary))
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('features: {:,}'.format(X_train.shape[1]))
+
+    # get random state
+    random_state = exp_util.get_random_state(seed)
+
+    # choose instances to delete
+    n_remove = X_train.shape[0] - 1 if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
+
+    if args.adversary == 'random':
+        np.random.seed(random_state)
+        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
+
+    elif args.adversary == 'root':
+        delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=random_state,
+                                                        verbose=args.verbose, logger=logger)
+    else:
+        exit('uknown adversary: {}'.format(args.adversary))
+
     logger.info('delete instances: {:,}'.format(len(delete_indices)))
     logger.info('adversary: {}'.format(args.adversary))
 
-    # set the random_state
-    random_state = exp_util.get_random_state(seed)
-
     # record time it takes to train an exact model
     logger.info('\nExact')
-    model = _get_model(args, epsilon=0, seed=random_state)
+    model = _get_model(args, epsilon=0, random_state=random_state)
     start = time.time()
     model = model.fit(X_train, y_train)
     exact_train_time = time.time() - start
@@ -99,7 +100,7 @@ def experiment(args, logger, out_dir, seed):
     for i, epsilon in enumerate(epsilons):
         remaining_time = exact_train_time
 
-        model = _get_model(args, epsilon=epsilon, seed=random_state)
+        model = _get_model(args, epsilon=epsilon, random_state=random_state)
         model = model.fit(X_train, y_train)
 
         # delete instances until retrain time is exceeded

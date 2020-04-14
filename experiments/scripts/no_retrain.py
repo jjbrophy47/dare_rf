@@ -6,7 +6,6 @@ import os
 import sys
 import time
 import argparse
-from itertools import product
 
 import numpy as np
 from sklearn.model_selection import cross_val_score
@@ -19,7 +18,7 @@ import cedar
 from utility import data_util, exp_util, print_util
 
 
-def _get_model(args, lmbda, seed=None):
+def _get_model(args, lmbda, random_state):
     """
     Return the appropriate model CeDAR model.
     """
@@ -28,13 +27,13 @@ def _get_model(args, lmbda, seed=None):
         model = cedar.Tree(lmbda=lmbda,
                            max_depth=1,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'tree':
         model = cedar.Tree(lmbda=lmbda,
                            max_depth=args.max_depth,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'forest':
         model = cedar.Forest(lmbda=lmbda,
@@ -42,7 +41,7 @@ def _get_model(args, lmbda, seed=None):
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
-                             random_state=seed)
+                             random_state=random_state)
 
     else:
         exit('model_type {} unknown!'.format(args.model_type))
@@ -53,18 +52,21 @@ def _get_model(args, lmbda, seed=None):
 def experiment(args, logger, out_dir, seed):
 
     # obtain data
-    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
 
+    # get random state
+    random_state = exp_util.get_random_state(seed)
+
     # tune on a fraction of the training data
     if args.tune_frac < 1.0:
         sss = StratifiedShuffleSplit(n_splits=1, test_size=2,
                                      train_size=args.tune_frac,
-                                     random_state=seed)
+                                     random_state=random_state)
         tune_indices, _ = list(sss.split(X_train, y_train))[0]
         X_train_sub, y_train_sub = X_train[tune_indices], y_train[tune_indices]
         logger.info('tune instances: {:,}'.format(X_train_sub.shape[0]))
@@ -84,31 +86,8 @@ def experiment(args, logger, out_dir, seed):
     exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
     logger.info('total time: {:.3f}s'.format(time.time() - start))
 
-    # find smallest lmbda that gives god performance
+    # find smallest lmbda that gives good performance
     logger.info('\nCeDAR')
-
-    # hyperparameters
-    if args.model_type == 'stump':
-        param_grid = [{'max_depth': 1}]
-
-    elif args.model_type == 'tree':
-        max_depth_list = [1, 3, 5, 10, 20]
-        max_depth_list = [x for x in max_depth_list if x <= args.max_depth]
-        param_grid = [{'max_depth': max_depth} for max_depth in max_depth_list]
-
-    elif args.model_type == 'forest':
-        max_depths_list = [1, 3, 5, 10, 20]
-        n_estimators_list = [10, 100, 1000]
-        max_features_list = [0.25]
-
-        max_depths_list = [x for x in max_depths_list if x <= args.max_depth]
-        n_estimators_list = [x for x in n_estimators_list if x <= args.n_estimators]
-        max_features_list = [x for x in max_features_list if x <= args.max_features]
-        max_features_list.insert(0, 'sqrt')
-
-        names = ['max_depth', 'n_estimators', 'max_features']
-        values_list = list(product(max_depths_list, n_estimators_list, max_features_list))
-        param_grid = [dict(zip(names, values)) for values in values_list]
 
     cedar_score = 0
     lmbda = -args.increment_lmbda
@@ -119,40 +98,26 @@ def experiment(args, logger, out_dir, seed):
         lmbda += args.increment_lmbda
         i += 1
 
-        random_state = exp_util.get_random_state(seed + i)
+        start = time.time()
+        model = _get_model(args, lmbda=lmbda, seed=random_state)
+        cedar_score = cross_val_score(model, X_train_sub, y_train_sub,
+                                      scoring=args.scoring, cv=args.cv).mean()
 
-        for params in param_grid:
+        end = time.time() - start
+        out_str = '[{:.3f}s] lmbda: {:.2e} => {}: {:.3f}'
+        logger.info(out_str.format(end, lmbda, args.scoring, cedar_score))
 
-            start = time.time()
-            model = _get_model(args, lmbda=lmbda, seed=random_state)
-            model.set_params(**params)
-            cedar_score = cross_val_score(model, X_train_sub, y_train_sub,
-                                          scoring=args.scoring, cv=args.cv).mean()
-
-            end = time.time() - start
-            out_str = '[{:.3f}s] params: {}, lmbda: {:.2e} => {}: {:.3f}'
-            logger.info(out_str.format(end, params, lmbda, args.scoring, cedar_score))
-
-            if exact_score - cedar_score <= args.tol:
-                finished = True
-                break
+        if exact_score - cedar_score <= args.tol:
+            finished = True
+            break
 
     model = model.fit(X_train, y_train)
     exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
     logger.info('lmbda: {}'.format(lmbda))
 
-    n_removes = [1, 10, 100, 1000, int(0.005 * X_train.shape[0]), int(0.01 * X_train.shape[0])]
-    epsilons = [lmbda * (n_remove / X_train.shape[0]) for n_remove in n_removes]
-
-    logger.info('n_removes: {}'.format(n_removes))
-    logger.info('epsilons: {}'.format(epsilons))
-
     if args.save_results:
         d = model.get_params()
-        d['params'] = params
         d['lmbda'] = lmbda
-        d['epsilon'] = epsilons
-        d['n_remove'] = n_removes
         d['n_train'] = X_train.shape[0]
         d['n_features'] = X_train.shape[1]
         np.save(os.path.join(out_dir, 'results.npy'), d)
@@ -200,7 +165,7 @@ if __name__ == '__main__':
     parser.add_argument('--increment_lmbda', type=float, default=100, help='value to increment lmbda by.')
 
     parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
-    parser.add_argument('--scoring', type=str, default='accuracy', help='Predictive performance metric.')
+    parser.add_argument('--scoring', type=str, default='roc_auc', help='Predictive performance metric.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='Predictive performance tolerance.')
 

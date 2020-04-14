@@ -19,7 +19,7 @@ import cedar
 from utility import data_util, exp_util, print_util
 
 
-def _get_best_params(gs, param_grid, logger, tol=0.0):
+def _get_best_params(gs, param_grid, logger, tol=0.01):
     """
     Chooses the set of hyperparameters whose `mean_fit_score` is within
     `tol` of the best `mean_fit_score` and has the lowest `mean_fit_time`.
@@ -46,12 +46,15 @@ def _get_best_params(gs, param_grid, logger, tol=0.0):
 def performance(args, logger, seed):
 
     # obtain data
-    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, seed, data_dir=args.data_dir)
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
+
+    # get random state
+    random_state = exp_util.get_random_state(seed)
 
     # tune on a fraction of the training data
     if not args.no_tune:
@@ -59,7 +62,7 @@ def performance(args, logger, seed):
         if args.tune_frac < 1.0:
             sss = StratifiedShuffleSplit(n_splits=1, test_size=2,
                                          train_size=args.tune_frac,
-                                         random_state=seed)
+                                         random_state=random_state)
             tune_indices, _ = list(sss.split(X_train, y_train))[0]
             X_train_sub, y_train_sub = X_train[tune_indices], y_train[tune_indices]
             logger.info('tune instances: {:,}'.format(X_train_sub.shape[0]))
@@ -87,11 +90,11 @@ def performance(args, logger, seed):
 
         if args.model_type == 'stump':
             model = DecisionTreeClassifier(max_depth=1,
-                                           random_state=seed)
+                                           random_state=random_state)
 
         elif args.model_type == 'tree':
             model = DecisionTreeClassifier(max_depth=args.max_depth,
-                                           random_state=seed)
+                                           random_state=random_state)
 
         else:
             sk_max_features = 'sqrt' if not args.max_features else args.max_features
@@ -99,7 +102,7 @@ def performance(args, logger, seed):
                                            n_estimators=args.n_estimators,
                                            max_features=sk_max_features)
 
-        if args.tune:
+        if not args.no_tune and args.model_type in ['tree', 'forest']:
             logger.info('param_grid: {}'.format(param_grid))
             gs = GridSearchCV(model, param_grid, scoring=args.scoring,
                               cv=args.cv, verbose=args.verbose)
@@ -121,13 +124,13 @@ def performance(args, logger, seed):
         model = cedar.Tree(lmbda=-1,
                            max_depth=1,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'tree':
         model = cedar.Tree(lmbda=-1,
                            max_depth=args.max_depth,
                            verbose=args.verbose,
-                           random_state=seed)
+                           random_state=random_state)
 
     elif args.model_type == 'forest':
         model = cedar.Forest(lmbda=-1,
@@ -135,7 +138,7 @@ def performance(args, logger, seed):
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
-                             random_state=seed)
+                             random_state=random_state)
 
     if args.model_type in['tree', 'forest'] and not args.no_tune:
 
@@ -179,7 +182,7 @@ if __name__ == '__main__':
     # hyperparameter tuning settings
     parser.add_argument('--no_tune', action='store_true', default=False, help='do not tune.')
     parser.add_argument('--cv', type=int, default=2, help='number of cross-validation folds for tuning.')
-    parser.add_argument('--scoring', type=str, default='accuracy', help='metric for tuning.')
+    parser.add_argument('--scoring', type=str, default='roc_auc', help='metric for tuning.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')
 
