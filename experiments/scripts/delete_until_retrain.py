@@ -92,11 +92,12 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
     # CeDAR
     logger.info('\nCeDAR')
-    logger.info('random_state: {}'.format(random_state))
-    logger.info('lmbda: {}'.format(lmbda))
+    start = time.time()
 
     epsilons = [0, 0.001, 0.01, 0.1, 1.0, 10.0]
     logger.info('epsilons: {}'.format(epsilons))
+    logger.info('lmbda: {}'.format(lmbda))
+    logger.info('random_state: {}'.format(random_state))
 
     # test different epsilons
     n_deletions = []
@@ -113,9 +114,9 @@ def experiment(args, logger, out_dir, seed, lmbda):
         # delete instances until retrain time is exceeded
         j = 0
         while remaining_time > 0 or j == len(X_train):
-            start = time.time()
+            start2 = time.time()
             model.delete(delete_indices[j])
-            delete_time = time.time() - start
+            delete_time = time.time() - start2
 
             remaining_time -= delete_time
             j += 1
@@ -137,6 +138,8 @@ def experiment(args, logger, out_dir, seed, lmbda):
         d['n_features'] = X_train.shape[1]
         d['adversary'] = args.adversary
         np.save(os.path.join(out_dir, 'results.npy'), d)
+
+    logger.info('total time: {:.3f}s'.format(time.time() - start))
 
 
 def main(args):

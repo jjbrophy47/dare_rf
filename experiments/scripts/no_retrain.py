@@ -99,12 +99,12 @@ def experiment(args, logger, out_dir, seed):
         lmbda += args.lmbda_step_size
         i += 1
 
-        start = time.time()
+        start2 = time.time()
         model = _get_model(args, lmbda=lmbda, random_state=random_state)
         cedar_score = cross_val_score(model, X_train_sub, y_train_sub,
                                       scoring=args.scoring, cv=args.cv).mean()
 
-        end = time.time() - start
+        end = time.time() - start2
         out_str = '[{:.3f}s] lmbda: {:.2e} => {}: {:.3f}'
         logger.info(out_str.format(end, lmbda, args.scoring, cedar_score))
 
@@ -123,6 +123,8 @@ def experiment(args, logger, out_dir, seed):
         d['n_features'] = X_train.shape[1]
         d['lmbda_step_size'] = args.lmbda_step_size
         np.save(os.path.join(out_dir, 'results.npy'), d)
+
+    logger.info('total time: {:.3f}s'.format(time.time() - start))
 
 
 def main(args):
