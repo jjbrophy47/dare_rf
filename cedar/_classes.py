@@ -1,8 +1,9 @@
 """
 CeDAR (CErtified Data Addition and Removal) Trees.
 """
-import numpy as np
+import numbers
 
+import numpy as np
 
 from ._manager import _DataManager
 from ._splitter import _Splitter
@@ -14,25 +15,6 @@ from ._tree import _TreeBuilder
 
 RAND_INT_LIMIT = 1000000
 MAX_DEPTH_LIMIT = 1000
-
-
-def check_data(X, y=None):
-    """
-    Makes sure data is an integer type.
-    """
-    result = None
-
-    if X.dtype != np.int32:
-        X = X.astype(np.int32)
-
-    if y is not None:
-        if y.dtype != np.int32:
-            y = y.astype(np.int32)
-        result = X, y
-    else:
-        result = X
-
-    return result
 
 
 class Forest(object):
@@ -101,10 +83,7 @@ class Forest(object):
         X, y = check_data(X, y)
 
         # set random state
-        if not self.random_state:
-            self.random_state_ = np.random.randint(RAND_INT_LIMIT)
-        else:
-            self.random_state_ = self.random_state
+        self.random_state_ = 1 if self.random_state is None else self.random_state
 
         # set max_features
         if not self.max_features or self.max_features == 'sqrt':
@@ -333,10 +312,7 @@ class Tree(object):
         assert y.ndim == 1
 
         # set random state
-        if not self.random_state:
-            self.random_state_ = np.random.randint(RAND_INT_LIMIT)
-        else:
-            self.random_state_ = self.random_state
+        self.random_state_ = check_random_state(self.random_state)
 
         # configure data manager
         if features is not None:
@@ -357,13 +333,13 @@ class Tree(object):
 
         self.tree_ = _Tree(features)
         self.splitter_ = _Splitter(self.min_samples_leaf,
-                                   self.lmbda_)
+                                   self.lmbda_,
+                                   self.random_state_)
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
                                           self.min_samples_split,
                                           self.min_samples_leaf,
-                                          self.max_depth_,
-                                          self.random_state_)
+                                          self.max_depth_)
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
                                  self.epsilon,
@@ -492,3 +468,52 @@ class Tree(object):
         for key, value in params.items():
             setattr(self, key, value)
         return self
+
+
+# ========================================================================
+# Validation Methods
+# =========================================================================
+
+# https://github.com/scikit-learn/scikit-learn/blob/\
+# 95d4f0841d57e8b5f6b2a570312e9d832e69debc/sklearn/utils/validation.py#L800
+def check_random_state(seed):
+    """Turn seed into a np.random.RandomState instance
+    Parameters
+    ----------
+    seed : None | int | instance of RandomState
+        If seed is None, return the RandomState singleton used by np.random.
+        If seed is an int, return a new RandomState instance seeded with seed.
+        If seed is already a RandomState instance, return it.
+        Otherwise raise ValueError.
+    """
+    if seed is None or seed is np.random:
+        return np.random.mtrand._rand
+
+    elif isinstance(seed, numbers.Integral):
+        return np.random.RandomState(seed)
+
+    elif isinstance(seed, np.random.RandomState):
+        return seed
+
+    else:
+        raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
+                         ' instance' % seed)
+
+
+def check_data(X, y=None):
+    """
+    Makes sure data is an integer type.
+    """
+    result = None
+
+    if X.dtype != np.int32:
+        X = X.astype(np.int32)
+
+    if y is not None:
+        if y.dtype != np.int32:
+            y = y.astype(np.int32)
+        result = X, y
+    else:
+        result = X
+
+    return result

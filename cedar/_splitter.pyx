@@ -10,10 +10,11 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
-from ._utils cimport get_random
+# from ._utils cimport get_random
 from ._utils cimport compute_gini
 from ._utils cimport generate_distribution
 from ._utils cimport sample_distribution
+from ._utils cimport RAND_R_MAX
 
 cdef class _Splitter:
     """
@@ -21,7 +22,7 @@ cdef class _Splitter:
     Finds the best splits on dense data, one split at a time.
     """
 
-    def __cinit__(self, int min_samples_leaf, double lmbda):
+    def __cinit__(self, int min_samples_leaf, double lmbda, object random_state):
         """
         Parameters
         ----------
@@ -32,9 +33,13 @@ cdef class _Splitter:
         lmbda : double
             Noise control when generating distribution; higher values mean a
             more deterministic algorithm.
+        random_state : object
+            The user inputted random state to be used for pseudo-randomness
         """
         self.min_samples_leaf = min_samples_leaf
         self.lmbda = lmbda
+        self.random_state = random_state
+        self.rand_r_state = self.random_state.randint(0, RAND_R_MAX)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -55,6 +60,8 @@ cdef class _Splitter:
         cdef double* distribution = NULL
         cdef int  chosen_ndx
 
+        cdef UINT32_t* random_state = &self.rand_r_state
+
         cdef int i
         cdef int j
         cdef int k
@@ -72,7 +79,7 @@ cdef class _Splitter:
 
             # generate and sample from the distribution
             generate_distribution(lmbda, distribution, gini_indices, node.features_count)
-            chosen_ndx = sample_distribution(distribution, node.features_count)
+            chosen_ndx = sample_distribution(distribution, node.features_count, random_state)
             chosen_feature = node.features[chosen_ndx]
 
             # assign results from chosen feature

@@ -2,6 +2,7 @@ import numpy as np
 cimport numpy as np
 
 from ._tree cimport Node
+from ._utils cimport UINT32_t
 
 
 cdef struct SplitRecord:
@@ -32,7 +33,9 @@ cdef class _Splitter:
     # Internal structures
     cdef public int min_samples_leaf       # Min samples in a leaf
     cdef double lmbda                      # Noise control parameter
-    cdef int random_state                  # Random state reference
+
+    cdef object random_state               # Random state reference
+    cdef UINT32_t rand_r_state             # sklearn_rand_r random number state
 
     # Methods
     cdef int split_node(self, Node* node, int** X, int* y,

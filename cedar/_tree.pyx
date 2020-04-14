@@ -16,11 +16,11 @@ cimport numpy as np
 np.import_array()
 
 from ._utils cimport convert_int_ndarray
-from ._utils cimport set_srand
+# from ._utils cimport set_srand
 from ._utils cimport dealloc
 
 # constants
-from numpy import int32 as INT
+# from numpy import int32 as INT
 
 cdef int UNDEF = -1
 cdef double UNDEF_LEAF_VAL = 0.5
@@ -35,14 +35,12 @@ cdef class _TreeBuilder:
     """
 
     def __cinit__(self, _DataManager manager, _Splitter splitter, int min_samples_split,
-                  int min_samples_leaf, int max_depth, int random_state):
+                  int min_samples_leaf, int max_depth):
         self.manager = manager
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = max_depth
-        self.random_state = random_state
-        set_srand(self.random_state)
 
     cpdef void build(self, _Tree tree):
         """

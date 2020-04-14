@@ -114,6 +114,7 @@ def experiment(args, logger, out_dir, seed):
     logger.info('lmbda: {}'.format(lmbda))
     model = _get_model(args, lmbda=lmbda, random_state=random_state)
     model = model.fit(X_train, y_train)
+    model.print(show_nodes=True)
     exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
 
     if args.save_results:

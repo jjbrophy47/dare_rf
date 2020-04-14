@@ -70,7 +70,7 @@ cdef class _TreeBuilder:
     cdef int min_samples_split       # Minimum number of samples in an internal node
     cdef int min_samples_leaf        # Minimum number of samples in a leaf
     cdef int max_depth               # Maximal tree depth
-    cdef int random_state            # Random state
+    # cdef int random_state            # Random state
 
     # Python API
     cpdef void build(self, _Tree tree)
