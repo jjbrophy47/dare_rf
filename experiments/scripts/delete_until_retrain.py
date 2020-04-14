@@ -16,28 +16,28 @@ import cedar
 from utility import data_util, exp_util, print_util, exact_adv_util
 
 
-def _get_model(args, epsilon, random_state=None):
+def _get_model(args, epsilon, lmbda, random_state=None):
     """
     Return the appropriate model CeDAR model.
     """
 
     if args.model_type == 'stump':
         model = cedar.Tree(epsilon=epsilon,
-                           lmbda=args.lmbda,
+                           lmbda=lmbda,
                            max_depth=1,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'tree':
         model = cedar.Tree(epsilon=epsilon,
-                           lmbda=args.lmbda,
+                           lmbda=lmbda,
                            max_depth=args.max_depth,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'forest':
         model = cedar.Forest(epsilon=epsilon,
-                             lmbda=args.lmbda,
+                             lmbda=lmbda,
                              max_depth=args.max_depth,
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
@@ -50,7 +50,7 @@ def _get_model(args, epsilon, random_state=None):
     return model
 
 
-def experiment(args, logger, out_dir, seed):
+def experiment(args, logger, out_dir, seed, lmbda):
 
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
@@ -81,7 +81,7 @@ def experiment(args, logger, out_dir, seed):
 
     # record time it takes to train an exact model
     logger.info('\nExact')
-    model = _get_model(args, epsilon=0, random_state=random_state)
+    model = _get_model(args, epsilon=0, lmbda=lmbda, random_state=random_state)
     start = time.time()
     model = model.fit(X_train, y_train)
     exact_train_time = time.time() - start
@@ -100,7 +100,7 @@ def experiment(args, logger, out_dir, seed):
     for i, epsilon in enumerate(epsilons):
         remaining_time = exact_train_time
 
-        model = _get_model(args, epsilon=epsilon, random_state=random_state)
+        model = _get_model(args, epsilon=epsilon, lmbda=lmbda, random_state=random_state)
         model = model.fit(X_train, y_train)
 
         # delete instances until retrain time is exceeded
@@ -148,7 +148,7 @@ def main(args):
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment
-        experiment(args, logger, ep_dir, seed=args.rs)
+        experiment(args, logger, ep_dir, seed=args.rs, lmbda=args.lmbda[i])
         args.rs += 1
 
         # remove logger
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
-    parser.add_argument('--lmbda', type=float, default=0, help='lambda.')
+    parser.add_argument('--lmbda', type=float, nargs='+', default=[0], help='list of lambdas.')
 
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
     args = parser.parse_args()

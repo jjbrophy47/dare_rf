@@ -90,12 +90,12 @@ def experiment(args, logger, out_dir, seed):
     logger.info('\nCeDAR')
 
     cedar_score = 0
-    lmbda = -args.increment_lmbda
+    lmbda = -args.lmbda_step_size
     finished = False
 
     i = -1
     while not finished:
-        lmbda += args.increment_lmbda
+        lmbda += args.lmbda_step_size
         i += 1
 
         start = time.time()
@@ -120,6 +120,7 @@ def experiment(args, logger, out_dir, seed):
         d['lmbda'] = lmbda
         d['n_train'] = X_train.shape[0]
         d['n_features'] = X_train.shape[1]
+        d['lmbda_step_size'] = args.lmbda_step_size
         np.save(os.path.join(out_dir, 'results.npy'), d)
 
 
@@ -162,7 +163,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
-    parser.add_argument('--increment_lmbda', type=float, default=100, help='value to increment lmbda by.')
+    parser.add_argument('--lmbda_step_size', type=float, default=100, help='value to increment lmbda by.')
 
     parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='Predictive performance metric.')
