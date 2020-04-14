@@ -163,13 +163,16 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
-    parser.add_argument('--lmbda_step_size', type=float, default=100, help='value to increment lmbda by.')
 
+    # tuning settings
+    parser.add_argument('--lmbda_step_size', type=float, default=100, help='value to increment lmbda by.')
     parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='Predictive performance metric.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='Predictive performance tolerance.')
 
+    # display settings
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+
     args = parser.parse_args()
     main(args)

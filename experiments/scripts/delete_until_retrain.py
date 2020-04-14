@@ -177,6 +177,8 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
     parser.add_argument('--lmbda', type=float, nargs='+', default=[0], help='list of lambdas.')
 
+    # display settings
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+
     args = parser.parse_args()
     main(args)
