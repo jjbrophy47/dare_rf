@@ -208,6 +208,8 @@ if __name__ == '__main__':
     parser.add_argument('--sklearn', action='store_true', default=False, help='run sklearn model.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
+    # display settings
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+
     args = parser.parse_args()
     main(args)
