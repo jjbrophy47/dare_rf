@@ -83,6 +83,18 @@ def performance(args, logger, seed):
                       'n_estimators': n_estimators,
                       'max_features': max_features}
 
+        # excludes the combination: 1000, 20, 0.25
+        if args.reduce_search:
+            param_grid = [{'max_depth': max_depth,
+                           'n_estimators': [1, 100],
+                           'max_features': max_features},
+                           {'max_depth': [1, 3, 5, 10],
+                            'n_estimators': [1000],
+                            'max_features': max_features}
+                          {'max_depth': [20],
+                           'n_estimators': [1000],
+                           'max_features': ['sqrt']}
+
     # SKLearn
     if args.sklearn:
         logger.info('\nSKLearn')
@@ -185,6 +197,7 @@ if __name__ == '__main__':
     parser.add_argument('--scoring', type=str, default='roc_auc', help='metric for tuning.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
     parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')
+    parser.add_argument('--reduce_search', action='store_true', default=False, help='remove costly tuning.')
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
