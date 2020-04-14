@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import argparse
+from datetime import datetime
 
 import numpy as np
 
@@ -79,18 +80,20 @@ def experiment(args, logger, out_dir, seed, lmbda):
     logger.info('delete instances: {:,}'.format(len(delete_indices)))
     logger.info('adversary: {}'.format(args.adversary))
 
-    # record time it takes to train an exact model
+    # record time it takes to train a deterministic model
     logger.info('\nExact')
-    model = _get_model(args, epsilon=0, lmbda=lmbda, random_state=random_state)
+    model = _get_model(args, epsilon=0, lmbda=-1, random_state=random_state)
     start = time.time()
     model = model.fit(X_train, y_train)
     exact_train_time = time.time() - start
 
     logger.info('train time: {:.3f}s'.format(exact_train_time))
-    exp_util.performance(model, X_test, y_test, name='exact', logger=logger)
+    exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
 
     # CeDAR
     logger.info('\nCeDAR')
+    logger.info('random_state: {}'.format(random_state))
+    logger.info('lmbda: {}'.format(lmbda))
 
     epsilons = [0, 0.001, 0.01, 0.1, 1.0, 10.0]
     logger.info('epsilons: {}'.format(epsilons))
@@ -102,6 +105,10 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
         model = _get_model(args, epsilon=epsilon, lmbda=lmbda, random_state=random_state)
         model = model.fit(X_train, y_train)
+
+        if i == 0:
+            exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
+            print()
 
         # delete instances until retrain time is exceeded
         j = 0
@@ -145,6 +152,7 @@ def main(args):
         # create logger
         logger = print_util.get_logger(os.path.join(ep_dir, 'log.txt'))
         logger.info(args)
+        logger.info(datetime.now())
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment

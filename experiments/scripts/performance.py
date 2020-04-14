@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import argparse
+from datetime import datetime
 
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
@@ -19,13 +20,13 @@ import cedar
 from utility import data_util, exp_util, print_util
 
 
-def _get_best_params(gs, param_grid, logger, tol=0.01):
+def _get_best_params(gs, param_grid, keys, logger, tol=0.01):
     """
     Chooses the set of hyperparameters whose `mean_fit_score` is within
     `tol` of the best `mean_fit_score` and has the lowest `mean_fit_time`.
     """
     cols = ['mean_fit_time', 'mean_test_score', 'rank_test_score']
-    cols += ['param_{}'.format(param) for param in param_grid.keys()]
+    cols += ['param_{}'.format(param) for param in keys]
 
     df = pd.DataFrame(gs.cv_results_)
     logger.info('gridsearch results:')
@@ -77,11 +78,13 @@ def performance(args, logger, seed):
 
     if args.model_type == 'tree':
         param_grid = {'max_depth': max_depth}
+        keys = list(param_grid.keys())
 
     elif args.model_type == 'forest':
         param_grid = {'max_depth': max_depth,
                       'n_estimators': n_estimators,
                       'max_features': max_features}
+        keys = list(param_grid.keys())
 
         # excludes combination: {n_estimators: 1000, max_depth: 20, max_features: 0.25}
         if args.reduce_search:
@@ -159,7 +162,7 @@ def performance(args, logger, seed):
                           cv=args.cv, verbose=args.verbose, refit=False)
         gs = gs.fit(X_train_sub, y_train_sub)
 
-        best_params = _get_best_params(gs, param_grid, logger, args.tol)
+        best_params = _get_best_params(gs, param_grid, keys, logger, args.tol)
         model.set_params(**best_params)
 
     model = model.fit(X_train, y_train)
@@ -176,6 +179,7 @@ def main(args):
     # create logger
     logger = print_util.get_logger(os.path.join(out_dir, 'log.txt'))
     logger.info(args)
+    logger.info(datetime.now())
 
     # run experiment
     performance(args, logger, seed=args.rs)

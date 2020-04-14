@@ -6,6 +6,7 @@ import sys
 import time
 import argparse
 from collections import Counter
+from datetime import datetime
 
 import numpy as np
 
@@ -214,6 +215,7 @@ def main(args):
         logger_name = 'log_ep{}.txt'.format(args.epsilon)
         logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
         logger.info(args)
+        logger.info(datetime.now())
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment

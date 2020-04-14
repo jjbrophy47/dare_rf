@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import argparse
+from datetime import datetime
 
 import numpy as np
 from sklearn.model_selection import cross_val_score
@@ -88,13 +89,13 @@ def experiment(args, logger, out_dir, seed):
 
     # find smallest lmbda that gives good performance
     logger.info('\nCeDAR')
+    logger.info('random_state: {}'.format(random_state))
 
     cedar_score = 0
     lmbda = -args.lmbda_step_size
-    finished = False
 
     i = -1
-    while not finished:
+    while True:
         lmbda += args.lmbda_step_size
         i += 1
 
@@ -108,12 +109,12 @@ def experiment(args, logger, out_dir, seed):
         logger.info(out_str.format(end, lmbda, args.scoring, cedar_score))
 
         if exact_score - cedar_score <= args.tol:
-            finished = True
             break
 
+    logger.info('lmbda: {}'.format(lmbda))
+    model = _get_model(args, lmbda=lmbda, random_state=random_state)
     model = model.fit(X_train, y_train)
     exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
-    logger.info('lmbda: {}'.format(lmbda))
 
     if args.save_results:
         d = model.get_params()
@@ -137,6 +138,7 @@ def main(args):
         # create logger
         logger = print_util.get_logger(os.path.join(ep_dir, 'log.txt'))
         logger.info(args)
+        logger.info(datetime.now())
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment

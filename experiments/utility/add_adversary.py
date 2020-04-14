@@ -1,10 +1,11 @@
 """
-Adversarial utilities.
+Addition adversary that attacks the root, choosing
+samples from a given set of samples.
 """
 import numpy as np
 
 
-def exact_adversary(X, y, n_samples=None, seed=None, verbose=0, logger=None):
+def constrained_add_adversary(X_train, y_train, X_add, y_add, seed=None, verbose=0, logger=None):
     """
     Given a dataset with labels, find the ordering that causes the most
     retrainings at the root node; brute-force greedy method.
@@ -13,25 +14,19 @@ def exact_adversary(X, y, n_samples=None, seed=None, verbose=0, logger=None):
     # start out with a being the better feature
     a_is_better = True
     retrains = 0
-    ordering = np.empty(n_samples)
-
-    # return only a fraction of the training data
-    if n_samples is not None:
-        assert n_samples <= len(X)
-    else:
-        n_samples = len(X)
+    ordering = np.empty(X_add.shape[0])
 
     # find best two attributes
-    ndx_a, ndx_b, meta_a, meta_b = _find_best_attributes(X, y)
+    ndx_a, ndx_b, meta_a, meta_b = _find_best_attributes(X_train, y_train)
     if logger and verbose > 1:
         logger.info('1st: x{}, 2nd: x{}'.format(ndx_a, ndx_b))
 
     # get instance counts based on the two attributes and the label
-    counts, indices = _type_counts(X[:, ndx_a], X[:, ndx_b], y)
+    counts, indices = _type_counts(X_add[:, ndx_a], X_add[:, ndx_b], y_add)
     if logger and verbose > 1:
         logger.info(counts)
 
-    for i in range(n_samples):
+    for i in range(X_add.shape[0]):
 
         # brute force check which instance type reduces the gini index gap the most
         meta_a, meta_b, bin_str, index_gap = _find_instance(meta_a, meta_b, counts, a_is_better)
@@ -173,11 +168,8 @@ def _find_instance(meta_a, meta_b, counts, a_is_better):
     for bin_str in ['000', '001', '010', '011', '100', '101', '110', '111']:
         v1, v2, v3 = (int(i) for i in bin_str)
 
-        if not _check(meta_a, v1, v3) or not _check(meta_b, v2, v3):
-            continue
-
-        temp_a = _decrement(meta_a, v1, v3)
-        temp_b = _decrement(meta_b, v2, v3)
+        temp_a = _increment(meta_a, v1, v3)
+        temp_b = _increment(meta_b, v2, v3)
 
         if a_is_better:
             index_gap = temp_b['gini_index'] - temp_a['gini_index']
@@ -195,33 +187,9 @@ def _find_instance(meta_a, meta_b, counts, a_is_better):
     return best_a, best_b, best_bin_str, best_index_gap
 
 
-def _check(meta, x, y):
+def _increment(meta, x, y):
     """
-    Makes sure no illegal deletions are being made.
-    """
-
-    # check attribute
-    if meta['n_count'] < 2:
-        result = False
-
-    elif x == 1:
-        if y == 1:
-            result = meta['left_pos'] > 0
-        else:
-            result = meta['left_count'] - meta['left_pos'] > 0
-
-    elif x == 0:
-        if y == 1:
-            result = meta['right_pos'] > 0
-        else:
-            result = meta['right_count'] - meta['right_pos'] > 0
-
-    return result
-
-
-def _decrement(meta, x, y):
-    """
-    Decrements an instance from either or both branches and recomputes the gini gain.
+    Increments an instance to either or both branches and recomputes the gini gain.
     """
 
     left_pos, left_neg = 0, 0
@@ -243,17 +211,17 @@ def _decrement(meta, x, y):
 
 def _recompute(meta, left_pos=0, left_neg=0, right_pos=0, right_neg=0):
     """
-    Decrements an instance from either or both branches and recomputes the gini gain.
+    Increments an instance to either or both branches and recomputes the gini gain.
     """
 
     meta = meta.copy()
 
-    meta['n_pos'] -= (left_pos + right_pos)
-    meta['n_count'] -= (left_pos + left_neg + right_pos + right_neg)
-    meta['left_pos'] -= left_pos
-    meta['left_count'] -= (left_pos + left_neg)
-    meta['right_pos'] -= right_pos
-    meta['right_count'] -= (right_pos + right_neg)
+    meta['n_pos'] += (left_pos + right_pos)
+    meta['n_count'] += (left_pos + left_neg + right_pos + right_neg)
+    meta['left_pos'] += left_pos
+    meta['left_count'] += (left_pos + left_neg)
+    meta['right_pos'] += right_pos
+    meta['right_count'] += (right_pos + right_neg)
     meta['gini_index'] = _compute_gini_index(meta['n_pos'], meta['n_count'], meta['left_pos'],
                                              meta['left_count'], meta['right_pos'], meta['right_count'])
     return meta
