@@ -175,7 +175,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--repeats', type=int, default=10, help='number of times to perform the experiment.')
+    parser.add_argument('--repeats', type=int, default=5, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
     # adversary settings
