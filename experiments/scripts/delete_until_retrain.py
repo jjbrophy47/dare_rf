@@ -85,7 +85,6 @@ def experiment(args, logger, out_dir, seed, lmbda):
     model = _get_model(args, epsilon=0, lmbda=-1, random_state=random_state)
     start = time.time()
     model = model.fit(X_train, y_train)
-    model.print(show_nodes=True)
     exact_train_time = time.time() - start
 
     logger.info('train time: {:.3f}s'.format(exact_train_time))
@@ -110,7 +109,6 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
         if i == 0:
             exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
-            model.print(show_nodes=True)
             print()
 
         # delete instances until retrain time is exceeded
