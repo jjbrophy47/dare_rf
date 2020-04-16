@@ -103,6 +103,7 @@ def experiment(args, logger, out_dir, seed, lmbda):
     n_deletions = []
     for i, epsilon in enumerate(epsilons):
         remaining_time = exact_train_time
+        epsilon_start = time.time()
 
         model = _get_model(args, epsilon=epsilon, lmbda=lmbda, random_state=random_state)
         model = model.fit(X_train, y_train)
@@ -126,7 +127,8 @@ def experiment(args, logger, out_dir, seed, lmbda):
             logger.info('delete_types: {}'.format(delete_types))
             logger.info('delete_depths: {}'.format(delete_depths))
 
-        logger.info('epsilon: {:5} => num deletions: {:,}'.format(epsilon, j))
+        epsilon_end = time.time() - epsilon_start
+        logger.info('[{:.3f}s] epsilon: {:5} => num deletions: {:,}'.format(epsilon_end, epsilon, j))
         n_deletions.append(j)
 
     if args.save_results:
