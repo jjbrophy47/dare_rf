@@ -51,17 +51,20 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
     return model
 
 
-def unlearning_method(args, random_state, out_dir, logger, X_train, y_train, X_test, y_test,
+def unlearning_method(args, lmbda, random_state, out_dir, logger,
+                      X_train, y_train, X_test, y_test,
                       delete_indices, name):
 
     experiment_start = time.time()
 
-    epsilon = 0 if name == 'exact' else args.epsilon
-    lmbda = -1 if name == 'exact' else args.lmbda
+    logger.info('\n{}'.format(name.capitalize()))
+    logger.info('experiment start: {}'.format(datetime.now()))
 
     # train
-    logger.info('\n{}'.format(name.capitalize()))
-    model = _get_model(args, epsilon=epsilon, lmbda=lmbda, seed=random_state)
+    epsilon = 0 if name == 'exact' else args.epsilon
+    lmbda = -1 if name == 'exact' else lmbda
+    logger.info('lmbda: {}'.format(lmbda))
+    model = _get_model(args, epsilon=epsilon, lmbda=lmbda, random_state=random_state)
 
     start = time.time()
     model = model.fit(X_train, y_train)
@@ -99,7 +102,7 @@ def unlearning_method(args, random_state, out_dir, logger, X_train, y_train, X_t
     types, depths = model.get_removal_statistics()
     types_counter = Counter(types)
     depths_counter = Counter(depths)
-    logger.info('[{}] deletions: {:,}'.format(name, i))
+    logger.info('[{}] completed deletions: {:,}'.format(name, i))
     logger.info('[{}] amortized: {:.7f}s'.format(name, np.mean(times)))
     logger.info('[{}] types: {}'.format(name, types_counter))
     logger.info('[{}] depths: {}'.format(name, depths_counter))
@@ -126,7 +129,7 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
 
     # train
     logger.info('\n{}'.format(name.capitalize()))
-    model = _get_model(args, epsilon=0, lmbda=-1, seed=random_state)
+    model = _get_model(args, epsilon=0, lmbda=-1, random_state=random_state)
 
     start = time.time()
     model = model.fit(X_train, y_train)
@@ -139,12 +142,12 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
     y_train_new = np.delete(y_train, delete_indices)
 
     start = time.time()
-    model = _get_model(args, epsilon=0, lmbda=-1, seed=random_state)
+    model = _get_model(args, epsilon=0, lmbda=-1, random_state=random_state)
     model = model.fit(X_train_new, y_train_new)
     last_train_time = time.time() - start
     times = np.linspace(initial_train_time, last_train_time, n_remove - 1)
 
-    logger.info('[{}] amortized: {:.7f}s'.format(name, np.mean(times)))
+    logger.info('[{}] amortized: {:.3f}s'.format(name, np.mean(times)))
     exp_util.performance(model, X_test, y_test, logger=logger, name=name)
 
     if args.save_results:
@@ -156,7 +159,7 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
         np.save(os.path.join(out_dir, 'naive.npy'), d)
 
 
-def experiment(args, logger, out_dir, seed):
+def experiment(args, logger, out_dir, seed, lmbda):
 
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
@@ -192,12 +195,12 @@ def experiment(args, logger, out_dir, seed):
 
     # exact unlearning method
     if args.exact:
-        unlearning_method(args, random_state, out_dir, logger, X_train, y_train,
+        unlearning_method(args, lmbda, random_state, out_dir, logger, X_train, y_train,
                           X_test, y_test, delete_indices, 'exact')
 
     # approximate unlearning method
     if args.cedar:
-        unlearning_method(args, random_state, out_dir, logger, X_train, y_train,
+        unlearning_method(args, lmbda, random_state, out_dir, logger, X_train, y_train,
                           X_test, y_test, delete_indices, 'cedar')
 
 
@@ -219,7 +222,7 @@ def main(args):
         logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
 
         # run experiment
-        experiment(args, logger, rs_dir, seed=args.rs)
+        experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda[i])
         args.rs += 1
 
         # remove logger
@@ -232,11 +235,11 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--out_dir', type=str, default='output/amortize/', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
-    parser.add_argument('--dataset', default='synthetic', help='dataset to use for the experiment.')
-    parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
+    parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
+    parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
-    parser.add_argument('--repeats', type=int, default=1, help='number of times to repeat the experiment.')
-    parser.add_argument('--save_results', action='store_true', default=False, help='save results.')
+    parser.add_argument('--repeats', type=int, default=5, help='number of times to repeat the experiment.')
+    parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
     parser.add_argument('--time_limit', type=int, default=86400, help='maximum number of seconds.')
 
     # methods
@@ -246,7 +249,7 @@ if __name__ == '__main__':
 
     # model hyperparameters
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
-    parser.add_argument('--lmbda', type=float, default=100, help='amount of noise to add to the model.')
+    parser.add_argument('--lmbda', type=float, nargs='+', default=[0], help='list of lambdas.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
@@ -257,7 +260,7 @@ if __name__ == '__main__':
     parser.add_argument('--adversary', type=str, default='random', help='type of adversarial ordering.')
 
     # display settings
-    parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+    parser.add_argument('--verbose', type=int, default=1, help='verbosity level.')
 
     args = parser.parse_args()
     main(args)
