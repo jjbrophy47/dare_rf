@@ -5,7 +5,7 @@ samples from a given set of samples.
 import numpy as np
 
 
-def constrained_add_adversary(X_train, y_train, X_add, y_add, seed=None, verbose=0, logger=None):
+def order_samples(X_train, y_train, X_add, y_add, seed=None, verbose=0, logger=None):
     """
     Given a dataset with labels, find the ordering that causes the most
     retrainings at the root node; brute-force greedy method.
@@ -49,6 +49,7 @@ def constrained_add_adversary(X_train, y_train, X_add, y_add, seed=None, verbose
 
     if logger:
         logger.info('estimated retrains: {:,}'.format(retrains))
+
     ordering = ordering.astype(np.int32)
     return ordering
 

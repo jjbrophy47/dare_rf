@@ -1,5 +1,5 @@
 """
-Experiment: Compute the amortized runtime of deletions.
+Experiment: Compute the amortized runtime of addtions.
 """
 import os
 import sys
@@ -54,11 +54,11 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
     return model
 
 
-def unlearning_method(args, lmbda, random_state, out_dir, logger,
-                      X_train, y_train, X_test, y_test,
-                      delete_indices, name):
+def learning_method(args, lmbda, random_state, out_dir, logger,
+                    X_train, y_train, X_add, y_add, X_test, y_test, name):
 
     experiment_start = time.time()
+    n_add = X_add.shape[0]
 
     logger.info('\n{}'.format(name.capitalize()))
     logger.info('experiment start: {}'.format(datetime.now()))
@@ -76,16 +76,16 @@ def unlearning_method(args, lmbda, random_state, out_dir, logger,
     auc, acc = exp_util.performance(model, X_test, y_test, logger=logger, name=name)
 
     # result containers
-    performance_markers = [int(x) for x in np.linspace(0, len(delete_indices) - 1, 10)]
+    performance_markers = [int(x) for x in np.linspace(0, n_add - 1, 10)]
     times = [train_time]
     aucs, accs = [auc], [acc]
 
-    # delete as many indices as possible while time allows
+    # add as many indices as possible while time allows
     i = 0
-    while time.time() - experiment_start < args.time_limit and i < len(delete_indices):
+    while time.time() - experiment_start < args.time_limit and i < n_add:
 
         start = time.time()
-        model.delete(delete_indices[i])
+        model.add(X_add[[i]], y_add[[i]])
         end_time = time.time() - start
         times.append(end_time)
 
@@ -96,16 +96,16 @@ def unlearning_method(args, lmbda, random_state, out_dir, logger,
 
             if args.verbose > 0:
                 experiment_time = time.time() - experiment_start
-                percent_complete = i / len(delete_indices) * 100
+                percent_complete = i / n_add * 100
                 status_str = '[{:.2f}%] experiment time: {:.3f}s, amortized time: {:.3f}s'
                 logger.info(status_str.format(percent_complete, experiment_time, np.mean(times)))
 
         i += 1
 
-    types, depths = model.get_removal_statistics()
+    types, depths = model.get_add_statistics()
     types_counter = Counter(types)
     depths_counter = Counter(depths)
-    logger.info('[{}] completed deletions: {:,}'.format(name, i))
+    logger.info('[{}] completed additions: {:,}'.format(name, i))
     logger.info('[{}] amortized: {:.7f}s'.format(name, np.mean(times)))
     logger.info('[{}] types: {}'.format(name, types_counter))
     logger.info('[{}] depths: {}'.format(name, depths_counter))
@@ -126,9 +126,9 @@ def unlearning_method(args, lmbda, random_state, out_dir, logger,
 
 
 def naive_method(args, random_state, out_dir, logger, X_train, y_train,
-                 X_test, y_test, delete_indices, name):
+                 X_add, y_add, X_test, y_test, name):
 
-    n_remove = len(delete_indices)
+    n_add = X_add.shape[0]
 
     # train
     logger.info('\n{}'.format(name.capitalize()))
@@ -140,15 +140,15 @@ def naive_method(args, random_state, out_dir, logger, X_train, y_train,
     logger.info('[{}] train time: {:.3f}s'.format(name, initial_train_time))
     auc, acc = exp_util.performance(model, X_test, y_test, logger=logger, name=name)
 
-    # train again after deleting all instances and draw a line between the two points
-    X_train_new = np.delete(X_train, delete_indices, axis=0)
-    y_train_new = np.delete(y_train, delete_indices)
+    # train again after adding all instances and draw a line between the two points
+    X_train_new = np.vstack([X_train, X_add])
+    y_train_new = np.concatenate([y_train, y_add])
 
     start = time.time()
     model = _get_model(args, epsilon=0, lmbda=-1, random_state=random_state)
     model = model.fit(X_train_new, y_train_new)
     last_train_time = time.time() - start
-    times = np.linspace(initial_train_time, last_train_time, n_remove - 1)
+    times = np.linspace(initial_train_time, last_train_time, n_add - 1)
 
     logger.info('[{}] amortized: {:.3f}s'.format(name, np.mean(times)))
     exp_util.performance(model, X_test, y_test, logger=logger, name=name)
@@ -174,37 +174,48 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
     random_state = exp_util.get_random_state(seed)
 
-    # choose instances to delete
-    n_remove = args.n_remove if args.frac_remove is None else int(X_train.shape[0] * args.frac_remove)
+    # choose instances to add
+    n_add = args.n_add if args.frac_add is None else int(X_train.shape[0] * args.frac_add)
 
+    # order the samples based on an adversary
     if args.adversary == 'random':
         np.random.seed(random_state)
-        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
+        add_indices = np.random.choice(X_train.shape[0], size=n_add, replace=False)
 
     elif args.adversary == 'root':
-        delete_indices = root_adversary.order_samples(X_train, y_train,
-                                                      n_samples=n_remove, seed=random_state,
-                                                      verbose=args.verbose, logger=logger)
+        add_indices = root_adversary.order_samples(X_train, y_train, n_samples=n_add,
+                                                   seed=random_state, verbose=args.verbose,
+                                                   logger=logger)
+
     else:
         exit('unknown adversary: {}'.format(args.adversary))
 
-    logger.info('instances to delete: {:,}'.format(len(delete_indices)))
+    # separate add samples from the rest of the training data
+    add_order = add_indices[::-1]
+    X_add = X_train[add_order]
+    y_add = y_train[add_order]
+
+    train_indices = np.setdiff1d(np.arange(X_train.shape[0]), add_indices)
+    X_train_sub = X_train[train_indices]
+    y_train_sub = y_train[train_indices]
+
+    logger.info('instances to add: {:,}'.format(len(add_indices)))
     logger.info('adversary: {}'.format(args.adversary))
 
     # naive retraining method
     if args.naive:
-        naive_method(args, random_state, out_dir, logger, X_train, y_train,
-                     X_test, y_test, delete_indices, 'naive')
+        naive_method(args, random_state, out_dir, logger, X_train_sub, y_train_sub,
+                     X_add, y_add, X_test, y_test, 'naive')
 
     # exact unlearning method
     if args.exact:
-        unlearning_method(args, lmbda, random_state, out_dir, logger, X_train, y_train,
-                          X_test, y_test, delete_indices, 'exact')
+        learning_method(args, lmbda, random_state, out_dir, logger, X_train_sub, y_train_sub,
+                        X_add, y_add, X_test, y_test, 'exact')
 
     # approximate unlearning method
     if args.cedar:
-        unlearning_method(args, lmbda, random_state, out_dir, logger, X_train, y_train,
-                          X_test, y_test, delete_indices, 'cedar')
+        learning_method(args, lmbda, random_state, out_dir, logger, X_train_sub, y_train_sub,
+                        X_add, y_add, X_test, y_test, 'cedar')
 
 
 def main(args):
@@ -236,7 +247,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # experiment settings
-    parser.add_argument('--out_dir', type=str, default='output/amortize/', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/addition/', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
@@ -258,8 +269,8 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
 
     # adversary settings
-    parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
-    parser.add_argument('--frac_remove', type=float, default=0.1, help='fraction of instances to delete.')
+    parser.add_argument('--n_add', type=int, default=10, help='number of instances to sequentially add.')
+    parser.add_argument('--frac_add', type=float, default=0.1, help='fraction of instances to add.')
     parser.add_argument('--adversary', type=str, default='random', help='type of adversarial ordering.')
 
     # display settings

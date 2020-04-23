@@ -4,10 +4,10 @@ Adversarial utilities.
 import numpy as np
 
 
-def exact_adversary(X, y, n_samples=None, seed=None, verbose=0, logger=None):
+def order_samples(X, y, n_samples=None, seed=None, verbose=0, logger=None):
     """
     Given a dataset with labels, find the ordering that causes the most
-    retrainings at the root node; brute-force greedy method.
+    retrainings at the root node when deleting samples; brute-force greedy method.
     """
 
     # start out with a being the better feature
