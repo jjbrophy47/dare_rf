@@ -101,7 +101,7 @@ cdef int generate_distribution(double lmbda, double* distribution,
             min_gini = gini_indices[i]
 
     # determine if tree is in deterministic mode
-    if lmbda < 0 or exp(- lmbda * min_gini / 5) == 0:
+    if lmbda < 0 or exp(- lmbda * min_gini) == 0:
         for i in range(n_gini_indices):
             distribution[i] = 0
         distribution[first_min] = 1
@@ -109,7 +109,7 @@ cdef int generate_distribution(double lmbda, double* distribution,
     # generate probability distribution over the features
     else:
         for i in range(n_gini_indices):
-            distribution[i] = exp(- lmbda * gini_indices[i] / 5)
+            distribution[i] = exp(- lmbda * gini_indices[i])
             normalizing_constant += distribution[i]
 
         for i in range(n_gini_indices):

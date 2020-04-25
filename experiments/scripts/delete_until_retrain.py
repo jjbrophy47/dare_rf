@@ -14,7 +14,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 import cedar
-from utility import data_util, exp_util, print_util, exact_adv_util
+from utility import data_util
+from utility import exp_util
+from utility import print_util
+from utility import root_adversary
 
 
 def _get_model(args, epsilon, lmbda, random_state=None):
@@ -72,8 +75,8 @@ def experiment(args, logger, out_dir, seed, lmbda):
         delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
 
     elif args.adversary == 'root':
-        delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=random_state,
-                                                        verbose=args.verbose, logger=logger)
+        delete_indices = root_adversary.order_samples(X_train, y_train, n_samples=n_remove, seed=random_state,
+                                                      verbose=args.verbose, logger=logger)
     else:
         exit('uknown adversary: {}'.format(args.adversary))
 

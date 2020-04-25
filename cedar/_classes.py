@@ -98,7 +98,6 @@ class Forest(object):
 
         # set max_depth and lmbda
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
-        self.lmbda_ = self.lmbda / self.n_estimators
 
         # one central location for the data
         self.manager_ = _DataManager(X, y)
@@ -115,7 +114,7 @@ class Forest(object):
             feature_indices = feature_indices.astype(np.int32)
 
             tree = Tree(epsilon=self.epsilon,
-                        lmbda=self.lmbda_,
+                        lmbda=self.lmbda,
                         max_depth=self.max_depth_,
                         min_samples_split=self.min_samples_split,
                         min_samples_leaf=self.min_samples_leaf,
@@ -328,11 +327,10 @@ class Tree(object):
 
         # set max_depth and lmbda
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
-        self.lmbda_ = self.lmbda / self.max_depth_
 
         self.tree_ = _Tree(features)
         self.splitter_ = _Splitter(self.min_samples_leaf,
-                                   self.lmbda_,
+                                   self.lmbda,
                                    self.random_state_)
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
@@ -342,11 +340,11 @@ class Tree(object):
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
                                  self.epsilon,
-                                 self.lmbda_)
+                                 self.lmbda)
         self.adder_ = _Adder(self.manager_,
                              self.tree_builder_,
                              self.epsilon,
-                             self.lmbda_)
+                             self.lmbda)
         self.tree_builder_.build(self.tree_)
 
         return self
