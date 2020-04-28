@@ -10,8 +10,7 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
-# from ._utils cimport get_random
-from ._utils cimport compute_gini
+from ._utils cimport compute_split_score
 from ._utils cimport generate_distribution
 from ._utils cimport sample_distribution
 from ._utils cimport RAND_R_MAX
@@ -22,7 +21,8 @@ cdef class _Splitter:
     Finds the best splits on dense data, one split at a time.
     """
 
-    def __cinit__(self, int min_samples_leaf, double lmbda, object random_state):
+    def __cinit__(self, int min_samples_leaf, double lmbda, bint use_gini,
+                  object random_state):
         """
         Parameters
         ----------
@@ -33,11 +33,15 @@ cdef class _Splitter:
         lmbda : double
             Noise control when generating distribution; higher values mean a
             more deterministic algorithm.
+        use_gini : bool
+            If True, use the Gini index splitting criterion; otherwise
+            use entropy.
         random_state : object
             The user inputted random state to be used for pseudo-randomness
         """
         self.min_samples_leaf = min_samples_leaf
         self.lmbda = lmbda
+        self.use_gini = use_gini
         self.random_state = random_state
         self.rand_r_state = self.random_state.randint(0, RAND_R_MAX)
 
@@ -55,8 +59,9 @@ cdef class _Splitter:
         # parameters
         cdef int min_samples_leaf = self.min_samples_leaf
         cdef double lmbda = self.lmbda
+        cdef bint use_gini = self.use_gini
 
-        cdef double* gini_indices = NULL
+        cdef double* split_scores = NULL
         cdef double* distribution = NULL
         cdef int  chosen_ndx
 
@@ -70,15 +75,16 @@ cdef class _Splitter:
 
         if node.pos_count > 0 and node.pos_count < node.count:
 
-            gini_indices = <double *>malloc(node.features_count * sizeof(double))
+            split_scores = <double *>malloc(node.features_count * sizeof(double))
             distribution = <double *>malloc(node.features_count * sizeof(double))
 
             for j in range(node.features_count):
-                gini_indices[j] = compute_gini(node.count, node.left_counts[j], node.right_counts[j], 
-                                               node.left_pos_counts[j], node.right_pos_counts[j])
+                split_scores[j] = compute_split_score(use_gini, node.count, node.left_counts[j],
+                                                      node.right_counts[j], node.left_pos_counts[j],
+                                                      node.right_pos_counts[j])
 
             # generate and sample from the distribution
-            generate_distribution(lmbda, distribution, gini_indices, node.features_count)
+            generate_distribution(lmbda, distribution, split_scores, node.features_count)
             chosen_ndx = sample_distribution(distribution, node.features_count, random_state)
             chosen_feature = node.features[chosen_ndx]
 
@@ -110,7 +116,7 @@ cdef class _Splitter:
                     split.right_features[j] = node.features[i]
                     j += 1
 
-            free(gini_indices)
+            free(split_scores)
             free(distribution)
 
         else:

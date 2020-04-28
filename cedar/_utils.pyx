@@ -7,6 +7,7 @@ from libc.stdlib cimport srand
 from libc.stdlib cimport RAND_MAX
 from libc.stdio cimport printf
 from libc.math cimport exp
+from libc.math cimport log2
 
 cimport cython
 
@@ -50,11 +51,33 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
     # cdef np.uint32_t another_good_cast = <UINT32_t>RAND_R_MAX + 1
     return seed[0] % <UINT32_t>(RAND_R_MAX + 1)
 
+
+@cython.cdivision(True)
+cdef double compute_split_score(bint use_gini, double count, double left_count,
+                                double right_count, int left_pos_count,
+                                int right_pos_count) nogil:
+    """
+    Computes either the Gini index or entropy given this attribute.
+    """
+    cdef double result
+
+    if use_gini:
+        result = compute_gini(count, left_count, right_count,
+                              left_pos_count, right_pos_count)
+
+    else:
+        result = compute_mutual_info(count, left_count, right_count,
+                                     left_pos_count, right_pos_count)
+
+    return result
+
+
+
 @cython.cdivision(True)
 cdef double compute_gini(double count, double left_count, double right_count,
                          int left_pos_count, int right_pos_count) nogil:
     """
-    Compute the Gini index of this attribute.
+    Compute the Gini index given this attribute.
     """
     cdef double weight
     cdef double pos_prob
@@ -80,39 +103,69 @@ cdef double compute_gini(double count, double left_count, double right_count,
 
     return left_weighted_index + right_weighted_index
 
+@cython.cdivision(True)
+cdef double compute_mutual_info(double count, double left_count, double right_count,
+                                int left_pos_count, int right_pos_count) nogil:
+    """
+    Compute the mutual information given this attribute.
+    """
+    cdef double weight
+    cdef double pos_prob
+    cdef double neg_prob
+
+    cdef double entropy
+    cdef double left_weighted_entropy = 0
+    cdef double right_weighted_entropy = 0
+
+    if left_count > 0:
+        weight = left_count / count
+        pos_prob = left_pos_count / left_count
+        neg_prob = 1 - pos_prob
+        entropy = - (pos_prob * log2(pos_prob)) - (neg_prob * log2(neg_prob))
+        left_weighted_entropy = weight * entropy
+
+    if right_count > 0:
+        weight = right_count / count
+        pos_prob = right_pos_count / right_count
+        neg_prob = 1 - pos_prob
+        entropy = - (pos_prob * log2(pos_prob)) - (neg_prob * log2(neg_prob))
+        right_weighted_entropy = weight * entropy
+
+    return left_weighted_entropy + right_weighted_entropy
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
 cdef int generate_distribution(double lmbda, double* distribution,
-                               double* gini_indices, int n_gini_indices) nogil:
+                               double* scores, int n_scores) nogil:
     """
-    Generate a probability distribution based on the Gini index values.
+    Generate a probability distribution based on the attribute split scores.
     """
     cdef int i
     cdef double normalizing_constant = 0
 
-    cdef double min_gini = 1
+    cdef double min_score = 1
     cdef int first_min = -1
 
-    # find min Gini
-    for i in range(n_gini_indices):
-        if gini_indices[i] < min_gini:
+    # find min score
+    for i in range(n_scores):
+        if scores[i] < min_score:
             first_min = i
-            min_gini = gini_indices[i]
+            min_score = scores[i]
 
     # determine if tree is in deterministic mode
-    if lmbda < 0 or exp(- lmbda * min_gini) == 0:
-        for i in range(n_gini_indices):
+    if lmbda < 0 or exp(- lmbda * min_score) == 0:
+        for i in range(n_scores):
             distribution[i] = 0
         distribution[first_min] = 1
 
     # generate probability distribution over the features
     else:
-        for i in range(n_gini_indices):
-            distribution[i] = exp(- lmbda * gini_indices[i])
+        for i in range(n_scores):
+            distribution[i] = exp(- lmbda * scores[i])
             normalizing_constant += distribution[i]
 
-        for i in range(n_gini_indices):
+        for i in range(n_scores):
             distribution[i] /= normalizing_constant
 
     return 0

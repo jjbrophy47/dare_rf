@@ -27,7 +27,7 @@ def performance(model, X_test, y_test, display=True, logger=None,
 
 def get_random_state(seed):
     """
-    Get a random number from the whole range of large insteger values.
+    Get a random number from the whole range of large integer values.
     """
     np.random.seed(seed)
     return np.random.randint(MAX_INT)

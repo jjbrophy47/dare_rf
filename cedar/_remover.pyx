@@ -17,7 +17,7 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
-from ._utils cimport compute_gini
+from ._utils cimport compute_split_score
 from ._utils cimport generate_distribution
 from ._utils cimport convert_int_ndarray
 from ._utils cimport copy_int_array
@@ -45,7 +45,7 @@ cdef class _Remover:
             return self._get_int_ndarray(self.remove_depths, self.remove_count)
 
     def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,
-                  double epsilon, double lmbda):
+                  double epsilon, double lmbda, bint use_gini):
         """
         Constructor.
         """
@@ -53,6 +53,7 @@ cdef class _Remover:
         self.tree_builder = tree_builder
         self.epsilon = epsilon
         self.lmbda = lmbda
+        self.use_gini = use_gini
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
@@ -301,8 +302,9 @@ cdef class _Remover:
         # parameters
         cdef double epsilon = self.epsilon
         cdef double lmbda = self.lmbda
+        cdef bint use_gini = self.use_gini
 
-        cdef double* gini_indices = NULL
+        cdef double* split_scores = NULL
         cdef double* distribution = NULL
 
         cdef int chosen_ndx = -1
@@ -321,19 +323,20 @@ cdef class _Remover:
 
         if updated_pos_count > 0 and updated_pos_count < updated_count:
 
-            gini_indices = <double *>malloc(node.features_count * sizeof(double))
+            split_scores = <double *>malloc(node.features_count * sizeof(double))
             distribution = <double *>malloc(node.features_count * sizeof(double))
 
             for j in range(node.features_count):
 
-                gini_indices[j] = compute_gini(updated_count, node.left_counts[j], node.right_counts[j],
-                                               node.left_pos_counts[j], node.right_pos_counts[j])
+                split_scores[j] = compute_split_score(use_gini, updated_count, node.left_counts[j],
+                                                      node.right_counts[j], node.left_pos_counts[j],
+                                                      node.right_pos_counts[j])
 
                 if node.features[j] == node.feature:
                     chosen_ndx = j
 
             # generate new probability and compare to previous probability
-            generate_distribution(lmbda, distribution, gini_indices, node.features_count)
+            generate_distribution(lmbda, distribution, split_scores, node.features_count)
             p = parent_p * distribution[chosen_ndx]
             ratio = p / node.p
 
@@ -363,7 +366,7 @@ cdef class _Remover:
             else:
                 result = 2
 
-            free(gini_indices)
+            free(split_scores)
             free(distribution)
 
         # all samples in one class => leaf

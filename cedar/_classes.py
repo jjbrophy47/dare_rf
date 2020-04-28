@@ -36,6 +36,8 @@ class Forest(object):
         If None or 'sqrt', then max_features=sqrt(n_features).
     max_depth: int (default=None)
         The maximum depth of a tree.
+    criterion: str (default='gini')
+        Splitting criterion to use.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
     min_samples_leaf: int (default=1)
@@ -46,13 +48,14 @@ class Forest(object):
         Verbosity level.
     """
     def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt',
-                 max_depth=10, min_samples_split=2, min_samples_leaf=1,
+                 max_depth=10, criterion='gini', min_samples_split=2, min_samples_leaf=1,
                  random_state=None, verbose=0):
         self.epsilon = epsilon
         self.lmbda = lmbda
         self.n_estimators = n_estimators
         self.max_features = max_features
         self.max_depth = max_depth
+        self.criterion = criterion
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.random_state = random_state
@@ -65,6 +68,7 @@ class Forest(object):
         s += '\nn_estimators={}'.format(self.n_estimators)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_depth={}'.format(self.max_depth)
+        s += '\ncriterion={}'.format(self.criterion)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
         s += '\nmin_samples_leaf={}'.format(self.min_samples_leaf)
         s += '\nrandom_state={}'.format(self.random_state)
@@ -116,6 +120,7 @@ class Forest(object):
             tree = Tree(epsilon=self.epsilon,
                         lmbda=self.lmbda,
                         max_depth=self.max_depth_,
+                        criterion=self.criterion,
                         min_samples_split=self.min_samples_split,
                         min_samples_leaf=self.min_samples_leaf,
                         random_state=self.random_state_ + i,
@@ -272,6 +277,8 @@ class Tree(object):
         Set to -1 for a detrminisic tree; equivalent to setting it to infty.
     max_depth: int (default=None)
         The maximum depth of a tree.
+    criterion: str (default='gini')
+        Splitting criterion to use.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
     min_samples_leaf: int (default=1)
@@ -281,11 +288,13 @@ class Tree(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, min_samples_split=2,
-                 min_samples_leaf=1, random_state=None, verbose=0):
+    def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, criterion='gini',
+                 min_samples_split=2, min_samples_leaf=1, random_state=None,
+                 verbose=0):
         self.epsilon = epsilon
         self.max_depth = max_depth
         self.lmbda = lmbda
+        self.criterion = criterion
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.random_state = random_state
@@ -296,6 +305,7 @@ class Tree(object):
         s += '\nepsilon={}'.format(self.epsilon)
         s += '\nlmbda={}'.format(self.lmbda)
         s += '\nmax_depth={}'.format(self.max_depth)
+        s += '\ncriterion={}'.format(self.criterion)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
         s += '\nmin_samples_leaf={}'.format(self.min_samples_leaf)
         s += '\nrandom_state={}'.format(self.random_state)
@@ -328,9 +338,13 @@ class Tree(object):
         # set max_depth and lmbda
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
 
+        # set splitting criterion
+        self.use_gini_ = True if self.criterion == 'gini' else False
+
         self.tree_ = _Tree(features)
         self.splitter_ = _Splitter(self.min_samples_leaf,
                                    self.lmbda,
+                                   self.use_gini_,
                                    self.random_state_)
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
@@ -340,11 +354,13 @@ class Tree(object):
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
                                  self.epsilon,
-                                 self.lmbda)
+                                 self.lmbda,
+                                 self.use_gini_)
         self.adder_ = _Adder(self.manager_,
                              self.tree_builder_,
                              self.epsilon,
-                             self.lmbda)
+                             self.lmbda,
+                             self.use_gini_)
         self.tree_builder_.build(self.tree_)
 
         return self

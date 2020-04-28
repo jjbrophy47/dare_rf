@@ -138,18 +138,21 @@ def performance(args, logger, seed):
     if args.model_type == 'stump':
         model = cedar.Tree(lmbda=-1,
                            max_depth=1,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'tree':
         model = cedar.Tree(lmbda=-1,
                            max_depth=args.max_depth,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'forest':
         model = cedar.Forest(lmbda=-1,
                              max_depth=args.max_depth,
+                             criterion=args.criterion,
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
@@ -207,6 +210,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     # sklearn specific hyperparameters
     parser.add_argument('--sklearn', action='store_true', default=False, help='run sklearn model.')

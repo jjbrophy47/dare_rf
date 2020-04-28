@@ -18,6 +18,7 @@ cdef class _Adder:
     cdef _TreeBuilder tree_builder   # Tree Builder
     cdef double epsilon              # Indistinguishability parameter
     cdef double lmbda                # Noise parameter
+    cdef bint use_gini               # Controls splitting criterion
     cdef int min_samples_leaf        # Minimum number of samples for a leaf
     cdef int min_samples_split       # Minimum number of samples for a split
 

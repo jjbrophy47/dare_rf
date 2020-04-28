@@ -33,7 +33,7 @@ cdef class _Splitter:
     # Internal structures
     cdef public int min_samples_leaf       # Min samples in a leaf
     cdef double lmbda                      # Noise control parameter
-
+    cdef bint use_gini                     # Controls splitting criterion
     cdef object random_state               # Random state reference
     cdef UINT32_t rand_r_state             # sklearn_rand_r random number state
 

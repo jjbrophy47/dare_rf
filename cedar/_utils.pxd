@@ -13,8 +13,13 @@ cdef enum:
 
 cdef UINT32_t our_rand_r(UINT32_t* seed) nogil
 cdef double rand_uniform(double low, double high, UINT32_t* random_state) nogil
+cdef double compute_split_score(bint use_gini, double count, double left_count,
+                                double right_count, int left_pos_count,
+                                int right_pos_count) nogil
 cdef double compute_gini(double count, double left_count, double right_count,
                          int left_pos_count, int right_pos_count) nogil
+cdef double compute_mutual_info(double count, double left_count, double right_count,
+                                int left_pos_count, int right_pos_count) nogil
 cdef int generate_distribution(double lmbda, double* distribution,
                                double* gini_indices, int n_gini_indices) nogil
 cdef int sample_distribution(double* distribution, int n_distribution,
