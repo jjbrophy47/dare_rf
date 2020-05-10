@@ -211,7 +211,7 @@ def main(args):
 
     # create output dir
     rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                          args.adversary, 'rs{}'.format(args.rs))
+                          args.criterion, args.adversary, 'rs{}'.format(args.rs))
     os.makedirs(rs_dir, exist_ok=True)
 
     # create logger
@@ -219,7 +219,7 @@ def main(args):
     logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
     logger.info(args)
     logger.info(datetime.now())
-    logger.info('\nseed: {}'.format(args.rs))
+    logger.info('\nSeed: {}, Advesary: {}'.format(args.rs, args.adversary))
 
     # run experiment
     experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda)
@@ -238,7 +238,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
-    parser.add_argument('--repeats', type=int, default=5, help='number of times to repeat the experiment.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
     parser.add_argument('--time_limit', type=int, default=86400, help='maximum number of seconds.')
 
@@ -253,6 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     # adversary settings
     parser.add_argument('--n_remove', type=int, default=10, help='number of instances to sequentially delete.')
