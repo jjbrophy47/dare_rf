@@ -2,9 +2,13 @@ data
 output
 myenv
 notes
+plots
+scripts
 
 experiments/scripts/other
 experiments/utility/__pycache__
+experiments/scripts/__pycache__
+experiments/notebooks/.*
 
 cedar/__pycache__
 cedar/build

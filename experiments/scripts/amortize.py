@@ -209,27 +209,24 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
 def main(args):
 
-    # run experiment multiple times
-    for i in range(args.repeats):
+    # create output dir
+    rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
+                          args.adversary, 'rs{}'.format(args.rs))
+    os.makedirs(rs_dir, exist_ok=True)
 
-        # create output dir
-        rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                              args.adversary, 'rs{}'.format(args.rs))
-        os.makedirs(rs_dir, exist_ok=True)
+    # create logger
+    logger_name = 'log_ep{}.txt'.format(args.epsilon) if args.cedar else 'log.txt'
+    logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
+    logger.info(args)
+    logger.info(datetime.now())
+    logger.info('\nseed: {}'.format(args.rs))
 
-        # create logger
-        logger_name = 'log_ep{}.txt'.format(args.epsilon)
-        logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
-        logger.info(args)
-        logger.info(datetime.now())
-        logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
+    # run experiment
+    experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda)
+    args.rs += 1
 
-        # run experiment
-        experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda[i])
-        args.rs += 1
-
-        # remove logger
-        print_util.remove_logger(logger)
+    # remove logger
+    print_util.remove_logger(logger)
 
 
 if __name__ == '__main__':
@@ -252,7 +249,7 @@ if __name__ == '__main__':
 
     # model hyperparameters
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
-    parser.add_argument('--lmbda', type=float, nargs='+', default=[0], help='list of lambdas.')
+    parser.add_argument('--lmbda', type=float, default=0, help='noise hyperparameter.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
@@ -267,3 +264,27 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     main(args)
+
+
+# External API
+class Args:
+    out_dir = 'output/amortize/'
+    data_dir = 'data'
+    dataset = 'surgical'
+    model_type = 'forest'
+    rs = 1
+    repeats = 1
+    save_results = True
+    time_limit = 86400
+    naive = False
+    exact = False
+    cedar = False
+    epsilon = 1.0
+    lmbda = [0]
+    n_estimators = 100
+    max_features = 0.25
+    max_depth = 1
+    n_remove = 10
+    frac_remove = 0.1
+    adversary = 'random'
+    verbose = 1
