@@ -42,12 +42,13 @@ def _get_model(args, epsilon, lmbda, random_state=None):
                            random_state=random_state)
 
     elif args.model_type == 'forest':
+        max_features = None if args.max_features == -1 else args.max_features
         model = cedar.Forest(epsilon=epsilon,
                              lmbda=lmbda,
                              max_depth=args.max_depth,
                              criterion=args.criterion,
                              n_estimators=args.n_estimators,
-                             max_features=args.max_features,
+                             max_features=max_features,
                              verbose=args.verbose,
                              random_state=random_state)
 
@@ -178,7 +179,7 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/delete_until_retrain', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
-    parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
+    parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
@@ -188,7 +189,7 @@ if __name__ == '__main__':
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
+    parser.add_argument('--max_features', type=float, default=-1, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     parser.add_argument('--lmbda', type=float, default=0, help='noise hyperparameter')

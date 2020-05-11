@@ -42,12 +42,13 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
                            random_state=random_state)
 
     elif args.model_type == 'forest':
+        max_features = None if args.max_features == -1 else args.max_features
         model = cedar.Forest(epsilon=epsilon,
                              lmbda=lmbda,
                              max_depth=args.max_depth,
                              criterion=args.criterion,
                              n_estimators=args.n_estimators,
-                             max_features=args.max_features,
+                             max_features=max_features,
                              verbose=args.verbose,
                              random_state=random_state)
 
@@ -264,7 +265,7 @@ if __name__ == '__main__':
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
     parser.add_argument('--lmbda', type=float, default=0, help='noise hyperparameter.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
+    parser.add_argument('--max_features', type=float, default=-1, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 

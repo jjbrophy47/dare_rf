@@ -3,6 +3,9 @@ output
 myenv
 notes
 
+jobs/errors/
+jobs/logs/
+
 !scripts
 scripts/**/__pycache__
 

@@ -37,10 +37,11 @@ def _get_model(args, lmbda, random_state):
                            random_state=random_state)
 
     elif args.model_type == 'forest':
+        max_features = None if args.max_features == -1 else args.max_features
         model = cedar.Forest(lmbda=lmbda,
                              max_depth=args.max_depth,
                              n_estimators=args.n_estimators,
-                             max_features=args.max_features,
+                             max_features=max_features,
                              verbose=args.verbose,
                              random_state=random_state)
 
@@ -154,18 +155,18 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/no_retrain/', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
-    parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
+    parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
+    parser.add_argument('--max_features', type=float, default=-1, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     # tuning settings
-    parser.add_argument('--lmbda_step_size', type=float, default=100, help='value to increment lmbda by.')
+    parser.add_argument('--step_size', type=float, default=100, help='value to increment lmbda by.')
     parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='Predictive performance metric.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')

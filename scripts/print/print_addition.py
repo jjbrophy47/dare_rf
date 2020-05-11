@@ -30,7 +30,7 @@ def print_dataset(args, dataset, logger):
 
         naive_train, _ = print_util.get_mean1d(args, naive, 'train_time')
         naive_amortize, _ = print_util._get_mean_amortize(args, naive)
-        s = '[Naive] train time: {:.3f}s, amortized: {:.5f}s'
+        s = '[Naive] train: {:.3f}s, amortized: {:.5f}s'
         logger.info(s.format(naive_train, naive_amortize))
 
         exact_train, _ = print_util.get_mean1d(args, exact, 'train_time')
