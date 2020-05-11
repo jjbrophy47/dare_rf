@@ -29,6 +29,7 @@ def _get_model(args, epsilon, lmbda, random_state=None):
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=1,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
@@ -36,6 +37,7 @@ def _get_model(args, epsilon, lmbda, random_state=None):
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=args.max_depth,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
@@ -43,6 +45,7 @@ def _get_model(args, epsilon, lmbda, random_state=None):
         model = cedar.Forest(epsilon=epsilon,
                              lmbda=lmbda,
                              max_depth=args.max_depth,
+                             criterion=args.criterion,
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
@@ -149,26 +152,23 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
 def main(args):
 
-    # run experiment multiple times
-    for i in range(args.repeats):
+    # create output dir
+    ep_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
+                          args.criterion, args.adversary,
+                          'rs{}'.format(args.rs))
+    os.makedirs(ep_dir, exist_ok=True)
 
-        # create output dir
-        ep_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                              args.adversary, 'rs{}'.format(args.rs))
-        os.makedirs(ep_dir, exist_ok=True)
+    # create logger
+    logger = print_util.get_logger(os.path.join(ep_dir, 'log.txt'))
+    logger.info(args)
+    logger.info(datetime.now())
+    logger.info('\nSeed: {}'.format(args.rs))
 
-        # create logger
-        logger = print_util.get_logger(os.path.join(ep_dir, 'log.txt'))
-        logger.info(args)
-        logger.info(datetime.now())
-        logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
+    # run experiment
+    experiment(args, logger, ep_dir, seed=args.rs, lmbda=args.lmbda)
 
-        # run experiment
-        experiment(args, logger, ep_dir, seed=args.rs, lmbda=args.lmbda[i])
-        args.rs += 1
-
-        # remove logger
-        print_util.remove_logger(logger)
+    # remove logger
+    print_util.remove_logger(logger)
 
 
 if __name__ == '__main__':
@@ -180,7 +180,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--repeats', type=int, default=5, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
     # adversary settings
@@ -191,7 +190,8 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
-    parser.add_argument('--lmbda', type=float, nargs='+', default=[0], help='list of lambdas.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
+    parser.add_argument('--lmbda', type=float, default=0, help='noise hyperparameter')
 
     # display settings
     parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')

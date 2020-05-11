@@ -129,26 +129,22 @@ def experiment(args, logger, out_dir, seed):
 
 def main(args):
 
-    # run experiment multiple times
-    for i in range(args.repeats):
+    # create output dir
+    ep_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
+                          args.criterion, 'rs{}'.format(args.rs))
+    os.makedirs(ep_dir, exist_ok=True)
 
-        # create output dir
-        ep_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                              'rs{}'.format(args.rs))
-        os.makedirs(ep_dir, exist_ok=True)
+    # create logger
+    logger = print_util.get_logger(os.path.join(ep_dir, 'log.txt'))
+    logger.info(args)
+    logger.info(datetime.now())
+    logger.info('\nSeed: {}'.format(args.rs))
 
-        # create logger
-        logger = print_util.get_logger(os.path.join(ep_dir, 'log.txt'))
-        logger.info(args)
-        logger.info(datetime.now())
-        logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
+    # run experiment
+    experiment(args, logger, ep_dir, seed=args.rs)
 
-        # run experiment
-        experiment(args, logger, ep_dir, seed=args.rs)
-        args.rs += 1
-
-        # remove logger
-        print_util.remove_logger(logger)
+    # remove logger
+    print_util.remove_logger(logger)
 
 
 if __name__ == '__main__':
@@ -160,13 +156,13 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='stump', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--repeats', type=int, default=5, help='number of times to perform the experiment.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     # tuning settings
     parser.add_argument('--lmbda_step_size', type=float, default=100, help='value to increment lmbda by.')

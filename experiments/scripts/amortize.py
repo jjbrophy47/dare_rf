@@ -29,6 +29,7 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=1,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
@@ -36,6 +37,7 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=args.max_depth,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
@@ -43,6 +45,7 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
         model = cedar.Forest(epsilon=epsilon,
                              lmbda=lmbda,
                              max_depth=args.max_depth,
+                             criterion=args.criterion,
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
@@ -223,7 +226,6 @@ def main(args):
 
     # run experiment
     experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda)
-    args.rs += 1
 
     # remove logger
     print_util.remove_logger(logger)
@@ -284,6 +286,7 @@ class Args:
     n_estimators = 100
     max_features = 0.25
     max_depth = 1
+    criterion = 'gini'
     n_remove = 10
     frac_remove = 0.1
     adversary = 'random'

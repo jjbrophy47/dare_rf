@@ -29,6 +29,7 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=1,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
@@ -36,6 +37,7 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
         model = cedar.Tree(epsilon=epsilon,
                            lmbda=lmbda,
                            max_depth=args.max_depth,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
@@ -43,6 +45,7 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
         model = cedar.Forest(epsilon=epsilon,
                              lmbda=lmbda,
                              max_depth=args.max_depth,
+                             criterion=args.criterion,
                              n_estimators=args.n_estimators,
                              max_features=args.max_features,
                              verbose=args.verbose,
@@ -220,27 +223,24 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
 def main(args):
 
-    # run experiment multiple times
-    for i in range(args.repeats):
+    # create output dir
+    rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
+                          args.criterion, args.adversary,
+                          'rs{}'.format(args.rs))
+    os.makedirs(rs_dir, exist_ok=True)
 
-        # create output dir
-        rs_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
-                              args.adversary, 'rs{}'.format(args.rs))
-        os.makedirs(rs_dir, exist_ok=True)
+    # create logger
+    logger_name = 'log_ep{}.txt'.format(args.epsilon) if args.cedar else 'log.txt'
+    logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
+    logger.info(args)
+    logger.info(datetime.now())
+    logger.info('\nRun {}, seed: {}'.format(args.rs))
 
-        # create logger
-        logger_name = 'log_ep{}.txt'.format(args.epsilon)
-        logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
-        logger.info(args)
-        logger.info(datetime.now())
-        logger.info('\nRun {}, seed: {}'.format(i + 1, args.rs))
+    # run experiment
+    experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda)
 
-        # run experiment
-        experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda[i])
-        args.rs += 1
-
-        # remove logger
-        print_util.remove_logger(logger)
+    # remove logger
+    print_util.remove_logger(logger)
 
 
 if __name__ == '__main__':
@@ -252,7 +252,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
-    parser.add_argument('--repeats', type=int, default=5, help='number of times to repeat the experiment.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
     parser.add_argument('--time_limit', type=int, default=86400, help='maximum number of seconds.')
 
@@ -263,10 +262,11 @@ if __name__ == '__main__':
 
     # model hyperparameters
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
-    parser.add_argument('--lmbda', type=float, nargs='+', default=[0], help='list of lambdas.')
+    parser.add_argument('--lmbda', type=float, default=0, help='noise hyperparameter.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=None, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     # adversary settings
     parser.add_argument('--n_add', type=int, default=10, help='number of instances to sequentially add.')

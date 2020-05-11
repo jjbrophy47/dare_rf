@@ -2,8 +2,9 @@ data
 output
 myenv
 notes
-plots
-scripts
+
+!scripts
+scripts/**/__pycache__
 
 experiments/scripts/other
 experiments/utility/__pycache__

@@ -176,7 +176,8 @@ def performance(args, logger, seed):
 def main(args):
 
     # create output dir
-    out_dir = os.path.join(args.out_dir, args.dataset, args.model_type)
+    out_dir = os.path.join(args.out_dir, args.dataset, args.model_type,
+                           args.criterion)
     os.makedirs(out_dir, exist_ok=True)
 
     # create logger
