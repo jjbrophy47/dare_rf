@@ -15,8 +15,8 @@ def print_dataset(args, dataset):
     for adversary in args.adversary:
         print('\n{}'.format(adversary.capitalize()))
 
-        naive = print_util.get_results(args, adversary, 'naive')
-        exact = print_util.get_results(args, adversary, 'exact')
+        naive = print_util.get_results(args, dataset, adversary, 'naive')
+        exact = print_util.get_results(args, dataset, adversary, 'exact')
 
         n_train, _ = print_util.get_mean1d(args, naive, 'n_train', as_int=True)
         n_features, _ = print_util.get_mean1d(args, naive, 'n_features', as_int=True)
@@ -47,7 +47,7 @@ def print_dataset(args, dataset):
                        exact_speedup, exact_retrains, exact_depth))
 
         for epsilon in args.epsilon:
-            cedar = print_util.get_results(args, adversary, 'cedar_ep{}'.format(epsilon))
+            cedar = print_util.get_results(args, dataset, adversary, 'cedar_ep{}'.format(epsilon))
 
             lmbda, _ = print_util.get_mean1d(args, cedar, 'lmbda', as_int=True)
             cedar_train, _ = print_util.get_mean1d(args, cedar, 'train_time')

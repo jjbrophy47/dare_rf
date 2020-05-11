@@ -39,13 +39,13 @@ def remove_logger(logger):
     logger.handlers = []
 
 
-def get_results(args, adversary, method):
+def get_results(args, dataset, adversary, method):
     """
     Get results for a single method.
     """
     r = {}
     for rs in args.rs:
-        fp = os.path.join(args.in_dir, args.dataset,
+        fp = os.path.join(args.in_dir, dataset,
                           args.model_type, args.criterion,
                           adversary,
                           'rs{}'.format(rs),
