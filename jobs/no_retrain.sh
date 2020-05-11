@@ -17,6 +17,7 @@ max_depth=10
 max_features=0.25
 criterion="gini"
 model_type="forest"
+
 data_dir="data/"
 out_dir="output/no_retrain/"
 rs_list=(1 2 3 4 5)

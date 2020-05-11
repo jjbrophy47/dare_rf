@@ -10,14 +10,15 @@
 #SBATCH --account=uoml
 module load python3/3.7.5
 
+# Higgs: use 0.05 tune_frac and reduce_search
 dataset="gas_sensor"
 criterion="gini"
 tune_frac=1.0
+
 scoring="roc_auc"
 data_dir="data/"
 out_dir="output/performance/"
-
-# Higgs: use 0.05 tune_frac and reduce_search
+verbose=1
 
 
 python3 experiments/scripts/performance.py \
@@ -26,5 +27,6 @@ python3 experiments/scripts/performance.py \
   --dataset $dataset \
   --tune_frac $tune_frac \
   --scoring $scoring \
-  --criterion $criterion
+  --criterion $criterion \
+  --verbose $verbose
   # --reduce_search
