@@ -27,6 +27,7 @@ def main(args):
             r = {}
             for rs in args.rs:
                 fp = os.path.join(args.in_dir, dataset, model_type,
+                                  args.criterion,
                                   'rs{}'.format(rs), 'results.npy')
                 r[rs] = np.load(fp, allow_pickle=True)[()]
 
@@ -63,5 +64,6 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=5, help='number of repeated results to include.')
     parser.add_argument('--dataset', type=str, nargs='+', default=['mfc20'], help='datasets to show.')
     parser.add_argument('--model_type', type=str, nargs='+', default=['forest'], help='models to show.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     args = parser.parse_args()
     main(args)

@@ -87,5 +87,6 @@ if __name__ == '__main__':
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--epsilon', type=str, nargs='+', default=['0.1', '0.25', '0.5', '1.0'], help='epsilon.')
     parser.add_argument('--adversary', type=str, nargs='+', default=['random', 'root'], help='adversary to show.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     args = parser.parse_args()
     main(args)

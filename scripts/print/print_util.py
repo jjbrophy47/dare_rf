@@ -39,7 +39,6 @@ def remove_logger(logger):
     logger.handlers = []
 
 
-# amortize methods
 def get_results(args, adversary, method):
     """
     Get results for a single method.
@@ -47,7 +46,8 @@ def get_results(args, adversary, method):
     r = {}
     for rs in args.rs:
         fp = os.path.join(args.in_dir, args.dataset,
-                          args.model_type, adversary,
+                          args.model_type, args.criterion,
+                          adversary,
                           'rs{}'.format(rs),
                           '{}.npy'.format(method))
         r[rs] = np.load(fp, allow_pickle=True)[()]

@@ -29,7 +29,7 @@ def main(args):
                 # get results
                 r = {}
                 for rs in args.rs:
-                    fp = os.path.join(args.in_dir, dataset, model_type, adversary,
+                    fp = os.path.join(args.in_dir, dataset, model_type, args.criterion, adversary,
                                       'rs{}'.format(rs), 'results.npy')
                     r[rs] = np.load(fp, allow_pickle=True)[()]
 
@@ -55,5 +55,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, nargs='+', default=['mfc19'], help='datasets to show.')
     parser.add_argument('--adversary', type=str, nargs='+', default=['random'], help='adversary to show.')
     parser.add_argument('--model_type', type=str, nargs='+', default=['stump'], help='models to show.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     args = parser.parse_args()
     main(args)
