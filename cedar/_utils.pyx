@@ -158,7 +158,8 @@ cdef int generate_distribution(double lmbda, double** distribution_ptr,
     cdef int i
     cdef double normalizing_constant = 0
 
-    cdef double min_score = 1
+    # max score possible <= 1
+    cdef double min_score = 2
     cdef int first_min = -1
 
     # find min score
