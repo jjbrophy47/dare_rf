@@ -1,0 +1,16 @@
+sbatch surgical.sh
+sbatch mfc20.sh
+sbatch adult.sh
+sbatch bank_marketing.sh
+sbatch flight_delays1.sh
+sbatch flight_delays2.sh
+sbatch diabetes1.sh
+sbatch diabetes2.sh
+sbatch skin1.sh
+sbatch skin2.sh
+sbatch census.sh
+sbatch twitter.sh
+sbatch gas_sensor1.sh
+sbatch gas_sensor2.sh
+sbatch higgs1.sh
+sbatch higgs2.sh
