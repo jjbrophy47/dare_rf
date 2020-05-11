@@ -13,6 +13,7 @@ import print_util
 def main(args):
 
     # create logger
+    os.makedirs(args.out_dir, exist_ok=True)
     logger_name = 'deletions.txt'
     logger = print_util.get_logger(os.path.join(args.out_dir, logger_name))
     logger.info(args)

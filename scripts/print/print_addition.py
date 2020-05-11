@@ -15,6 +15,7 @@ def main(args):
     dataset = args.dataset
 
     # create logger
+    os.makedirs(args.out_dir, exist_ok=True)
     logger_name = 'addition.txt'
     logger = print_util.get_logger(os.path.join(args.out_dir, logger_name))
     logger.info(args)
