@@ -10,16 +10,7 @@ import numpy as np
 import print_util
 
 
-def main(args):
-
-    dataset = args.dataset
-
-    # create logger
-    os.makedirs(args.out_dir, exist_ok=True)
-    logger_name = 'amortize.txt'
-    logger = print_util.get_logger(os.path.join(args.out_dir, logger_name))
-    logger.info(args)
-    logger.info(datetime.now())
+def print_dataset(args, dataset):
 
     for adversary in args.adversary:
         print('\n{}'.format(adversary.capitalize()))
@@ -77,11 +68,24 @@ def main(args):
                            epsilon, lmbda, args.metric, score_diff))
 
 
+def main(args):
+
+    # create logger
+    os.makedirs(args.out_dir, exist_ok=True)
+    logger_name = 'amortize.txt'
+    logger = print_util.get_logger(os.path.join(args.out_dir, logger_name))
+    logger.info(args)
+    logger.info(datetime.now())
+
+    for dataset in args.dataset:
+        print_dataset(args, dataset)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--in_dir', type=str, default='output/amortize/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/prints/', help='output directory.')
-    parser.add_argument('--dataset', type=str, default='surgical', help='dataset to plot.')
+    parser.add_argument('--dataset', type=str, nargs='+', default=['surgical'], help='dataset to print.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--repeats', type=int, default=5, help='number of experiments.')
     parser.add_argument('--metric', type=str, default='auc', help='predictive performance metric.')

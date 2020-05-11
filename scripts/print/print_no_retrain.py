@@ -32,19 +32,20 @@ def main(args):
                                   'rs{}'.format(rs), 'results.npy')
                 r[rs] = np.load(fp, allow_pickle=True)[()]
 
-            lmbda, _, lmbdas = print_util.get_mean(args, r, key='lmbda')
-            n_train = r[args.rs]['n_train']
-            n_features = r[args.rs]['n_features']
-            max_depth = r[args.rs]['max_depth']
-            n_estimators = r[args.rs].get('n_estimators')
-            max_features = r[args.rs].get('max_features')
-            lmbda_step_size = r[args.rs].get('lmbda_step_size')
+            lmbdas = [r[rs]['lmbda'] for rs in args.rs]
+            lmbda = sum(lmbdas) / len(lmbdas)
+            n_train = r[args.rs[0]]['n_train']
+            n_features = r[args.rs[0]]['n_features']
+            max_depth = r[args.rs[0]]['max_depth']
+            n_estimators = r[args.rs[0]].get('n_estimators')
+            max_features = r[args.rs[0]].get('max_features')
+            lmbda_step_size = r[args.rs[0]].get('lmbda_step_size')
 
             n_trees = 1 if n_estimators is None else n_estimators
             adjusted_lmbdas = [lm / 5 / max_depth / n_trees for lm in lmbdas]
 
-            out_str = '\n{} ({:,} instances, {:,} features), depth: {}, trees: {}, features: {}'
-            out_str += ', lmbda_step_size: {}, lmbda: {}'
+            out_str = '\n{} ({:,} instances, {:,} features), depth: {}, trees: {}, '
+            out_str += 'features: {}, lmbda_step_size: {}, lmbda: {}'
             print(out_str.format(dataset, n_train, n_features, max_depth, n_estimators,
                                  max_features, lmbda_step_size, lmbda))
             print('lmbdas: {}'.format(lmbdas))
