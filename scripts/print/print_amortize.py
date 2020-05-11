@@ -79,7 +79,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--in_dir', type=str, default='output/addition/', help='input directory.')
+    parser.add_argument('--in_dir', type=str, default='output/amortize/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/prints/', help='output directory.')
     parser.add_argument('--dataset', type=str, default='surgical', help='dataset to plot.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
