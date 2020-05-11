@@ -82,7 +82,7 @@ if __name__ == '__main__':
     parser.add_argument('--in_dir', type=str, default='output/addition/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/prints/', help='output directory.')
     parser.add_argument('--dataset', type=str, default='surgical', help='dataset to plot.')
-    parser.add_argument('--rs', type=str, default=1, help='experiment random state.')
+    parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--repeats', type=str, default=5, help='number of experiments.')
     parser.add_argument('--metric', type=str, default='auc', help='predictive performance metric.')
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')

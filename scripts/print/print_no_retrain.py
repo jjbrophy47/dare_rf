@@ -61,7 +61,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--in_dir', type=str, default='output/no_retrain/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/prints/', help='output directory.')
-    parser.add_argument('--rs', type=int, default=1, help='initial seed.')
+    parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--repeats', type=int, default=5, help='number of repeated results to include.')
     parser.add_argument('--dataset', type=str, nargs='+', default=['mfc20'], help='datasets to show.')
     parser.add_argument('--model_type', type=str, nargs='+', default=['forest'], help='models to show.')
