@@ -235,7 +235,7 @@ def main(args):
     logger = print_util.get_logger(os.path.join(rs_dir, logger_name))
     logger.info(args)
     logger.info(datetime.now())
-    logger.info('\nRun {}, seed: {}'.format(args.rs))
+    logger.info('\nSeed: {}, Advesary: {}'.format(args.rs, args.adversary))
 
     # run experiment
     experiment(args, logger, rs_dir, seed=args.rs, lmbda=args.lmbda)
