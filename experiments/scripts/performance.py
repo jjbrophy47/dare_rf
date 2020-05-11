@@ -20,6 +20,81 @@ import cedar
 from utility import data_util, exp_util, print_util
 
 
+def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
+    """
+    Return the appropriate model CeDAR model.
+    """
+
+    if args.model_type == 'stump':
+        model = cedar.Tree(epsilon=epsilon,
+                           lmbda=lmbda,
+                           max_depth=1,
+                           criterion=args.criterion,
+                           verbose=args.verbose,
+                           random_state=random_state)
+
+    elif args.model_type == 'tree':
+        model = cedar.Tree(epsilon=epsilon,
+                           lmbda=lmbda,
+                           max_depth=args.max_depth,
+                           criterion=args.criterion,
+                           verbose=args.verbose,
+                           random_state=random_state)
+
+    elif args.model_type == 'forest':
+        max_features = None if args.max_features == -1 else args.max_features
+        model = cedar.Forest(epsilon=epsilon,
+                             lmbda=lmbda,
+                             max_depth=args.max_depth,
+                             criterion=args.criterion,
+                             n_estimators=args.n_estimators,
+                             max_features=max_features,
+                             verbose=args.verbose,
+                             random_state=random_state)
+
+    else:
+        exit('model_type {} unknown!'.format(args.model_type))
+
+    return model
+
+
+def _get_model_dict(args, params, epsilon=0, lmbda=-1, random_state=None):
+    """
+    Return the appropriate model CeDAR model.
+    """
+
+    if args.model_type == 'stump':
+        model = cedar.Tree(epsilon=epsilon,
+                           lmbda=lmbda,
+                           max_depth=1,
+                           criterion=args.criterion,
+                           verbose=args.verbose,
+                           random_state=random_state)
+
+    elif args.model_type == 'tree':
+        model = cedar.Tree(epsilon=epsilon,
+                           lmbda=lmbda,
+                           max_depth=params['max_depth'],
+                           criterion=args.criterion,
+                           verbose=args.verbose,
+                           random_state=random_state)
+
+    elif args.model_type == 'forest':
+        model = cedar.Forest(epsilon=epsilon,
+                             lmbda=lmbda,
+                             max_depth=params['max_depth'],
+                             criterion=args.criterion,
+                             n_estimators=params['n_estimators'],
+                             max_features=params['max_features'],
+                             verbose=args.verbose,
+                             random_state=random_state)
+
+    else:
+        exit('model_type {} unknown!'.format(args.model_type))
+
+    return model
+
+
 def _get_best_params(gs, param_grid, keys, logger, tol=0.01):
     """
     Chooses the set of hyperparameters whose `mean_fit_score` is within
@@ -135,29 +210,7 @@ def performance(args, logger, seed):
     logger.info('\nDeterministic')
     start = time.time()
 
-    if args.model_type == 'stump':
-        model = cedar.Tree(lmbda=-1,
-                           max_depth=1,
-                           criterion=args.criterion,
-                           verbose=args.verbose,
-                           random_state=random_state)
-
-    elif args.model_type == 'tree':
-        model = cedar.Tree(lmbda=-1,
-                           max_depth=args.max_depth,
-                           criterion=args.criterion,
-                           verbose=args.verbose,
-                           random_state=random_state)
-
-    elif args.model_type == 'forest':
-        max_features = None if args.max_features == -1 else args.max_features
-        model = cedar.Forest(lmbda=-1,
-                             max_depth=args.max_depth,
-                             criterion=args.criterion,
-                             n_estimators=args.n_estimators,
-                             max_features=max_features,
-                             verbose=args.verbose,
-                             random_state=random_state)
+    model = _get_model(args, random_state=seed)
 
     if args.model_type in['tree', 'forest'] and not args.no_tune:
 
@@ -167,7 +220,7 @@ def performance(args, logger, seed):
         gs = gs.fit(X_train_sub, y_train_sub)
 
         best_params = _get_best_params(gs, param_grid, keys, logger, args.tol)
-        model.set_params(**best_params)
+        model = _get_model_dict(args, best_params, random_state=seed)
 
     model = model.fit(X_train, y_train)
     exp_util.performance(model, X_test, y_test, name='deterministic', logger=logger)
@@ -219,7 +272,7 @@ if __name__ == '__main__':
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping (sklearn).')
 
     # display settings
-    parser.add_argument('--verbose', type=int, default=0, help='verbosity level.')
+    parser.add_argument('--verbose', type=int, default=2, help='verbosity level.')
 
     args = parser.parse_args()
     main(args)
