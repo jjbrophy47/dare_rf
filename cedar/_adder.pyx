@@ -293,11 +293,9 @@ cdef class _Adder:
                         chosen_ndx = j
 
                 # generate new probability and compare to previous probability
-                generate_distribution(lmbda, distribution, split_scores, node.features_count)
+                generate_distribution(lmbda, &distribution, split_scores, node.features_count)
                 p = parent_p * distribution[chosen_ndx]
                 ratio = p / node.p
-
-                # printf('ratio: %.3f, epsilon: %.3f, lmbda: %.3f\n', ratio, epsilon, lmbda)
 
                 if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
 

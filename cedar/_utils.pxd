@@ -18,10 +18,10 @@ cdef double compute_split_score(bint use_gini, double count, double left_count,
                                 int right_pos_count) nogil
 cdef double compute_gini(double count, double left_count, double right_count,
                          int left_pos_count, int right_pos_count) nogil
-cdef double compute_mutual_info(double count, double left_count, double right_count,
-                                int left_pos_count, int right_pos_count) nogil
-cdef int generate_distribution(double lmbda, double* distribution,
-                               double* gini_indices, int n_gini_indices) nogil
+cdef double compute_entropy(double count, double left_count, double right_count,
+                            int left_pos_count, int right_pos_count) nogil
+cdef int generate_distribution(double lmbda, double** distribution_ptr,
+                               double* scores, int n_scores) nogil
 cdef int sample_distribution(double* distribution, int n_distribution,
                              UINT32_t* random_state) nogil
 cdef int* convert_int_ndarray(np.ndarray arr)

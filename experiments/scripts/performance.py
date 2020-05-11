@@ -209,7 +209,6 @@ def performance(args, logger, seed):
     # Deterministic
     logger.info('\nDeterministic')
     start = time.time()
-
     model = _get_model(args, random_state=seed)
 
     if args.model_type in['tree', 'forest'] and not args.no_tune:

@@ -66,8 +66,8 @@ cdef double compute_split_score(bint use_gini, double count, double left_count,
                               left_pos_count, right_pos_count)
 
     else:
-        result = compute_mutual_info(count, left_count, right_count,
-                                     left_pos_count, right_pos_count)
+        result = compute_entropy(count, left_count, right_count,
+                                 left_pos_count, right_pos_count)
 
     return result
 
@@ -104,8 +104,8 @@ cdef double compute_gini(double count, double left_count, double right_count,
     return left_weighted_index + right_weighted_index
 
 @cython.cdivision(True)
-cdef double compute_mutual_info(double count, double left_count, double right_count,
-                                int left_pos_count, int right_pos_count) nogil:
+cdef double compute_entropy(double count, double left_count, double right_count,
+                            int left_pos_count, int right_pos_count) nogil:
     """
     Compute the mutual information given this attribute.
     """
@@ -121,14 +121,26 @@ cdef double compute_mutual_info(double count, double left_count, double right_co
         weight = left_count / count
         pos_prob = left_pos_count / left_count
         neg_prob = 1 - pos_prob
-        entropy = - (pos_prob * log2(pos_prob)) - (neg_prob * log2(neg_prob))
+
+        entropy = 0
+        if pos_prob > 0:
+            entropy -= pos_prob * log2(pos_prob)
+        if neg_prob > 0:
+            entropy -= neg_prob * log2(neg_prob)
+
         left_weighted_entropy = weight * entropy
 
     if right_count > 0:
         weight = right_count / count
         pos_prob = right_pos_count / right_count
         neg_prob = 1 - pos_prob
-        entropy = - (pos_prob * log2(pos_prob)) - (neg_prob * log2(neg_prob))
+
+        entropy = 0
+        if pos_prob > 0:
+            entropy -= pos_prob * log2(pos_prob)
+        if neg_prob > 0:
+            entropy -= neg_prob * log2(neg_prob)
+
         right_weighted_entropy = weight * entropy
 
     return left_weighted_entropy + right_weighted_entropy
@@ -136,11 +148,13 @@ cdef double compute_mutual_info(double count, double left_count, double right_co
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
-cdef int generate_distribution(double lmbda, double* distribution,
+cdef int generate_distribution(double lmbda, double** distribution_ptr,
                                double* scores, int n_scores) nogil:
     """
     Generate a probability distribution based on the attribute split scores.
     """
+    cdef double* distribution = distribution_ptr[0]
+
     cdef int i
     cdef double normalizing_constant = 0
 

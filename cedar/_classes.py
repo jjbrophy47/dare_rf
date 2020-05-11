@@ -77,7 +77,7 @@ class Forest(object):
 
     def fit(self, X, y):
         """
-        Build decision tree.
+        Build random forest.
         """
         assert X.ndim == 2
         assert y.ndim == 1

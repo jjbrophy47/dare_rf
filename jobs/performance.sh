@@ -14,11 +14,12 @@ module load python3/3.7.5
 dataset="gas_sensor"
 criterion="gini"
 tune_frac=1.0
+model_type="forest"
 
 scoring="roc_auc"
 data_dir="data/"
 out_dir="output/performance/"
-verbose=1
+verbose=2
 
 
 python3 experiments/scripts/performance.py \
@@ -26,6 +27,7 @@ python3 experiments/scripts/performance.py \
   --out_dir $out_dir \
   --dataset $dataset \
   --tune_frac $tune_frac \
+  --model_type $model_type \
   --scoring $scoring \
   --criterion $criterion \
   --verbose $verbose

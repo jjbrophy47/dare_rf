@@ -84,7 +84,7 @@ cdef class _Splitter:
                                                       node.right_pos_counts[j])
 
             # generate and sample from the distribution
-            generate_distribution(lmbda, distribution, split_scores, node.features_count)
+            generate_distribution(lmbda, &distribution, split_scores, node.features_count)
             chosen_ndx = sample_distribution(distribution, node.features_count, random_state)
             chosen_feature = node.features[chosen_ndx]
 
