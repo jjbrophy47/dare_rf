@@ -10,18 +10,18 @@
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-data_dir="data/"
-out_dir="output/addition/"
 dataset="gas_sensor"
-lmbdas=(320 340 260 340 360)
 n_estimators=100
 max_depth=10
 max_features=0.25
-adversaries=("random" "root")
-epsilons=(0.1 0.25 0.5 1.0)
+lmbdas=(320 340 260 340 360)
 rs_list=(1 2 3 4 5)
 criterion="gini"
 
+data_dir="data/"
+out_dir="output/addition/"
+adversaries=("random" "root")
+epsilons=(0.1 0.25 0.5 1.0)
 
 for i in ${!rs_list[@]}; do
     for adversary in ${adversaries[@]}; do
