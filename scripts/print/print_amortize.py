@@ -47,7 +47,7 @@ def main(args):
         exact_retrains, _ = print_util.get_mean_retrainings(args, exact)
         exact_speedup = int(naive_amortize / exact_amortize)
         exact_scores, _ = print_util.get_mean(args, exact, args.metric)
-        exact_deletions, _ = print_util.get_mean_deletions(args, exact, n_trees)
+        exact_deletions, _ = print_util.get_mean_completions(args, exact, n_trees)
         exact_depth, _ = print_util.get_mean_retrain_depth(args, exact)
         exact_n_scores = len(exact_scores)
         s = '[Exact] train: {:.3f}s, completed: {:,}, '
@@ -64,7 +64,7 @@ def main(args):
             cedar_retrains, _ = print_util.get_mean_retrainings(args, cedar)
             cedar_speedup = int(naive_amortize / cedar_amortize)
             cedar_scores, _ = print_util.get_mean(args, cedar, args.metric)
-            cedar_deletions, _ = print_util.get_mean_deletions(args, cedar, n_trees)
+            cedar_deletions, _ = print_util.get_mean_completions(args, cedar, n_trees)
             cedar_depth, _ = print_util.get_mean_retrain_depth(args, cedar)
             cedar_n_scores = len(cedar_scores)
             n_scores = min(exact_n_scores, cedar_n_scores)

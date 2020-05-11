@@ -58,7 +58,7 @@ def get_max_features(args, r, name):
     """
     Get mean values.
     """
-    max_features = r[args.rs][name]
+    max_features = r[args.rs[0]][name]
     max_features = 'sqrt' if not max_features else max_features
     return max_features
 
