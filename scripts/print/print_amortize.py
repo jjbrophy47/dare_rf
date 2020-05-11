@@ -10,10 +10,10 @@ import numpy as np
 import print_util
 
 
-def print_dataset(args, dataset):
+def print_dataset(args, dataset, logger):
 
     for adversary in args.adversary:
-        print('\n{}'.format(adversary.capitalize()))
+        logger.info('\nDataset: {}, Adversary: {}'.format(dataset, adversary))
 
         naive = print_util.get_results(args, dataset, adversary, 'naive')
         exact = print_util.get_results(args, dataset, adversary, 'exact')
@@ -24,14 +24,14 @@ def print_dataset(args, dataset):
         max_depth, _ = print_util.get_mean1d(args, naive, 'max_depth', as_int=True)
         max_features = print_util.get_max_features(args, naive, 'max_features')
 
-        s = 'Dataset: {} ({:,} instances, {:,} features)   Trees: {:,}   '
+        s = '{:,} instances   {:,} features   Trees: {:,}   '
         s += 'Max depth: {}   Max features: {}'
-        print(s.format(dataset, n_train, n_features, n_trees, max_depth, max_features))
+        logger.info(s.format(n_train, n_features, n_trees, max_depth, max_features))
 
         naive_train, _ = print_util.get_mean1d(args, naive, 'train_time')
         naive_amortize, _ = print_util.get_mean_amortize(args, naive)
         s = '[Naive] train time: {:.3f}s, amortized: {:.5f}s'
-        print(s.format(naive_train, naive_amortize))
+        logger.info(s.format(naive_train, naive_amortize))
 
         exact_train, _ = print_util.get_mean1d(args, exact, 'train_time')
         exact_amortize, _ = print_util.get_mean_amortize(args, exact)
@@ -43,8 +43,8 @@ def print_dataset(args, dataset):
         exact_n_scores = len(exact_scores)
         s = '[Exact] train: {:.3f}s, completed: {:,}, '
         s += 'amortized: {:.5f}s, speedup: {:>7}x, retrains: {:7,}, retrain depth: {}'
-        print(s.format(exact_train, exact_deletions, exact_amortize,
-                       exact_speedup, exact_retrains, exact_depth))
+        logger.info(s.format(exact_train, exact_deletions, exact_amortize,
+                    exact_speedup, exact_retrains, exact_depth))
 
         for epsilon in args.epsilon:
             cedar = print_util.get_results(args, dataset, adversary, 'cedar_ep{}'.format(epsilon))
@@ -63,9 +63,9 @@ def print_dataset(args, dataset):
             s = '[CeDAR] train: {:.3f}s, completed: {:,}, amortized: {:.5f}s, '
             s += 'speedup: {:>7}x, retrains: {:7,}, retrain depth: {}, '
             s += 'epsilon: {:>4}, lmbda: {}, {} diff: {:.5f}'
-            print(s.format(cedar_train, cedar_deletions, cedar_amortize, cedar_speedup,
-                           cedar_retrains, cedar_depth,
-                           epsilon, lmbda, args.metric, score_diff))
+            logger.info(s.format(cedar_train, cedar_deletions, cedar_amortize, cedar_speedup,
+                        cedar_retrains, cedar_depth,
+                        epsilon, lmbda, args.metric, score_diff))
 
 
 def main(args):
@@ -78,7 +78,8 @@ def main(args):
     logger.info(datetime.now())
 
     for dataset in args.dataset:
-        print_dataset(args, dataset)
+        print_dataset(args, dataset, logger)
+        logger.info('\n')
 
 
 if __name__ == '__main__':
