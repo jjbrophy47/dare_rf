@@ -38,7 +38,7 @@ for i in ${!rs_list[@]}; do
               --adversary $adversary \
               --criterion $criterion \
               --lmbda ${lmbdas[$i]} \
-              --epsilon $epsilon \
+              --frac_remove $frac_remove \
               --rs ${rs_list[$i]}
         done
     done
