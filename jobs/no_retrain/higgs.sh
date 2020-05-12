@@ -17,6 +17,7 @@ max_depth=10
 max_features=0.25
 criterion="entropy"
 model_type="forest"
+tune_frac=0.05
 
 data_dir="data/"
 out_dir="output/no_retrain/"
@@ -34,6 +35,7 @@ for i in ${!rs_list[@]}; do
       --max_depth $max_depth \
       --max_features $max_features \
       --criterion $criterion \
-      --rs ${rs_list[$i]}
+      --rs ${rs_list[$i]} \
+      --tune_frac $tune_frac
 done
 

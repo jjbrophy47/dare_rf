@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/skin
-#SBATCH --error=jobs/errors/addition/skin
+#SBATCH --output=jobs/logs/addition/skin1
+#SBATCH --error=jobs/errors/addition/skin1
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

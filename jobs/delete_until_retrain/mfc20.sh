@@ -1,22 +1,22 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/gas_sensor
-#SBATCH --error=jobs/errors/delete_until_retrain/gas_sensor
-#SBATCH --time=14-00:00:00       ### Wall clock time limit in Days-HH:MM:SS
+#SBATCH --output=jobs/logs/delete_until_retrain/mfc20
+#SBATCH --error=jobs/errors/delete_until_retrain/mfc20
+#SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=9
+#SBATCH --cpus-per-task=3
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-dataset="gas_sensor"
+dataset="mfc20"
 n_estimators=100
-max_depth=10
+max_depth=20
 max_features=0.25
-lmbdas=(320 340 260 340 360)
-frac_remove 0.5
-criterion="gini"
+lmbdas=(75 75 75 75 75)
+frac_remove=0.35
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"

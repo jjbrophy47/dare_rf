@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/gas_sensor
-#SBATCH --error=jobs/errors/addition/gas_sensor
+#SBATCH --output=jobs/logs/addition/gas_sensor2
+#SBATCH --error=jobs/errors/addition/gas_sensor2
 #SBATCH --time=14-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

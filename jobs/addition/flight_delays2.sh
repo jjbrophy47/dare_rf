@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/flight_delays
-#SBATCH --error=jobs/errors/addition/flight_delays
+#SBATCH --output=jobs/logs/addition/flight_delays2
+#SBATCH --error=jobs/errors/addition/flight_delays2
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

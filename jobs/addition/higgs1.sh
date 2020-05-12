@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/higgs
-#SBATCH --error=jobs/errors/addition/higgs
+#SBATCH --output=jobs/logs/addition/higgs1
+#SBATCH --error=jobs/errors/addition/higgs1
 #SBATCH --time=14-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

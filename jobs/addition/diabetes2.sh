@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/diabetes
-#SBATCH --error=jobs/errors/addition/diabetes
+#SBATCH --output=jobs/logs/addition/diabetes2
+#SBATCH --error=jobs/errors/addition/diabetes2
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
