@@ -93,11 +93,11 @@ def experiment(args, logger, out_dir, seed):
     logger.info('random_state: {}'.format(random_state))
 
     cedar_score = 0
-    lmbda = -args.lmbda_step_size
+    lmbda = -args.step_size
 
     i = -1
     while True:
-        lmbda += args.lmbda_step_size
+        lmbda += args.step_size
         i += 1
 
         start2 = time.time()
@@ -122,7 +122,7 @@ def experiment(args, logger, out_dir, seed):
         d['lmbda'] = lmbda
         d['n_train'] = X_train.shape[0]
         d['n_features'] = X_train.shape[1]
-        d['lmbda_step_size'] = args.lmbda_step_size
+        d['step_size'] = args.step_size
         np.save(os.path.join(out_dir, 'results.npy'), d)
 
     logger.info('total time: {:.3f}s'.format(time.time() - start))
