@@ -1,0 +1,11 @@
+sbatch jobs/no_retrain/surgical.sh
+sbatch jobs/no_retrain/mfc20.sh
+sbatch jobs/no_retrain/adult.sh
+sbatch jobs/no_retrain/bank_marketing.sh
+sbatch jobs/no_retrain/flight_delays.sh
+sbatch jobs/no_retrain/diabetes.sh
+sbatch jobs/no_retrain/skin.sh
+sbatch jobs/no_retrain/census.sh
+sbatch jobs/no_retrain/twitter.sh
+sbatch jobs/no_retrain/gas_sensor.sh
+sbatch jobs/no_retrain/higgs.sh
