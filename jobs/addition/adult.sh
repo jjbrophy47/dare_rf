@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/adult
-#SBATCH --error=jobs/errors/addition/adult
+#SBATCH --output=jobs/logs/addition/adult_en
+#SBATCH --error=jobs/errors/addition/adult_en
 #SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -16,7 +16,7 @@ max_depth=10
 max_features=0.25
 lmbdas=(100 200 150 200 150)
 rs_list=(1 2 3 4 5)
-criterion="gini"
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/addition/"

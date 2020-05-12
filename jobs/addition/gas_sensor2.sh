@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/gas_sensor2
-#SBATCH --error=jobs/errors/addition/gas_sensor2
+#SBATCH --output=jobs/logs/addition/gas_sensor2_en
+#SBATCH --error=jobs/errors/addition/gas_sensor2_en
 #SBATCH --time=14-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -11,12 +11,12 @@
 module load python3/3.7.5
 
 dataset="gas_sensor"
-n_estimators=10
+n_estimators=100
 max_depth=10
 max_features=0.25
 lmbdas=(0 0)
 rs_list=(4 5)
-criterion="gini"
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/addition/"

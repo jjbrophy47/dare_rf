@@ -12,5 +12,5 @@ sbatch jobs/addition/census.sh
 sbatch jobs/addition/twitter.sh
 sbatch jobs/addition/gas_sensor1.sh
 sbatch jobs/addition/gas_sensor2.sh
-sbatch jobs/addition/higgs1.sh
-sbatch jobs/addition/higgs2.sh
+# sbatch jobs/addition/higgs1.sh
+# sbatch jobs/addition/higgs2.sh

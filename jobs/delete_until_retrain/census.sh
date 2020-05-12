@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/census
-#SBATCH --error=jobs/errors/delete_until_retrain/census
+#SBATCH --output=jobs/logs/delete_until_retrain/census_en
+#SBATCH --error=jobs/errors/delete_until_retrain/census_en
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,7 +14,7 @@ dataset="census"
 n_estimators=10
 max_depth=10
 max_features=0.25
-lmbdas=
+lmbdas=(1500 2000 1500 2000 1500)
 frac_remove=0.35
 criterion="entropy"
 

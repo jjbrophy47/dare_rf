@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/higgs1
-#SBATCH --error=jobs/errors/addition/higgs1
+#SBATCH --output=jobs/logs/addition/higgs1_en
+#SBATCH --error=jobs/errors/addition/higgs1_en
 #SBATCH --time=14-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,9 +14,9 @@ dataset="higgs"
 n_estimators=100
 max_depth=10
 max_features=0.25
-lmbdas=(320 340 260)
+lmbdas=
 rs_list=(1 2 3)
-criterion="gini"
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/addition/"

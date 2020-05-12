@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/bank_marketing
-#SBATCH --error=jobs/errors/delete_until_retrain/bank_marketing
+#SBATCH --output=jobs/logs/delete_until_retrain/bank_marketing_en
+#SBATCH --error=jobs/errors/delete_until_retrain/bank_marketing_en
 #SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

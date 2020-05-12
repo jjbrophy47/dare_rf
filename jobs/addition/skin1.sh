@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/skin1
-#SBATCH --error=jobs/errors/addition/skin1
+#SBATCH --output=jobs/logs/addition/skin1_en
+#SBATCH --error=jobs/errors/addition/skin1_en
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,9 +14,9 @@ dataset="skin"
 n_estimators=1000
 max_depth=20
 max_features=-1
-lmbdas=(0 0 0 0 0)
+lmbdas=(0 0 0)
 rs_list=(1 2 3)
-criterion="gini"
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/addition/"

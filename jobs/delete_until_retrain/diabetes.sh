@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/diabetes
-#SBATCH --error=jobs/errors/delete_until_retrain/diabetes
+#SBATCH --output=jobs/logs/delete_until_retrain/diabetes_en
+#SBATCH --error=jobs/errors/delete_until_retrain/diabetes_en
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,7 +14,7 @@ dataset="diabetes"
 n_estimators=100
 max_depth=20
 max_features=0.25
-lmbdas=
+lmbdas=(1000 1000 1000 500 1000)
 frac_remove=0.35
 criterion="entropy"
 

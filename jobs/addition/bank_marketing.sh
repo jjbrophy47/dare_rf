@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/bank_marketing
-#SBATCH --error=jobs/errors/addition/bank_marketing
+#SBATCH --output=jobs/logs/addition/bank_marketing_en
+#SBATCH --error=jobs/errors/addition/bank_marketing_en
 #SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,9 +14,9 @@ dataset="bank_marketing"
 n_estimators=100
 max_depth=5
 max_features=0.25
-lmbdas=(60 30 50 50 40)
+lmbdas=(75 50 50 50 50)
 rs_list=(1 2 3 4 5)
-criterion="gini"
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/addition/"

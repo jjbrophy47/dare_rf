@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/diabetes2
-#SBATCH --error=jobs/errors/addition/diabetes2
+#SBATCH --output=jobs/logs/addition/diabetes2_en
+#SBATCH --error=jobs/errors/addition/diabetes2_en
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -12,11 +12,11 @@ module load python3/3.7.5
 
 dataset="diabetes"
 n_estimators=100
-max_depth=10
+max_depth=20
 max_features=0.25
-lmbdas=(1500 1500)
+lmbdas=(500 1000)
 rs_list=(4 5)
-criterion="gini"
+criterion="entropy"
 
 data_dir="data/"
 out_dir="output/addition/"

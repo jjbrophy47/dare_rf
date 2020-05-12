@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/surgical
-#SBATCH --error=jobs/errors/delete_until_retrain/surgical
+#SBATCH --output=jobs/logs/delete_until_retrain/surgical_en
+#SBATCH --error=jobs/errors/delete_until_retrain/surgical_en
 #SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
