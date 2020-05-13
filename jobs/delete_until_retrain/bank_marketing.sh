@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/bank_marketing_en
-#SBATCH --error=jobs/errors/delete_until_retrain/bank_marketing_en
+#SBATCH --output=jobs/logs/delete_until_retrain/bank_marketing_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/bank_marketing_gi
 #SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,9 +14,9 @@ dataset="bank_marketing"
 n_estimators=100
 max_depth=5
 max_features=0.25
-lmbdas=(75 50 50 50 50)
+lmbdas=(60 30 50 50 40)
 frac_remove=0.35
-criterion="entropy"
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"

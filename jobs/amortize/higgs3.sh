@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=amortize
-#SBATCH --output=jobs/logs/amortize/higgs2_en
-#SBATCH --error=jobs/errors/amortize/higgs2_en
+#SBATCH --output=jobs/logs/amortize/higgs3_en
+#SBATCH --error=jobs/errors/amortize/higgs3_en
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,8 +14,8 @@ dataset="higgs"
 n_estimators=100
 max_depth=10
 max_features=0.25
-lmbdas=(350)
-rs_list=(2)
+lmbdas=(250)
+rs_list=(3)
 criterion="entropy"
 
 data_dir="data/"

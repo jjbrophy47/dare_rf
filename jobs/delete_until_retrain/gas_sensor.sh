@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/gas_sensor_en
-#SBATCH --error=jobs/errors/delete_until_retrain/gas_sensor_en
+#SBATCH --output=jobs/logs/delete_until_retrain/gas_sensor_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/gas_sensor_gi
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -11,12 +11,12 @@
 module load python3/3.7.5
 
 dataset="gas_sensor"
-n_estimators=100
+n_estimators=10
 max_depth=10
 max_features=0.25
 lmbdas=(0 0 0 0 0)
 frac_remove=0.35
-criterion="entropy"
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"

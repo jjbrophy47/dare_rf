@@ -8,4 +8,5 @@ sbatch jobs/delete_until_retrain/skin.sh
 sbatch jobs/delete_until_retrain/census.sh
 sbatch jobs/delete_until_retrain/twitter.sh
 sbatch jobs/delete_until_retrain/gas_sensor.sh
-# sbatch jobs/delete_until_retrain/higgs.sh
+sbatch jobs/delete_until_retrain/higgs1.sh
+sbatch jobs/delete_until_retrain/higgs2.sh

@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/higgs_en
-#SBATCH --error=jobs/errors/delete_until_retrain/higgs_en
+#SBATCH --output=jobs/logs/delete_until_retrain/higgs1_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/higgs1_gi
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,9 +14,9 @@ dataset="higgs"
 n_estimators=100
 max_depth=10
 max_features=0.25
-lmbdas=
+lmbdas=(320 340 260)
 frac_remove=0.35
-criterion="entropy"
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"

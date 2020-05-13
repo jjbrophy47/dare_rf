@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/flight_delays_en
-#SBATCH --error=jobs/errors/delete_until_retrain/flight_delays_en
+#SBATCH --output=jobs/logs/delete_until_retrain/flight_delays_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/flight_delays_gi
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -16,7 +16,7 @@ max_depth=10
 max_features=0.25
 lmbdas=(2000 2000 2500 2000 2500)
 frac_remove=0.35
-criterion="entropy"
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"

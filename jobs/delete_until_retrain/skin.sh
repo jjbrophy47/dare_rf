@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/skin_en
-#SBATCH --error=jobs/errors/delete_until_retrain/skin_en
-#SBATCH --time=5-00:00:00
+#SBATCH --output=jobs/logs/delete_until_retrain/skin_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/skin_gi
+#SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=7
@@ -16,7 +16,7 @@ max_depth=20
 max_features=-1
 lmbdas=(0 0 0 0 0)
 frac_remove=0.35
-criterion="entropy"
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"

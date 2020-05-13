@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/diabetes_en
-#SBATCH --error=jobs/errors/delete_until_retrain/diabetes_en
+#SBATCH --output=jobs/logs/delete_until_retrain/diabetes_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/diabetes_gi
 #SBATCH --time=5-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -12,11 +12,11 @@ module load python3/3.7.5
 
 dataset="diabetes"
 n_estimators=100
-max_depth=20
+max_depth=10
 max_features=0.25
-lmbdas=(1000 1000 1000 500 1000)
+lmbdas=(1500 1500 1500 1500 1500)
 frac_remove=0.35
-criterion="entropy"
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"
