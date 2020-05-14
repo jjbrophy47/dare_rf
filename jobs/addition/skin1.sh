@@ -14,8 +14,8 @@ dataset="skin"
 n_estimators=1000
 max_depth=20
 max_features=-1
-lmbdas=(0 0 0)
-rs_list=(1 2 3)
+lmbdas=(0)
+rs_list=(1)
 criterion="entropy"
 
 data_dir="data/"

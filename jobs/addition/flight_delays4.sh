@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/diabetes1_en
-#SBATCH --error=jobs/errors/addition/diabetes1_en
+#SBATCH --output=jobs/logs/addition/flight_delays4_en
+#SBATCH --error=jobs/errors/addition/flight_delays4_en
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -10,12 +10,12 @@
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-dataset="diabetes"
+dataset="flight_delays"
 n_estimators=100
-max_depth=20
+max_depth=10
 max_features=0.25
-lmbdas=(1000)
-rs_list=(1)
+lmbdas=(2000)
+rs_list=(4)
 criterion="entropy"
 
 data_dir="data/"

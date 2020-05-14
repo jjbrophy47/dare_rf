@@ -14,8 +14,8 @@ dataset="diabetes"
 n_estimators=100
 max_depth=20
 max_features=0.25
-lmbdas=(500 1000)
-rs_list=(4 5)
+lmbdas=(1000)
+rs_list=(2)
 criterion="entropy"
 
 data_dir="data/"

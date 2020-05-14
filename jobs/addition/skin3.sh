@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/diabetes1_en
-#SBATCH --error=jobs/errors/addition/diabetes1_en
+#SBATCH --output=jobs/logs/addition/skin3_en
+#SBATCH --error=jobs/errors/addition/skin3_en
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -10,12 +10,12 @@
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-dataset="diabetes"
-n_estimators=100
+dataset="skin"
+n_estimators=1000
 max_depth=20
-max_features=0.25
-lmbdas=(1000)
-rs_list=(1)
+max_features=-1
+lmbdas=(0)
+rs_list=(3)
 criterion="entropy"
 
 data_dir="data/"

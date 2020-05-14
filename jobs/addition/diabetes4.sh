@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=addition
-#SBATCH --output=jobs/logs/addition/diabetes1_en
-#SBATCH --error=jobs/errors/addition/diabetes1_en
+#SBATCH --output=jobs/logs/addition/diabetes4_en
+#SBATCH --error=jobs/errors/addition/diabetes4_en
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,8 +14,8 @@ dataset="diabetes"
 n_estimators=100
 max_depth=20
 max_features=0.25
-lmbdas=(1000)
-rs_list=(1)
+lmbdas=(500)
+rs_list=(4)
 criterion="entropy"
 
 data_dir="data/"

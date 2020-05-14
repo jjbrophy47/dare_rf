@@ -14,8 +14,8 @@ dataset="flight_delays"
 n_estimators=100
 max_depth=10
 max_features=0.25
-lmbdas=(2000 2000 2500)
-rs_list=(1 2 3)
+lmbdas=(2000)
+rs_list=(1)
 criterion="entropy"
 
 data_dir="data/"
