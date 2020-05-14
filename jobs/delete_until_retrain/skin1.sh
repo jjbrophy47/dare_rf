@@ -1,27 +1,27 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=delete_until_retrain
-#SBATCH --output=jobs/logs/delete_until_retrain/twitter_gi
-#SBATCH --error=jobs/errors/delete_until_retrain/twitter_gi
-#SBATCH --time=5-00:00:00
+#SBATCH --output=jobs/logs/delete_until_retrain/skin1_gi
+#SBATCH --error=jobs/errors/delete_until_retrain/skin1_gi
+#SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=7
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-dataset="twitter"
-n_estimators=100
-max_depth=10
-max_features=0.25
-lmbdas=(300 300 300 300 300)
+dataset="skin"
+n_estimators=1000
+max_depth=20
+max_features=-1
+lmbdas=(0 0 0)
 frac_remove=0.35
 criterion="gini"
 
 data_dir="data/"
 out_dir="output/delete_until_retrain/"
 adversaries=("random" "root")
-rs_list=(1 2 3 4 5)
+rs_list=(1 2 3)
 
 
 for i in ${!rs_list[@]}; do

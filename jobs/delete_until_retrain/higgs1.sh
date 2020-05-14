@@ -21,26 +21,23 @@ criterion="gini"
 data_dir="data/"
 out_dir="output/delete_until_retrain/"
 adversaries=("random" "root")
-rs_list=(1 2 3 4 5)
-epsilons=(0.1 0.25 0.5 1.0 10.0)
+rs_list=(1 2 3)
 
 
 for i in ${!rs_list[@]}; do
     for adversary in ${adversaries[@]}; do
-        for epsilon in ${epsilons[@]}; do
-            python3 experiments/scripts/delete_until_retrain.py \
-              --data_dir $data_dir \
-              --out_dir $out_dir \
-              --dataset $dataset \
-              --n_estimators $n_estimators \
-              --max_depth $max_depth \
-              --max_features $max_features \
-              --adversary $adversary \
-              --criterion $criterion \
-              --lmbda ${lmbdas[$i]} \
-              --frac_remove $frac_remove \
-              --rs ${rs_list[$i]}
-        done
+        python3 experiments/scripts/delete_until_retrain.py \
+          --data_dir $data_dir \
+          --out_dir $out_dir \
+          --dataset $dataset \
+          --n_estimators $n_estimators \
+          --max_depth $max_depth \
+          --max_features $max_features \
+          --adversary $adversary \
+          --criterion $criterion \
+          --lmbda ${lmbdas[$i]} \
+          --frac_remove $frac_remove \
+          --rs ${rs_list[$i]}
     done
 done
 
