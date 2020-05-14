@@ -1,21 +1,21 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=amortize
-#SBATCH --output=jobs/logs/amortize/higgs5_gi
-#SBATCH --error=jobs/errors/amortize/higgs5_gi
+#SBATCH --output=jobs/logs/amortize/skin4_gi
+#SBATCH --error=jobs/errors/amortize/skin4_gi
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=9
+#SBATCH --cpus-per-task=7
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-dataset="higgs"
-n_estimators=100
-max_depth=10
-max_features=0.25
-lmbdas=(360)
-rs_list=(5)
+dataset="skin"
+n_estimators=1000
+max_depth=20
+max_features=-1
+lmbdas=(0)
+rs_list=(4)
 criterion="gini"
 
 data_dir="data/"

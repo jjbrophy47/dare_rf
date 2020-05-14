@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=amortize
-#SBATCH --output=jobs/logs/amortize/skin2_en
-#SBATCH --error=jobs/errors/amortize/skin2_en
+#SBATCH --output=jobs/logs/amortize/skin2_gi
+#SBATCH --error=jobs/errors/amortize/skin2_gi
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -14,9 +14,9 @@ dataset="skin"
 n_estimators=1000
 max_depth=20
 max_features=-1
-lmbdas=(0 0)
-rs_list=(4 5)
-criterion="entropy"
+lmbdas=(0)
+rs_list=(2)
+criterion="gini"
 
 data_dir="data/"
 out_dir="output/amortize/"

@@ -6,8 +6,11 @@
 # sbatch jobs/amortize/flight_delays2.sh
 # sbatch jobs/amortize/diabetes1.sh
 # sbatch jobs/amortize/diabetes2.sh
-# sbatch jobs/amortize/skin1.sh
-# sbatch jobs/amortize/skin2.sh
+sbatch jobs/amortize/skin1.sh
+sbatch jobs/amortize/skin2.sh
+sbatch jobs/amortize/skin3.sh
+sbatch jobs/amortize/skin4.sh
+sbatch jobs/amortize/skin5.sh
 # sbatch jobs/amortize/census.sh
 # sbatch jobs/amortize/twitter.sh
 # sbatch jobs/amortize/gas_sensor1.sh
