@@ -15,8 +15,8 @@ sbatch jobs/amortize/skin5.sh
 # sbatch jobs/amortize/twitter.sh
 # sbatch jobs/amortize/gas_sensor1.sh
 # sbatch jobs/amortize/gas_sensor2.sh
-sbatch jobs/amortize/higgs1.sh
-sbatch jobs/amortize/higgs2.sh
-sbatch jobs/amortize/higgs3.sh
-sbatch jobs/amortize/higgs4.sh
-sbatch jobs/amortize/higgs5.sh
+# sbatch jobs/amortize/higgs1.sh
+# sbatch jobs/amortize/higgs2.sh
+# sbatch jobs/amortize/higgs3.sh
+# sbatch jobs/amortize/higgs4.sh
+# sbatch jobs/amortize/higgs5.sh
