@@ -175,6 +175,7 @@ def experiment(args, logger, out_dir, seed, lmbda):
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('features: {:,}'.format(X_train.shape[1]))
+    logger.info('split criterion: {}'.format(args.criterion))
 
     random_state = exp_util.get_random_state(seed)
 
@@ -187,6 +188,7 @@ def experiment(args, logger, out_dir, seed, lmbda):
 
     elif args.adversary == 'root':
         delete_indices = root_adversary.order_samples(X_train, y_train,
+                                                      criterion=args.criterion,
                                                       n_samples=n_remove, seed=random_state,
                                                       verbose=args.verbose, logger=logger)
     else:

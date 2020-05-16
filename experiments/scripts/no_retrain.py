@@ -60,6 +60,7 @@ def experiment(args, logger, out_dir, seed):
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
+    logger.info('split criterion: {}'.format(args.criterion))
 
     # get random state
     random_state = exp_util.get_random_state(seed)

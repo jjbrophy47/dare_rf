@@ -1,13 +1,17 @@
 """
 Adversarial utilities.
 """
+import math
+
 import numpy as np
 
 
-def order_samples(X, y, n_samples=None, seed=None, verbose=0, logger=None):
+def order_samples(X, y, n_samples=None, criterion='gini',
+                  seed=None, verbose=0, logger=None):
     """
-    Given a dataset with labels, find the ordering that causes the most
-    retrainings at the root node when deleting samples; brute-force greedy method.
+    Given a dataset with labels, find the ordering that
+    causes the most retrainings at the root node when
+    deleting samples; brute-force greedy method.
     """
 
     # start out with a being the better feature
@@ -22,7 +26,7 @@ def order_samples(X, y, n_samples=None, seed=None, verbose=0, logger=None):
         n_samples = len(X)
 
     # find best two attributes
-    ndx_a, ndx_b, meta_a, meta_b = _find_best_attributes(X, y)
+    ndx_a, ndx_b, meta_a, meta_b = _find_best_attributes(X, y, criterion)
     if logger and verbose > 1:
         logger.info('1st: x{}, 2nd: x{}'.format(ndx_a, ndx_b))
 
@@ -33,13 +37,15 @@ def order_samples(X, y, n_samples=None, seed=None, verbose=0, logger=None):
 
     for i in range(n_samples):
 
-        # brute force check which instance type reduces the gini index gap the most
-        meta_a, meta_b, bin_str, index_gap = _find_instance(meta_a, meta_b, counts, a_is_better)
+        # brute force find instance type that reduces the score gap the most
+        meta_a, meta_b, bin_str, score_gap = _find_instance(meta_a, meta_b,
+                                                            counts, a_is_better,
+                                                            criterion)
         if logger and verbose > 1:
-            logger.info('{}, {}, {}'.format(i, bin_str, index_gap))
+            logger.info('{}, {}, {}'.format(i, bin_str, score_gap))
 
         # attributes have switched position!
-        if index_gap < 0:
+        if score_gap < 0:
             a_is_better = not a_is_better
             retrains += 1
 
@@ -58,42 +64,42 @@ def order_samples(X, y, n_samples=None, seed=None, verbose=0, logger=None):
     return ordering
 
 
-def _find_best_attributes(X, y):
+def _find_best_attributes(X, y, criterion):
     """
     Find the first and second best attributes to split on.
     """
-    gi_a, gi_b = 1, 1
+    si_a, si_b = 2, 2
     ndx_a, ndx_b = None, None
     meta_a, meta_b = None, None
 
     # iterate through each feature
     for i in range(X.shape[1]):
 
-        meta = _get_gini_index(X[:, i], y)
-        gini_index = meta['gini_index']
+        meta = _get_score(X[:, i], y, criterion)
+        score = meta['score']
 
         # keep the best attribute
-        if gini_index < gi_a:
-            gi_b = gi_a
+        if score < si_a:
+            si_b = si_a
             ndx_b = ndx_a
             meta_b = meta_a
 
-            gi_a = gini_index
+            si_a = score
             ndx_a = i
             meta_a = meta
 
         # keep the second best attribute
-        elif gini_index < gi_b:
-            gi_b = gini_index
+        elif score < si_b:
+            si_b = score
             ndx_b = i
             meta_b = meta
 
     return ndx_a, ndx_b, meta_a, meta_b
 
 
-def _get_gini_index(x, y):
+def _get_score(x, y, criterion):
     """
-    Computes the gini index of this attribute and returns
+    Computes the split score of this attribute and returns
     the metadata used in the computation.
     """
 
@@ -110,7 +116,14 @@ def _get_gini_index(x, y):
     right_pos = np.sum(y[right_indices])
     right_count = len(right_indices)
 
-    gini_index = _compute_gini_index(n_pos, n_count, left_pos, left_count, right_pos, right_count)
+    if criterion == 'gini':
+        score = _compute_gini_index(n_pos, n_count, left_pos, left_count, right_pos, right_count)
+
+    elif criterion == 'entropy':
+        score = _compute_entropy(n_pos, n_count, left_pos, left_count, right_pos, right_count)
+
+    else:
+        raise ValueError('criterion unknown: {}'.format(criterion))
 
     # save the metadata for this attribute
     result = {}
@@ -120,12 +133,16 @@ def _get_gini_index(x, y):
     result['left_count'] = left_count
     result['right_pos'] = right_pos
     result['right_count'] = right_count
-    result['gini_index'] = gini_index
+    result['score'] = score
 
     return result
 
 
-def _compute_gini_index(n_pos, n_count, left_pos, left_count, right_pos, right_count):
+def _compute_gini_index(n_pos, n_count, left_pos, left_count,
+                        right_pos, right_count):
+    """
+    Computes the Gini Index given the appropriate statistics.
+    """
 
     # use counts to compute gini index
     left_weight = left_count / n_count
@@ -141,9 +158,48 @@ def _compute_gini_index(n_pos, n_count, left_pos, left_count, right_pos, right_c
     return left_weight * left_gini + right_weight * right_gini
 
 
+def _compute_entropy(n_pos, n_count, left_pos, left_count,
+                     right_pos, right_count):
+    """
+    Computes the conditional entropy given the appropriate statistics.
+    """
+
+    left_weighted_entropy = 0
+    right_weighted_entropy = 0
+
+    if left_count > 0:
+        weight = left_count / n_count
+        pos_prob = left_pos / left_count
+        neg_prob = 1 - pos_prob
+
+        entropy = 0
+        if pos_prob > 0:
+            entropy -= pos_prob * math.log(pos_prob, 2)
+        if neg_prob > 0:
+            entropy -= neg_prob * math.log(neg_prob, 2)
+
+        left_weighted_entropy = weight * entropy
+
+    if right_count > 0:
+        weight = right_count / n_count
+        pos_prob = right_pos / right_count
+        neg_prob = 1 - pos_prob
+
+        entropy = 0
+        if pos_prob > 0:
+            entropy -= pos_prob * math.log(pos_prob, 2)
+        if neg_prob > 0:
+            entropy -= neg_prob * math.log(neg_prob, 2)
+
+        right_weighted_entropy = weight * entropy
+
+    return left_weighted_entropy + right_weighted_entropy
+
+
 def _type_counts(xa, xb, y):
     """
-    Counts the number of instance types between two attributes and a class label.
+    Counts the number of instance types between two
+    attributes and a class label.
     """
     counts = {'000': 0, '001': 0, '010': 0, '011': 0,
               '100': 0, '101': 0, '110': 0, '111': 0}
@@ -160,39 +216,40 @@ def _type_counts(xa, xb, y):
     return counts, indices
 
 
-def _find_instance(meta_a, meta_b, counts, a_is_better):
+def _find_instance(meta_a, meta_b, counts, a_is_better, criterion):
     """
-    Find which instance type narrows the gini index gap the most after deletion
-    using a brute-force method.
+    Find which instance type narrows the score gap
+    the most after deletion using a brute-force method.
     """
 
     best_bin_str = None
     best_a, best_b = None, None
-    best_index_gap = 1e7
+    best_score_gap = 1e7
 
-    for bin_str in ['000', '001', '010', '011', '100', '101', '110', '111']:
+    bin_strs = ['000', '001', '010', '011', '100', '101', '110', '111']
+    for bin_str in bin_strs:
         v1, v2, v3 = (int(i) for i in bin_str)
 
         if not _check(meta_a, v1, v3) or not _check(meta_b, v2, v3):
             continue
 
-        temp_a = _decrement(meta_a, v1, v3)
-        temp_b = _decrement(meta_b, v2, v3)
+        temp_a = _decrement(meta_a, v1, v3, criterion)
+        temp_b = _decrement(meta_b, v2, v3, criterion)
 
         if a_is_better:
-            index_gap = temp_b['gini_index'] - temp_a['gini_index']
+            score_gap = temp_b['score'] - temp_a['score']
         else:
-            index_gap = temp_a['gini_index'] - temp_b['gini_index']
+            score_gap = temp_a['score'] - temp_b['score']
 
-        if index_gap < best_index_gap:
+        if score_gap < best_score_gap:
 
             # empirical instances
             if counts[bin_str] > 0:
                 best_bin_str = bin_str
                 best_a, best_b = temp_a, temp_b
-                best_index_gap = index_gap
+                best_score_gap = score_gap
 
-    return best_a, best_b, best_bin_str, best_index_gap
+    return best_a, best_b, best_bin_str, best_score_gap
 
 
 def _check(meta, x, y):
@@ -219,9 +276,10 @@ def _check(meta, x, y):
     return result
 
 
-def _decrement(meta, x, y):
+def _decrement(meta, x, y, criterion):
     """
-    Decrements an instance from either or both branches and recomputes the gini gain.
+    Decrements an instance from either or both branches
+    and recomputes the split score.
     """
 
     left_pos, left_neg = 0, 0
@@ -238,12 +296,15 @@ def _decrement(meta, x, y):
         else:
             right_neg += 1
 
-    return _recompute(meta, left_pos, left_neg, right_pos, right_neg)
+    score = _recompute(meta, criterion, left_pos, left_neg,
+                       right_pos, right_neg)
+    return score
 
 
-def _recompute(meta, left_pos=0, left_neg=0, right_pos=0, right_neg=0):
+def _recompute(meta, criterion, left_pos=0, left_neg=0, right_pos=0, right_neg=0):
     """
-    Decrements an instance from either or both branches and recomputes the gini gain.
+    Decrements an instance from either or both branches and recomputes
+    the split score.
     """
 
     meta = meta.copy()
@@ -254,6 +315,22 @@ def _recompute(meta, left_pos=0, left_neg=0, right_pos=0, right_neg=0):
     meta['left_count'] -= (left_pos + left_neg)
     meta['right_pos'] -= right_pos
     meta['right_count'] -= (right_pos + right_neg)
-    meta['gini_index'] = _compute_gini_index(meta['n_pos'], meta['n_count'], meta['left_pos'],
-                                             meta['left_count'], meta['right_pos'], meta['right_count'])
+
+    if criterion == 'gini':
+        meta['score'] = _compute_gini_index(meta['n_pos'],
+                                            meta['n_count'],
+                                            meta['left_pos'],
+                                            meta['left_count'],
+                                            meta['right_pos'],
+                                            meta['right_count'])
+    elif criterion == 'entropy':
+        meta['score'] = _compute_entropy(meta['n_pos'],
+                                         meta['n_count'],
+                                         meta['left_pos'],
+                                         meta['left_count'],
+                                         meta['right_pos'],
+                                         meta['right_count'])
+    else:
+        raise ValueError('unknown criterion: {}'.format(criterion))
+
     return meta

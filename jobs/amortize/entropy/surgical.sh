@@ -1,26 +1,26 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --job-name=amortize
-#SBATCH --output=jobs/logs/amortize/gas_sensor
-#SBATCH --error=jobs/errors/amortize/gas_sensor
-#SBATCH --time=14-00:00:00
+#SBATCH --output=jobs/logs/amortize/surgical_en
+#SBATCH --error=jobs/errors/amortize/surgical_en
+#SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=9
+#SBATCH --cpus-per-task=3
 #SBATCH --account=uoml
 module load python3/3.7.5
 
-dataset="gas_sensor"
+dataset="surgical"
 n_estimators=100
-max_depth=10
+max_depth=5
 max_features=0.25
-lmbdas=(320 340 260 340 360)
+lmbdas=(250 250 250 250 250)
 rs_list=(1 2 3 4 5)
 criterion="entropy"
 
 data_dir="data/"
 out_dir="output/amortize/"
-adversaries=("random" "root")
+adversaries=("root")
 epsilons=(0.1 0.25 0.5 1.0)
 
 for i in ${!rs_list[@]}; do
