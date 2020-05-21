@@ -29,7 +29,7 @@ def print_dataset(args, dataset, logger):
         logger.info(s.format(n_train, n_features, n_trees, max_depth, max_features))
 
         naive_train, _ = print_util.get_mean1d(args, naive, 'train_time')
-        naive_amortize, _ = print_util._get_mean_amortize(args, naive)
+        naive_amortize, _ = print_util.get_mean_amortize(args, naive)
         s = '[Naive] train: {:.3f}s, amortized: {:.5f}s'
         logger.info(s.format(naive_train, naive_amortize))
 
@@ -55,7 +55,7 @@ def print_dataset(args, dataset, logger):
             cedar_retrains, _ = print_util.get_mean_retrainings(args, cedar)
             cedar_speedup = int(naive_amortize / cedar_amortize)
             cedar_scores, _ = print_util.get_mean(args, cedar, args.metric)
-            cedar_additions, _ = print_util.get_mean_cmpletions(args, cedar, n_trees)
+            cedar_additions, _ = print_util.get_mean_completions(args, cedar, n_trees)
             cedar_depth, _ = print_util.get_mean_retrain_depth(args, cedar)
             cedar_n_scores = len(cedar_scores)
             n_scores = min(exact_n_scores, cedar_n_scores)
@@ -80,7 +80,7 @@ def main(args):
     logger.info(datetime.now())
 
     for dataset in args.dataset:
-        print_dataset(args, dataset)
+        print_dataset(args, dataset, logger)
         logger.info('\n')
 
 

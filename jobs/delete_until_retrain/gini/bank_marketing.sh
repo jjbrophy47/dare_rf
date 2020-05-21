@@ -37,7 +37,8 @@ for i in ${!rs_list[@]}; do
           --criterion $criterion \
           --lmbda ${lmbdas[$i]} \
           --frac_remove $frac_remove \
-          --rs ${rs_list[$i]}
+          --rs ${rs_list[$i]} \
+          --exact
     done
 done
 

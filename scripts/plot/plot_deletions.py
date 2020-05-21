@@ -3,10 +3,25 @@ Plot delete_until retrain results.
 """
 import os
 import argparse
+import sys
+here = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, here + '/../')
+sys.path.insert(0, here + '/../../')
+from scripts.print import print_util
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import sem
+# from scipy.stats import sem
+
+
+def get_n_plots(args):
+    """
+    Return size of the figure based on the number of datasets.
+    """
+    n_datasets = len(args.dataset)
+    n_rows = int((n_datasets / 4)) + 1
+    n_cols = min(n_datasets, 4)
+    return n_rows, n_cols
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
@@ -18,39 +33,11 @@ def set_size(width, fraction=1, subplots=(1, 1)):
     return width, height
 
 
-def _get_mean(args, r, name='n_deletions'):
-    """
-    Get mean CeDAR test performance.
-    """
-    res_list = []
-    for i in range(args.rs, args.rs + args.repeats):
-        res_list.append(r[i][name])
-    res = np.vstack(res_list)
-    res_mean = res.mean(axis=0)
-    res_sem = sem(res, axis=0)
-    return res_mean, res_sem
-
-
-def _get_mean1d(args, r, name='train_time'):
-    """
-    Get mean value of a single item across multiple runs.
-    """
-    res_list = []
-    for i in range(args.rs, args.rs + args.repeats):
-        res_list.append(r[i][name])
-    res_arr = np.array(res_list)
-    res_mean = res_arr.mean()
-    res_sem = sem(res_arr)
-    return res_mean, res_sem
-
-
 def main(args):
 
     colors = ['k', 'k']
     lines = ['-', '--']
     markers = ['x', '^']
-
-    assert len(args.dataset) == 3
 
     # matplotlib settings
     plt.rc('font', family='serif')
@@ -64,8 +51,10 @@ def main(args):
     plt.rc('lines', markersize=10)
 
     width = 5.5
-    width, height = set_size(width=width * 3, fraction=1, subplots=(1, 3))
-    fig, axs = plt.subplots(1, 3, figsize=(width, height * 1.25), sharey=True)
+    n_rows, n_cols = get_n_plots(args)
+    width, height = set_size(width=width * n_cols, fraction=1, subplots=(n_rows, n_cols))
+    fig, axs = plt.subplots(n_rows, n_cols, figsize=(width, height * 1.25), sharey=True)
+    axs = axs.flatten()
 
     for i, dataset in enumerate(args.dataset):
         ax = axs[i]
@@ -75,21 +64,21 @@ def main(args):
 
             # get results
             r = {}
-            for rs in range(args.rs, args.rs + args.repeats):
-                fp = os.path.join(args.in_dir, dataset, args.model_type, adversary,
-                                  'rs{}'.format(rs), 'results.npy')
+            for rs in args.rs:
+                fp = os.path.join(args.in_dir, dataset, args.model_type, args.criterion,
+                                  adversary, 'rs{}'.format(rs), 'results.npy')
                 r[rs] = np.load(fp, allow_pickle=True)[()]
 
-            n_train = r[args.rs]['n_train']
-            n_features = r[args.rs]['n_features']
+            n_train = r[1]['n_train']
+            n_features = r[1]['n_features']
 
-            n_deletions, n_deletions_sem = _get_mean(args, r, name='n_deletions')
+            n_deletions, n_deletions_sem = print_util.get_mean(args, r, name='n_deletions')
             if not args.no_pct:
                 n_deletions = [x / n_train * 100 for x in n_deletions]
                 n_deletions_sem = [x / n_train * 100 for x in n_deletions_sem]
-            train_time, _ = _get_mean1d(args, r, name='train_time')
-            lmbda, _ = _get_mean1d(args, r, name='lmbda')
-            epsilons = r[args.rs]['epsilon']
+            train_time, _ = print_util.get_mean1d(args, r, name='train_time')
+            lmbda, _ = print_util.get_mean1d(args, r, name='lmbda')
+            epsilons = r[1]['epsilon']
             theoretical_n_deletions = [(ep / lmbda) * n_train for ep in epsilons]
 
             out_str = '\n{} ({:,} instances, {:,} features), train_time: {:.5f}s'
@@ -142,14 +131,17 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', type=str, nargs='+', default=['surgical', 'mfc20'], help='datasets to show.')
     parser.add_argument('--in_dir', type=str, default='output/delete_until_retrain', help='input directory.')
-    parser.add_argument('--out_dir', type=str, default='plots/delete_until_retrain', help='input directory.')
-    parser.add_argument('--rs', type=int, default=1, help='initial seed.')
-    parser.add_argument('--repeats', type=int, default=5, help='number of repeated results to include.')
-    parser.add_argument('--dataset', type=str, nargs='+', default=['surgical', 'mfc19'], help='datasets to show.')
+    parser.add_argument('--out_dir', type=str, default='output/plots/delete_until_retrain', help='output directory.')
+
     parser.add_argument('--adversary', type=str, nargs='+', default=['random', 'root'], help='adversary to show.')
     parser.add_argument('--model_type', type=str, nargs='+', default='forest', help='models to show.')
+    parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
+
     parser.add_argument('--png', action='store_true', default=False, help='save a png of this plot.')
     parser.add_argument('--no_pct', action='store_true', default=False, help='do not show percentages.')
+
+    parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     args = parser.parse_args()
     main(args)

@@ -1,6 +1,7 @@
 """
 Experiment: How much data can we delete before the cumulative deletion time
             equals the original training time.
+TODO: Record % deletions for exact unlearner.
 """
 import os
 import sys
@@ -98,29 +99,19 @@ def experiment(args, logger, out_dir, seed, lmbda):
     logger.info('train time: {:.3f}s'.format(exact_train_time))
     exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
 
-    # CeDAR
-    logger.info('\nCeDAR')
-    start = time.time()
+    # Exact
+    if args.exact:
+        logger.info('\nExact')
+        logger.info('random_state: {}'.format(random_state))
 
-    epsilons = [0, 0.001, 0.01, 0.1, 1.0, 10.0]
-    logger.info('epsilons: {}'.format(epsilons))
-    logger.info('lmbda: {}'.format(lmbda))
-    logger.info('random_state: {}'.format(random_state))
-
-    # test different epsilons
-    n_deletions = []
-    for i, epsilon in enumerate(epsilons):
+        start = time.time()
         remaining_time = exact_train_time
-        epsilon_start = time.time()
 
-        model = _get_model(args, epsilon=epsilon, lmbda=lmbda, random_state=random_state)
+        model = _get_model(args, epsilon=0, lmbda=-1, random_state=random_state)
         model = model.fit(X_train, y_train)
+        exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
 
-        if i == 0:
-            exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
-            print()
-
-        # delete instances until retrain time is exceeded
+        # delete instances until train time is exceeded
         j = 0
         while remaining_time > 0 or j == len(X_train):
             start2 = time.time()
@@ -135,21 +126,73 @@ def experiment(args, logger, out_dir, seed, lmbda):
             logger.info('delete_types: {}'.format(delete_types))
             logger.info('delete_depths: {}'.format(delete_depths))
 
-        epsilon_end = time.time() - epsilon_start
-        logger.info('[{:.3f}s] epsilon: {:5} => num deletions: {:,}'.format(epsilon_end, epsilon, j))
-        n_deletions.append(j)
+        end = time.time() - start
+        logger.info('[{:.3f}s] num deletions: {:,}'.format(end, j))
 
     if args.save_results:
         d = model.get_params()
         d['train_time'] = exact_train_time
-        d['n_deletions'] = n_deletions
-        d['epsilon'] = epsilons
+        d['n_deletions'] = j
         d['n_train'] = X_train.shape[0]
         d['n_features'] = X_train.shape[1]
         d['adversary'] = args.adversary
-        np.save(os.path.join(out_dir, 'results.npy'), d)
+        np.save(os.path.join(out_dir, 'exact.npy'), d)
 
-    logger.info('total time: {:.3f}s'.format(time.time() - start))
+        logger.info('total time: {:.3f}s'.format(time.time() - start))
+
+    # CeDAR
+    if args.cedar:
+        logger.info('\nCeDAR')
+        start = time.time()
+
+        epsilons = [0, 0.001, 0.01, 0.1, 1.0, 10.0]
+        logger.info('epsilons: {}'.format(epsilons))
+        logger.info('lmbda: {}'.format(lmbda))
+        logger.info('random_state: {}'.format(random_state))
+
+        # test different epsilons
+        n_deletions = []
+        for i, epsilon in enumerate(epsilons):
+            remaining_time = exact_train_time
+            epsilon_start = time.time()
+
+            model = _get_model(args, epsilon=epsilon, lmbda=lmbda, random_state=random_state)
+            model = model.fit(X_train, y_train)
+
+            if i == 0:
+                exp_util.performance(model, X_test, y_test, name='TEST', logger=logger)
+                print()
+
+            # delete instances until train time is exceeded
+            j = 0
+            while remaining_time > 0 or j == len(X_train):
+                start2 = time.time()
+                model.delete(delete_indices[j])
+                delete_time = time.time() - start2
+
+                remaining_time -= delete_time
+                j += 1
+
+            if args.verbose > 0:
+                delete_types, delete_depths = model.get_removal_statistics()
+                logger.info('delete_types: {}'.format(delete_types))
+                logger.info('delete_depths: {}'.format(delete_depths))
+
+            epsilon_end = time.time() - epsilon_start
+            logger.info('[{:.3f}s] epsilon: {:5} => num deletions: {:,}'.format(epsilon_end, epsilon, j))
+            n_deletions.append(j)
+
+        if args.save_results:
+            d = model.get_params()
+            d['train_time'] = exact_train_time
+            d['n_deletions'] = n_deletions
+            d['epsilon'] = epsilons
+            d['n_train'] = X_train.shape[0]
+            d['n_features'] = X_train.shape[1]
+            d['adversary'] = args.adversary
+            np.save(os.path.join(out_dir, 'results.npy'), d)
+
+        logger.info('total time: {:.3f}s'.format(time.time() - start))
 
 
 def main(args):
@@ -183,6 +226,10 @@ if __name__ == '__main__':
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
+
+    # method settings
+    parser.add_argument('--cedar', action='store_true', default=False, help='run CEDAR.')
+    parser.add_argument('--exact', action='store_true', default=False, help='run exact.')
 
     # adversary settings
     parser.add_argument('--frac_remove', type=float, default=None, help='fraction of instances to delete.')
