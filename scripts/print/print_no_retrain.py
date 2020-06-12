@@ -42,7 +42,8 @@ def main(args):
             lmbda_step_size = r[args.rs[0]].get('lmbda_step_size')
 
             n_trees = 1 if n_estimators is None else n_estimators
-            adjusted_lmbdas = [lm / 5 / max_depth / n_trees for lm in lmbdas]
+            if args.adjust_lambdas:
+                adjusted_lmbdas = [lm / 5 / max_depth / n_trees for lm in lmbdas]
 
             out_str = '\n{} ({:,} instances, {:,} features), depth: {}, trees: {}, '
             out_str += 'features: {}, lmbda_step_size: {}, lmbda: {}'
@@ -61,11 +62,14 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--in_dir', type=str, default='output/no_retrain/', help='input directory.')
-    parser.add_argument('--out_dir', type=str, default='output/prints/', help='output directory.')
-    parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
-    parser.add_argument('--repeats', type=int, default=5, help='number of repeated results to include.')
+    parser.add_argument('--out_dir', type=str, default='output/prints/no_retrain/', help='output directory.')
     parser.add_argument('--dataset', type=str, nargs='+', default=['mfc20'], help='datasets to show.')
+
     parser.add_argument('--model_type', type=str, nargs='+', default=['forest'], help='models to show.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
+    parser.add_argument('--adjust', action='store_true', default=False, help='adjust lambdas.')
+
+    parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
+    parser.add_argument('--repeats', type=int, default=5, help='number of repeated results to include.')
     args = parser.parse_args()
     main(args)

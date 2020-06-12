@@ -1,5 +1,5 @@
 """
 CeDAR module.
 """
-from ._classes import Tree
-from ._classes import Forest
+from ._classes import tree
+from ._classes import forest

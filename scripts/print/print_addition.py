@@ -74,8 +74,9 @@ def main(args):
 
     # create logger
     os.makedirs(args.out_dir, exist_ok=True)
-    logger_name = 'addition.txt'
-    logger = print_util.get_logger(os.path.join(args.out_dir, logger_name))
+    logger = print_util.get_logger(os.path.join(args.out_dir,
+                                   args.criterion,
+                                   '{}.txt'.format(args.metric)))
     logger.info(args)
     logger.info(datetime.now())
 
@@ -87,7 +88,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--in_dir', type=str, default='output/addition/', help='input directory.')
-    parser.add_argument('--out_dir', type=str, default='output/prints/', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/prints/addition/', help='output directory.')
     parser.add_argument('--dataset', type=str, nargs='+', default=['surgical'], help='dataset to print.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--repeats', type=str, default=5, help='number of experiments.')

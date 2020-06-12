@@ -15,7 +15,8 @@ experiments/scripts/__pycache__
 experiments/notebooks/.*
 
 cedar/__pycache__
-cedar/build
-cedar/*.c
-cedar/*.so
-cedar/*.html
+cedar/*/__pycache__
+cedar/*/build
+cedar/*/*.c
+cedar/*/*.so
+cedar/*/*.html

@@ -11,7 +11,8 @@ from scripts.print import print_util
 
 import numpy as np
 import matplotlib.pyplot as plt
-# from scipy.stats import sem
+
+MAX_COL = 4
 
 
 def get_n_plots(args):
@@ -19,8 +20,8 @@ def get_n_plots(args):
     Return size of the figure based on the number of datasets.
     """
     n_datasets = len(args.dataset)
-    n_rows = int((n_datasets / 4)) + 1
-    n_cols = min(n_datasets, 4)
+    n_rows = int((n_datasets / MAX_COL)) + 1
+    n_cols = min(n_datasets, MAX_COL)
     return n_rows, n_cols
 
 
@@ -41,12 +42,12 @@ def main(args):
 
     # matplotlib settings
     plt.rc('font', family='serif')
-    plt.rc('xtick', labelsize=15)
-    plt.rc('ytick', labelsize=15)
-    plt.rc('axes', labelsize=22)
-    plt.rc('axes', titlesize=22)
-    plt.rc('legend', fontsize=15)
-    plt.rc('legend', title_fontsize=15)
+    plt.rc('xtick', labelsize=19)
+    plt.rc('ytick', labelsize=19)
+    plt.rc('axes', labelsize=26)
+    plt.rc('axes', titlesize=26)
+    plt.rc('legend', fontsize=19)
+    plt.rc('legend', title_fontsize=19)
     plt.rc('lines', linewidth=3)
     plt.rc('lines', markersize=10)
 
@@ -64,34 +65,44 @@ def main(args):
 
             # get results
             r = {}
+            re = {}
             for rs in args.rs:
                 fp = os.path.join(args.in_dir, dataset, args.model_type, args.criterion,
                                   adversary, 'rs{}'.format(rs), 'results.npy')
                 r[rs] = np.load(fp, allow_pickle=True)[()]
 
+                fp = os.path.join(args.in_dir, dataset, args.model_type, args.criterion,
+                                  adversary, 'rs{}'.format(rs), 'exact.npy')
+                re[rs] = np.load(fp, allow_pickle=True)[()]
+
+            # extract dataset statistics
             n_train = r[1]['n_train']
             n_features = r[1]['n_features']
-
-            n_deletions, n_deletions_sem = print_util.get_mean(args, r, name='n_deletions')
-            if not args.no_pct:
-                n_deletions = [x / n_train * 100 for x in n_deletions]
-                n_deletions_sem = [x / n_train * 100 for x in n_deletions_sem]
-            train_time, _ = print_util.get_mean1d(args, r, name='train_time')
-            lmbda, _ = print_util.get_mean1d(args, r, name='lmbda')
-            epsilons = r[1]['epsilon']
-            theoretical_n_deletions = [(ep / lmbda) * n_train for ep in epsilons]
-
+            train_time, _ = print_util.get_mean1d(args, re, name='train_time')
             out_str = '\n{} ({:,} instances, {:,} features), train_time: {:.5f}s'
             print(out_str.format(dataset, n_train, n_features, train_time))
+
+            # process exact results
+            n_deletions, _ = print_util.get_mean1d(args, re, name='n_deletions')
+            n_deletions_pct = n_deletions / n_train * 100
+            print('\nExact')
+            print('n_deletions: {}'.format(n_deletions))
+            ax.axhline(n_deletions_pct, linestyle=lines[j])
+
+            # process cedar results
+            n_deletions, n_deletions_sem = print_util.get_mean(args, r, name='n_deletions')
+            n_deletions_pct = [x / n_train * 100 for x in n_deletions]
+            n_deletions_pct_sem = [x / n_train * 100 for x in n_deletions_sem]
+            lmbda, _ = print_util.get_mean1d(args, r, name='lmbda')
+            epsilons = r[1]['epsilon']
+
+            print('\nCeDAR')
             print('lmbda: {}'.format(lmbda))
             print('epsilons: {}'.format(epsilons))
             print('n_deletions: {}'.format(n_deletions))
-            print('theoretical deletions: {}'.format(theoretical_n_deletions))
 
             label = adversary.capitalize()
-            # ax.plot(epsilons, n_deletions, color=colors[j], linestyle=lines[j],
-            #         marker=markers[j], label=label)
-            ax.errorbar(epsilons, n_deletions, yerr=n_deletions_sem, color=colors[j],
+            ax.errorbar(epsilons, n_deletions_pct, yerr=n_deletions_pct_sem, color=colors[j],
                         linestyle=lines[j], marker=markers[j], label=label)
             ax.set_xscale('log')
             ax.set_xlabel(r'$\epsilon$')
@@ -104,6 +115,8 @@ def main(args):
 
         if i == 0:
             ax.legend(title='Adversary', handlelength=3)
+
+        if i % MAX_COL == 0:
             ax.set_ylabel(ylabel)
 
         if args.png:
@@ -112,6 +125,12 @@ def main(args):
 
         else:
             ax.set_title(dataset)
+
+    # delete unused subplots
+    i += 1
+    while i < n_rows * n_cols:
+        fig.delaxes(axs[i])
+        i += 1
 
     out_dir = os.path.join(args.out_dir)
     os.makedirs(out_dir, exist_ok=True)

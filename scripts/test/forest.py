@@ -4,118 +4,106 @@ Tests the CeDAR forest implementation.
 import os
 import sys
 import time
+import argparse
 here = os.path.abspath(os.path.dirname(__file__))
-sys.path.insert(0, here + '/..')
+sys.path.insert(0, here + '/../../')
 
 import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score
-from sklearn.ensemble import RandomForestClassifier
 
 import cedar
-from experiments.utility import data_util, exact_adv_util
+from experiments.utility import data_util
 
-seed = 1
-n_remove = 1000
-n_add = 1000
 
-n_estimators = 100
+def main(args):
 
-add = False
-delete = False
-adv = True
-batch = True
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
-n_samples = -1
-n_features = 200
+    start = time.time()
+    model = cedar.forest(epsilon=args.epsilon,
+                         lmbda=args.lmbda,
+                         n_estimators=args.n_estimators,
+                         max_depth=args.max_depth,
+                         max_features=args.max_features,
+                         random_state=args.rs,
+                         cedar_type=args.cedar_type)
+    model = model.fit(X_train, y_train)
+    print('\n[CeDAR] build time: {:.7f}s'.format(time.time() - start))
 
-if n_samples == -1:
-    X_train, X_test, y_train, y_test = data_util.get_data('mfc19', seed, data_dir='data')
-    np.random.seed(seed)
+    preds = model.predict(X_test)
+    proba = model.predict_proba(X_test)[:, 1]
+    acc = accuracy_score(y_test, preds)
+    auc = roc_auc_score(y_test, proba)
+    print('auc: {:.3f}, acc: {:.3f}'.format(auc, acc))
 
-else:
-    np.random.seed(1)
-    X_train = np.random.randint(2, size=(n_samples, n_features), dtype=np.int32)
-    np.random.seed(1)
-    y_train = np.random.randint(2, size=n_samples, dtype=np.int32)
+    if not args.add:
+        np.random.seed(args.rs)
+        delete_indices = np.random.choice(X_train.shape[0], size=args.n_update, replace=False)
+        print('\ndeleting {} instances'.format(args.n_update))
 
-    np.random.seed(2)
-    X_test = np.random.randint(2, size=(10, n_features), dtype=np.int32)
-    np.random.seed(2)
-    y_test = np.random.randint(2, size=10, dtype=np.int32)
-
-data = np.hstack([X_train, y_train.reshape(-1, 1)])
-print(data.shape)
-print('data assembled')
-
-t1 = time.time()
-m1 = RandomForestClassifier(n_estimators=n_estimators, max_depth=20, max_features=0.2,
-                            bootstrap=False, random_state=1).fit(X_train, y_train)
-print('\n[SK] build time: {:.7f}s'.format(time.time() - t1))
-preds = m1.predict(X_test)
-print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-proba = m1.predict_proba(X_test)[:, 1]
-print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
-
-mf = int(np.sqrt(X_train.shape[1] * 4))
-t1 = time.time()
-model = cedar.Forest(epsilon=0.5, lmbda=-1, n_estimators=n_estimators,
-                     max_depth=20, max_features=0.2, random_state=1).fit(X_train, y_train)
-print('\n[CeDAR] build time: {:.7f}s'.format(time.time() - t1))
-
-preds = model.predict(X_test)
-print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-proba = model.predict_proba(X_test)[:, 1]
-print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
-
-if delete:
-    if adv:
-        delete_indices = exact_adv_util.exact_adversary(X_train, y_train, n_samples=n_remove, seed=seed, verbose=1)
-    else:
-        delete_indices = np.random.choice(X_train.shape[0], size=n_remove, replace=False)
-    print('\ndeleting {} instances'.format(n_remove))
-
-    if batch:
-        t1 = time.time()
-        model.delete([delete_indices])
-        print('delete time: {:.7f}s'.format(time.time() - t1))
-
-    else:
-        for i in range(len(delete_indices)):
+        if args.batch:
             t1 = time.time()
-            model.delete(delete_indices[i])
+            model.delete(delete_indices)
             print('delete time: {:.7f}s'.format(time.time() - t1))
 
-    print(model.get_removal_statistics())
-    proba = model.predict_proba(X_test)[:, 1]
-    preds = model.predict(X_test)
-    print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-    print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
+        else:
+            for i in range(len(delete_indices)):
+                t1 = time.time()
+                model.delete(delete_indices[i])
+                print('delete time: {:.7f}s'.format(time.time() - t1))
 
-if add:
-    np.random.seed(seed)
-    X_add = np.random.randint(2, size=(n_add, X_train.shape[1]), dtype=np.int32)
-    np.random.seed(seed)
-    y_add = np.random.randint(2, size=n_add, dtype=np.int32)
-
-    if delete:
-        X_add = X_train[delete_indices]
-        y_add = y_train[delete_indices]
-    print('\nadding {} instances'.format(X_add.shape[0]))
-
-    if batch:
-        t1 = time.time()
-        model.add(X_add, y_add)
-        print('add time: {:.7f}s'.format(time.time() - t1))
+        print(model.get_removal_statistics())
+        proba = model.predict_proba(X_test)[:, 1]
+        preds = model.predict(X_test)
+        acc = accuracy_score(y_test, preds)
+        auc = roc_auc_score(y_test, proba)
+        print('auc: {:.3f}, acc: {:.3f}'.format(auc, acc))
 
     else:
-        for i in range(X_add.shape[0]):
+        np.random.seed(args.rs)
+        add_indices = np.random.choice(X_train.shape[0], size=args.n_update, replace=False)
+        X_add, y_add = X_train[add_indices], y_train[add_indices]
+
+        if args.batch:
             t1 = time.time()
-            model.add(X_add[[i]], y_add[[i]])
+            model.add(X_add, y_add)
             print('add time: {:.7f}s'.format(time.time() - t1))
 
-    print(model.get_add_statistics())
-    proba = model.predict_proba(X_test)[:, 1]
-    preds = model.predict(X_test)
-    print('accuracy: {:.3f}'.format(accuracy_score(y_test, preds)))
-    print('auc: {:.3f}'.format(roc_auc_score(y_test, proba)))
-    print()
+        else:
+            for i in range(X_add.shape[0]):
+                t1 = time.time()
+                model.add(X_add[[i]], y_add[[i]])
+                print('add time: {:.7f}s'.format(time.time() - t1))
+
+        print(model.get_add_statistics())
+        proba = model.predict_proba(X_test)[:, 1]
+        preds = model.predict(X_test)
+        acc = accuracy_score(y_test, preds)
+        auc = roc_auc_score(y_test, proba)
+        print('auc: {:.3f}, acc: {:.3f}'.format(auc, acc))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    # experiment settings
+    parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
+    parser.add_argument('--dataset', default='spect', help='dataset to use for the experiment.')
+    parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
+
+    # model hyperparameters
+    parser.add_argument('--cedar_type', default='1', help='dataset to use for the experiment.')
+    parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
+    parser.add_argument('--lmbda', type=float, default=100, help='noise hyperparameter.')
+    parser.add_argument('--n_estimators', type=int, default=100, help='no. trees.')
+    parser.add_argument('--max_depth', type=int, default=3, help='maximum depth of the tree.')
+    parser.add_argument('--max_features', type=float, default=0.25, help='maximum fraction of features.')
+    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
+
+    # update settings
+    parser.add_argument('--add', action='store_true', default=False, help='add instances.')
+    parser.add_argument('--batch', action='store_true', default=False, help='update in batches.')
+    parser.add_argument('--n_update', type=int, default=10, help='no. instances to add/delete.')
+
+    args = parser.parse_args()
+    main(args)

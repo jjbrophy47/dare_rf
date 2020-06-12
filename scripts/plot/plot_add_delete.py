@@ -81,7 +81,7 @@ def single_plot(args, adversary, operation, n_train, fig, ax, colors, lines):
     n_features, _ = print_util.get_mean1d(args, naive, 'n_features', as_int=True)
     n_trees, _ = print_util.get_mean1d(args, naive, 'n_estimators', as_int=True)
     max_depth, _ = print_util.get_mean1d(args, naive, 'max_depth', as_int=True)
-    max_features, _ = print_util.get_mean1d(args, naive, 'max_features')
+    max_features = print_util.get_max_features(args, naive, 'max_features')
 
     if not args.pdf:
         fig_s = 'Dataset: {} ({:,} instances, {:,} features)   Trees: {:,}   '
@@ -155,7 +155,7 @@ def main(args):
             single_plot(args, adversary, op_map[operation], n_train, fig, axs[i], colors, lines)
 
             op_label = 'Deletion' if operation == 'delete' else 'Addition'
-            axs[i].set_title(op_label)
+            axs[i].set_title('{} ({})'.format(op_label, adversary))
 
             if i == 0:
                 axs[i].legend()
