@@ -1,15 +1,15 @@
 """
 CeDAR implementation selector.
 """
-from . import cedar1
-from . import cedar2
-from . import cedar3
+from . import cedar_single
+from . import cedar_layer
+from . import cedar_pyramid
 from . import exact
 
 
 def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_features='sqrt',
            max_depth=10, min_samples_split=2, min_samples_leaf=1,
-           cedar_type='3', random_state=None, verbose=0):
+           cedar_type='pyramid', random_state=None, verbose=0):
     """
     CeDAR Forest.
 
@@ -35,26 +35,24 @@ def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_featu
         The minimum number of samples needed to make a split when building a tree.
     min_samples_leaf: int (default=1)
         The minimum number of samples needed to make a leaf.
-    cedar_type: str (default='3')
+    cedar_type: str {'single', 'layer', 'pyramid'} (default='pyramid')
         Different types represent different budget allocation protocols.
-    topd: int (default=-1)
-        Number of top layers to share a budget (only relevant if `cedar_type`='3').
     random_state: int (default=None)
         Random state for reproducibility.
     verbose: int (default=0)
         Verbosity level.
     """
-    if cedar_type == '1':
-        model_func = cedar1.Forest1
+    if cedar_type == 'single':
+        model_func = cedar_single.Forest
 
-    elif cedar_type == '2':
-        model_func = cedar2.Forest2
+    elif cedar_type == 'layer':
+        model_func = cedar_layer.Forest
 
-    elif cedar_type == '3':
-        model_func = cedar3.Forest3
+    elif cedar_type == 'pyramid':
+        model_func = cedar_pyramid.Forest
 
     elif cedar_type == 'exact':
-        model_func = exact.Forest_e
+        model_func = exact.Forest
         lmbda = -1
         epsilon = 0
 
@@ -77,7 +75,7 @@ def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_featu
 
 def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
          min_samples_split=2, min_samples_leaf=1,
-         cedar_type='1', random_state=None, verbose=0):
+         cedar_type='pyramid', random_state=None, verbose=0):
     """
     CeDAR Tree.
 
@@ -106,17 +104,17 @@ def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
     verbose: int (default=0)
         Verbosity level.
     """
-    if cedar_type == '1':
-        model_func = cedar1.Tree1
+    if cedar_type == 'single':
+        model_func = cedar_single.Tree
 
-    elif cedar_type == '2':
-        model_func = cedar2.Tree2
+    elif cedar_type == 'layer':
+        model_func = cedar_layer.Tree
 
-    elif cedar_type == '3':
-        model_func = cedar3.Tree3
+    elif cedar_type == 'pyramid':
+        model_func = cedar_pyramid.Tree
 
     elif cedar_type == 'exact':
-        model_func = exact.Tree_e
+        model_func = exact.Tree
         lmbda = -1
         epsilon = 0
 
