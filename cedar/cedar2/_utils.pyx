@@ -205,8 +205,10 @@ cdef int generate_distribution(double lmbda, double** distribution_ptr,
 
     # generate probability distribution over the features
     else:
+        # printf('N: %d\n', n_samples)
         for i in range(n_scores):
             distribution[i] = exp(- lmbda * n_samples * scores[i])
+            # printf('(N, lmbda, scores[%d], D[%d]): (%d, %.3f, %.5f, %.5f)\n', i, i, n_samples, lmbda, scores[i], distribution[i])
             normalizing_constant += distribution[i]
 
         for i in range(n_scores):

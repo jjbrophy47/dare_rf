@@ -18,13 +18,13 @@ cdef struct SplitRecord:
     int  features_count          # Number of valid features after split.
 
     # Extra metadata
-    double p                   # Total probability of chosen feature
-    int    count               # Number of samples in the node
-    int    pos_count           # Number of positive samples in the node
-    int*   left_counts         # Number of left samples for each attribute
-    int*   left_pos_counts     # Number of left positive samples for each attribute
-    int*   right_counts        # Number of right samples for each attribute
-    int*   right_pos_counts    # Number of right positive samples for each attribute
+    int     count               # Number of samples in the node
+    int     pos_count           # Number of positive samples in the node
+    int*    left_counts         # Number of left samples for each attribute
+    int*    left_pos_counts     # Number of left positive samples for each attribute
+    int*    right_counts        # Number of right samples for each attribute
+    int*    right_pos_counts    # Number of right positive samples for each attribute
+    double* sspd                # Current probabilities for each features.
 
 cdef class _Splitter:
     """
@@ -39,7 +39,7 @@ cdef class _Splitter:
 
     # Methods
     cdef int split_node(self, Node* node, int** X, int* y,
-                        int* samples, int n_samples, double parent_p,
+                        int* samples, int n_samples,
                         SplitRecord *split) nogil
     cdef int compute_splits(self, Node** node_ptr, int** X, int* y,
                             int* samples, int n_samples,

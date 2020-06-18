@@ -10,6 +10,7 @@ from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.stdlib cimport realloc
 from libc.stdio cimport printf
+from libc.math cimport pow
 
 import numpy as np
 cimport numpy as np
@@ -32,12 +33,14 @@ cdef class _TreeBuilder:
     """
 
     def __cinit__(self, _DataManager manager, _Splitter splitter, int min_samples_split,
-                  int min_samples_leaf, int max_depth):
+                  int min_samples_leaf, int max_depth, double tree_budget):
         self.manager = manager
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = max_depth
+        self.tree_budget = tree_budget
+        # self.topd = topd
 
     cpdef void build(self, _Tree tree):
         """
@@ -50,20 +53,23 @@ cdef class _TreeBuilder:
         self.manager.get_data(&X, &y)
 
         cdef int* samples
-        cdef int n_samples = self.manager.n_samples
+        cdef int  n_samples = self.manager.n_samples
         cdef int* features = tree.feature_indices
-        cdef int n_features = tree.n_feature_indices
+        cdef int  n_features = tree.n_feature_indices
 
         # fill in samples
         samples = <int *>malloc(n_samples * sizeof(int))
         for i in range(n_samples):
             samples[i] = i
 
-        tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0, 1.0)
+        tree.layer_budget = <double *>malloc(sizeof(double) * self.max_depth)
+        tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0,
+                                &tree.layer_budget)
 
+    @cython.cdivision(True)
     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,
                       int* features, int n_features,
-                      int depth, bint is_left, double parent_p) nogil:
+                      int depth, bint is_left, double** layer_budget_ptr) nogil:
         """
         Builds a subtree given samples to train from.
         """
@@ -71,7 +77,15 @@ cdef class _TreeBuilder:
         cdef SplitRecord split
         cdef int result
 
+        # allocate budget for this layer
+        # if depth <= self.topd - 1:
+        #     layer_budget_ptr[0][0] = (self.tree_budget / self.max_depth) * self.topd
+        # else:
+        layer_budget_ptr[0][depth] = self.tree_budget / self.max_depth
+
         cdef Node *node = <Node *>malloc(sizeof(Node))
+        node.layer_budget_ptr = layer_budget_ptr
+        node.divergence = 0
         node.depth = depth
         node.is_left = is_left
 
@@ -79,31 +93,39 @@ cdef class _TreeBuilder:
         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
                                     n_samples < 2 * self.min_samples_leaf)
 
+        # printf('\n(depth, is_left, is_leaf, n_samples): (%d, %d, %d, %d)\n', node.depth, node.is_left, node.is_leaf, n_samples)
+
         if is_bottom_leaf:
+            # printf('bottom leaf\n')
             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
 
         else:
+            # printf('compute splits...\n')
             self.splitter.compute_splits(&node, X, y, samples, n_samples, features,
                                          n_features)
 
             if not is_middle_leaf:
+                # printf('split node\n')
                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
-                                                          parent_p, &split)
+                                                          &split)
 
             if is_middle_leaf:
+                # printf('leaf node\n')
                 self._set_leaf_node(&node, y, samples, n_samples, 0)
 
             else:
+                # printf('free samples\n')
                 free(samples)
+                # printf('done freeing samples\n')
                 self._set_decision_node(&node, &split)
 
                 node.left = self._build(X, y, split.left_indices, split.left_count,
                                         split.left_features, split.features_count,
-                                        depth + 1, 1, node.p)
+                                        depth + 1, 1, layer_budget_ptr)
 
                 node.right = self._build(X, y, split.right_indices, split.right_count,
                                          split.right_features, split.features_count,
-                                         depth + 1, 0, node.p)
+                                         depth + 1, 0, layer_budget_ptr)
 
         return node
 
@@ -141,7 +163,7 @@ cdef class _TreeBuilder:
         else:
             node.value = UNDEF_LEAF_VAL
 
-        node.p = UNDEF
+        node.sspd = NULL
         node.feature = UNDEF
 
         node.left = NULL
@@ -157,7 +179,7 @@ cdef class _TreeBuilder:
         node.value = UNDEF
         node.leaf_samples = NULL
 
-        node.p = split.p
+        node.sspd = split.sspd
         node.feature = split.feature
 
 
@@ -177,12 +199,15 @@ cdef class _Tree:
         self.feature_indices = convert_int_ndarray(features)
 
         # internal data structures
+        self.layer_budget = NULL
         self.root = NULL
 
     def __dealloc__(self):
         """
         Destructor.
         """
+        if self.layer_budget:
+            free(self.layer_budget)
         if self.root:
             dealloc(self.root)
             free(self.root)

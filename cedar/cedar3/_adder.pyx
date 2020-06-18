@@ -19,6 +19,7 @@ np.import_array()
 
 from ._utils cimport compute_split_score
 from ._utils cimport generate_distribution
+from ._utils cimport find_max_divergence
 from ._utils cimport copy_int_array
 from ._utils cimport dealloc
 
@@ -43,13 +44,13 @@ cdef class _Adder:
             return self._get_int_ndarray(self.add_depths, self.add_count)
 
     def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,
-                  double epsilon, double lmbda, bint use_gini):
+                  double lmbda, bint use_gini):
         """
         Constructor.
         """
         self.manager = manager
         self.tree_builder = tree_builder
-        self.epsilon = epsilon
+        # self.epsilon = epsilon
         self.lmbda = lmbda
         self.use_gini = use_gini
         self.min_samples_leaf = tree_builder.min_samples_leaf
@@ -84,14 +85,22 @@ cdef class _Adder:
         cdef int** X = NULL
         cdef int* y = NULL
 
+        cdef int min_retrain_layer = -1
+
         self.manager.get_data(&X, &y)
         self._resize_metrics(n_samples)
-        self._add(&tree.root, X, y, samples, n_samples, 1.0)
+
+        self._detect_retrains(&tree.root, X, y, samples, n_samples, &min_retrain_layer)
+        if min_retrain_layer >= 0:
+            # printf("retraining needed at layer %d\n", min_retrain_layer)
+            self._add_add_type(2, min_retrain_layer)
+            self._retrain_min_layer(&tree.root, X, y, samples, n_samples, min_retrain_layer)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _add(self, Node** node_ptr, int** X, int* y,
-                   int* samples, int n_samples, double parent_p) nogil:
+    cdef void _detect_retrains(self, Node** node_ptr, int** X, int* y,
+                                int* samples, int n_samples,
+                                int* min_retrain_layer) nogil:
         """
         Recursively add the samples to this subtree.
         """
@@ -105,6 +114,9 @@ cdef class _Adder:
 
         cdef int pos_count = 0
 
+        if min_retrain_layer[0] != -1 and node.depth >= min_retrain_layer[0]:
+            return
+
         for i in range(n_samples):
             if y[samples[i]] == 1:
                 pos_count += 1
@@ -117,12 +129,13 @@ cdef class _Adder:
             self._update_splits(&node, X, y, samples, n_samples, pos_count)
 
             result = self._check_node(node, X, y, samples, n_samples,
-                                      pos_count, parent_p, &split)
+                                      pos_count, &split)
 
             # retrain
             if result > 0:
-                self._add_add_type(result, node.depth)
-                self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
+
+                if min_retrain_layer[0] == -1 or node.depth < min_retrain_layer[0]:
+                    min_retrain_layer[0] = node.depth
 
             else:
 
@@ -136,15 +149,77 @@ cdef class _Adder:
 
                     # traverse left
                     if split.left_count > 0:
-                        self._add(&node.left, X, y, split.left_indices,
-                                  split.left_count, split.p)
+                        self._detect_retrains(&node.left, X, y, split.left_indices,
+                                              split.left_count, min_retrain_layer)
 
                     # traverse right
                     if split.right_count > 0:
-                        self._add(&node.right, X, y, split.right_indices,
-                                  split.right_count, split.p)
+                        self._detect_retrains(&node.right, X, y, split.right_indices,
+                                              split.right_count, min_retrain_layer)
 
+        if node.depth > 0 or min_retrain_layer[0] == -1:
+            free(samples)
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _retrain_min_layer(self, Node** node_ptr, int** X, int* y,
+                                 int* samples, int n_samples,
+                                 int min_retrain_layer) nogil:
+        """
+        Recursively find the nodes at the target layer and retrain them.
+        """
+
+        # printf('accessing node...\n')
+        cdef Node* node = node_ptr[0]
+        cdef SplitRecord split
+        # printf('updating count...\n')
+        # cdef int updated_count = node.count + n_samples
+        # printf('done updating count...\n')
+        # printf('(count, n_samples, updated_count): (%d, %d, %d)\n', node.count, n_samples, updated_count)
+
+        # printf('\nnode (depth, is_left, is_leaf, n_samples): (%d, %d, %d, %d)\n', node.depth, node.is_left, node.is_leaf, n_samples)
+
+        # retrain
+        if node.depth == min_retrain_layer:
+            # printf('retraining...\n')
+
+            if not node.is_leaf or (node.is_leaf and n_samples > 0):
+                # printf('retraining...\n')
+
+                # for i in range(n_samples):
+                    # printf('samples[%d]: %d\n', i, samples[i])
+
+                self._retrain(&node_ptr, X, y, samples, n_samples)
+                # printf('done retraining\n')
+
+        else:
+            # printf('splitting...\n')
+            self._split_samples(node, X, y, samples, n_samples, &split)
+            # printf('done splitting...\n')
+
+            # for i in range(n_samples):
+            #     printf('samples[%d]: %d\n', i, samples[i])
+
+            # if split.left_indices == NULL or split.left_count == 0:
+            #     printf('left indices is equal to NULL\n')
+
+            # if split.right_indices == NULL or split.right_count == 0:
+            #     printf('right indices is equal to NULL\n')
+
+            # traverse left
+            # printf('traversing left...\n')
+            if node.left:
+                self._retrain_min_layer(&node.left, X, y, split.left_indices,
+                                        split.left_count, min_retrain_layer)
+
+            # traverse right
+            if node.right:
+                self._retrain_min_layer(&node.right, X, y, split.right_indices,
+                                        split.right_count, min_retrain_layer)
+
+        # printf('freeing samples\n')
         free(samples)
+        # printf('done freeing samples\n')
 
     # private
     @cython.boundscheck(False)
@@ -172,14 +247,15 @@ cdef class _Adder:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef void _retrain(self, Node*** node_pp, int** X, int* y, int* samples,
-                       int n_samples, double parent_p, SplitRecord *split) nogil:
+                       int n_samples) nogil:
         """
         Rebuild subtree at this node.
         """
         cdef Node*  node = node_pp[0][0]
         cdef Node** node_ptr = node_pp[0]
 
-        cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
+        # cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))
+        cdef int* leaf_samples = <int *>malloc((node.count + n_samples) * sizeof(int))
         cdef int  leaf_samples_count = 0
 
         cdef int* rebuild_features = NULL
@@ -188,16 +264,30 @@ cdef class _Adder:
         cdef int is_left = node.is_left
         cdef int features_count = node.features_count
 
+        # printf('getting leaf samples...\n')
         self._get_leaf_samples(node, &leaf_samples, &leaf_samples_count)
-        self._add_leaf_samples(samples, n_samples, &leaf_samples, &leaf_samples_count)
+        # for i in range(leaf_samples_count):
+        #     printf('leaf_samples[%d]: %d\n', i, leaf_samples[i])
+
+        # printf('adding leaf samples...\n')
+        self._add_samples(samples, n_samples, &leaf_samples, &leaf_samples_count)
+        # for i in range(leaf_samples_count):
+        #     printf('leaf_samples[%d]: %d\n', i, leaf_samples[i])
+        leaf_samples = <int *>realloc(leaf_samples, leaf_samples_count * sizeof(int))
 
         rebuild_features = copy_int_array(node.features, node.features_count)
+        # printf('deallocing node...\n')
         dealloc(node)
         free(node)
 
+        # for i in range(leaf_samples_count):
+        #     printf('leaf_samples[%d]: %d\n', i, leaf_samples[i])
+
+        # printf('rebuilding subtree...\n')
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
                                                rebuild_features, features_count,
-                                               depth, is_left, parent_p)
+                                               depth, is_left, node.layer_budget_ptr)
+        # printf('done rebuilding.\n')
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -235,27 +325,77 @@ cdef class _Adder:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
+    cdef void _add_samples(self, int* samples, int n_samples,
+                           int** leaf_samples_ptr,
+                           int*  leaf_samples_count_ptr) nogil:
+        """
+        Add samples if not already present.
+        """
+        cdef int n_leaf_samples = leaf_samples_count_ptr[0]
+
+        cdef bint add
+        cdef int i
+
+        for i in range(n_samples):
+            add = 1
+
+            for j in range(n_leaf_samples):
+                if samples[i] == leaf_samples_ptr[0][j]:
+                    add = 0
+                    break
+
+            if add:
+                leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = samples[i]
+                leaf_samples_count_ptr[0] += 1
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil:
         """
         Update tree with node metadata.
         """
         cdef Node* node = node_ptr[0]
-        node.p = split.p
         node.count = split.count
         node.pos_count = split.pos_count
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _split_samples(self, Node* node, int** X, int* y,
+                             int* samples, int n_samples,
+                             SplitRecord *split) nogil:
+        """
+        Split samples based on the chosen feature.
+        """
+
+        cdef int j = 0
+        cdef int k = 0
+
+        # assign results from chosen feature
+        split.left_indices = <int *>malloc(n_samples * sizeof(int))
+        split.right_indices = <int *>malloc(n_samples * sizeof(int))
+        for i in range(n_samples):
+            if X[samples[i]][node.feature] == 1:
+                split.left_indices[j] = samples[i]
+                j += 1
+            else:
+                split.right_indices[k] = samples[i]
+                k += 1
+        split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+        split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
+        split.left_count = j
+        split.right_count = k
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int _check_node(self, Node* node, int** X, int* y,
                           int* samples, int n_samples, int pos_count,
-                          double parent_p, SplitRecord *split) nogil:
+                          SplitRecord *split) nogil:
         """
         Checks node for retraining and splits the add samples.
         """
 
         # parameters
-        cdef double epsilon = self.epsilon
         cdef double lmbda = self.lmbda
         cdef bint use_gini = self.use_gini
 
@@ -264,8 +404,7 @@ cdef class _Adder:
 
         cdef int chosen_ndx = -1
 
-        cdef double p
-        cdef double ratio
+        cdef double max_local_divergence
 
         cdef int updated_count = node.count + n_samples
         cdef int updated_pos_count = node.pos_count + pos_count
@@ -274,11 +413,16 @@ cdef class _Adder:
         cdef int j
         cdef int k
 
+        cdef double tree_budget = self.tree_builder.tree_budget
+        cdef double max_depth = self.tree_builder.max_depth
+        cdef double starting_layer_budget = (tree_budget / max_depth)
+        cdef double cumulative_divergence = 0
+
         cdef int result = 0
 
         if updated_pos_count > 0 and updated_pos_count < updated_count:
 
-            if node.p != UNDEF:
+            if node.sspd != NULL:
 
                 split_scores = <double *>malloc(node.features_count * sizeof(double))
                 distribution = <double *>malloc(node.features_count * sizeof(double))
@@ -293,11 +437,26 @@ cdef class _Adder:
                         chosen_ndx = j
 
                 # generate new probability and compare to previous probability
-                generate_distribution(lmbda, &distribution, split_scores, node.features_count)
-                p = parent_p * distribution[chosen_ndx]
-                ratio = p / node.p
+                generate_distribution(lmbda, &distribution, split_scores,
+                                      node.features_count, updated_count, use_gini)
 
-                if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
+                # remove affect of previous divergence and add affect of current divergence to layer budget
+                max_local_divergence = find_max_divergence(node.sspd, distribution, node.features_count)
+
+                # if node.depth <= self.tree_builder.topd - 1:
+                #     budget_selector = 0
+                # else:
+                #     budget_selector = node.depth
+
+                node.layer_budget_ptr[0][node.depth] += node.divergence
+                node.layer_budget_ptr[0][node.depth] -= max_local_divergence
+                node.divergence = max_local_divergence
+
+                # compute cumulative divergence up to and including this layer
+                for depth in range(node.depth + 1):
+                    cumulative_divergence += starting_layer_budget - node.layer_budget_ptr[0][depth]
+
+                if cumulative_divergence <= starting_layer_budget * (node.depth + 1):
 
                     # assign results from chosen feature
                     split.left_indices = <int *>malloc(n_samples * sizeof(int))
@@ -315,7 +474,6 @@ cdef class _Adder:
                     split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
                     split.left_count = j
                     split.right_count = k
-                    split.p = p
 
                 # bounds exceeded => retrain
                 else:

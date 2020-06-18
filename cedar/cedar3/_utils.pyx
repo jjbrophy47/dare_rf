@@ -7,7 +7,9 @@ from libc.stdlib cimport srand
 from libc.stdlib cimport RAND_MAX
 from libc.stdio cimport printf
 from libc.math cimport exp
+from libc.math cimport log
 from libc.math cimport log2
+from libc.math cimport fabs
 
 cimport cython
 
@@ -17,6 +19,7 @@ np.import_array()
 
 # constants
 cdef inline UINT32_t DEFAULT_SEED = 1
+cdef double MAX_DBL = 1.79768e+308
 
 cdef inline double rand_uniform(double low, double high,
                                 UINT32_t* random_state) nogil:
@@ -148,10 +151,38 @@ cdef double compute_entropy(double count, double left_count, double right_count,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
-cdef int generate_distribution(double lmbda, double** distribution_ptr,
-                               double* scores, int n_scores) nogil:
+cdef double find_max_divergence(double* sspd1, double* sspd2,
+                                int n_features) nogil:
     """
-    Generate a probability distribution based on the attribute split scores.
+    Find the feature with the maximum divergence between the two SSPDs.
+    Return that max divergence value.
+    """
+    cdef double divergence = 0
+    cdef double max_divergence = 0
+    cdef int i
+
+    for i in range(n_features):
+
+        if fabs(sspd1[i] - sspd2[i]) == 1.0:
+            divergence = MAX_DBL
+
+        else:
+            divergence = fabs(log(sspd1[i] / sspd2[i]))
+
+        if divergence > max_divergence:
+            max_divergence = divergence
+
+    return max_divergence
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+cdef int generate_distribution(double lmbda, double** distribution_ptr,
+                               double* scores, int n_scores,
+                               int n_samples, bint use_gini) nogil:
+    """
+    Generate a probability distribution based on the attribute split scores,
+    and the number of samples at this node.
     """
     cdef double* distribution = distribution_ptr[0]
 
@@ -162,6 +193,11 @@ cdef int generate_distribution(double lmbda, double** distribution_ptr,
     cdef double min_score = 2
     cdef int first_min = -1
 
+    cdef double multiplier = lmbda * n_samples
+
+    if not use_gini:
+        multiplier /= log2(n_samples)
+
     # find min score
     for i in range(n_scores):
         if scores[i] < min_score:
@@ -169,7 +205,7 @@ cdef int generate_distribution(double lmbda, double** distribution_ptr,
             min_score = scores[i]
 
     # determine if tree is in deterministic mode
-    if lmbda < 0 or exp(- lmbda * min_score) == 0:
+    if lmbda < 0 or exp(- multiplier * min_score) == 0:
         for i in range(n_scores):
             distribution[i] = 0
         distribution[first_min] = 1
@@ -177,7 +213,7 @@ cdef int generate_distribution(double lmbda, double** distribution_ptr,
     # generate probability distribution over the features
     else:
         for i in range(n_scores):
-            distribution[i] = exp(- lmbda * scores[i])
+            distribution[i] = exp(- multiplier * scores[i])
             normalizing_constant += distribution[i]
 
         for i in range(n_scores):
@@ -248,6 +284,7 @@ cdef void dealloc(Node *node) nogil:
         free(node.left_pos_counts)
         free(node.right_counts)
         free(node.right_pos_counts)
+        free(node.sspd)
 
     if node.is_leaf:
         free(node.leaf_samples)

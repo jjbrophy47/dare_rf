@@ -16,7 +16,7 @@ cdef class _Adder:
     # Inner structures
     cdef _DataManager manager        # Database manager
     cdef _TreeBuilder tree_builder   # Tree Builder
-    cdef double epsilon              # Indistinguishability parameter
+    # cdef double epsilon              # Indistinguishability parameter
     cdef double lmbda                # Noise parameter
     cdef bint use_gini               # Controls splitting criterion
     cdef int min_samples_leaf        # Minimum number of samples for a leaf
@@ -33,24 +33,36 @@ cdef class _Adder:
     cpdef void clear_add_metrics(self)
 
     # C API
-    cdef void _add(self, Node** node_ptr, int** X, int* y,
-                   int* samples, int n_samples, double parent_p) nogil
+    cdef void _detect_retrains(self, Node** node_ptr, int** X, int* y,
+                               int* samples, int n_samples,
+                               int *min_retrain_layer) nogil
+    cdef void _retrain_min_layer(self, Node** node_ptr, int** X, int* y,
+                                 int* samples, int n_samples,
+                                 int min_retrain_layer) nogil
+
     cdef int _check_node(self, Node* node, int** X, int* y,
                           int* samples, int n_samples, int pos_count,
-                          double parent_p, SplitRecord *split) nogil
+                          SplitRecord *split) nogil
     cdef int _update_splits(self, Node** node_ptr, int** X, int* y,
                             int* samples, int n_samples, int pos_count) nogil
 
     cdef void _update_leaf(self, Node** node_ptr, int* y,
                            int* samples, int n_samples, int pos_count) nogil
     cdef void _retrain(self, Node*** node_ptr, int** X, int* y, int* samples,
-                       int n_samples, double parent_p, SplitRecord *split) nogil
+                       int n_samples) nogil
     cdef void _get_leaf_samples(self, Node* node, int** leaf_samples_ptr,
                                 int* leaf_samples_count_ptr) nogil
     cdef void _add_leaf_samples(self, int* samples, int n_samples,
                                 int** leaf_samples_ptr,
                                 int*  leaf_samples_count_ptr) nogil
+    cdef void _add_samples(self, int* samples, int n_samples,
+                           int** leaf_samples_ptr,
+                           int*  leaf_samples_count_ptr) nogil
     cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
+
+    cdef void _split_samples(self, Node* node, int** X, int* y,
+                             int* samples, int n_samples,
+                             SplitRecord *split) nogil
 
     cdef void _resize_metrics(self, int capacity=*) nogil
     cdef void _add_add_type(self, int add_type, int add_depth) nogil

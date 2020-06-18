@@ -22,6 +22,7 @@ def main(args):
     start = time.time()
     model = cedar.forest(epsilon=args.epsilon,
                          lmbda=args.lmbda,
+                         criterion=args.criterion,
                          n_estimators=args.n_estimators,
                          max_depth=args.max_depth,
                          max_features=args.max_features,
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     # model hyperparameters
     parser.add_argument('--cedar_type', default='1', help='dataset to use for the experiment.')
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
-    parser.add_argument('--lmbda', type=float, default=100, help='noise hyperparameter.')
+    parser.add_argument('--lmbda', type=float, default=0.1, help='noise hyperparameter.')
     parser.add_argument('--n_estimators', type=int, default=100, help='no. trees.')
     parser.add_argument('--max_depth', type=int, default=3, help='maximum depth of the tree.')
     parser.add_argument('--max_features', type=float, default=0.25, help='maximum fraction of features.')

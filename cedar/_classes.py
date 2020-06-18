@@ -3,12 +3,13 @@ CeDAR implementation selector.
 """
 from . import cedar1
 from . import cedar2
-# from . import cedar3
+from . import cedar3
+from . import exact
 
 
-def forest(epsilon=1.0, lmbda=0.1, n_estimators=100, max_features='sqrt',
-           max_depth=10, criterion='gini', min_samples_split=2, min_samples_leaf=1,
-           random_state=None, verbose=0, cedar_type='1'):
+def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_features='sqrt',
+           max_depth=10, min_samples_split=2, min_samples_leaf=1,
+           cedar_type='3', random_state=None, verbose=0):
     """
     CeDAR Forest.
 
@@ -19,7 +20,9 @@ def forest(epsilon=1.0, lmbda=0.1, n_estimators=100, max_features='sqrt',
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-        Set to -1 for detemrinistic trees; equivalent to setting it to infty.
+        Set to -1 for deterministic trees; equivalent to setting it to infinity.
+    criterion: str (default='gini')
+        Splitting criterion to use.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -28,25 +31,35 @@ def forest(epsilon=1.0, lmbda=0.1, n_estimators=100, max_features='sqrt',
         If None or 'sqrt', then max_features=sqrt(n_features).
     max_depth: int (default=None)
         The maximum depth of a tree.
-    criterion: str (default='gini')
-        Splitting criterion to use.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
     min_samples_leaf: int (default=1)
         The minimum number of samples needed to make a leaf.
+    cedar_type: str (default='3')
+        Different types represent different budget allocation protocols.
+    topd: int (default=-1)
+        Number of top layers to share a budget (only relevant if `cedar_type`='3').
     random_state: int (default=None)
         Random state for reproducibility.
     verbose: int (default=0)
         Verbosity level.
     """
     if cedar_type == '1':
-        model_func = cedar1.Forest
+        model_func = cedar1.Forest1
 
     elif cedar_type == '2':
-        model_func = cedar2.Forest
+        model_func = cedar2.Forest2
+
+    elif cedar_type == '3':
+        model_func = cedar3.Forest3
+
+    elif cedar_type == 'exact':
+        model_func = exact.Forest_e
+        lmbda = -1
+        epsilon = 0
 
     else:
-        model_func = cedar3.Forest
+        raise ValueError('Unknown cedar_type: {}'.format(cedar_type))
 
     model = model_func(epsilon=epsilon,
                        lmbda=lmbda,
@@ -62,9 +75,9 @@ def forest(epsilon=1.0, lmbda=0.1, n_estimators=100, max_features='sqrt',
     return model
 
 
-def tree(epsilon=0.1, lmbda=0.1, max_depth=4, criterion='gini',
-         min_samples_split=2, min_samples_leaf=1, random_state=None,
-         verbose=0, cedar_type='1'):
+def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
+         min_samples_split=2, min_samples_leaf=1,
+         cedar_type='1', random_state=None, verbose=0):
     """
     CeDAR Tree.
 
@@ -76,27 +89,39 @@ def tree(epsilon=0.1, lmbda=0.1, max_depth=4, criterion='gini',
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
         Set to -1 for a detrminisic tree; equivalent to setting it to infty.
-    max_depth: int (default=None)
-        The maximum depth of a tree.
     criterion: str (default='gini')
         Splitting criterion to use.
+    max_depth: int (default=None)
+        The maximum depth of a tree.
     min_samples_split: int (default=2)
         The minimum number of samples needed to make a split when building a tree.
     min_samples_leaf: int (default=1)
         The minimum number of samples needed to make a leaf.
+    cedar_type: str (default='3')
+        Different types represent different budget allocation protocols.
+    topd: int (default=-1)
+        Number of top layers to share a budget (only relevant if `cedar_type`='3').
     random_state: int (default=None)
         Random state for reproducibility.
     verbose: int (default=0)
         Verbosity level.
     """
     if cedar_type == '1':
-        model_func = cedar1.Tree
+        model_func = cedar1.Tree1
 
     elif cedar_type == '2':
-        model_func = cedar2.Tree
+        model_func = cedar2.Tree2
+
+    elif cedar_type == '3':
+        model_func = cedar3.Tree3
+
+    elif cedar_type == 'exact':
+        model_func = exact.Tree_e
+        lmbda = -1
+        epsilon = 0
 
     else:
-        model_func = cedar3.Tree
+        raise ValueError('Unknown cedar_type: {}'.format(cedar_type))
 
     model = model_func(epsilon=epsilon,
                        lmbda=lmbda,

@@ -48,7 +48,7 @@ cdef class _Splitter:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef int split_node(self, Node* node, int** X, int* y,
-                        int* samples, int n_samples, double parent_p,
+                        int* samples, int n_samples,
                         SplitRecord *split) nogil:
         """
         Splits the node by sampling from the valid feature distribution.
@@ -84,7 +84,8 @@ cdef class _Splitter:
                                                       node.right_pos_counts[j])
 
             # generate and sample from the distribution
-            generate_distribution(lmbda, &distribution, split_scores, node.features_count)
+            generate_distribution(lmbda, &distribution, split_scores,
+                                  node.features_count, n_samples, use_gini)
             chosen_ndx = sample_distribution(distribution, node.features_count, random_state)
             chosen_feature = node.features[chosen_ndx]
 
@@ -94,6 +95,7 @@ cdef class _Splitter:
             j = 0
             k = 0
             for i in range(n_samples):
+                # printf('[node_split] samples[%d]: %d\n', i, samples[i])
                 if X[samples[i]][chosen_feature] == 1:
                     split.left_indices[j] = samples[i]
                     j += 1
@@ -103,7 +105,7 @@ cdef class _Splitter:
             split.left_count = j
             split.right_count = k
             split.feature = chosen_feature
-            split.p = parent_p * distribution[chosen_ndx]
+            split.sspd = distribution
 
             # remove chosen feature from descendent nodes
             split.features_count = node.features_count - 1
@@ -117,7 +119,6 @@ cdef class _Splitter:
                     j += 1
 
             free(split_scores)
-            free(distribution)
 
         else:
             result = 1
@@ -148,10 +149,15 @@ cdef class _Splitter:
 
         cdef int i
 
+        # printf('counting pos labels\n')
+
         # count number of pos labels
         for i in range(n_samples):
+            # printf('samples[%d]: %d\n', i, samples[i])
             if y[samples[i]] == 1:
                 pos_count += 1
+
+        # printf('computing statistics\n')
 
         # compute statistics for each attribute
         for j in range(n_features):
@@ -169,6 +175,8 @@ cdef class _Splitter:
             left_pos_counts[j] = left_pos_count
             right_counts[j] = count - left_count
             right_pos_counts[j] = pos_count - left_pos_count
+
+        # printf('filling in node\n')
 
         node.count = count
         node.pos_count = pos_count

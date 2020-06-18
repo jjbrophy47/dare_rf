@@ -6,8 +6,8 @@ from numpy.distutils.core import setup
 from Cython.Build import cythonize
 
 
-def configuration(parent_package='', top_path=None):
-    config = Configuration('cedar', parent_name=parent_package, top_path=top_path)
+def configuration(parent_package='cedar', top_path=None):
+    config = Configuration('exact', parent_name=parent_package, top_path=top_path)
 
     libraries = []
     if os.name == 'posix':

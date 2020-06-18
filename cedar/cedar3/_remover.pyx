@@ -19,6 +19,7 @@ np.import_array()
 
 from ._utils cimport compute_split_score
 from ._utils cimport generate_distribution
+from ._utils cimport find_max_divergence
 from ._utils cimport convert_int_ndarray
 from ._utils cimport copy_int_array
 from ._utils cimport dealloc
@@ -45,13 +46,13 @@ cdef class _Remover:
             return self._get_int_ndarray(self.remove_depths, self.remove_count)
 
     def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,
-                  double epsilon, double lmbda, bint use_gini):
+                  double lmbda, bint use_gini):
         """
         Constructor.
         """
         self.manager = manager
         self.tree_builder = tree_builder
-        self.epsilon = epsilon
+        # self.epsilon = epsilon
         self.lmbda = lmbda
         self.use_gini = use_gini
         self.min_samples_leaf = tree_builder.min_samples_leaf
@@ -87,6 +88,8 @@ cdef class _Remover:
         cdef int  n_samples = remove_indices.shape[0]
         cdef int  result = 0
 
+        cdef int min_retrain_layer = -1
+
         # make room for new deletions
         self._resize_metrics(n_samples)
 
@@ -95,14 +98,21 @@ cdef class _Remover:
         if result == -1:
             return -1
 
-        self._remove(&tree.root, X, y, samples, n_samples, 1.0)
+        # check if any node at any layer needs to retrain
+        self._detect_retrains(&tree.root, X, y, samples, n_samples, &min_retrain_layer)
+
+        # retrain shallowest layer
+        if min_retrain_layer >= 0:
+            self._add_removal_type(2, min_retrain_layer)
+            self._retrain_min_layer(&tree.root, X, y, samples, n_samples, min_retrain_layer)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _remove(self, Node** node_ptr, int** X, int* y,
-                      int* samples, int n_samples, double parent_p) nogil:
+    cdef void _detect_retrains(self, Node** node_ptr, int** X, int* y,
+                               int* samples, int n_samples,
+                               int* min_retrain_layer) nogil:
         """
-        Recursively remove the samples from this subtree.
+        Recursively update and detect any layers that need retraining.
         """
 
         cdef Node *node = node_ptr[0]
@@ -114,6 +124,9 @@ cdef class _Remover:
         cdef int i = UNDEF
 
         cdef int pos_count = 0
+
+        if min_retrain_layer[0] != -1 and node.depth >= min_retrain_layer[0]:
+            return
 
         for i in range(n_samples):
             if y[samples[i]] == 1:
@@ -134,17 +147,14 @@ cdef class _Remover:
             else:
 
                 result = self._check_node(node, X, y, samples, n_samples,
-                                          pos_count, parent_p, &split)
-
-                # convert to leaf
-                if result == 1:
-                    self._convert_to_leaf(&node, samples, n_samples, &split)
-                    self._add_removal_type(result, node.depth)
+                                          pos_count, &split)
 
                 # retrain
-                elif result > 1:
-                    self._add_removal_type(result, node.depth)
-                    self._retrain(&node_ptr, X, y, samples, n_samples, parent_p, &split)
+                if result > 0:
+                    # printf('retrain\n')
+
+                    if min_retrain_layer[0] == -1 or node.depth < min_retrain_layer[0]:
+                        min_retrain_layer[0] = node.depth
 
                 # update and recurse
                 else:
@@ -152,13 +162,50 @@ cdef class _Remover:
 
                     # traverse left
                     if split.left_count > 0:
-                        self._remove(&node.left, X, y, split.left_indices,
-                                     split.left_count, split.p)
+                        self._detect_retrains(&node.left, X, y, split.left_indices,
+                                     split.left_count, min_retrain_layer)
 
                     # traverse right
                     if split.right_count > 0:
-                        self._remove(&node.right, X, y, split.right_indices,
-                                     split.right_count, split.p)
+                        self._detect_retrains(&node.right, X, y, split.right_indices,
+                                     split.right_count, min_retrain_layer)
+
+        if node.depth > 0 or min_retrain_layer[0] == -1:
+            free(samples)
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _retrain_min_layer(self, Node** node_ptr, int** X, int* y,
+                                 int* samples, int n_samples,
+                                 int min_retrain_layer) nogil:
+        """
+        Recursively find the nodes at the target layer and retrain them.
+        """
+
+        cdef Node *node = node_ptr[0]
+        cdef SplitRecord split
+        # cdef int updated_count = node.count - n_samples
+
+        # printf('depth=%d, is_leaf=%d, count=%d, n_samples=%d\n', node.depth, node.is_leaf, node.count, n_samples)
+
+        # retrain
+        if node.depth == min_retrain_layer:
+
+            if not node.is_leaf:
+                self._retrain(&node_ptr, X, y, samples, n_samples)
+
+        else:
+            self._split_samples(node, X, y, samples, n_samples, &split)
+
+            # traverse left
+            if node.left:
+                self._retrain_min_layer(&node.left, X, y, split.left_indices,
+                                        split.left_count, min_retrain_layer)
+
+            # traverse right
+            if node.right:
+                self._retrain_min_layer(&node.right, X, y, split.right_indices,
+                                        split.right_count, min_retrain_layer)
 
         free(samples)
 
@@ -211,7 +258,7 @@ cdef class _Remover:
         node.value = node.pos_count / <double> node.count
         node.leaf_samples = leaf_samples
 
-        node.p = UNDEF
+        node.sspd = NULL
         node.feature = UNDEF
 
         node.left = NULL
@@ -220,14 +267,16 @@ cdef class _Remover:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef void _retrain(self, Node*** node_pp, int** X, int* y, int* samples,
-                       int n_samples, double parent_p, SplitRecord *split) nogil:
+                       int n_samples) nogil:
         """
         Rebuild subtree at this node.
         """
         cdef Node*  node = node_pp[0][0]
         cdef Node** node_ptr = node_pp[0]
 
-        cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
+        # printf('updated_count: %d\n', updated_count)
+        # cdef int* leaf_samples = <int *>malloc(updated_count * sizeof(int))
+        cdef int* leaf_samples = <int *>malloc(node.count * sizeof(int))
         cdef int  leaf_samples_count = 0
 
         cdef int* rebuild_features = NULL
@@ -238,14 +287,18 @@ cdef class _Remover:
 
         self._get_leaf_samples(node, samples, n_samples,
                                &leaf_samples, &leaf_samples_count)
+        leaf_samples = <int *>realloc(leaf_samples, leaf_samples_count * sizeof(int))
+        # printf('leaf_samples_count: %d\n', leaf_samples_count)
 
         rebuild_features = copy_int_array(node.features, node.features_count)
         dealloc(node)
         free(node)
 
+        # printf('done freeing node\n')
+
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
                                                rebuild_features, features_count,
-                                               depth, is_left, parent_p)
+                                               depth, is_left, node.layer_budget_ptr)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -255,6 +308,11 @@ cdef class _Remover:
         Recursively obtain and filter the samples at the leaves.
         """
         cdef bint add_sample
+        cdef int i
+        cdef int j
+
+        # for j in range(n_remove_samples):
+            # printf('remove_samples[%d]=%d\n', j, remove_samples[j])
 
         if node.is_leaf:
             for i in range(node.count):
@@ -266,6 +324,7 @@ cdef class _Remover:
                         break
 
                 if add_sample:
+                    # printf('leaf_samples[%d]=%d\n', i, node.leaf_samples[i])
                     leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]
                     leaf_samples_count_ptr[0] += 1
 
@@ -285,22 +344,47 @@ cdef class _Remover:
         Update tree with node metadata.
         """
         cdef Node* node = node_ptr[0]
-        node.p = split.p
         node.count = split.count
         node.pos_count = split.pos_count
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _split_samples(self, Node* node, int** X, int* y,
+                             int* samples, int n_samples,
+                             SplitRecord *split) nogil:
+        """
+        Split samples based on the chosen feature.
+        """
+
+        cdef int j = 0
+        cdef int k = 0
+
+        # assign results from chosen feature
+        split.left_indices = <int *>malloc(n_samples * sizeof(int))
+        split.right_indices = <int *>malloc(n_samples * sizeof(int))
+        for i in range(n_samples):
+            if X[samples[i]][node.feature] == 1:
+                split.left_indices[j] = samples[i]
+                j += 1
+            else:
+                split.right_indices[k] = samples[i]
+                k += 1
+        split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
+        split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
+        split.left_count = j
+        split.right_count = k
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int _check_node(self, Node* node, int** X, int* y,
                           int* samples, int n_samples, int pos_count,
-                          double parent_p, SplitRecord *split) nogil:
+                          SplitRecord *split) nogil:
         """
         Checks node for retraining and splits the removal samples.
         """
 
         # parameters
-        cdef double epsilon = self.epsilon
         cdef double lmbda = self.lmbda
         cdef bint use_gini = self.use_gini
 
@@ -309,8 +393,7 @@ cdef class _Remover:
 
         cdef int chosen_ndx = -1
 
-        cdef double p
-        cdef double ratio
+        cdef double max_local_divergence
 
         cdef int updated_count = node.count - n_samples
         cdef int updated_pos_count = node.pos_count - pos_count
@@ -318,6 +401,13 @@ cdef class _Remover:
         cdef int i
         cdef int j
         cdef int k
+
+        # cdef int budget_selector
+
+        cdef double tree_budget = self.tree_builder.tree_budget
+        cdef double max_depth = self.tree_builder.max_depth
+        cdef double starting_layer_budget = (tree_budget / max_depth)
+        cdef double cumulative_divergence = 0
 
         cdef int result = 0
 
@@ -336,11 +426,33 @@ cdef class _Remover:
                     chosen_ndx = j
 
             # generate new probability and compare to previous probability
-            generate_distribution(lmbda, &distribution, split_scores, node.features_count)
-            p = parent_p * distribution[chosen_ndx]
-            ratio = p / node.p
+            generate_distribution(lmbda, &distribution, split_scores,
+                                  node.features_count, updated_count, use_gini)
 
-            if exp(-epsilon) <= ratio and ratio <= exp(epsilon):
+            # for i in range(node.features_count):
+            #     printf('sspd1[%d]: %.5f, sspd2[%d]: %.5f\n', i, node.sspd[i], i, distribution[i])
+
+            # remove affect of previous divergence and add affect of current divergence to layer budget
+            max_local_divergence = find_max_divergence(node.sspd, distribution, node.features_count)
+            # printf('\nmax local divergence (depth=%d): %.10f\n', node.depth, max_local_divergence)
+
+            # printf('[before] layer_budget[%d]: %.10f\n', node.depth, node.layer_budget_ptr[0][node.depth])
+
+            node.layer_budget_ptr[0][node.depth] += node.divergence
+            node.layer_budget_ptr[0][node.depth] -= max_local_divergence
+            node.divergence = max_local_divergence
+
+            # printf('[before] layer_budget[%d]: %.10f\n', node.depth, node.layer_budget_ptr[0][node.depth])
+
+            # compute cumulative divergence up to and including this layer
+            for depth in range(node.depth + 1):
+                cumulative_divergence += starting_layer_budget - node.layer_budget_ptr[0][depth]
+
+            # printf('cumulative_divergence=%.5f, cumulative_budget=%.5f\n', cumulative_divergence, (tree_budget / max_depth) * (node.depth + 1))
+
+            if cumulative_divergence <= starting_layer_budget * (node.depth + 1):
+
+                # printf('positive budget\n')
 
                 # assign results from chosen feature
                 split.left_indices = <int *>malloc(n_samples * sizeof(int))
@@ -358,16 +470,16 @@ cdef class _Remover:
                 split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
                 split.left_count = j
                 split.right_count = k
-                split.p = p
 
-            # bounds exceeded => retrain
+            # bounds exceeded => retrain entire layer
             else:
+                # printf('retrain\n')
                 result = 2
 
             free(split_scores)
             free(distribution)
 
-        # all samples in one class => leaf
+        # all samples in one class => leaf - retrain entire layer
         else:
             result = 1
 

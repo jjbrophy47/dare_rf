@@ -406,10 +406,15 @@ cdef class _Remover:
             # generate new probability and compare to previous probability
             generate_distribution(lmbda, &distribution, split_scores, node.features_count, updated_count)
 
+            # for i in range(node.features_count):
+            #     printf('sspd1[%d]: %.5f, sspd2[%d]: %.5f\n', i, node.sspd[i], i, distribution[i])
+
             # remove affect of previous divergence and add affect of current divergence to layer budget
             max_local_divergence = find_max_divergence(node.sspd, distribution, node.features_count)
+            # printf('max local divergence: %.10f\n', max_local_divergence)
             node.layer_budget_ptr[0][node.depth] += node.divergence
             node.layer_budget_ptr[0][node.depth] -= max_local_divergence
+            # printf('layer_budget[%d]: %.10f\n', node.depth, node.layer_budget_ptr[0][node.depth])
             node.divergence = max_local_divergence
 
             if node.layer_budget_ptr[0][node.depth] >= 0:
