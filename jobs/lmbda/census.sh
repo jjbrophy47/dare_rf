@@ -13,8 +13,8 @@ module load python3/3.7.5
 model_type=$1
 criterion=$2
 tune_frac=$3
-step_size=$4
-start_val=$5
+start_val=$4
+step_size=$5
 
 dataset="census"
 n_estimators=250
