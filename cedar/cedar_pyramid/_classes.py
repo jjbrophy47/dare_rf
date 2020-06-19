@@ -4,8 +4,8 @@ CeDAR (CErtified Data Addition and Removal) Trees.
 Retrains an ENTIRE layer of a tree once the indistinguishability budget
 for that layer has been exceeded.
 
-However, the top d levels can be specified to share a budget, and
-the root is retrained if the nodes in those layers exceed their budget.
+However, each layer can borrow leftover budgets from the layers above;
+if this still does not coer their divergence, the whole layer must retrain.
 """
 import numbers
 
@@ -33,9 +33,7 @@ class Forest(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-        Set to -1 for detemrinistic trees; equivalent to setting it to infinity.
-    topd: int (default=-1)
-        Number of top layers to share a budget (only relevant if `cedar_type`='3').
+        Set to -1 for deterministic trees; equivalent to setting it to infinity.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -55,12 +53,11 @@ class Forest(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, lmbda=0.1, epsilon=1.0, topd=-1, n_estimators=100, max_features='sqrt',
+    def __init__(self, epsilon=1.0, lmbda=0.1, n_estimators=100, max_features='sqrt',
                  max_depth=10, criterion='gini', min_samples_split=2, min_samples_leaf=1,
                  random_state=None, verbose=0):
-        self.lmbda = lmbda
         self.epsilon = epsilon
-        self.topd = topd
+        self.lmbda = lmbda
         self.n_estimators = n_estimators
         self.max_features = max_features
         self.max_depth = max_depth
@@ -72,9 +69,8 @@ class Forest(object):
 
     def __str__(self):
         s = 'Forest:'
-        s += '\nlmbda={}'.format(self.lmbda)
         s += '\nepsilon={}'.format(self.epsilon)
-        s += '\ntopd={}'.format(self.topd)
+        s += '\nlmbda={}'.format(self.lmbda)
         s += '\nn_estimators={}'.format(self.n_estimators)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_depth={}'.format(self.max_depth)
@@ -110,10 +106,10 @@ class Forest(object):
             assert self.max_features > 0 and self.max_features <= 1.0
             self.max_features_ = int(self.max_features * self.n_features_)
 
-        # set max_depth and lmbda
+        # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
 
-        # one central location for the data
+        # # one central location for the data
         self.manager_ = _DataManager(X, y)
 
         # build forest
@@ -127,9 +123,8 @@ class Forest(object):
             feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
             feature_indices = feature_indices.astype(np.int32)
 
-            tree = Tree(lmbda=self.lmbda,
-                        epsilon=self.epsilon / self.n_estimators,
-                        topd=self.topd,
+            tree = Tree(epsilon=self.epsilon / self.n_estimators,
+                        lmbda=self.lmbda,
                         max_depth=self.max_depth_,
                         criterion=self.criterion,
                         min_samples_split=self.min_samples_split,
@@ -248,9 +243,8 @@ class Forest(object):
         Returns the parameter of this model as a dictionary.
         """
         d = {}
-        d['lmbda'] = self.lmbda
         d['epsilon'] = self.epsilon
-        d['topd'] = self.topd
+        d['lmbda'] = self.lmbda
         d['n_estimators'] = self.n_estimators
         d['max_features'] = self.max_features
         d['max_depth'] = self.max_depth
@@ -286,9 +280,7 @@ class Tree(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-        Set to -1 for a detrminisic tree; equivalent to setting it to infinity.
-    topd: int (default=-1)
-        Number of top layers to share a budget (only relevant if `cedar_type`='3').
+        Set to -1 for a deterministic tree; equivalent to setting it to infinity.
     max_depth: int (default=None)
         The maximum depth of a tree.
     criterion: str (default='gini')
@@ -302,12 +294,11 @@ class Tree(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, lmbda=0.1, epsilon=1.0, topd=-1, max_depth=4, criterion='gini',
+    def __init__(self, epsilon=1.0, lmbda=0.1, max_depth=4, criterion='gini',
                  min_samples_split=2, min_samples_leaf=1, random_state=None,
                  verbose=0):
-        self.lmbda = lmbda
         self.epsilon = epsilon
-        self.topd = topd
+        self.lmbda = lmbda
         self.max_depth = max_depth
         self.criterion = criterion
         self.min_samples_split = min_samples_split
@@ -317,9 +308,8 @@ class Tree(object):
 
     def __str__(self):
         s = 'Tree:'
-        s += '\nlmbda={}'.format(self.lmbda)
         s += '\nepsilon={}'.format(self.epsilon)
-        s += '\ntopd={}'.format(self.topd)
+        s += '\nlmbda={}'.format(self.lmbda)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\ncriterion={}'.format(self.criterion)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
@@ -352,9 +342,8 @@ class Tree(object):
             self.manager_ = _DataManager(X, y)
             self.single_tree_ = True
 
-        # set max_depth and lmbda
+        # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
-        # self.topd_ = min(self.topd, self.max_depth)
 
         # set splitting criterion
         self.use_gini_ = True if self.criterion == 'gini' else False
@@ -370,15 +359,12 @@ class Tree(object):
                                           self.min_samples_leaf,
                                           self.max_depth_,
                                           self.epsilon)
-        # self.topd_)
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
-                                 # self.epsilon,
                                  self.lmbda,
                                  self.use_gini_)
         self.adder_ = _Adder(self.manager_,
                              self.tree_builder_,
-                             # self.epsilon,
                              self.lmbda,
                              self.use_gini_)
         self.tree_builder_.build(self.tree_)
@@ -485,9 +471,8 @@ class Tree(object):
         Returns the parameter of this model as a dictionary.
         """
         d = {}
-        d['lmbda'] = self.lmbda
         d['epsilon'] = self.epsilon
-        d['topd'] = self.topd
+        d['lmbda'] = self.lmbda
         d['max_depth'] = self.max_depth
         d['min_samples_split'] = self.min_samples_split
         d['min_samples_leaf'] = self.min_samples_leaf

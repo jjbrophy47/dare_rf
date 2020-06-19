@@ -26,16 +26,18 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
     """
 
     if args.model_type == 'stump':
-        model = cedar.Tree(epsilon=epsilon,
+        model = cedar.tree(epsilon=epsilon,
                            lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=1,
                            criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'tree':
-        model = cedar.Tree(epsilon=epsilon,
+        model = cedar.tree(epsilon=epsilon,
                            lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=args.max_depth,
                            criterion=args.criterion,
                            verbose=args.verbose,
@@ -43,8 +45,9 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
 
     elif args.model_type == 'forest':
         max_features = None if args.max_features == -1 else args.max_features
-        model = cedar.Forest(epsilon=epsilon,
+        model = cedar.forest(epsilon=epsilon,
                              lmbda=lmbda,
+                             cedar_type=args.cedar_type,
                              max_depth=args.max_depth,
                              criterion=args.criterion,
                              n_estimators=args.n_estimators,
@@ -64,24 +67,27 @@ def _get_model_dict(args, params, epsilon=0, lmbda=-1, random_state=None):
     """
 
     if args.model_type == 'stump':
-        model = cedar.Tree(epsilon=epsilon,
+        model = cedar.tree(epsilon=epsilon,
                            lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=1,
                            criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'tree':
-        model = cedar.Tree(epsilon=epsilon,
+        model = cedar.tree(epsilon=epsilon,
                            lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=params['max_depth'],
                            criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'forest':
-        model = cedar.Forest(epsilon=epsilon,
+        model = cedar.forest(epsilon=epsilon,
                              lmbda=lmbda,
+                             cedar_type=args.cedar_type,
                              max_depth=params['max_depth'],
                              criterion=args.criterion,
                              n_estimators=params['n_estimators'],
@@ -148,7 +154,7 @@ def performance(args, logger, seed):
             X_train_sub, y_train_sub = X_train, y_train
 
     # hyperparameter values
-    n_estimators = [10, 100, 1000]
+    n_estimators = [10, 100, 250, 500]
     max_depth = [1, 3, 5, 10, 20]
     max_features = ['sqrt', 0.25]
 
@@ -258,10 +264,11 @@ if __name__ == '__main__':
     parser.add_argument('--cv', type=int, default=2, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='metric for tuning.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
-    parser.add_argument('--tol', type=float, default=0.01, help='allowable accuracy difference from the best.')
+    parser.add_argument('--tol', type=float, default=0.0025, help='allowable accuracy difference from the best.')
     parser.add_argument('--reduce_search', action='store_true', default=False, help='remove costly tuning.')
 
     # tree/forest hyperparameters
+    parser.add_argument('--cedar_type', type=str, default='exact', help='type of deletion model.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=-1, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')

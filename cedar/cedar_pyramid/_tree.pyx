@@ -61,7 +61,7 @@ cdef class _TreeBuilder:
         for i in range(n_samples):
             samples[i] = i
 
-        tree.layer_budget = <double *>malloc(sizeof(double) * self.max_depth)
+        tree.layer_budget = <double *>malloc((self.max_depth + 1) * sizeof(double))
         tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0,
                                 &tree.layer_budget)
 

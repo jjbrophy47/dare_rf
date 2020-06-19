@@ -61,7 +61,7 @@ cdef class _TreeBuilder:
         for i in range(n_samples):
             samples[i] = i
 
-        tree.layer_budget = <double *>malloc(sizeof(double) * self.max_depth)
+        tree.layer_budget = <double *>malloc((self.max_depth + 1) * sizeof(double))
         tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0,
                                 &tree.layer_budget)
 
@@ -89,30 +89,22 @@ cdef class _TreeBuilder:
         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
                                     n_samples < 2 * self.min_samples_leaf)
 
-        # printf('\n(depth, is_left, is_leaf, n_samples): (%d, %d, %d, %d)\n', node.depth, node.is_left, node.is_leaf, n_samples)
-
         if is_bottom_leaf:
-            # printf('bottom leaf\n')
             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
 
         else:
-            # printf('compute splits...\n')
             self.splitter.compute_splits(&node, X, y, samples, n_samples, features,
                                          n_features)
 
             if not is_middle_leaf:
-                # printf('split node\n')
                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
                                                           &split)
 
             if is_middle_leaf:
-                # printf('leaf node\n')
                 self._set_leaf_node(&node, y, samples, n_samples, 0)
 
             else:
-                # printf('free samples\n')
                 free(samples)
-                # printf('done freeing samples\n')
                 self._set_decision_node(&node, &split)
 
                 node.left = self._build(X, y, split.left_indices, split.left_count,

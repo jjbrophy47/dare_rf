@@ -1,6 +1,6 @@
 """
-Experiment: Find smallest epsilon/lmbda that gives a predictive performance
-            within a tolerance % of the deterministic model.
+Experiment: Find the smallest lambda that gives a predictive performance
+            within a % tolerance of the deterministic model.
 """
 import os
 import sys
@@ -25,23 +25,29 @@ def _get_model(args, lmbda, random_state):
     """
 
     if args.model_type == 'stump':
-        model = cedar.Tree(lmbda=lmbda,
+        model = cedar.tree(lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=1,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'tree':
-        model = cedar.Tree(lmbda=lmbda,
+        model = cedar.tree(lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=args.max_depth,
+                           criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'forest':
         max_features = None if args.max_features == -1 else args.max_features
-        model = cedar.Forest(lmbda=lmbda,
+        model = cedar.forest(lmbda=lmbda,
+                             cedar_type=args.cedar_type,
                              max_depth=args.max_depth,
                              n_estimators=args.n_estimators,
                              max_features=max_features,
+                             criterion=args.criterion,
                              verbose=args.verbose,
                              random_state=random_state)
 
@@ -98,8 +104,12 @@ def experiment(args, logger, out_dir, seed):
 
     i = -1
     while True:
-        lmbda += args.step_size
         i += 1
+
+        if i == 0:
+            lmbda = 0
+        else:
+            lmbda = (lmbda * args.step_size) if args.multiply else (lmbda + args.step_size)
 
         start2 = time.time()
         model = _get_model(args, lmbda=lmbda, random_state=random_state)
@@ -112,6 +122,9 @@ def experiment(args, logger, out_dir, seed):
 
         if exact_score - cedar_score <= args.tol:
             break
+
+        if i == 0:
+            lmbda = args.start_val
 
     logger.info('lmbda: {}'.format(lmbda))
     model = _get_model(args, lmbda=lmbda, random_state=random_state)
@@ -161,13 +174,16 @@ if __name__ == '__main__':
     parser.add_argument('--save_results', action='store_true', default=True, help='save results.')
 
     # tree/forest hyperparameters
+    parser.add_argument('--cedar_type', type=str, default='pyramid', help='type of deletion model.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=-1, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     # tuning settings
-    parser.add_argument('--step_size', type=float, default=100, help='value to increment lmbda by.')
+    parser.add_argument('--start_val', type=float, default=1e-6, help='starting lmbda value.')
+    parser.add_argument('--step_size', type=float, default=1e-1, help='value to add/multiply lmbda by.')
+    parser.add_argument('--multiply', action='store_true', default=False, help='if True, then multiply lambda.')
     parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='Predictive performance metric.')
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')

@@ -30,7 +30,7 @@ class Forest(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-        Set to -1 for detemrinistic trees; equivalent to setting it to infty.
+        Set to -1 for deterministic trees; equivalent to setting it to infinity.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -50,7 +50,7 @@ class Forest(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, n_estimators=100, max_features='sqrt',
+    def __init__(self, epsilon=1.0, lmbda=0.1, n_estimators=100, max_features='sqrt',
                  max_depth=10, criterion='gini', min_samples_split=2, min_samples_leaf=1,
                  random_state=None, verbose=0):
         self.epsilon = epsilon
@@ -103,7 +103,7 @@ class Forest(object):
             assert self.max_features > 0 and self.max_features <= 1.0
             self.max_features_ = int(self.max_features * self.n_features_)
 
-        # set max_depth and lmbda
+        # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
 
         # one central location for the data
@@ -277,7 +277,7 @@ class Tree(object):
         higher for more deletion efficiency.
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
-        Set to -1 for a detrminisic tree; equivalent to setting it to infty.
+        Set to -1 for a deterministic tree; equivalent to setting it to infinity.
     max_depth: int (default=None)
         The maximum depth of a tree.
     criterion: str (default='gini')
@@ -291,12 +291,12 @@ class Tree(object):
     verbose: int (default=0)
         Verbosity level.
     """
-    def __init__(self, epsilon=0.1, lmbda=0.1, max_depth=4, criterion='gini',
+    def __init__(self, epsilon=1.0, lmbda=0.1, max_depth=4, criterion='gini',
                  min_samples_split=2, min_samples_leaf=1, random_state=None,
                  verbose=0):
         self.epsilon = epsilon
-        self.max_depth = max_depth
         self.lmbda = lmbda
+        self.max_depth = max_depth
         self.criterion = criterion
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
@@ -339,7 +339,7 @@ class Tree(object):
             self.manager_ = _DataManager(X, y)
             self.single_tree_ = True
 
-        # set max_depth and lmbda
+        # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
 
         # set splitting criterion

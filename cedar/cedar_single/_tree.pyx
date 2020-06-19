@@ -145,7 +145,6 @@ cdef class _TreeBuilder:
         else:
             node.value = UNDEF_LEAF_VAL
 
-        # node.p = UNDEF
         node.sspd = NULL
         node.feature = UNDEF
 
@@ -162,7 +161,6 @@ cdef class _TreeBuilder:
         node.value = UNDEF
         node.leaf_samples = NULL
 
-        # node.p = split.p
         node.sspd = split.sspd
         node.feature = split.feature
 

@@ -20,7 +20,7 @@ cdef struct Node:
 
     # Metadata necessary for efficient updating
     double   divergence          # Total divergence for this node.
-    double** layer_budget_ptr    # Pointer to Array of budgets, shape=[max_depth]
+    double** layer_budget_ptr    # Pointer to pointer of Array of budgets, shape=[max_depth]
     int      count               # Number of samples in the node
     int      pos_count           # Number of pos samples in the node
     int      features_count      # Number of features in the node
