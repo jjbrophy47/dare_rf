@@ -166,7 +166,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # experiment settings
-    parser.add_argument('--out_dir', type=str, default='output/no_retrain/', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/lmbda/', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
