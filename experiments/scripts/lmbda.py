@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
     # tuning settings
     parser.add_argument('--start_val', type=float, default=1e-6, help='starting lmbda value.')
-    parser.add_argument('--step_size', type=float, default=1e-1, help='value to add/multiply lmbda by.')
+    parser.add_argument('--step_size', type=float, default=5, help='value to add/multiply lmbda by.')
     parser.add_argument('--multiply', action='store_true', default=False, help='if True, then multiply lambda.')
     parser.add_argument('--cv', type=int, default=2, help='Number of cross-validations.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='Predictive performance metric.')

@@ -14,6 +14,9 @@ Getting Started
 Changelog
 ===
 
+### [0.2.1] - 2020-06-18
+* Fixed memory issue with the layer budget.
+
 ### [0.2.0] - 2020-06-18
 * Re-implementation of CeDAR with three differen budget
   allocation strategies: *Single*, *Layer*, and *Pyramid*.
