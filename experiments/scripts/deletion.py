@@ -6,6 +6,7 @@ import sys
 import time
 import argparse
 from collections import Counter
+from collections import defaultdict
 from datetime import datetime
 
 import numpy as np
@@ -20,22 +21,34 @@ from utility import print_util
 from utility import root_adversary
 
 
+def _process_statistics(types, depths):
+    """
+    Compress the information about retrain depth into counts.
+    """
+    r = {k: defaultdict(int) for k in set(types)}
+    for t, d in zip(types, depths):
+        r[t][d] += 1
+    return r
+
+
 def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
     """
     Return the appropriate model CeDAR model.
     """
 
     if args.model_type == 'stump':
-        model = cedar.Tree(epsilon=epsilon,
+        model = cedar.tree(epsilon=epsilon,
                            lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=1,
                            criterion=args.criterion,
                            verbose=args.verbose,
                            random_state=random_state)
 
     elif args.model_type == 'tree':
-        model = cedar.Tree(epsilon=epsilon,
+        model = cedar.tree(epsilon=epsilon,
                            lmbda=lmbda,
+                           cedar_type=args.cedar_type,
                            max_depth=args.max_depth,
                            criterion=args.criterion,
                            verbose=args.verbose,
@@ -43,8 +56,9 @@ def _get_model(args, epsilon=0, lmbda=-1, random_state=None):
 
     elif args.model_type == 'forest':
         max_features = None if args.max_features == -1 else args.max_features
-        model = cedar.Forest(epsilon=epsilon,
+        model = cedar.forest(epsilon=epsilon,
                              lmbda=lmbda,
+                             cedar_type=args.cedar_type,
                              max_depth=args.max_depth,
                              criterion=args.criterion,
                              n_estimators=args.n_estimators,
@@ -120,8 +134,8 @@ def unlearning_method(args, lmbda, random_state, out_dir, logger,
         d = model.get_params()
         d['train_time'] = train_time
         d['time'] = np.array(times)
-        d['type'] = np.array(types)
-        d['depth'] = np.array(depths)
+        d['retrain_statistics'] = _process_statistics(types, depths)
+        logger.info(d['retrain_statistics'])
         d['auc'] = np.array(aucs)
         d['acc'] = np.array(accs)
 
@@ -238,7 +252,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # experiment settings
-    parser.add_argument('--out_dir', type=str, default='output/amortize/', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/deletion/', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--model_type', type=str, default='forest', help='stump, tree, or forest.')
@@ -254,6 +268,7 @@ if __name__ == '__main__':
     # model hyperparameters
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
     parser.add_argument('--lmbda', type=float, default=0, help='noise hyperparameter.')
+    parser.add_argument('--cedar_type', type=str, default='pyramid', help='type of deletion model.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=-1, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
@@ -273,24 +288,30 @@ if __name__ == '__main__':
 
 # External API
 class Args:
-    out_dir = 'output/amortize/'
+
+    out_dir = 'output/deletion/'
     data_dir = 'data'
     dataset = 'surgical'
+
     model_type = 'forest'
     rs = 1
     repeats = 1
     save_results = True
     time_limit = 86400
+
     naive = False
     exact = False
     cedar = False
+
     epsilon = 1.0
     lmbda = [0]
     n_estimators = 100
     max_features = 0.25
     max_depth = 1
     criterion = 'gini'
+
     n_remove = 10
     frac_remove = 0.1
     adversary = 'random'
+
     verbose = 1

@@ -37,5 +37,6 @@ for rs in ${rs_list[@]}; do
       --max_depth $max_depth \
       --max_features $max_features \
       --criterion $criterion \
+      --tune_frac $tune_frac \
       --rs $rs
 done
