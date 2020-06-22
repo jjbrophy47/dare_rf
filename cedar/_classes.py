@@ -4,12 +4,23 @@ CeDAR implementation selector.
 from . import cedar_single
 from . import cedar_layer
 from . import cedar_pyramid
+from . import cedar_pyramid_top
 from . import exact
 
 
-def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_features='sqrt',
-           max_depth=10, min_samples_split=2, min_samples_leaf=1,
-           cedar_type='pyramid', random_state=None, verbose=0):
+def forest(epsilon=1.0,
+           lmbda=0.1,
+           topd=1,
+           criterion='gini',
+           atol=1e-7,
+           n_estimators=100,
+           max_features='sqrt',
+           max_depth=10,
+           min_samples_split=2,
+           min_samples_leaf=1,
+           cedar_type='pyramid',
+           random_state=None,
+           verbose=0):
     """
     CeDAR Forest.
 
@@ -21,8 +32,12 @@ def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_featu
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
         Set to -1 for deterministic trees; equivalent to setting it to infinity.
+    topd: int (default=1)
+        Number of non-random layers that share the indistinguishability budget.
     criterion: str (default='gini')
         Splitting criterion to use.
+    atol: float (default=1e-7)
+        Clip unnormalized probabilities to this value.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -51,6 +66,9 @@ def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_featu
     elif cedar_type == 'pyramid':
         model_func = cedar_pyramid.Forest
 
+    elif cedar_type == 'pyramid_top':
+        model_func = cedar_pyramid_top.Forest
+
     elif cedar_type == 'exact':
         model_func = exact.Forest
         lmbda = -1
@@ -70,12 +88,24 @@ def forest(epsilon=1.0, lmbda=0.1, criterion='gini', n_estimators=100, max_featu
                        random_state=random_state,
                        verbose=verbose)
 
+    if cedar_type == 'pyramid_top':
+        model.topd = topd
+        model.atol = atol
+
     return model
 
 
-def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
-         min_samples_split=2, min_samples_leaf=1,
-         cedar_type='pyramid', random_state=None, verbose=0):
+def tree(epsilon=0.1,
+         lmbda=0.1,
+         topd=1,
+         criterion='gini',
+         atol=1e-7,
+         max_depth=4,
+         min_samples_split=2,
+         min_samples_leaf=1,
+         cedar_type='pyramid',
+         random_state=None,
+         verbose=0):
     """
     CeDAR Tree.
 
@@ -87,8 +117,12 @@ def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
     lmbda: float (default=0.1)
         Controls the amount of noise injected into the learning algorithm.
         Set to -1 for a detrminisic tree; equivalent to setting it to infty.
+    topd: int (default=1)
+        Number of non-random layers that share the indistinguishability budget.
     criterion: str (default='gini')
         Splitting criterion to use.
+    atol: float (default=1e-7)
+        Clip unnormalized probabilities to this value.
     max_depth: int (default=None)
         The maximum depth of a tree.
     min_samples_split: int (default=2)
@@ -113,6 +147,9 @@ def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
     elif cedar_type == 'pyramid':
         model_func = cedar_pyramid.Tree
 
+    elif cedar_type == 'pyramid_top':
+        model_func = cedar_pyramid_top.Tree
+
     elif cedar_type == 'exact':
         model_func = exact.Tree
         lmbda = -1
@@ -129,5 +166,9 @@ def tree(epsilon=0.1, lmbda=0.1, criterion='gini', max_depth=4,
                        min_samples_leaf=min_samples_leaf,
                        random_state=random_state,
                        verbose=verbose)
+
+    if cedar_type == 'pyramid_top':
+        model.topd = topd
+        model.atol = atol
 
     return model

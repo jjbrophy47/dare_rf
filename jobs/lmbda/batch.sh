@@ -1,4 +1,4 @@
-# sbatch jobs/lmbda/surgical.sh forest gini 1.0 0.01 0.01
+sbatch jobs/lmbda/surgical.sh forest gini 1.0 0.01 0.01
 # sbatch jobs/lmbda/surgical.sh forest entropy 1.0 0.01 0.01
 
 # sbatch jobs/lmbda/adult.sh forest gini 1.0 0.01 0.01

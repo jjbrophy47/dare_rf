@@ -16,13 +16,16 @@ from experiments.utility import data_util
 
 
 def main(args):
+    print(args)
 
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     start = time.time()
     model = cedar.tree(epsilon=args.epsilon,
                        lmbda=args.lmbda,
+                       topd=args.topd,
                        criterion=args.criterion,
+                       atol=args.atol,
                        max_depth=args.max_depth,
                        random_state=args.rs,
                        cedar_type=args.cedar_type)
@@ -91,11 +94,13 @@ if __name__ == '__main__':
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
 
     # model hyperparameters
-    parser.add_argument('--cedar_type', default='1', help='dataset to use for the experiment.')
+    parser.add_argument('--cedar_type', default='pyramid_top', help='dataset to use for the experiment.')
     parser.add_argument('--epsilon', type=float, default=1.0, help='setting for certified adversarial ordering.')
     parser.add_argument('--lmbda', type=float, default=0.1, help='noise hyperparameter.')
+    parser.add_argument('--topd', type=int, default=1, help='no. non-random layers.')
     parser.add_argument('--max_depth', type=int, default=3, help='maximum depth of the tree.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
+    parser.add_argument('--atol', type=float, default=1e-7, help='clip unnormalized probabilties to this value.')
 
     # update settings
     parser.add_argument('--add', action='store_true', default=False, help='add instances.')
