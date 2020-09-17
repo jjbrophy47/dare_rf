@@ -1,5 +1,4 @@
 # directories
-data
 output
 myenv
 notes
@@ -18,6 +17,24 @@ jobs/logs/
 **.c
 **.so
 **.html
-
 **catboost*
 **.cb.json
+
+# data
+data/*/raw/*
+!data/*/raw/readme.txt
+data/*/*.npy
+data/5xor
+data/6xor
+data/activity
+data/amazon
+data/dota2
+data/mfc18
+data/mfc18_mfc19
+data/mfc19
+data/mfc20
+data/mushroom
+data/nc17
+data/no_show
+data/spect
+data/summary.txt
