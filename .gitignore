@@ -1,0 +1,23 @@
+# directories
+data
+output
+myenv
+notes
+
+# build and log directories
+jobs/errors/
+jobs/logs/
+**__pycache__/
+**build/
+**.temp
+
+# files
+**temp*
+**save*
+**results*
+**.c
+**.so
+**.html
+
+**catboost*
+**.cb.json
