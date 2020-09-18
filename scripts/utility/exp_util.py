@@ -2,6 +2,7 @@
 Utility methods to make epxeriments easier.
 """
 import numpy as np
+from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import average_precision_score
@@ -28,6 +29,45 @@ def performance(model, X_test, y_test, logger=None,
         print(score_str.format(name, auc, acc))
 
     return auc, acc, ap
+
+
+def explain(model, X_train, y_train, X_test, y_test=None):
+    """
+    Generate an instance-attribution explanation for each test
+    instance, returning a matrix of shape=(no. train, X.shape[0]).
+
+    Entry i, j in the matrix represents the effect training
+    sample i has on the prediction of test instance j.
+
+    If the labels of the test instances are given (y), then positive
+    numbers in the matrix correspond to training samples that contribute
+    towards the predicted label, and vice versa if negative.
+    Otherwise, the value in each cell is simply the difference from the
+    original prediction.
+    """
+    assert X_train.shape[1] == X_test.shape[1]
+    if y_test is not None:
+        assert y_test.ndim == 1
+
+    # setup containers
+    initial_proba = model.predict_proba(X_test)[:, 1]
+    impact = np.zeros(shape=(X_train.shape[0], X_test.shape[0]))
+
+    # measure the effect of each training sample
+    for i in tqdm(range(X_train.shape[0])):
+        model.delete(i)
+        proba = model.predict_proba(X_test)[:, 1]
+        impact[i] = initial_proba - proba
+
+        # flip contribution for predictions whose label=1
+        if y_test is not None:
+            for j in range(X_test.shape[0]):
+                if y_test[j] == 1:
+                    impact[i][j] *= -1
+
+        model.add(X_train[[i]], y_train[[i]])
+
+    return impact
 
 
 def get_random_state(seed):

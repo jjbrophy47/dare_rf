@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=logo.png?raw=true" alt="logo"/>
+  <img src=images/logo.png?raw=true" alt="logo"/>
 </p>
 
 ---
@@ -9,7 +9,5 @@
 
 Install
 ---
-1. Clone or fork this repository.
-1. Install dependencies:
-    1. Install Python >= 3.7.
-    1. Install DART and all Python 3 modules: `make all`.
+1. Install Python 3.7 or greater.
+1. Run `make all`.
