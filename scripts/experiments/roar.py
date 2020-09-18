@@ -1,5 +1,5 @@
 """
-Generate an instance-attribution explanation.
+Remove and Retrain (ROAR) experiment.
 """
 import os
 import sys
@@ -141,7 +141,16 @@ def experiment(args, logger, out_dir):
         train_order = np.argsort(np.sum(explanation, axis=1))[::-1]
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
+    # D-DART
+    elif args.method == 'dart2':
+        logger.info('\nordering by D-DART...')
+        explanation = exp_util.explain(model, X_train, y_train, X_test, y_test=y_test)
+        train_order = np.argsort(np.sum(explanation, axis=1))[::-1]
+        results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
+
     logger.info('time: {:3f}s'.format(time.time() - start))
+
+    results['percentage'] = percentages
     np.save(os.path.join(out_dir, 'results.npy'), results)
 
 

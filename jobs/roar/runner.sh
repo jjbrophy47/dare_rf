@@ -9,10 +9,14 @@ criterion=$2
 n_estimators=$3
 max_depth=$4
 max_features=$5
+method=$6
+rs=$7
 
-python3 scripts/experiments/explain.py \
+python3 scripts/experiments/roar.py \
   --dataset $dataset \
   --criterion $criterion \
   --n_estimators $n_estimators \
   --max_depth $max_depth \
-  --max_features $max_features
+  --max_features $max_features \
+  --method $method \
+  --rs $rs

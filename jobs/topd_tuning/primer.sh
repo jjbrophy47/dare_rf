@@ -15,10 +15,10 @@ for rs in ${rs_list[@]}; do
     sbatch --mem=${mem}G \
            --time=$time \
            --partition=$partition \
-           --job-name=TOPD_$dataset \
+           --job-name=TT_$dataset \
            --output=jobs/logs/topd_tuning/$dataset \
            --error=jobs/errors/topd_tuning/$dataset \
            jobs/topd_tuning/runner.sh $dataset \
            $n_estimators $max_depth $max_features \
-           $tune_frac $scoring $criterion
+           $tune_frac $scoring $criterion $rs
 done

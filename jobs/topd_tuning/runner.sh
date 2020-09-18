@@ -11,7 +11,14 @@ max_features=$4
 tune_frac=$5
 scoring=$6
 criterion=$7
+rs=$8
 
-python3 scripts/experiments/topd_tuning.py --dataset $dataset \
-    --n_estimators $n_estimators --max_depth $max_depth --max_features $max_features \
-    --tune_frac $tune_frac --scoring $scoring --criterion $criterion
+python3 scripts/experiments/topd_tuning.py \
+    --dataset $dataset \
+    --n_estimators $n_estimators \
+    --max_depth $max_depth \
+    --max_features $max_features \
+    --tune_frac $tune_frac \
+    --scoring $scoring \
+    --criterion $criterion \
+    --rs $rs

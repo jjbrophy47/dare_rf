@@ -8,8 +8,8 @@ jobs/errors/
 jobs/logs/
 **__pycache__/
 **build/
-**.temp
-**.ipynb_checkpoints
+**.temp/
+**.ipynb_checkpoints/
 
 # files
 **temp*
