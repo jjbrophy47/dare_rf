@@ -53,6 +53,7 @@ cdef class _TreeBuilder:
         self.tree_budget = tree_budget
         self.topd = topd
         self.min_support = min_support
+        self.max_features = max_features
         self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
     cpdef void build(self, _Tree tree):
@@ -109,6 +110,7 @@ cdef class _TreeBuilder:
             self.splitter.select_features(&node, n_features, n_max_features,
                                           invalid_features, n_invalid_features,
                                           random_state)
+
             self.splitter.compute_splits(&node, X, y, samples, n_samples)
 
             if not is_middle_leaf:
@@ -192,10 +194,11 @@ cdef class _TreeBuilder:
         """
         Create and initialize a new node.
         """
-        cdef int topd = self.topd
-        cdef double tree_budget = self.tree_budget
         cdef double n_topd_nodes = pow(2, self.topd) - 1
-        cdef double budget = self.tree_budget / (pow(2, self.topd) - 1)
+        cdef double budget = 0
+
+        if n_topd_nodes > 0:
+            budget = self.tree_budget / n_topd_nodes
 
         cdef Node *node = <Node *>malloc(sizeof(Node))
         node.depth = depth
