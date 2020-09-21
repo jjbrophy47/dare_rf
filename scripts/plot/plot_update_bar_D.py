@@ -31,17 +31,17 @@ dataset_dict = {'surgical': ('acc', 250, 20, [2, 13, 18, 19]),
                 'synthetic': ('acc', 250, 20, [2, 4, 6, 9]),
                 'higgs': ('acc', 100, 10, [1, 2, 4, 5])}
 
-dataset_dict = {'surgical': ('acc', 100, 10, [0, 3, 4, 6]),
-                'vaccine': ('acc', 250, 20, [0, 8, 12, 15]),
+dataset_dict = {'surgical': ('acc', 250, 10, [0, 2, 4, 6]),
+                'vaccine': ('acc', 250, 20, [0, 8, 10, 15]),
                 'adult': ('acc', 250, 20, [11, 12, 14, 16]),
-                'bank_marketing': ('auc', 100, 10, [2, 4, 5, 7]),
-                'flight_delays': ('auc', 250, 20, [2, 5, 10, 17]),
-                'diabetes': ('acc', 250, 20, [2, 6, 11, 17]),
-                'olympics': ('auc', 250, 20, [0, 0, 1, 2]),
-                'census': ('auc', 250, 20, [3, 6, 9, 15]),
-                'credit_card': ('ap', 250, 20, [2, 4, 6, 13]),
+                'bank_marketing': ('auc', 250, 10, [3, 4, 6, 7]),
+                'flight_delays': ('auc', 250, 20, [1, 3, 8, 15]),
+                'diabetes': ('acc', 250, 20, [3, 7, 10, 16]),
+                'olympics': ('auc', 250, 20, [0, 1, 1, 3]),
+                'census': ('auc', 250, 20, [3, 6, 10, 15]),
+                'credit_card': ('ap', 250, 10, [1, 2, 2, 3]),
                 'synthetic': ('acc', 250, 20, [1, 3, 5, 7]),
-                'higgs': ('acc', 100, 10, [0, 1, 2, 3])}
+                'higgs': ('acc', 100, 10, [0, 1, 2, 4])}
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
@@ -77,6 +77,7 @@ def organize_results(args, df):
         temp1 = temp1[temp1['max_depth'] == max_depth]
 
         if len(temp1) < 4:
+            print(temp1, dataset)
             continue
 
         n_datasets += 1
@@ -311,7 +312,7 @@ if __name__ == '__main__':
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays',
                                  'diabetes', 'olympics', 'census', 'credit_card', 'synthetic',
                                  'higgs'])
-    parser.add_argument('--in_dir', type=str, default='output/', help='input directory.')
+    parser.add_argument('--in_dir', type=str, default='output/update/csv/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/plots/update_bar_D/', help='output directory.')
 
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')

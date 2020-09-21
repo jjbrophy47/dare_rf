@@ -61,7 +61,6 @@ cdef class _Adder:
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
-        self.sim_mode = 0
         self.capacity = 10
         self.add_count = 0
         self.add_types = <int *>malloc(self.capacity * sizeof(int))
@@ -78,7 +77,7 @@ cdef class _Adder:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef int add(self, _Tree tree, bint sim_mode):
+    cpdef int add(self, _Tree tree):
         """
         Add the data to the learned _Tree.
         """
@@ -96,9 +95,7 @@ cdef class _Adder:
         self.manager.get_data(&X, &y)
 
         # check if any layer needs to be retrained
-        self.sim_mode = sim_mode
         self._add(&tree.root, X, y, samples, n_samples)
-        self.sim_mode = 0
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -133,7 +130,6 @@ cdef class _Adder:
 
         # bottom node
         if is_bottom_leaf:
-            # printf('[A] bottom leaf\n')
             self._add_add_type(result, node.depth)
             self._update_leaf(&node, y, samples, n_samples, pos_count)
             free(samples)
@@ -154,8 +150,10 @@ cdef class _Adder:
             # retrain
             if result == 2:
 
-                if self.sim_mode:
-                    self.retrain_sample_count += node.count
+                # simulation mode, do not actually retrain
+                if self.tree_builder.sim_mode:
+                    self.tree_builder.sim_depth = node.depth
+                    self.retrain_sample_count += node.count + n_samples
                     return
 
                 # exact node, ONLY retrain the node
@@ -193,6 +191,12 @@ cdef class _Adder:
                     self._update_decision_node(&node, &split)
                     free(samples)
 
+                    # prevent sim mode from updating beyond the deletion point
+                    if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
+                        free(split.left_indices)
+                        free(split.right_indices)
+                        return
+
                     # traverse left
                     if split.left_count > 0:
                         self._add(&node.left, X, y, split.left_indices, split.left_count)
@@ -214,10 +218,11 @@ cdef class _Adder:
         """
         Update leaf node: count, pos_count, value, leaf_samples.
         """
-        if self.sim_mode:
-            return
-
         cdef Node* node = node_ptr[0]
+
+        if self.tree_builder.sim_mode:
+            self.tree_builder.sim_depth = node.depth
+            return
 
         # add samples to leaf
         cdef int* leaf_samples = <int *>malloc((node.count + n_samples) * sizeof(int))
@@ -329,7 +334,7 @@ cdef class _Adder:
         """
         Update tree with node metadata.
         """
-        if self.sim_mode:
+        if self.tree_builder.sim_mode:
             return
 
         cdef Node* node = node_ptr[0]

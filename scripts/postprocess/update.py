@@ -294,7 +294,7 @@ if __name__ == '__main__':
     # hyperparameter settings
     parser.add_argument('--n_estimators', type=int, nargs='+', default=[10, 25, 50, 100, 250, 500], help='no. trees.')
     parser.add_argument('--max_depth', type=int, nargs='+', default=[1, 3, 5, 10, 15, 20], help='max depth.')
-    parser.add_argument('--max_features', type=float, nargs='+', default=[-1, 0.25], help='max features.')
+    parser.add_argument('--max_features', type=float, nargs='+', default=[-1.0, 0.25], help='max features.')
     parser.add_argument('--topd', type=int, nargs='+', default=list(range(21)), help='top d.')
     parser.add_argument('--min_support', type=int, nargs='+', default=[2], help='minimum support.')
     parser.add_argument('--epsilon', type=float, nargs='+', default=[10.0, 100.0], help='epsilon.')

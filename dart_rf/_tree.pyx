@@ -54,6 +54,16 @@ cdef class _TreeBuilder:
         self.max_features = max_features
         self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
+        self.sim_mode = 0
+        self.sim_depth = -1
+
+    cpdef void set_sim_mode(self, bint sim_mode):
+        """
+        Turns simulation mode on/off, and resets the simulation depth.
+        """
+        self.sim_mode = sim_mode
+        self.sim_depth = -1
+
     cpdef void build(self, _Tree tree):
         """
         Build a decision tree from the training set (X, y).

@@ -28,11 +28,8 @@ cdef class _Remover:
     cdef int* remove_depths          # Depth of leaf or node needing retraining
     cdef int  retrain_sample_count   # Number of samples used for retraining
 
-    # Simluation structures
-    cdef bint sim_mode               # If True, deletes a sample without retraining
-
     # Python API
-    cpdef int remove(self, _Tree tree, np.ndarray remove_indices, bint sim_mode)
+    cpdef int remove(self, _Tree tree, np.ndarray remove_indices)
     cpdef void clear_remove_metrics(self)
 
     # C API

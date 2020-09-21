@@ -86,8 +86,11 @@ cdef class _TreeBuilder:
     cdef int          min_support          # Minimum number of samples to be a semi-random node
     cdef int          max_features         # Maximum number of features to consider at each split
     cdef UINT32_t     rand_r_state         # sklearn_rand_r random number state
+    cdef bint         sim_mode             # Activates simulation mode
+    cdef int          sim_depth            # Depth of previous operation completion
 
     # Python API
+    cpdef void set_sim_mode(self, bint sim_mode)
     cpdef void build(self, _Tree tree)
 
     # C API

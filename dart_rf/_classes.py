@@ -177,7 +177,7 @@ class Forest(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
-    def add(self, X, y, get_indices=False, sim_mode=False):
+    def add(self, X, y, get_indices=False):
         """
         Adds instances to the database and updates the model.
         """
@@ -190,7 +190,7 @@ class Forest(object):
 
         # update trees
         for i in range(len(self.trees_)):
-            self.trees_[i].add(sim_mode=sim_mode)
+            self.trees_[i].add()
 
         # cleanup
         if get_indices:
@@ -198,7 +198,7 @@ class Forest(object):
         else:
             self.manager_.clear_add_indices()
 
-    def delete(self, remove_indices, sim_mode=False):
+    def delete(self, remove_indices):
         """
         Removes instances from the database and updates the model.
         """
@@ -214,7 +214,7 @@ class Forest(object):
 
         # update trees
         for i in range(len(self.trees_)):
-            self.trees_[i].delete(remove_indices, sim_mode=sim_mode)
+            self.trees_[i].delete(remove_indices)
 
         # remove data from the database
         self.manager_.remove_data(remove_indices)
@@ -309,6 +309,13 @@ class Forest(object):
         """
         for tree in self.trees_:
             tree.clear_add_metrics()
+
+    def set_sim_mode(self, sim_mode=False):
+        """
+        Turns simulation mode on/off.
+        """
+        for tree in self.trees_:
+            tree.set_sim_mode(sim_mode=sim_mode)
 
     def get_params(self, deep=False):
         """
@@ -484,7 +491,7 @@ class Tree(object):
             self.tree_.print_value()
             print()
 
-    def add(self, X=None, y=None, get_indices=False, sim_mode=False):
+    def add(self, X=None, y=None, get_indices=False):
         """
         Adds instances to the database and updates the model.
         """
@@ -501,7 +508,7 @@ class Tree(object):
             self.manager_.add_data(X, y)
 
         # update model
-        self.adder_.add(self.tree_, sim_mode)
+        self.adder_.add(self.tree_)
 
         # cleanup
         if self.single_tree_:
@@ -510,7 +517,7 @@ class Tree(object):
             else:
                 self.manager_.clear_add_indices()
 
-    def delete(self, remove_indices, sim_mode=False):
+    def delete(self, remove_indices):
         """
         Removes instances from the database and updates the model.
         """
@@ -527,7 +534,7 @@ class Tree(object):
             remove_indices = np.unique(remove_indices).astype(np.int32)
 
         # update model
-        rc = self.remover_.remove(self.tree_, remove_indices, sim_mode)
+        rc = self.remover_.remove(self.tree_, remove_indices)
         if rc == -1:
             exit('Removal index invalid!')
 
@@ -596,6 +603,12 @@ class Tree(object):
         n_semi_random_nodes = self.tree_.get_random_node_count(self.topd_,
                                                                self.min_support)
         return n_nodes, n_exact_nodes, n_semi_random_nodes
+
+    def set_sim_mode(self, sim_mode=False):
+        """
+        Turns simulation mode on/off.
+        """
+        self.tree_builder_.set_sim_mode(sim_mode)
 
     def get_params(self, deep=False):
         """

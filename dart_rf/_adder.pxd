@@ -27,11 +27,8 @@ cdef class _Adder:
     cdef int* add_depths             # Depth of leaf or node needing retraining
     cdef int  retrain_sample_count   # Number of samples used for retraining
 
-    # Simulation structures
-    cdef bint sim_mode               # adds a sample without retraining
-
     # Python API
-    cpdef int  add(self, _Tree tree, bint sim_mode)
+    cpdef int  add(self, _Tree tree)
     cpdef void clear_add_metrics(self)
 
     # C API

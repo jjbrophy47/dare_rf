@@ -59,7 +59,7 @@ cdef class _Remover:
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
-        self.sim_mode = 0
+        # self.sim_mode = 0
         self.capacity = 10
         self.remove_count = 0
         self.remove_types = <int *>malloc(self.capacity * sizeof(int))
@@ -76,7 +76,7 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef int remove(self, _Tree tree, np.ndarray remove_indices, bint sim_mode):
+    cpdef int remove(self, _Tree tree, np.ndarray remove_indices):
         """
         Remove the data from remove_indices from the learned _Tree.
         """
@@ -95,9 +95,9 @@ cdef class _Remover:
             return -1
 
         # check if any node at any layer needs to retrain
-        self.sim_mode = sim_mode
+        # self.sim_mode = sim_mode
         self._remove(&tree.root, X, y, samples, n_samples)
-        self.sim_mode = 0
+        # self.sim_mode = 0
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -127,6 +127,7 @@ cdef class _Remover:
 
         # bottom node
         if is_bottom_leaf:
+            # printf('[R] bottom leaf, depth=%d\n', node.depth)
             self._add_removal_type(result, node.depth)
             self._update_leaf(&node, y, samples, n_samples, pos_count)
             free(samples)
@@ -137,6 +138,7 @@ cdef class _Remover:
 
             # leaf node
             if node.is_leaf:
+                # printf('[R] middle leaf, depth=%d\n', node.depth)
                 self._add_removal_type(result, node.depth)
                 self._update_leaf(&node, y, samples, n_samples, pos_count)
                 free(samples)
@@ -148,12 +150,14 @@ cdef class _Remover:
 
                 # convert to leaf
                 if result == 1:
+                    # printf('[R] convert to leaf, depth=%d\n', node.depth)
                     self._add_removal_type(result, node.depth)
                     self._convert_to_leaf(&node, samples, n_samples, &split)
                     free(samples)
 
                 # exact node, retrain
                 elif result == 2:
+                    # printf('[R] retrain, depth=%d\n', node.depth)
                     self._add_removal_type(result, node.depth)
                     self._retrain(&node_ptr, X, y, samples, n_samples)
                     free(samples)
@@ -163,6 +167,13 @@ cdef class _Remover:
 
                     self._update_decision_node(&node, &split)
                     free(samples)
+
+                    # prevent sim mode from updating beyond the deletion point
+                    if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
+                        # printf('[A] decision node, depth=%d\n', node.depth)
+                        free(split.left_indices)
+                        free(split.right_indices)
+                        return
 
                     # traverse left
                     if split.left_count > 0:
@@ -185,10 +196,11 @@ cdef class _Remover:
         """
         Update leaf node: count, pos_count, value, leaf_samples.
         """
-        if self.sim_mode:
-            return
-
         cdef Node* node = node_ptr[0]
+
+        if self.tree_builder.sim_mode:
+            self.tree_builder.sim_depth = node.depth
+            return
 
         # remove samples from leaf
         cdef int* leaf_samples = <int *>malloc((node.count - n_samples) * sizeof(int))
@@ -212,10 +224,12 @@ cdef class _Remover:
         """
         Convert decision node to a leaf node.
         """
-        if self.sim_mode:
+        cdef Node* node = node_ptr[0]
+
+        if self.tree_builder.sim_mode:
+            self.tree_builder.sim_depth = node.depth
             return
 
-        cdef Node* node = node_ptr[0]
         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
         cdef int  leaf_samples_count = 0
         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
@@ -246,8 +260,9 @@ cdef class _Remover:
         """
         cdef Node*  node = node_pp[0][0]
 
-        if self.sim_mode:
-            self.retrain_sample_count += node.count
+        if self.tree_builder.sim_mode:
+            self.tree_builder.sim_depth = node.depth
+            self.retrain_sample_count += node.count - n_samples
             return
 
         cdef Node** node_ptr = node_pp[0]
@@ -288,6 +303,8 @@ cdef class _Remover:
         cdef int i
         cdef int j
 
+        # cdef int samples_added = 0
+
         if node.is_leaf:
 
             for i in range(node.count):
@@ -301,6 +318,9 @@ cdef class _Remover:
                 if add_sample:
                     leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]
                     leaf_samples_count_ptr[0] += 1
+                    # samples_added += 1
+
+            # printf('[GLS] node.count=%d, samples_added=%d, n_remove_samples=%d\n', node.count, samples_added, n_remove_samples)
 
         else:
             if node.left:
@@ -317,7 +337,7 @@ cdef class _Remover:
         """
         Update tree with node metadata.
         """
-        if self.sim_mode:
+        if self.tree_builder.sim_mode:
             return
 
         cdef Node* node = node_ptr[0]
@@ -369,6 +389,8 @@ cdef class _Remover:
                     if split_score < best_score:
                         best_score = split_score
                         chosen_ndx = j
+
+                # printf('[CN] chosen feature=%d\n', node.features[chosen_ndx])
 
                 # same feature is still best
                 if node.feature == node.features[chosen_ndx]:

@@ -151,36 +151,46 @@ def get_update_ndx(model, X_train, y_train, indices):
     np.random.seed(args.rs)
     subsample_indices = np.random.choice(indices, size=args.subsample_size, replace=False)
 
+    if args.subsample_size == 1:
+        return subsample_indices[0], time.time() - start
+
     # test subsamples
     ndx_cost_list = []
     for j, subsample_ndx in enumerate(subsample_indices):
 
+        model.set_sim_mode(True)
+
         if args.operation == 'delete':
 
             # delete test sample
-            model.delete(subsample_ndx, sim_mode=True)
+            model.delete(subsample_ndx)
 
             sample_cost = model.get_removal_retrain_sample_count()
             ndx_cost_list.append((subsample_ndx, sample_cost))
+            delete_cost = sample_cost
             model.clear_removal_metrics()
 
             # add sample back in to reset for the next test sample
-            model.add(X_train[[subsample_ndx]], y_train[[subsample_ndx]], sim_mode=True)
+            model.add(X_train[[subsample_ndx]], y_train[[subsample_ndx]])
+            add_cost = model.get_add_retrain_sample_count()
+            # print('  [candidate {}] delete cost={}, add cost={}'.format(subsample_ndx, delete_cost, add_cost))
             model.clear_add_metrics()
 
         # add operation
         else:
             # delete test sample
             add_indices = model.add(X_train[[subsample_ndx]], y_train[[subsample_ndx]],
-                                    get_indices=True, sim_mode=True)
+                                    get_indices=True)
 
             sample_cost = model.get_add_retrain_sample_count()
             ndx_cost_list.append((subsample_ndx, sample_cost))
             model.clear_add_metrics()
 
             # delete sample to reset for the next test sample
-            model.delete(add_indices, sim_mode=True)
+            model.delete(add_indices)
             model.clear_removal_metrics()
+
+        model.set_sim_mode(False)
 
     # extract best sample based on update time
     ndx_cost_list = sorted(ndx_cost_list, key=lambda x: x[1])[::-1]
