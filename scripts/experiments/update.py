@@ -167,13 +167,10 @@ def get_update_ndx(model, X_train, y_train, indices):
 
             sample_cost = model.get_removal_retrain_sample_count()
             ndx_cost_list.append((subsample_ndx, sample_cost))
-            delete_cost = sample_cost
             model.clear_removal_metrics()
 
             # add sample back in to reset for the next test sample
             model.add(X_train[[subsample_ndx]], y_train[[subsample_ndx]])
-            add_cost = model.get_add_retrain_sample_count()
-            # print('  [candidate {}] delete cost={}, add cost={}'.format(subsample_ndx, delete_cost, add_cost))
             model.clear_add_metrics()
 
         # add operation

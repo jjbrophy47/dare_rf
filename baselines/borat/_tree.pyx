@@ -54,6 +54,8 @@ cdef class _TreeBuilder:
         self.max_features = max_features
         self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
+        self.features = NULL
+
     cpdef void build(self, _Tree tree):
         """
         Build a decision tree from the training set (X, y).
@@ -107,7 +109,9 @@ cdef class _TreeBuilder:
         else:
             self.splitter.select_features(&node, n_features, n_max_features,
                                           invalid_features, n_invalid_features,
-                                          random_state)
+                                          random_state, self.features)
+            self.features = NULL
+
             self.splitter.compute_splits(&node, X, y, samples, n_samples)
 
             if not is_middle_leaf:

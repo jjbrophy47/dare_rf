@@ -82,6 +82,7 @@ cdef class _TreeBuilder:
     cdef int          min_support          # Minimum number of samples to be a semi-random node
     cdef int          max_features         # Maximum number of features to consider at each split
     cdef UINT32_t     rand_r_state         # sklearn_rand_r random number state
+    cdef int*         features             # Features to use whn retraining a node
 
     # Python API
     cpdef void build(self, _Tree tree)

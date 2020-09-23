@@ -88,9 +88,7 @@ cdef class _Adder:
         self.manager.get_data(&X, &y)
 
         # add sample to the tree
-        # self.sim_mode = sim_mode
         self._add(&tree.root, X, y, samples, n_samples)
-        # self.sim_mode = -1
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -120,7 +118,6 @@ cdef class _Adder:
 
         # bottom node
         if is_bottom_leaf:
-            # printf('[A] bottom leaf, depth=%d\n', node.depth)
             self._add_add_type(result, node.depth)
             self._update_leaf(&node, y, samples, n_samples, pos_count)
             free(samples)
@@ -134,14 +131,12 @@ cdef class _Adder:
 
             # convert leaf to decision node
             if result == 1:
-                # printf('[A] convert leaf -> decision, depth=%d\n', node.depth)
                 self._add_add_type(result, node.depth)
                 self._retrain(&node_ptr, X, y, samples, n_samples)
                 free(samples)
 
             # retrain
             elif result == 2:
-                # printf('[A] retrain, depth=%d\n', node.depth)
                 self._add_add_type(result, node.depth)
                 self._retrain(&node_ptr, X, y, samples, n_samples)
                 free(samples)
@@ -151,7 +146,6 @@ cdef class _Adder:
 
                 # leaf node
                 if node.is_leaf:
-                    # printf('[A] middle leaf, depth=%d\n', node.depth)
                     self._add_add_type(result, node.depth)
                     self._update_leaf(&node, y, samples, n_samples, pos_count)
                     free(samples)
@@ -163,7 +157,6 @@ cdef class _Adder:
 
                     # prevent sim mode from updating beyond the deletion point
                     if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
-                        # printf('[A] decision node, depth=%d\n', node.depth)
                         free(split.left_indices)
                         free(split.right_indices)
                         return
@@ -239,6 +232,8 @@ cdef class _Adder:
         self.retrain_sample_count += leaf_samples_count
 
         invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
+        self.tree_builder.features = copy_int_array(node.features, node.features_count)
+
         dealloc(node)
         free(node)
 

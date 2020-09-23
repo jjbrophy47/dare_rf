@@ -41,4 +41,4 @@ cdef class _Splitter:
 
     cdef void select_features(self, Node** node, int n_features, int n_max_features,
                               int* invalid_features, int n_invalid_features,
-                              UINT32_t* random_state) nogil
+                              UINT32_t* random_state, int* features) nogil

@@ -56,6 +56,7 @@ cdef class _TreeBuilder:
 
         self.sim_mode = 0
         self.sim_depth = -1
+        self.features = NULL
 
     cpdef void set_sim_mode(self, bint sim_mode):
         """
@@ -117,7 +118,9 @@ cdef class _TreeBuilder:
         else:
             self.splitter.select_features(&node, n_features, n_max_features,
                                           invalid_features, n_invalid_features,
-                                          random_state)
+                                          random_state, self.features)
+            self.features = NULL
+
             self.splitter.compute_splits(&node, X, y, samples, n_samples)
 
             if not is_middle_leaf:

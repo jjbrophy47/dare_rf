@@ -270,6 +270,8 @@ cdef class _Remover:
         self.retrain_sample_count += leaf_samples_count
 
         invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
+        self.tree_builder.features = copy_int_array(node.features, node.features_count)
+
         dealloc(node)
         free(node)
 

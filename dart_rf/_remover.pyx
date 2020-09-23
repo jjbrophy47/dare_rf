@@ -59,7 +59,6 @@ cdef class _Remover:
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
-        # self.sim_mode = 0
         self.capacity = 10
         self.remove_count = 0
         self.remove_types = <int *>malloc(self.capacity * sizeof(int))
@@ -95,9 +94,7 @@ cdef class _Remover:
             return -1
 
         # check if any node at any layer needs to retrain
-        # self.sim_mode = sim_mode
         self._remove(&tree.root, X, y, samples, n_samples)
-        # self.sim_mode = 0
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -127,7 +124,6 @@ cdef class _Remover:
 
         # bottom node
         if is_bottom_leaf:
-            # printf('[R] bottom leaf, depth=%d\n', node.depth)
             self._add_removal_type(result, node.depth)
             self._update_leaf(&node, y, samples, n_samples, pos_count)
             free(samples)
@@ -138,7 +134,6 @@ cdef class _Remover:
 
             # leaf node
             if node.is_leaf:
-                # printf('[R] middle leaf, depth=%d\n', node.depth)
                 self._add_removal_type(result, node.depth)
                 self._update_leaf(&node, y, samples, n_samples, pos_count)
                 free(samples)
@@ -150,14 +145,12 @@ cdef class _Remover:
 
                 # convert to leaf
                 if result == 1:
-                    # printf('[R] convert to leaf, depth=%d\n', node.depth)
                     self._add_removal_type(result, node.depth)
                     self._convert_to_leaf(&node, samples, n_samples, &split)
                     free(samples)
 
                 # exact node, retrain
                 elif result == 2:
-                    # printf('[R] retrain, depth=%d\n', node.depth)
                     self._add_removal_type(result, node.depth)
                     self._retrain(&node_ptr, X, y, samples, n_samples)
                     free(samples)
@@ -170,7 +163,6 @@ cdef class _Remover:
 
                     # prevent sim mode from updating beyond the deletion point
                     if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
-                        # printf('[A] decision node, depth=%d\n', node.depth)
                         free(split.left_indices)
                         free(split.right_indices)
                         return
@@ -276,8 +268,6 @@ cdef class _Remover:
         cdef int* invalid_features = NULL
         cdef int  invalid_features_count = node.invalid_features_count
 
-        cdef int i
-
         self._get_leaf_samples(node, samples, n_samples,
                                &leaf_samples, &leaf_samples_count)
         leaf_samples = <int *>realloc(leaf_samples, leaf_samples_count * sizeof(int))
@@ -285,6 +275,8 @@ cdef class _Remover:
         self.retrain_sample_count += leaf_samples_count
 
         invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
+        self.tree_builder.features = copy_int_array(node.features, node.features_count)
+
         dealloc(node)
         free(node)
 
@@ -303,8 +295,6 @@ cdef class _Remover:
         cdef int i
         cdef int j
 
-        # cdef int samples_added = 0
-
         if node.is_leaf:
 
             for i in range(node.count):
@@ -318,9 +308,6 @@ cdef class _Remover:
                 if add_sample:
                     leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]
                     leaf_samples_count_ptr[0] += 1
-                    # samples_added += 1
-
-            # printf('[GLS] node.count=%d, samples_added=%d, n_remove_samples=%d\n', node.count, samples_added, n_remove_samples)
 
         else:
             if node.left:
@@ -389,8 +376,6 @@ cdef class _Remover:
                     if split_score < best_score:
                         best_score = split_score
                         chosen_ndx = j
-
-                # printf('[CN] chosen feature=%d\n', node.features[chosen_ndx])
 
                 # same feature is still best
                 if node.feature == node.features[chosen_ndx]:

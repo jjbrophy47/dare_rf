@@ -171,7 +171,7 @@ cdef class _Splitter:
     @cython.cdivision(True)
     cdef void select_features(self, Node** node_ptr, int n_features, int n_max_features,
                               int* invalid_features, int n_invalid_features,
-                              UINT32_t* random_state) nogil:
+                              UINT32_t* random_state, int* features) nogil:
         """
         Select a random subset of features that are not alread used.
         """
@@ -180,6 +180,14 @@ cdef class _Splitter:
         cdef int n_elem = n_max_features
         if n_features - n_invalid_features < n_max_features:
             n_elem = n_features - n_invalid_features
+
+        # use the same features from the node being retrained
+        if features:
+            node.features = features
+            node.features_count = n_elem
+            node.invalid_features = invalid_features
+            node.invalid_features_count = n_invalid_features
+            return
 
         cdef int ndx
 
