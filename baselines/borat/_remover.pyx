@@ -59,7 +59,6 @@ cdef class _Remover:
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
-        self.sim_mode = 0
         self.capacity = 10
         self.remove_count = 0
         self.remove_types = <int *>malloc(self.capacity * sizeof(int))
@@ -76,7 +75,7 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef int remove(self, _Tree tree, np.ndarray remove_indices, bint sim_mode):
+    cpdef int remove(self, _Tree tree, np.ndarray remove_indices):
         """
         Remove the data from remove_indices from the learned _Tree.
         """
@@ -95,9 +94,7 @@ cdef class _Remover:
             return -1
 
         # check if any node at any layer needs to retrain
-        self.sim_mode = sim_mode
         self._remove(&tree.root, X, y, samples, n_samples)
-        self.sim_mode = 0
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -164,6 +161,12 @@ cdef class _Remover:
                     self._update_decision_node(&node, &split)
                     free(samples)
 
+                    # prevent sim mode from updating beyond the deletion point
+                    if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
+                        free(split.left_indices)
+                        free(split.right_indices)
+                        return
+
                     # traverse left
                     if split.left_count > 0:
                         self._remove(&node.left, X, y, split.left_indices, split.left_count)
@@ -185,10 +188,11 @@ cdef class _Remover:
         """
         Update leaf node: count, pos_count, value, leaf_samples.
         """
-        if self.sim_mode:
-            return
-
         cdef Node* node = node_ptr[0]
+
+        if self.tree_builder.sim_mode
+            self.tree_builder.sim_depth = node.depth
+            return
 
         # remove samples from leaf
         cdef int* leaf_samples = <int *>malloc((node.count - n_samples) * sizeof(int))
@@ -212,10 +216,12 @@ cdef class _Remover:
         """
         Convert decision node to a leaf node.
         """
-        if self.sim_mode:
+        cdef Node* node = node_ptr[0]
+
+        if self.tree_builder.sim_mode
+            self.tree_builder.sim_depth = node.depth
             return
 
-        cdef Node* node = node_ptr[0]
         cdef int* leaf_samples = <int *>malloc(split.count * sizeof(int))
         cdef int  leaf_samples_count = 0
         self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
@@ -246,8 +252,9 @@ cdef class _Remover:
         """
         cdef Node*  node = node_pp[0][0]
 
-        if self.sim_mode:
-            self.retrain_sample_count += node.count
+        if self.tree_builder.sim_mode:
+            self.tree_builder.sim_depth = node.depth
+            self.retrain_sample_count += node.count - n_samples
             return
 
         cdef Node** node_ptr = node_pp[0]
@@ -319,7 +326,8 @@ cdef class _Remover:
         """
         Update tree with node metadata.
         """
-        if self.sim_mode:
+        if self.tree_builder.sim_mode
+            self.tree_builder.sim_depth = node.depth
             return
 
         cdef Node* node = node_ptr[0]
