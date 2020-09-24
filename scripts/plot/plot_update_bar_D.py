@@ -40,7 +40,7 @@ dataset_dict = {'surgical': ('acc', 250, 10, [0, 2, 4, 6]),
                 'olympics': ('auc', 250, 20, [0, 1, 1, 3]),
                 'census': ('auc', 250, 20, [3, 6, 10, 15]),
                 'credit_card': ('ap', 250, 10, [1, 2, 2, 3]),
-                'synthetic': ('acc', 250, 20, [1, 3, 5, 7]),
+                'synthetic': ('acc', 250, 20, [2, 3, 5, 7]),
                 'higgs': ('acc', 100, 10, [0, 1, 2, 4])}
 
 

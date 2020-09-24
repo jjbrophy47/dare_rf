@@ -283,7 +283,7 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/update/csv/', help='output directory.')
 
     # experiment settings
-    parser.add_argument('--operation', type=str, nargs='+', default=['delete', 'add'], help='update operation.')
+    parser.add_argument('--operation', type=str, nargs='+', default=['deletion', 'addition'], help='operation.')
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
                                  'olympics', 'census', 'credit_card', 'synthetic', 'higgs'], help='dataset.')

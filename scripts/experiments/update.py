@@ -121,12 +121,16 @@ def get_allotted_time(args, X_train, y_train, X_test, y_test, logger=None):
     delete_indices = np.random.choice(np.arange(X_train.shape[0]),
                                       size=args.n_update, replace=False)
 
-    if args.operation == 'delete':
+    if args.operation == 'deletion':
         new_X_train = np.delete(X_train, delete_indices, axis=0)
         new_y_train = np.delete(y_train, delete_indices)
-    else:
+
+    elif args.operation == 'addition':
         new_X_train = np.vstack([X_train, X_train[delete_indices]])
         new_y_train = np.concatenate([y_train, y_train[delete_indices]])
+
+    else:
+        raise ValueError('Operation {} unknown!'.format(args.operation))
 
     model = _get_naive(args)
     start = time.time()
@@ -160,7 +164,7 @@ def get_update_ndx(model, X_train, y_train, indices):
 
         model.set_sim_mode(True)
 
-        if args.operation == 'delete':
+        if args.operation == 'deletion':
 
             # delete test sample
             model.delete(subsample_ndx)
@@ -174,7 +178,8 @@ def get_update_ndx(model, X_train, y_train, indices):
             model.clear_add_metrics()
 
         # add operation
-        else:
+        elif args.operation == 'addition':
+
             # delete test sample
             add_indices = model.add(X_train[[subsample_ndx]], y_train[[subsample_ndx]],
                                     get_indices=True)
@@ -186,6 +191,9 @@ def get_update_ndx(model, X_train, y_train, indices):
             # delete sample to reset for the next test sample
             model.delete(add_indices)
             model.clear_removal_metrics()
+
+        else:
+            raise ValueError('Operation {} unknown!'.format(args.operation))
 
         model.set_sim_mode(False)
 
@@ -203,7 +211,7 @@ def update_model(model, X_train, y_train, update_ndx, allotted_time):
     Add or delete the specified sample.
     """
 
-    if args.operation == 'delete':
+    if args.operation == 'deletion':
         start = time.time()
         model.delete(update_ndx)
         update_time = time.time() - start
@@ -211,13 +219,16 @@ def update_model(model, X_train, y_train, update_ndx, allotted_time):
         retrain_depths = model.get_removal_retrain_depths()
         model.clear_removal_metrics()
 
-    else:
+    elif args.operation == 'addition':
         start = time.time()
         model.add(X_train[[update_ndx]], y_train[[update_ndx]])
         update_time = time.time() - start
         sample_cost = model.get_add_retrain_sample_count()
         retrain_depths = model.get_add_retrain_depths()
         model.clear_add_metrics()
+
+    else:
+        raise ValueError('Operation {} unknown!'.format(args.operation))
 
     return model, update_time, sample_cost, retrain_depths
 
@@ -236,12 +247,16 @@ def check_utility(model, X_train, y_train, X_test, y_test,
 
     start = time.time()
 
-    if args.operation == 'delete':
+    if args.operation == 'deletion':
         new_X_train = np.delete(X_train, updated_indices, axis=0)
         new_y_train = np.delete(y_train, updated_indices)
-    else:
+    
+    elif args.operation == 'addition':
         new_X_train = np.vstack([X_train, X_train[updated_indices]])
         new_y_train = np.concatenate([y_train, y_train[updated_indices]])
+
+    else:
+        raise ValueError('Operation {} unknown!'.format(args.operation))
 
     exact_model = _get_naive(args)
     exact_model = exact_model.fit(new_X_train, new_y_train)
@@ -406,6 +421,10 @@ def experiment(args, logger, out_dir, seed):
 
 def main(args):
 
+    # assertions
+    assert args.operation in ['deletion', 'addition']
+    assert args.criterion in ['gini', 'entropy']
+
     # create output dir
     out_dir = os.path.join(args.out_dir,
                            args.dataset,
@@ -459,7 +478,7 @@ if __name__ == '__main__':
 
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
-    parser.add_argument('--operation', type=str, default='delete', help='add or delete.')
+    parser.add_argument('--operation', type=str, default='deletion', help='deletion or addition.')
     parser.add_argument('--n_check', type=int, default=5, help='check utility after no. instances.')
     parser.add_argument('--n_update', type=int, default=1, help='number of instances for naive to add/delete.')
     parser.add_argument('--time_limit', type=int, default=72000, help='seconds given for the entire experiment.')
@@ -468,7 +487,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_depth', type=int, default=10, help='maximum depth of the tree.')
     parser.add_argument('--max_features', type=float, default=0.25, help='maximum features to sample.')
-    parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
+    parser.add_argument('--criterion', type=str, default='gini', help='gini or entropy.')
 
     # DART
     parser.add_argument('--dart', action='store_true', default=False, help='DART model.')
