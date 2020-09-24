@@ -1,5 +1,5 @@
 """
-Module that adds data to a CeDAR tree.
+Data adder.
 """
 from cpython cimport Py_INCREF
 from cpython.ref cimport PyObject

@@ -326,11 +326,11 @@ cdef class _Remover:
         """
         Update tree with node metadata.
         """
+        cdef Node* node = node_ptr[0]
+
         if self.tree_builder.sim_mode:
-            self.tree_builder.sim_depth = node.depth
             return
 
-        cdef Node* node = node_ptr[0]
         node.count = split.count
         node.pos_count = split.pos_count
 
