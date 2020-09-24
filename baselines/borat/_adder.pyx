@@ -184,7 +184,7 @@ cdef class _Adder:
         """
         cdef Node* node = node_ptr[0]
 
-        if self.tree_builder.sim_mode
+        if self.tree_builder.sim_mode:
             self.tree_builder.sim_depth = node.depth
             return
 
