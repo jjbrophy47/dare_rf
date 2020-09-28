@@ -24,6 +24,7 @@ python3 scripts/experiments/update.py \
   --criterion $criterion \
   --n_estimators $n_estimators \
   --max_depth $max_depth \
+  --max_features $max_features \
   --topd $topd \
   --subsample_size $subsample_size \
   --operation $operation \
