@@ -453,6 +453,7 @@ def main(args):
 
     # skip experiment if results already exist
     if args.append_results and os.path.exists(os.path.join(out_dir, 'results.npy')):
+        print('results exist: {}'.format(out_dir))
         return
 
     # create logger
