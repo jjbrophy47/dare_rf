@@ -4,7 +4,6 @@ Plot update results as four clustered bar graphs:
     2) Sub-1000 efficiency
     3) Sub-1 - Sub-1000 efficiency
     4) Test error increase BEFORE addition/deletion
-TODO: sharey
 """
 import os
 import argparse
@@ -144,47 +143,31 @@ def print_summary_stats(summary_stats, subsample_size):
 def main(args):
     print(args)
 
-    if False:
+    # matplotlib settings
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize=24)
+    plt.rc('ytick', labelsize=24)
+    plt.rc('axes', labelsize=24)
+    plt.rc('axes', titlesize=24)
+    plt.rc('legend', fontsize=20)
+    plt.rc('legend', title_fontsize=9)
+    plt.rc('lines', linewidth=2)
+    plt.rc('lines', markersize=5)
 
-        # matplotlib settings
-        plt.rc('font', family='serif')
-        plt.rc('xtick', labelsize=13)
-        plt.rc('ytick', labelsize=13)
-        plt.rc('axes', labelsize=13)
-        plt.rc('axes', titlesize=13)
-        plt.rc('legend', fontsize=11)
-        plt.rc('legend', title_fontsize=9)
-        plt.rc('lines', linewidth=2)
-        plt.rc('lines', markersize=5)
+    # setup figure
+    width = 5
+    width, height = set_size(width=width * 5, fraction=1, subplots=(2, 3))
+    fig = plt.figure(figsize=(width, height * 1.25))
 
-        # setup figure
-        width = 2.5
-        width, height = set_size(width=width * 3, fraction=1, subplots=(2, 3))
-        fig, axs = plt.subplots(4, 1, figsize=(width, height * 3), sharex=True)
-
-    else:
-
-        # matplotlib settings
-        plt.rc('font', family='serif')
-        plt.rc('xtick', labelsize=24)
-        plt.rc('ytick', labelsize=24)
-        plt.rc('axes', labelsize=24)
-        plt.rc('axes', titlesize=24)
-        plt.rc('legend', fontsize=20)
-        plt.rc('legend', title_fontsize=9)
-        plt.rc('lines', linewidth=2)
-        plt.rc('lines', markersize=5)
-
-        # setup figure
-        width = 5
-        width, height = set_size(width=width * 5, fraction=1, subplots=(2, 3))
-        fig, axs = plt.subplots(3, 1, figsize=(width, height * 1.25), sharex=True)
+    ax1 = fig.add_subplot(311)
+    ax2 = fig.add_subplot(312, sharey=ax1, sharex=ax1)
+    ax3 = fig.add_subplot(313, sharex=ax1)
 
     tol_list = ['0.1%', '0.25%', '0.5%', '1.0%']
     labels = ['D-DART']
     labels += ['R-DART (tol={})'.format(tol) for tol in tol_list]
     if args.cedar:
-        labels += [r'CEDR ($\epsilon=$)'.format(args.epsilon[0])]
+        labels += [r'CEDAR ($\epsilon={}$)'.format(args.epsilon[0])]
     colors = ['0.0', '1.0', '0.75', '0.5', '0.25', '0.1']
 
     titles = ['Efficiency Using the Random Adversary (higher is better)',
@@ -224,13 +207,11 @@ def main(args):
     subd_res_df = sub1_res_df.copy()
     for col in n_model_y:
         subd_res_df[col] = sub1_res_df[col] / subX_res_df[col]
-    # subd_n_model_std = [np.mean([x, y]) for x, y in zip(sub1_n_model_std, subX_n_model_std)]
 
     assert sub1_n_datasets == subX_n_datasets
 
     print('\nsub 1:\n{}'.format(sub1_res_df))
     print('\nsub {}:\n{}'.format(args.subsample_size, subX_res_df))
-    # print(subd_res_df.head(5))
 
     n_methods = len(labels)
 
@@ -239,64 +220,51 @@ def main(args):
     metric_diff_yerr = np.reshape(metric_diff_std_list, (n_methods - 1, 2, sub1_n_datasets), order='F')
 
     sub1_res_df.plot(x='dataset', y=n_model_y, yerr=sub1_n_model_yerr, kind='bar',
-                     color=colors, ax=axs[0], edgecolor='k', linewidth=0.5, capsize=2)
+                     color=colors, ax=ax1, edgecolor='k', linewidth=0.5, capsize=2)
 
     subX_res_df.plot(x='dataset', y=n_model_y, yerr=subX_n_model_yerr, kind='bar',
-                       color=colors, ax=axs[1], edgecolor='k', linewidth=0.5, capsize=2)
-
-    # subd_res_df.plot(x='dataset', y=n_model_y, yerr=None, kind='bar',
-    #                  color=colors, ax=axs[2], edgecolor='k', linewidth=0.5, capsize=2)
+                       color=colors, ax=ax2, edgecolor='k', linewidth=0.5, capsize=2)
 
     sub1_res_df.plot(x='dataset', y=metric_diff_y, yerr=metric_diff_yerr, kind='bar',
-                     color=colors[1:], ax=axs[2], edgecolor='k', linewidth=0.5, capsize=2)
+                     color=colors[1:], ax=ax3, edgecolor='k', linewidth=0.5, capsize=2)
 
-    axs[0].set_yscale('log')
-    axs[0].grid(which='major', axis='y')
-    axs[0].set_axisbelow(True)
-    axs[0].set_ylim(bottom=1)
-    axs[0].set_title(titles[0], loc='left')
-    axs[0].set_ylabel('Speedup vs Naive')
-    axs[0].set_yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
-    leg = axs[0].legend(labels=labels, ncol=3, framealpha=1.0, loc='upper right')
+    ax1.set_yscale('log')
+    ax1.grid(which='major', axis='y')
+    ax1.set_axisbelow(True)
+    ax1.set_ylim(bottom=1)
+    ax1.set_title(titles[0], loc='left')
+    ax1.set_ylabel('Speedup vs Naive')
+    ax1.set_yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
+    leg = ax1.legend(labels=labels, ncol=3, framealpha=1.0, loc='upper right')
 
-    axs[1].set_yscale('log')
-    axs[1].grid(which='major', axis='y')
-    axs[1].set_axisbelow(True)
-    axs[1].set_ylim(bottom=1)
-    axs[1].set_title(titles[1].format(args.subsample_size), loc='left')
-    axs[1].set_ylabel('Speedup vs Naive')
-    axs[1].set_yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
-    axs[1].get_legend().remove()
-
-    # axs[2].set_yscale('log')
-    # axs[2].grid(which='major', axis='y')
-    # axs[2].set_axisbelow(True)
-    # axs[2].set_ylim(bottom=1)
-    # axs[2].set_title(titles[2].format(args.subsample_size), loc='left')
-    # axs[2].set_ylabel('Speedup vs Naive')
-    # axs[2].set_ylim(bottom=1)
-    # axs[2].set_yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
-    # axs[2].get_legend().remove()
+    ax2.set_yscale('log')
+    ax2.grid(which='major', axis='y')
+    ax2.set_axisbelow(True)
+    ax2.set_ylim(bottom=1)
+    ax2.set_title(titles[1].format(args.subsample_size), loc='left')
+    ax2.set_ylabel('Speedup vs Naive')
+    ax2.set_yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
+    ax2.get_legend().remove()
 
     x_labels = [label.get_text().replace('_', ' ').title() if i % 2 == 0 else \
                 '\n' + label.get_text().replace('_', ' ').title() for i, label in
-                enumerate(axs[2].xaxis.get_majorticklabels())]
-    axs[2].set_xticklabels(x_labels, rotation=0)
-    axs[2].set_title(titles[3], loc='left')
-    axs[2].set_xlabel('Dataset')
-    axs[2].set_ylabel(r'Test error $\Delta$ (%)')
-    axs[2].grid(which='major', axis='y')
-    axs[2].set_axisbelow(True)
-    axs[2].get_legend().remove()
+                enumerate(ax3.xaxis.get_majorticklabels())]
+    ax3.set_xticklabels(x_labels, rotation=0)
+    ax3.set_title(titles[3], loc='left')
+    ax3.set_xlabel('Dataset')
+    ax3.set_ylabel(r'Test error $\Delta$ (%)')
+    ax3.grid(which='major', axis='y')
+    ax3.set_axisbelow(True)
+    ax3.get_legend().remove()
 
     # Get the bounding box of the original legend
-    bb = leg.get_bbox_to_anchor().inverse_transformed(axs[0].transAxes)
+    bb = leg.get_bbox_to_anchor().inverse_transformed(ax1.transAxes)
 
     # Change to location of the legend.
     yOffset = 0.375
     bb.y0 += yOffset
     bb.y1 += yOffset
-    leg.set_bbox_to_anchor(bb, transform=axs[0].transAxes)
+    leg.set_bbox_to_anchor(bb, transform=ax1.transAxes)
 
     out_dir = os.path.join(args.out_dir)
     os.makedirs(out_dir, exist_ok=True)

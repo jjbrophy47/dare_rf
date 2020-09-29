@@ -24,6 +24,18 @@ dataset_dict = {'surgical': ('acc', 250, 20, [2, 13, 18, 19]),
                 'synthetic': ('acc', 250, 20, [2, 4, 6, 9]),
                 'higgs': ('acc', 100, 10, [1, 2, 4, 5])}
 
+dataset_dict = {'surgical': ('acc', 250, 10, 0.25, [0, 2, 4, 6]),
+                'vaccine': ('acc', 250, 20, -1.0, [0, 8, 10, 15]),
+                'adult': ('acc', 250, 20, -1.0, [11, 12, 14, 16]),
+                'bank_marketing': ('auc', 250, 10, 0.25, [3, 4, 6, 7]),
+                'flight_delays': ('auc', 250, 20, -1.0, [1, 3, 8, 15]),
+                'diabetes': ('acc', 250, 20, -1.0, [3, 7, 10, 16]),
+                'olympics': ('auc', 250, 20, 0.25, [0, 1, 1, 3]),
+                'census': ('auc', 250, 20, -1.0, [3, 6, 10, 15]),
+                'credit_card': ('ap', 250, 10, 0.25, [1, 2, 2, 3]),
+                'synthetic': ('acc', 250, 20, 0.25, [2, 3, 5, 7]),
+                'higgs': ('acc', 100, 10, 0.25, [0, 1, 2, 4])}
+
 
 def set_size(width, fraction=1, subplots=(1, 1)):
     """
@@ -75,6 +87,7 @@ def main(args):
         metric = dataset_dict[dataset][0]
         n_trees = dataset_dict[dataset][1]
         max_depth = dataset_dict[dataset][2]
+        max_features = dataset_dict[dataset][3]
 
         # filter results
         df = main_df[main_df['dataset'] == dataset]
@@ -83,6 +96,7 @@ def main(args):
         df = df[df['subsample_size'] == args.subsample_size]
         df = df[df['n_estimators'] == n_trees]
         df = df[df['max_depth'] == max_depth]
+        df = df[df['max_features'] == max_features]
 
         exact_df = df[df['model'] == 'exact']
         dart_df = df[df['model'] == 'dart']
@@ -91,7 +105,7 @@ def main(args):
         ax = axs[i][0]
         ax.set_ylabel('Speedup vs Naive')
         ax.errorbar(dart_df['topd'], dart_df['n_model'], yerr=dart_df['n_model_std'], label='R-DART', color='k')
-        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][3], shape_list):
+        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][4], shape_list):
             if topd == 0:
                 continue
             x = dart_df['topd'].iloc[topd - 1]
@@ -108,7 +122,7 @@ def main(args):
         ax.set_ylabel(r'Test error $\Delta$ (%)')
         ax.errorbar(dart_df['topd'], dart_df['{}_diff_mean'.format(metric)] * 100, color='k',
                     yerr=dart_df['{}_diff_std'.format(metric)] * 100, label='R-DART')
-        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][3], shape_list):
+        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][4], shape_list):
             if topd == 0:
                 continue
             x = dart_df['topd'].iloc[topd - 1]
@@ -155,11 +169,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, nargs='+', help='datasets to use for plotting',
                         default=['surgical', 'vaccine', 'adult', 'diabetes', 'synthetic'])
-    parser.add_argument('--in_dir', type=str, default='output/', help='input directory.')
+    parser.add_argument('--in_dir', type=str, default='output/update/csv/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/plots/update_detail_B/', help='output directory.')
 
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
-    parser.add_argument('--operation', type=str, default='delete', help='add or delete.')
+    parser.add_argument('--operation', type=str, default='deletion', help='addition or deletion.')
     parser.add_argument('--subsample_size', type=int, default=1, help='adversary strength.')
     args = parser.parse_args()
     main(args)
