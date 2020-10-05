@@ -12,7 +12,7 @@ max_features=$5
 method=$6
 rs=$7
 
-python3 scripts/experiments/explain.py \
+python3 scripts/experiments/cleaning.py \
   --dataset $dataset \
   --criterion $criterion \
   --n_estimators $n_estimators \
