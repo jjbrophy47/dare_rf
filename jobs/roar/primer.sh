@@ -8,7 +8,7 @@ time=$7
 partition=$8
 
 rs_list=(1 2 3 4 5 6 7 8 9 10)
-method_list=('random' 'dart' 'dart_loss')
+method_list=('random' 'dart1' 'dart2' 'dart3')
 
 for rs in ${rs_list[@]}; do
     for method in ${method_list[@]}; do

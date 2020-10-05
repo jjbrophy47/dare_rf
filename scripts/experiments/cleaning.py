@@ -1,5 +1,6 @@
 """
 Cleaning experiment.
+TODO: how should DART be ordered?
 """
 import os
 import sys
@@ -118,8 +119,8 @@ def measure_performance(args, checkpoints, fixed_indices, noisy_indices, model_n
         y_train_semi_noisy = flip_labels_with_indices(y_train, semi_noisy_indices)
 
         # train a new model on this partially fixed dataset
-        model_semi_noisy = _get_model(args).fit(X_train, y_train_semi_noisy)
-        auc, acc, ap = exp_util.performance(model_semi_noisy, X_test, y_test,
+        model_noisy = _get_model(args).fit(X_train, y_train_semi_noisy)
+        auc, acc, ap = exp_util.performance(model_noisy, X_test, y_test,
                                             logger=logger, name=label)
 
         accs.append(acc)
@@ -191,12 +192,14 @@ def experiment(args, logger, out_dir):
     logger.info('max_depth: {}'.format(args.max_depth))
     logger.info('max_features: {}\n'.format(args.max_features))
 
-    # show model performance before and after noise
-    model_clean = _get_model(args).fit(X_train, y_train)
-    model_noisy = _get_model(args).fit(X_train, y_train_noisy)
-    acc_clean, auc_clean, ap_clean = exp_util.performance(model_clean, X_test, y_test,
+    # clean model
+    model = _get_model(args).fit(X_train, y_train)
+    acc_clean, auc_clean, ap_clean = exp_util.performance(model, X_test, y_test,
                                                           logger=logger, name='clean')
-    acc_clean, auc_clean, ap_clean = exp_util.performance(model_noisy, X_test, y_test,
+
+    # noisy model
+    model = _get_model(args).fit(X_train, y_train_noisy)
+    acc_clean, auc_clean, ap_clean = exp_util.performance(model, X_test, y_test,
                                                           logger=logger, name='noisy')
 
     start = time.time()
@@ -209,22 +212,22 @@ def experiment(args, logger, out_dir):
         np.random.seed(args.rs + 1)
         train_order = np.random.choice(len(y_train), size=n_check, replace=False)
 
-    # D-DART
+    # D-DART: ordered by...
     elif args.method == 'dart':
         logger.info('\nOrdering by D-DART...')
-        explanation = exp_util.explain(model_noisy, X_train, y_train, X_test)
+        explanation = exp_util.explain(model, X_train, y_train, X_test)
         train_order = np.argsort(np.sum(np.abs(explanation), axis=1))[::-1]
 
-    # D-DART
+    # D-DART loss: ordered by largest loss on training samples
     elif args.method == 'dart_loss':
         logger.info('\nOrdering by D-DART loss...')
-        proba = model_noisy.predict_proba(X_train)[:, 1]
+        proba = model.predict_proba(X_train)[:, 1]
         loss = np.abs(proba - y_train_noisy)
         train_order = np.argsort(loss)[::-1]
 
     # save results
     checkpoints, fixed_indices = record_fixes(train_order[:n_check], noisy_indices, snapshot_interval)
-    results = measure_performance(args, checkpoints, fixed_indices, noisy_indices, model_noisy,
+    results = measure_performance(args, checkpoints, fixed_indices, noisy_indices, model,
                                   X_train, y_train, X_test, y_test, logger=logger)
     results['acc_clean'] = acc_clean
     results['auc_clean'] = auc_clean

@@ -124,7 +124,7 @@ def experiment(args, logger, out_dir):
     logger.info('[{}] train time: {:.3f}s'.format(name, train_time))
     exp_util.performance(model, X_test, y_test, logger=logger, name=name)
 
-    percentages = list(range(0, 10, 1))
+    percentages = list(range(0, 100, 1))
     start = time.time()
 
     # random method
@@ -134,18 +134,25 @@ def experiment(args, logger, out_dir):
         train_order = np.random.choice(np.arange(X_train.shape[0]), size=X_train.shape[0], replace=False)
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
-    # D-DART
-    elif args.method == 'dart':
+    # D-DART 1: ordered from biggest sum increase in positive label confidence to least
+    elif args.method == 'dart1':
         logger.info('\nordering by D-DART...')
-        explanation = exp_util.explain(model, X_train, y_train, X_test)
-        train_order = np.argsort(np.sum(explanation, axis=1))[::-1]
+        explanation = exp_util.explain_lite(model, X_train, y_train, X_test)
+        train_order = np.argsort(explanation)[::-1]
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
-    # D-DART
+    # D-DART 2: ordered by most positively influential to least positively influential
     elif args.method == 'dart2':
-        logger.info('\nordering by D-DART...')
-        explanation = exp_util.explain(model, X_train, y_train, X_test, y_test=y_test)
-        train_order = np.argsort(np.sum(explanation, axis=1))[::-1]
+        logger.info('\nordering by D-DART 2...')
+        explanation = exp_util.explain_lite(model, X_train, y_train, X_test, y_test=y_test)
+        train_order = np.argsort(explanation)[::-1]
+        results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
+
+    # D-DART 3: ordered by biggest sum of absolute change in predictions
+    elif args.method == 'dart3':
+        logger.info('\nordering by D-DART 3...')
+        explanation = exp_util.explain_lite(model, X_train, y_train, X_test, use_abs=True)
+        train_order = np.argsort(explanation)[::-1]
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
     logger.info('time: {:3f}s'.format(time.time() - start))

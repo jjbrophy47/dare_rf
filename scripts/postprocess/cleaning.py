@@ -10,7 +10,7 @@ from itertools import product
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from scipy import sem
+from scipy.stats import sem
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../')
@@ -46,19 +46,31 @@ def process_results(df):
     for tup, gf in tqdm(df.groupby(groups)):
         main_result = {k: v for k, v in zip(groups, tup)}
         main_result['auc_clean'] = gf['auc_clean'].mean()
-        main_result['acc_clean'] = gf['acc__clean'].mean()
+        main_result['acc_clean'] = gf['acc_clean'].mean()
         main_result['ap_clean'] = gf['ap_clean'].mean()
-
-        main_result['auc'] = gf['auc'].mean()
-        main_result['acc'] = gf['acc'].mean()
-        main_result['ap'] = gf['ap'].mean()
-
-        main_result['auc_std'] = sem(gf['auc'])
-        main_result['acc_std'] = sem(gf['acc'])
-        main_result['ap_std'] = sem(gf['ap'])
-
-        main_result['checked_pct'] = gf['checked_pct'].mean()
         main_result['num_runs'] = len(gf)
+
+        # aggregate list results
+        auc_list = []
+        acc_list = []
+        ap_list = []
+        checked_pct_list = []
+        for row in gf.itertuples(index=False):
+            auc_list.append(list(row.auc))
+            acc_list.append(list(row.acc))
+            ap_list.append(list(row.ap))
+            checked_pct_list.append(list(row.checked_pct))
+
+        main_result['auc'] = np.mean(auc_list, axis=0)
+        main_result['acc'] = np.mean(acc_list, axis=0)
+        main_result['ap'] = np.mean(ap_list, axis=0)
+
+        main_result['auc_std'] = sem(auc_list, axis=0)
+        main_result['acc_std'] = sem(acc_list, axis=0)
+        main_result['ap_std'] = sem(ap_list, axis=0)
+
+        main_result['checked_pct'] = np.mean(checked_pct_list, axis=0)
+
         main_result_list.append(main_result)
 
     main_df = pd.DataFrame(main_result_list)
