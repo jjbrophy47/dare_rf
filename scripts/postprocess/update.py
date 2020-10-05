@@ -50,6 +50,8 @@ def process_periodic_utility(gf):
     auc_diff_mean_list, auc_diff_std_list = [], []
     ap_diff_mean_list, ap_diff_std_list = [], []
 
+    deletion_time_list = []
+
     for row in gf.itertuples(index=False):
 
         acc_mean_list.append(np.mean(row.acc))
@@ -72,12 +74,15 @@ def process_periodic_utility(gf):
         auc_diff_std_list.append(np.std(auc_diff))
         ap_diff_std_list.append(np.std(ap_diff))
 
+        deletion_time_list.append(row.allotted_time / row.n_model)
+
     result['acc_mean'] = np.mean(acc_mean_list)
     result['auc_mean'] = np.mean(auc_mean_list)
     result['ap_mean'] = np.mean(ap_mean_list)
     result['acc_std'] = np.mean(acc_std_list)
     result['auc_std'] = np.mean(auc_std_list)
     result['ap_std'] = np.mean(ap_std_list)
+    result['deletion_time_mean'] = np.mean(deletion_time_list)
 
     result['acc_diff_mean'] = np.mean(acc_diff_mean_list)
     result['auc_diff_mean'] = np.mean(auc_diff_mean_list)
@@ -85,6 +90,7 @@ def process_periodic_utility(gf):
     result['acc_diff_std'] = np.mean(acc_diff_std_list)
     result['auc_diff_std'] = np.mean(auc_diff_std_list)
     result['ap_diff_std'] = np.mean(ap_diff_std_list)
+    result['deletion_time_std'] = sem(deletion_time_list)
 
     return result
 
@@ -104,6 +110,8 @@ def process_utility(gf):
     auc_diff_list = []
     ap_diff_list = []
 
+    deletion_time_list = []
+
     for row in gf.itertuples(index=False):
 
         acc_list.append(row.acc[0])
@@ -114,12 +122,15 @@ def process_utility(gf):
         auc_diff_list.append(row.exact_auc[0] - row.auc[0])
         ap_diff_list.append(row.exact_ap[0] - row.ap[0])
 
+        deletion_time_list.append(row.allotted_time / row.n_model)
+
     result['acc_mean'] = np.mean(acc_list)
     result['auc_mean'] = np.mean(auc_list)
     result['ap_mean'] = np.mean(ap_list)
     result['acc_std'] = sem(acc_list)
     result['auc_std'] = sem(auc_list)
     result['ap_std'] = sem(ap_list)
+    result['deletion_time_mean'] = np.mean(deletion_time_list)
 
     result['acc_diff_mean'] = np.mean(acc_diff_list)
     result['auc_diff_mean'] = np.mean(auc_diff_list)
@@ -127,6 +138,7 @@ def process_utility(gf):
     result['acc_diff_std'] = sem(acc_diff_list)
     result['auc_diff_std'] = sem(auc_diff_list)
     result['ap_diff_std'] = sem(ap_diff_list)
+    result['deletion_time_std'] = sem(deletion_time_list)
 
     return result
 

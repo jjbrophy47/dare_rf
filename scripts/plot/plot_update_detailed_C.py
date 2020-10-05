@@ -24,6 +24,18 @@ dataset_dict = {'surgical': ('acc', 250, 20, [2, 13, 18, 19]),
                 'synthetic': ('acc', 250, 20, [2, 4, 6, 9]),
                 'higgs': ('acc', 100, 10, [1, 2, 4, 5])}
 
+dataset_dict = {'surgical': ('acc', 250, 10, 0.25, [0, 2, 4, 6]),
+                'vaccine': ('acc', 250, 20, -1.0, [0, 8, 10, 15]),
+                'adult': ('acc', 250, 20, -1.0, [11, 12, 14, 16]),
+                'bank_marketing': ('auc', 250, 10, 0.25, [3, 4, 6, 7]),
+                'flight_delays': ('auc', 250, 20, -1.0, [1, 3, 8, 15]),
+                'diabetes': ('acc', 250, 20, -1.0, [3, 7, 10, 16]),
+                'olympics': ('auc', 250, 20, 0.25, [0, 1, 1, 3]),
+                'census': ('auc', 250, 20, -1.0, [3, 6, 10, 15]),
+                'credit_card': ('ap', 250, 10, 0.25, [1, 2, 2, 3]),
+                'synthetic': ('acc', 250, 20, 0.25, [2, 3, 5, 7]),
+                'higgs': ('acc', 100, 10, 0.25, [0, 1, 2, 4])}
+
 
 def set_size(width, fraction=1, subplots=(1, 1)):
     """
@@ -63,7 +75,7 @@ def main(args):
 
     tol_list = ['0.1%', '0.25%', '0.5%', '1.0%']
 
-    lines = ['-', '-.', ':']
+    lines = [':', '-.', '-']
     lines += lines
 
     # get results
@@ -75,35 +87,43 @@ def main(args):
         metric = dataset_dict[dataset][0]
         n_trees = dataset_dict[dataset][1]
         max_depth = dataset_dict[dataset][2]
+        max_features = dataset_dict[dataset][3]
 
         # filter results
         df = main_df[main_df['dataset'] == dataset]
         df = df[df['operation'] == args.operation]
         df = df[df['criterion'] == args.criterion]
         df = df[df['subsample_size'] == args.subsample_size]
+        df = df[df['max_features'] == max_features]
+        # df['avg_deletion_time'] = df['allotted_time'] / df['n_model']
+
+        # settings in question
         exp_df = df[df['n_estimators'] == n_trees]
         exp_df = exp_df[exp_df['max_depth'] == max_depth]
 
+        # models
         exact_df = exp_df[exp_df['model'] == 'exact']
         dart_df = exp_df[exp_df['model'] == 'dart']
-        alt_df = df[(df['model'] == 'exact') & (df['n_estimators'] != n_trees) & (df['max_depth'] != max_depth)]
+        dart_df = pd.concat([exact_df, dart_df])
+        alt_df = df[(df['model'] == 'exact') &
+                    (df['n_estimators'] != n_trees) &
+                    (df['max_depth'] != max_depth)]
 
         # plot efficiency
         ax = axs[i][0]
-        ax.set_ylabel('Speedup vs Naive')
-        ax.errorbar(dart_df['topd'], dart_df['n_model'], yerr=dart_df['n_model_std'], label='R-DART', color='k')
-        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][3], shape_list):
-            if topd == 0:
-                continue
-            x = dart_df['topd'].iloc[topd - 1]
-            y = dart_df['n_model'].iloc[topd - 1]
+        ax.set_ylabel('Average deletion time (s)')
+        ax.errorbar(dart_df['topd'], dart_df['deletion_time_mean'], yerr=dart_df['deletion_time_std'],
+                    label='R-DART', color='k')
+        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][4], shape_list):
+            x = dart_df['topd'].iloc[topd]
+            y = dart_df['deletion_time_mean'].iloc[topd]
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
-        ax.axhline(exact_df['n_model'].values[0], color='k', linestyle='--', label='D-DART')
+        ax.axhline(exact_df['deletion_time_mean'].values[0], color='k', linestyle='--', label='D-DART')
         for j, row in enumerate(alt_df.itertuples(index=False)):
-            ax.axhline(row.n_model, label=r'$T={}$, $D={}$'.format(row.n_estimators, row.max_depth),
+            ax.axhline(row.deletion_time_mean, label=r'$T={}$, $D={}$'.format(row.n_estimators, row.max_depth),
                        linestyle=lines[j], color='k')
         ax.set_yscale('log')
-        ax.set_title('Efficiency')
+        ax.set_title('Efficiency (lower is better)')
         if i == n_datasets - 1:
             ax.set_xlabel(r'$topd$')
         handles, labels = ax.get_legend_handles_labels()
@@ -113,22 +133,20 @@ def main(args):
         ax.set_ylabel('Test {}'.format(metric.upper()))
         ax.errorbar(dart_df['topd'], dart_df['{}_mean'.format(metric)],
                     yerr=dart_df['{}_diff_std'.format(metric)], color='k')
-        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][3], shape_list):
-            if topd == 0:
-                continue
-            x = dart_df['topd'].iloc[topd - 1]
-            y = dart_df['{}_mean'.format(metric)].iloc[topd - 1]
+        for tol, topd, shape in zip(tol_list, dataset_dict[dataset][4], shape_list):
+            x = dart_df['topd'].iloc[topd]
+            y = dart_df['{}_mean'.format(metric)].iloc[topd]
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
         ax.axhline(exact_df['{}_mean'.format(metric)].values[0], color='k', linestyle='--')
         for j in range(len(alt_df)):
             ax.axhline(alt_df.iloc[j]['{}_mean'.format(metric)], linestyle=lines[j], color='k')
-        ax.set_title('Utility')
+        ax.set_title('Utility (higher is better)')
         if i == n_datasets - 1:
             ax.set_xlabel(r'$topd$')
 
     os.makedirs(args.out_dir, exist_ok=True)
 
-    fig.legend(handles, labels, bbox_to_anchor=(0.5, 0), ncol=5, loc='lower center', frameon=True)
+    fig.legend(handles, labels, bbox_to_anchor=(0.5, 0), ncol=4, loc='lower center', frameon=True)
     fig.tight_layout(rect=[0, 0.125, 1, 1])
     fp = os.path.join(args.out_dir, '{}_sub{}_{}.pdf'.format(args.operation,
                                                              args.subsample_size,
@@ -140,11 +158,11 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, nargs='+', help='datasets to use for plotting', default=['credit_card'])
-    parser.add_argument('--in_dir', type=str, default='output/', help='input directory.')
+    parser.add_argument('--in_dir', type=str, default='output/update/csv/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/plots/update_detail_C/', help='output directory.')
 
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
-    parser.add_argument('--operation', type=str, default='delete', help='add or delete.')
+    parser.add_argument('--operation', type=str, default='deletion', help='addition or deletion.')
     parser.add_argument('--subsample_size', type=int, default=1, help='adversary strength.')
     args = parser.parse_args()
     main(args)

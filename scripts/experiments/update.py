@@ -250,7 +250,7 @@ def check_utility(model, X_train, y_train, X_test, y_test,
     if args.operation == 'deletion':
         new_X_train = np.delete(X_train, updated_indices, axis=0)
         new_y_train = np.delete(y_train, updated_indices)
-    
+
     elif args.operation == 'addition':
         new_X_train = np.vstack([X_train, X_train[updated_indices]])
         new_y_train = np.concatenate([y_train, y_train[updated_indices]])

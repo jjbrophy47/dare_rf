@@ -101,15 +101,15 @@ def main(args):
         exact_df = df[df['model'] == 'exact']
         dart_df = df[df['model'] == 'dart']
 
+        dart_df = pd.concat([exact_df, dart_df])
+
         # plot efficiency
         ax = axs[i][0]
         ax.set_ylabel('Speedup vs Naive')
         ax.errorbar(dart_df['topd'], dart_df['n_model'], yerr=dart_df['n_model_std'], label='R-DART', color='k')
         for tol, topd, shape in zip(tol_list, dataset_dict[dataset][4], shape_list):
-            if topd == 0:
-                continue
-            x = dart_df['topd'].iloc[topd - 1]
-            y = dart_df['n_model'].iloc[topd - 1]
+            x = dart_df['topd'].iloc[topd]
+            y = dart_df['n_model'].iloc[topd]
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
         ax.axhline(exact_df['n_model'].values[0], color='k', linestyle='--', label='D-DART')
         ax.set_yscale('log')
@@ -123,10 +123,8 @@ def main(args):
         ax.errorbar(dart_df['topd'], dart_df['{}_diff_mean'.format(metric)] * 100, color='k',
                     yerr=dart_df['{}_diff_std'.format(metric)] * 100, label='R-DART')
         for tol, topd, shape in zip(tol_list, dataset_dict[dataset][4], shape_list):
-            if topd == 0:
-                continue
-            x = dart_df['topd'].iloc[topd - 1]
-            y = dart_df['{}_diff_mean'.format(metric)].iloc[topd - 1] * 100
+            x = dart_df['topd'].iloc[topd]
+            y = dart_df['{}_diff_mean'.format(metric)].iloc[topd] * 100
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
         ax.axhline(0, color='k', linestyle='--', label='D-DART')
         ax.set_title('Utility')
@@ -138,7 +136,7 @@ def main(args):
         # plot retrains
         ax = axs[i][2]
         ax.set_ylabel('No. retrains')
-        for j, row in enumerate(dart_df.itertuples(index=False)):
+        for j, row in enumerate(dart_df[1:].itertuples(index=False)):
             linestyle = '-' if j < 10 else '--'
             temp = retrain_df[retrain_df['id'] == row.id]
             retrains = temp.iloc[0].values[1:]

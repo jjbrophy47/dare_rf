@@ -173,7 +173,7 @@ def main(args):
     titles = ['Efficiency Using the Random Adversary (higher is better)',
               'Efficiency Using the Worst-of-{} Adversary (higher is better)',
               'Difference in Efficiency Between the Random and Worst-of-{} Adversaries (lower is better)',
-              'Absolute Test Error Increase Relative to D-DART (lower is better)']
+              'Test Error Increase Relative to D-DART (lower is better)']
 
     # get results
     main_fp = os.path.join(args.in_dir, 'results.csv')
@@ -184,6 +184,9 @@ def main(args):
     df = df[df['criterion'] == args.criterion]
     sub1_df = df[df['subsample_size'] == 1]
     subX_df = df[df['subsample_size'] == args.subsample_size]
+
+    # pd.set_option('display.max_columns', 100)
+    # print(subX_df[subX_df['dataset'] == 'higgs'])
 
     # setup columns
     n_model_y = ['exact_n_model']
@@ -215,6 +218,7 @@ def main(args):
 
     n_methods = len(labels)
 
+    # get standard errors
     sub1_n_model_yerr = np.reshape(sub1_n_model_std, (n_methods, 2, sub1_n_datasets), order='F')
     subX_n_model_yerr = np.reshape(subX_n_model_std, (n_methods, 2, sub1_n_datasets), order='F')
     metric_diff_yerr = np.reshape(metric_diff_std_list, (n_methods - 1, 2, sub1_n_datasets), order='F')

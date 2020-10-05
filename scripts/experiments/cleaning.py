@@ -263,16 +263,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # I/O settings
-    parser.add_argument('--out_dir', type=str, default='output/roar/', help='output directory.')
+    parser.add_argument('--out_dir', type=str, default='output/cleaning/', help='output directory.')
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
-    parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
+    parser.add_argument('--dataset', type=str, default='surgical', help='dataset to use for the experiment.')
     parser.add_argument('--append_results', action='store_true', default=False, help='add results.')
 
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--method', type=str, default='dart', help='method to use.')
-    parser.add_argument('--flip_frac', type=float, default=0.4, help='% of data to flip.')
-    parser.add_argument('--check_frac', type=float, default=0.3, help='% of data to check.')
+    parser.add_argument('--flip_frac', type=float, default=0.4, help='percentage of data to flip.')
+    parser.add_argument('--check_frac', type=float, default=0.3, help='percentage of data to check.')
     parser.add_argument('--n_snapshots', type=int, default=10, help='no. points to record and plot.')
 
     # tree hyperparameters

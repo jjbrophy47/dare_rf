@@ -102,6 +102,8 @@ def main(args):
         exact_df = df[df['model'] == 'exact']
         dart_df = df[df['model'] == 'dart']
 
+        dart_df = pd.concat([exact_df, dart_df])
+
         # plot efficiency
         if i == 0:
             ax = fig.add_subplot(gs[i, 0])
@@ -111,10 +113,8 @@ def main(args):
         ax.set_ylabel('({})\nSpeedup vs Naive'.format(adversaries[i], subsample_size))
         ax.errorbar(dart_df['topd'], dart_df['n_model'], yerr=dart_df['n_model_std'], label='R-DART', color='k')
         for tol, topd, shape in zip(tol_list, dataset_dict[args.dataset][4], shape_list):
-            if topd == 0:
-                continue
-            x = dart_df['topd'].iloc[topd - 1]
-            y = dart_df['n_model'].iloc[topd - 1]
+            x = dart_df['topd'].iloc[topd]
+            y = dart_df['n_model'].iloc[topd]
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
         ax.axhline(exact_df['n_model'].values[0], color='k', linestyle='--', label='D-DART')
         ax.set_yscale('log')
@@ -131,10 +131,8 @@ def main(args):
             ax.errorbar(dart_df['topd'], dart_df['{}_diff_mean'.format(metric)] * 100,
                         yerr=dart_df['{}_diff_std'.format(metric)] * 100, color='k')
             for tol, topd, shape in zip(tol_list, dataset_dict[args.dataset][4], shape_list):
-                if topd == 0:
-                    continue
-                x = dart_df['topd'].iloc[topd - 1]
-                y = dart_df['{}_diff_mean'.format(metric)].iloc[topd - 1] * 100
+                x = dart_df['topd'].iloc[topd]
+                y = dart_df['{}_diff_mean'.format(metric)].iloc[topd] * 100
                 ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
             ax.axhline(0, color='k', linestyle='--')
             if i == 0:
@@ -148,7 +146,7 @@ def main(args):
         else:
             ax = fig.add_subplot(gs[i, 2], sharey=prev_retrain_ax)
         ax.set_ylabel('No. retrains')
-        for j, row in enumerate(dart_df.itertuples(index=False)):
+        for j, row in enumerate(dart_df[1:].itertuples(index=False)):
             linestyle = '-' if j < 10 else '--'
             temp = retrain_df[retrain_df['id'] == row.id]
             retrains = temp.iloc[0].values[1:]
@@ -168,7 +166,10 @@ def main(args):
 
     os.makedirs(args.out_dir, exist_ok=True)
 
-    fig.legend(handles, labels, bbox_to_anchor=(0.995, 0.965), ncol=1)
+    # set retrain legend
+    y_loc = 0.965 if max_depth == 20 else 0.800
+    fig.legend(handles, labels, bbox_to_anchor=(0.995, y_loc), ncol=1)
+
     fig.tight_layout(rect=[0, 0, 0.90, 1])
     fp = os.path.join(args.out_dir, '{}_{}.pdf'.format(args.operation,
                                                        args.dataset))
