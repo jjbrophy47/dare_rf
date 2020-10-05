@@ -10,6 +10,7 @@ from itertools import product
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from scipy import sem
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../')
@@ -44,9 +45,18 @@ def process_results(df):
 
     for tup, gf in tqdm(df.groupby(groups)):
         main_result = {k: v for k, v in zip(groups, tup)}
+        main_result['auc_clean'] = gf['auc_clean'].mean()
+        main_result['acc_clean'] = gf['acc__clean'].mean()
+        main_result['ap_clean'] = gf['ap_clean'].mean()
+
         main_result['auc'] = gf['auc'].mean()
         main_result['acc'] = gf['acc'].mean()
         main_result['ap'] = gf['ap'].mean()
+
+        main_result['auc_std'] = sem(gf['auc'])
+        main_result['acc_std'] = sem(gf['acc'])
+        main_result['ap_std'] = sem(gf['ap'])
+
         main_result['checked_pct'] = gf['checked_pct'].mean()
         main_result['num_runs'] = len(gf)
         main_result_list.append(main_result)

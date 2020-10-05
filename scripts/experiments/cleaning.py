@@ -226,6 +226,9 @@ def experiment(args, logger, out_dir):
     checkpoints, fixed_indices = record_fixes(train_order[:n_check], noisy_indices, snapshot_interval)
     results = measure_performance(args, checkpoints, fixed_indices, noisy_indices, model_noisy,
                                   X_train, y_train, X_test, y_test, logger=logger)
+    results['acc_clean'] = acc_clean
+    results['auc_clean'] = auc_clean
+    results['ap_clean'] = ap_clean
     np.save(os.path.join(out_dir, 'results.npy'), results)
 
     logger.info('time: {:3f}s'.format(time.time() - start))
