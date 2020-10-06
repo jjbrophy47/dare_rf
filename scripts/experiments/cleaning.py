@@ -1,6 +1,5 @@
 """
 Cleaning experiment.
-TODO: how should DART be ordered?
 """
 import os
 import sys
@@ -19,6 +18,7 @@ from utility import exp_util
 from utility import print_util
 
 MAX_SEED_INCREASE = 1000
+PRINT_COUNTER = 100
 
 
 def _get_model(args):
@@ -212,11 +212,26 @@ def experiment(args, logger, out_dir):
         np.random.seed(args.rs + 1)
         train_order = np.random.choice(len(y_train), size=n_check, replace=False)
 
-    # D-DART: ordered by...
+    # D-DART: ordered from biggest change in prediction for each training sample on itself
     elif args.method == 'dart':
         logger.info('\nOrdering by D-DART...')
-        explanation = exp_util.explain(model, X_train, y_train, X_test)
-        train_order = np.argsort(np.sum(np.abs(explanation), axis=1))[::-1]
+        start = time.time()
+
+        initial_proba = model.predict_proba(X_train)[:, 1]
+        explanation = np.zeros(shape=(X_train.shape[0],))
+
+        for i in range(X_train.shape[0]):
+            model.delete(i)
+            proba = model.predict_proba(X_train[[i]])[:, 1][0]
+            explanation[i] = np.abs(proba - initial_proba[i])
+
+            if i % PRINT_COUNTER == 0:
+                elapsed = time.time() - start
+                logger.info('[Influence on sample {}] cum time: {:.3f}s'.format(i, elapsed))
+
+            model.add(X_train[[i]], y_train_noisy[[i]])
+
+        train_order = np.argsort(explanation)[::-1]
 
     # D-DART loss: ordered by largest loss on training samples
     elif args.method == 'dart_loss':

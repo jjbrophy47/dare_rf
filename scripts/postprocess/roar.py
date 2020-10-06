@@ -9,6 +9,7 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
+from scipy.stats import sem
 from tqdm import tqdm
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -44,11 +45,29 @@ def process_results(df):
 
     for tup, gf in tqdm(df.groupby(groups)):
         main_result = {k: v for k, v in zip(groups, tup)}
-        main_result['auc'] = gf['auc'].mean()
-        main_result['acc'] = gf['acc'].mean()
-        main_result['ap'] = gf['ap'].mean()
-        main_result['percentage'] = gf['percentage'].mean()
         main_result['num_runs'] = len(gf)
+
+        # aggregate list results
+        auc_list = []
+        acc_list = []
+        ap_list = []
+        percentage_list = []
+        for row in gf.itertuples(index=False):
+            auc_list.append(list(row.auc))
+            acc_list.append(list(row.acc))
+            ap_list.append(list(row.ap))
+            percentage_list.append(list(row.percentage))
+
+        main_result['auc'] = np.mean(auc_list, axis=0)
+        main_result['acc'] = np.mean(acc_list, axis=0)
+        main_result['ap'] = np.mean(ap_list, axis=0)
+
+        main_result['auc_std'] = sem(auc_list, axis=0)
+        main_result['acc_std'] = sem(acc_list, axis=0)
+        main_result['ap_std'] = sem(ap_list, axis=0)
+
+        main_result['percentage'] = np.mean(percentage_list, axis=0)
+
         main_result_list.append(main_result)
 
     main_df = pd.DataFrame(main_result_list)
@@ -76,8 +95,8 @@ def create_csv(args, out_dir, logger):
         if result is not None:
             results.append(result)
 
-    pd.set_option('display.max_columns', 100)
-    pd.set_option('display.width', 180)
+    # pd.set_option('display.max_columns', 100)
+    # pd.set_option('display.width', 180)
 
     df = pd.DataFrame(results)
     logger.info('\nRaw results:\n{}'.format(df))
@@ -114,8 +133,8 @@ if __name__ == '__main__':
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
                                  'olympics', 'census', 'credit_card', 'synthetic', 'higgs'], help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
-    parser.add_argument('--rs', type=int, nargs='+', default=list(range(1, 10)), help='random state.')
-    parser.add_argument('--method', type=str, nargs='+', default=['random', 'dart', 'dart2'], help='method.')
+    parser.add_argument('--rs', type=int, nargs='+', default=list(range(1, 11)), help='random state.')
+    parser.add_argument('--method', type=str, nargs='+', default=['random', 'dart1', 'dart2', 'dart3'], help='method.')
 
     args = parser.parse_args()
     main(args)

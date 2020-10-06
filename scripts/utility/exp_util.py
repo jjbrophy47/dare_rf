@@ -1,6 +1,8 @@
 """
 Utility methods to make epxeriments easier.
 """
+import time
+
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
@@ -70,7 +72,8 @@ def explain(model, X_train, y_train, X_test, y_test=None):
     return impact
 
 
-def explain_lite(model, X_train, y_train, X_test, y_test=None, use_abs=False):
+def explain_lite(model, X_train, y_train, X_test, y_test=None,
+                 use_abs=False, print_cnt=100, logger=None):
     """
     Generate an instance-attribution explanation for each test
     instance, and then sum over the test instances,
@@ -88,6 +91,8 @@ def explain_lite(model, X_train, y_train, X_test, y_test=None, use_abs=False):
     If using absolute (abs), then take the sum over the absolute
     contributions.
     """
+    start = time.time()
+
     assert X_train.shape[1] == X_test.shape[1]
     if y_test is not None:
         assert y_test.ndim == 1
@@ -111,6 +116,10 @@ def explain_lite(model, X_train, y_train, X_test, y_test=None, use_abs=False):
         impact[i] = np.sum(diff) if use_abs else np.sum(np.abs(diff))
 
         model.add(X_train[[i]], y_train[[i]])
+
+        if logger and i % print_cnt == 0:
+            elapsed = time.time() - start
+            logger.info('[Influence on sample {}] cum time: {:.3f}s'.format(i, elapsed))
 
     return impact
 
