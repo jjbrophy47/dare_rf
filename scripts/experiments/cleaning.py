@@ -199,8 +199,7 @@ def experiment(args, logger, out_dir):
 
     # noisy model
     model = _get_model(args).fit(X_train, y_train_noisy)
-    acc_clean, auc_clean, ap_clean = exp_util.performance(model, X_test, y_test,
-                                                          logger=logger, name='noisy')
+    exp_util.performance(model, X_test, y_test, logger=logger, name='noisy')
 
     start = time.time()
 
