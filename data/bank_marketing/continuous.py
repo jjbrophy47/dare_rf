@@ -14,7 +14,12 @@ def dataset_specific(random_state, test_size):
 
     # retrieve dataset
     assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    df = pd.read_csv('raw/bank-additional-full.csv', sep=';')
+
+    # remove select columns
+    remove_cols = []
+    if len(remove_cols) > 0:
+        df = df.drop(columns=remove_cols)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
@@ -34,9 +39,10 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['complication']
-    numeric = ['bmi', 'Age', 'ccsComplicationRate', 'ccsMort30Rate',
-               'complication_rsi', 'hour', 'mortality_rsi']
+    label = ['y']
+    numeric = ['age', 'duration', 'campaign', 'pdays', 'previous',
+               'emp.var.rate', 'cons.price.idx', 'cons.conf.idx',
+               'euribor3m', 'nr.employed']
     categorical = list(set(columns) - set(numeric) - set(label))
 
     return train_df, test_df, label, numeric, categorical

@@ -11,32 +11,41 @@ from sklearn.preprocessing import LabelEncoder
 
 
 def dataset_specific(random_state, test_size):
+    """
+    Put dataset specific processing here.
+    """
+
+    # categorize attributes
+    columns = ['age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status',
+               'occupation', 'relationship', 'race', 'sex', 'capital-gain', 'capital-loss',
+               'hours-per-week', 'native-country', 'label']
 
     # retrieve dataset
     assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    train_df = pd.read_csv('raw/adult.data.txt', header=None, names=columns)
+    test_df = pd.read_csv('raw/adult.test.txt', header=None, names=columns)
+
+    # remove select columns
+    remove_cols = ['education-num']
+    if len(remove_cols) > 0:
+        train_df = train_df.drop(columns=remove_cols)
+        test_df = test_df.drop(columns=remove_cols)
+        columns = [x for x in columns if x not in remove_cols]
 
     # remove nan rows
-    nan_rows = df[df.isnull().any(axis=1)]
-    print('nan rows: {}'.format(len(nan_rows)))
-    df = df.dropna()
+    train_nan_rows = train_df[train_df.isnull().any(axis=1)]
+    test_nan_rows = test_df[test_df.isnull().any(axis=1)]
+    print('train nan rows: {}'.format(len(train_nan_rows)))
+    print('test nan rows: {}'.format(len(test_nan_rows)))
+    train_df = train_df.dropna()
+    test_df = test_df.dropna()
 
-    # split into train and test
-    indices = np.arange(len(df))
-    n_train_samples = int(len(indices) * (1 - test_size))
-
-    np.random.seed(random_state)
-    train_indices = np.random.choice(indices, size=n_train_samples, replace=False)
-    test_indices = np.setdiff1d(indices, train_indices)
-
-    train_df = df.iloc[train_indices]
-    test_df = df.iloc[test_indices]
+    # fix label columns
+    test_df['label'] = test_df['label'].apply(lambda x: x.replace('.', ''))
 
     # categorize attributes
-    columns = list(df.columns)
-    label = ['complication']
-    numeric = ['bmi', 'Age', 'ccsComplicationRate', 'ccsMort30Rate',
-               'complication_rsi', 'hour', 'mortality_rsi']
+    label = ['label']
+    numeric = ['age', 'fnlwgt', 'capital-gain', 'capital-loss', 'hours-per-week']
     categorical = list(set(columns) - set(numeric) - set(label))
 
     return train_df, test_df, label, numeric, categorical

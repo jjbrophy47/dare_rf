@@ -14,7 +14,23 @@ def dataset_specific(random_state, test_size):
 
     # retrieve dataset
     assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    feature_df = pd.read_csv(os.path.join('raw', 'training_set_features.csv'))
+    label_df = pd.read_csv(os.path.join('raw', 'training_set_labels.csv'))
+    df = feature_df.merge(label_df, on='respondent_id', how='left')
+
+    # remove select columns
+    remove_cols = ['respondent_id']
+    if len(remove_cols) > 0:
+        df = df.drop(columns=remove_cols)
+
+    # imputation
+    for c in df.columns:
+
+        if df[c].dtype == np.float64:
+            df[c] = df[c].fillna(-1)
+
+        if df[c].dtype == 'object':
+            df[c] = df[c].fillna('NAN')
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
@@ -34,10 +50,12 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['complication']
-    numeric = ['bmi', 'Age', 'ccsComplicationRate', 'ccsMort30Rate',
-               'complication_rsi', 'hour', 'mortality_rsi']
+    label = ['seasonal_vaccine']
+    numeric = []
     categorical = list(set(columns) - set(numeric) - set(label))
+    print('label', label)
+    print('numeric', numeric)
+    print('categorical', categorical)
 
     return train_df, test_df, label, numeric, categorical
 

@@ -14,7 +14,16 @@ def dataset_specific(random_state, test_size):
 
     # retrieve dataset
     assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    df = pd.read_csv('raw/creditcard.csv')
+
+    print(df)
+    for c in df.columns:
+        print(c, len(df[c].unique()), df[c].dtype)
+
+    # remove select columns
+    remove_cols = []
+    if len(remove_cols) > 0:
+        df = df.drop(columns=remove_cols)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
@@ -34,10 +43,14 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['complication']
-    numeric = ['bmi', 'Age', 'ccsComplicationRate', 'ccsMort30Rate',
-               'complication_rsi', 'hour', 'mortality_rsi']
+    label = ['Class']
+    numeric = ['Time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9',
+               'V10', 'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V17', 'V18', 'V19',
+               'V20', 'V21', 'V22', 'V23', 'V24', 'V25', 'V26', 'V27', 'V28', 'Amount']
     categorical = list(set(columns) - set(numeric) - set(label))
+    print('label', label)
+    print('numeric', numeric)
+    print('categorical', categorical)
 
     return train_df, test_df, label, numeric, categorical
 

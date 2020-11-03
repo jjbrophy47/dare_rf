@@ -14,7 +14,20 @@ def dataset_specific(random_state, test_size):
 
     # retrieve dataset
     assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    df = pd.read_csv('raw/athlete_events.csv')
+
+    pd.set_option('display.max_columns', 100)
+
+    # remove select columns
+    remove_cols = ['ID', 'Name', 'Team']
+    df = df.drop(columns=remove_cols)
+
+    df['Medal'] = df['Medal'].fillna(0)
+    df['Medal'] = df['Medal'].apply(lambda x: 0 if x == 0 else 1)
+
+    print(df)
+    for c in df.columns:
+        print(c, len(df[c].unique()), df[c].dtype)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
@@ -34,10 +47,12 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['complication']
-    numeric = ['bmi', 'Age', 'ccsComplicationRate', 'ccsMort30Rate',
-               'complication_rsi', 'hour', 'mortality_rsi']
+    label = ['Medal']
+    numeric = ['Age', 'Height', 'Weight']
     categorical = list(set(columns) - set(numeric) - set(label))
+    print('label', label)
+    print('numeric', numeric)
+    print('categorical', categorical)
 
     return train_df, test_df, label, numeric, categorical
 

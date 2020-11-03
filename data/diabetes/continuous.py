@@ -14,12 +14,20 @@ def dataset_specific(random_state, test_size):
 
     # retrieve dataset
     assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    df = pd.read_csv(os.path.join('raw', 'diabetic_data.csv'))
+
+    # remove select columns
+    remove_cols = ['encounter_id', 'patient_nbr', 'weight',
+                   'diag_1', 'diag_2', 'diag_3']
+    if len(remove_cols) > 0:
+        df = df.drop(columns=remove_cols)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
     print('nan rows: {}'.format(len(nan_rows)))
     df = df.dropna()
+
+    df['readmitted'] = df['readmitted'].apply(lambda x: 0 if x == 'NO' else 1)
 
     # split into train and test
     indices = np.arange(len(df))
@@ -34,10 +42,14 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['complication']
-    numeric = ['bmi', 'Age', 'ccsComplicationRate', 'ccsMort30Rate',
-               'complication_rsi', 'hour', 'mortality_rsi']
+    label = ['readmitted']
+    numeric = ['time_in_hospital', 'num_lab_procedures', 'num_medications',
+               'number_outpatient', 'number_emergency', 'number_inpatient',
+               'number_diagnoses']
     categorical = list(set(columns) - set(numeric) - set(label))
+    print('label', label)
+    print('numeric', numeric)
+    print('categorical', categorical)
 
     return train_df, test_df, label, numeric, categorical
 

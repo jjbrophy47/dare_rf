@@ -67,7 +67,7 @@ def process_results(df):
     """
     Averages utility results over different random states.
     """
-    groups = ['dataset', 'criterion', 'model', 'bootstrap']
+    groups = ['dataset', 'criterion', 'model', 'bootstrap', 'continuous']
 
     main_result_list = []
 
@@ -108,12 +108,22 @@ def create_csv(args, out_dir, logger):
         if result is not None:
             results.append(result)
 
-        # add bootstrap result
+        # add sklearn results
         if model == 'sklearn':
+
+            # add bootstrap result
             bootstrap_dir = os.path.join(experiment_dir, 'bootstrap')
             bootstrap_result = get_result(template, bootstrap_dir)
             if bootstrap_result is not None:
                 results.append(bootstrap_result)
+
+            # add continuous result
+            continuous_dir = os.path.join(args.in_dir, dataset, criterion,
+                                          'continuous', tuning,
+                                          'rs_{}'.format(rs), model)
+            continuous_result = get_result(template, continuous_dir)
+            if continuous_result is not None:
+                results.append(continuous_result)
 
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)

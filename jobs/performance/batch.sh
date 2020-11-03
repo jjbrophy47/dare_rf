@@ -56,11 +56,11 @@ criterion='gini'
 ./jobs/performance/primer.sh flight_delays 'sklearn' 1.0 roc_auc $criterion 20 1440 short
 ./jobs/performance/primer.sh diabetes 'sklearn' 1.0 accuracy $criterion 20 1440 short
 ./jobs/performance/primer.sh olympics 'sklearn' 1.0 roc_auc $criterion 25 4320 long
-./jobs/performance/primer.sh skin 'sklearn' 1.0 roc_auc $criterion 25 4320 long
+# ./jobs/performance/primer.sh skin 'sklearn' 1.0 roc_auc $criterion 25 4320 long
 ./jobs/performance/primer.sh census 'sklearn' 1.0 roc_auc $criterion 20 1440 short
 ./jobs/performance/primer.sh credit_card 'sklearn' 1.0 average_precision $criterion 6 1440 short
-./jobs/performance/primer.sh twitter 'sklearn' 1.0 roc_auc $criterion 30 1440 short
-./jobs/performance/primer.sh gas_sensor 'sklearn' 1.0 roc_auc $criterion 30 1440 short
+# ./jobs/performance/primer.sh twitter 'sklearn' 1.0 roc_auc $criterion 30 1440 short
+# ./jobs/performance/primer.sh gas_sensor 'sklearn' 1.0 roc_auc $criterion 30 1440 short
 ./jobs/performance/primer.sh synthetic 'sklearn' 0.5 accuracy $criterion 60 4320 long
 ./jobs/performance/notune_primer.sh higgs 100 10 0.25 'sklearn' accuracy $criterion 45 1440 short
 

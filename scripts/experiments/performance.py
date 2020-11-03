@@ -189,6 +189,7 @@ def performance(args, out_dir, logger):
     results['acc'] = acc
     results['ap'] = ap
     results['train_time'] = train_time
+    results['continuous'] = args.continuous
     np.save(os.path.join(out_dir, 'results.npy'), results)
 
     logger.info('total time: {:.3f}s'.format(time.time() - begin))
