@@ -6,11 +6,16 @@ import os
 import numpy as np
 
 
-def get_data(dataset, data_dir='data'):
+def get_data(dataset, data_dir='data', continuous=False):
     """
     Returns a train and test set from the desired dataset.
     """
-    assert os.path.exists(os.path.join(data_dir, dataset))
+    in_dir = os.path.join(data_dir, dataset)
+
+    if continuous:
+        in_dir = os.path.join(in_dir, 'continuous')
+
+    assert os.path.exists(in_dir)
 
     train = np.load(os.path.join(data_dir, dataset, 'train.npy'))
     test = np.load(os.path.join(data_dir, dataset, 'test.npy'))

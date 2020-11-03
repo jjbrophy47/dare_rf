@@ -23,6 +23,7 @@ jobs/logs/
 
 # data
 data/*/raw/*
+data/*/continuous/*
 !data/*/raw/readme.txt
 data/*/*.npy
 data/5xor

@@ -123,7 +123,9 @@ def performance(args, out_dir, logger):
     begin = time.time()
 
     # obtain data
-    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset,
+                                                          data_dir=args.data_dir,
+                                                          continuous=args.continuous)
 
     # dataset statistics
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
@@ -198,6 +200,9 @@ def main(args):
     out_dir = os.path.join(args.out_dir, args.dataset,
                            args.criterion)
 
+    if args.continuous:
+        out_dir = os.path.join(out_dir, 'continuous')
+
     if args.no_tune:
         out_dir = os.path.join(out_dir, 'no_tune', 'rs_{}'.format(args.rs))
     else:
@@ -244,6 +249,9 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--out_dir', type=str, default='output/performance/', help='output directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
+
+    # data settings
+    parser.add_argument('--continuous', action='store_true', default=False, help='If True, continuous, else binary.')
 
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')

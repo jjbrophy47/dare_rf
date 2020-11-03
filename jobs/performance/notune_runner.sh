@@ -15,4 +15,5 @@ rs=$8
 
 python3 scripts/experiments/performance.py --dataset $dataset \
     --n_estimators $n_estimators --max_depth $max_depth --max_features $max_features \
-    --model $model --scoring $scoring --criterion $criterion --no_tune --rs $rs
+    --model $model --scoring $scoring --criterion $criterion --no_tune --rs $rs \
+    --continuous
