@@ -67,6 +67,9 @@ def process_results(df):
     """
     Averages utility results over different random states.
     """
+
+    df['continuous'] = df['continuous'].fillna(False)
+
     groups = ['dataset', 'criterion', 'model', 'bootstrap', 'continuous']
 
     main_result_list = []
@@ -134,6 +137,9 @@ def create_csv(args, out_dir, logger):
     logger.info('\nProcessing results...')
     main_df = process_results(df)
     logger.info('\nProcessed results:\n{}'.format(main_df))
+
+    # uncomment to see performance differences between continuous and binary feature transformations
+    print(main_df[(main_df['model'] == 'sklearn') & (main_df['bootstrap'] == False)])
 
     main_df.to_csv(os.path.join(out_dir, 'results.csv'), index=None)
 

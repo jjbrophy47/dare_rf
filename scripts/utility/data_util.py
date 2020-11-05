@@ -17,10 +17,12 @@ def get_data(dataset, data_dir='data', continuous=False):
 
     assert os.path.exists(in_dir)
 
-    train = np.load(os.path.join(data_dir, dataset, 'train.npy'))
-    test = np.load(os.path.join(data_dir, dataset, 'test.npy'))
-    assert np.all(np.unique(train) == np.array([0, 1]))
-    assert np.all(np.unique(test) == np.array([0, 1]))
+    train = np.load(os.path.join(in_dir, 'train.npy'))
+    test = np.load(os.path.join(in_dir, 'test.npy'))
+
+    if not continuous:
+        assert np.all(np.unique(train) == np.array([0, 1]))
+        assert np.all(np.unique(test) == np.array([0, 1]))
 
     X_train = train[:, :-1]
     y_train = train[:, -1]
