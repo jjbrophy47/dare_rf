@@ -109,7 +109,7 @@ class Forest(object):
         self.random_state_ = get_random_int(self.random_state)
 
         # set max_features
-        if self.max_features == -1 or not self.max_features or self.max_features == 'sqrt':
+        if not self.max_features or self.max_features == 'sqrt':
             self.max_features_ = int(np.sqrt(self.n_features_))
 
         elif isinstance(self.max_features, int):
@@ -119,9 +119,6 @@ class Forest(object):
         elif isinstance(self.max_features, float):
             assert self.max_features > 0 and self.max_features <= 1.0
             self.max_features_ = int(self.max_features * self.n_features_)
-
-        else:
-            raise ValueError('max_features {} unknown!'.format(self.max_features))
 
         # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
@@ -136,6 +133,11 @@ class Forest(object):
         self.trees_ = []
         for i in range(self.n_estimators):
 
+            # select features
+            np.random.seed(self.random_state_ + i)
+            feature_indices = np.random.choice(self.n_features_, size=self.max_features_, replace=False)
+            feature_indices = feature_indices.astype(np.int32)
+
             # build tree
             tree = Tree(topd=self.topd_,
                         min_support=self.min_support,
@@ -146,7 +148,7 @@ class Forest(object):
                         random_state=self.random_state_ + i,
                         verbose=self.verbose)
 
-            tree = tree.fit(X, y, max_features=self.max_features_, manager=self.manager_)
+            tree = tree.fit(X, y, features=feature_indices, manager=self.manager_)
 
             # add to forest
             self.trees_.append(tree)
@@ -310,13 +312,6 @@ class Forest(object):
         for tree in self.trees_:
             tree.clear_add_metrics()
 
-    def set_sim_mode(self, sim_mode=False):
-        """
-        Turns simulation mode on/off.
-        """
-        for tree in self.trees_:
-            tree.set_sim_mode(sim_mode=sim_mode)
-
     def get_params(self, deep=False):
         """
         Returns the parameter of this model as a dictionary.
@@ -403,7 +398,7 @@ class Tree(object):
         s += '\nverbose={}'.format(self.verbose)
         return s
 
-    def fit(self, X, y, max_features=None, manager=None):
+    def fit(self, X, y, features=None, manager=None):
         """
         Build decision tree.
         """
@@ -414,25 +409,31 @@ class Tree(object):
         self.random_state_ = check_random_state(self.random_state)
 
         # configure data manager
-        if max_features is not None:
+        if features is not None:
             assert manager is not None
-            self.max_features_ = max_features
+
+            self.n_features_ = features.shape[0]
             self.manager_ = manager
             self.single_tree_ = False
 
         else:
             X, y = check_data(X, y)
-            self.max_features_ = X.shape[1]
+            features = np.arange(X.shape[1], dtype=np.int32)
+
+            self.n_features_ = features.shape[0]
             self.manager_ = _DataManager(X, y)
             self.single_tree_ = True
 
-        # set hyperparameters
+        # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
+
+        # set top d
         self.topd_ = min(self.topd, self.max_depth_ + 1)
+
+        # set splitting criterion
         self.use_gini_ = True if self.criterion == 'gini' else False
 
-        # create tree objects
-        self.tree_ = _Tree()
+        self.tree_ = _Tree(features)
 
         self.splitter_ = _Splitter(self.min_samples_leaf,
                                    self.use_gini_)
@@ -444,7 +445,6 @@ class Tree(object):
                                           self.max_depth_,
                                           self.topd_,
                                           self.min_support,
-                                          self.max_features_,
                                           self.random_state_)
 
         self.remover_ = _Remover(self.manager_,
@@ -603,12 +603,6 @@ class Tree(object):
         n_semi_random_nodes = self.tree_.get_random_node_count(self.topd_,
                                                                self.min_support)
         return n_nodes, n_exact_nodes, n_semi_random_nodes
-
-    def set_sim_mode(self, sim_mode=False):
-        """
-        Turns simulation mode on/off.
-        """
-        self.tree_builder_.set_sim_mode(sim_mode)
 
     def get_params(self, deep=False):
         """

@@ -19,7 +19,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart_rf as dart
+import dart
 from baselines import cedar
 from utility import data_util
 from utility import exp_util

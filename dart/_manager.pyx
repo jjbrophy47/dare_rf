@@ -81,6 +81,7 @@ cdef class _DataManager:
         """
         Destructor.
         """
+        # printf('[MD] freeing manager\n')
         for i in range(self.n_samples + self.n_vacant):
             if self.X[i]:
                 free(self.X[i])
@@ -88,6 +89,7 @@ cdef class _DataManager:
         free(self.y)
         if self.vacant:
             free(self.vacant)
+        # printf('[MD] done freeing manager\n')
 
     @cython.boundscheck(False)
     @cython.wraparound(False)

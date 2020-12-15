@@ -9,26 +9,28 @@ from ._utils cimport UINT32_t
 cdef struct Node:
 
     # Structure for predictions
-    bint   is_leaf               # Whether this node is a leaf
-    double value                 # Value of node if leaf
-    int    feature               # Chosen split feature if decision node
-    Node*  left                  # Left child node
-    Node*  right                 # Right child node
+    bint   is_leaf                   # Whether this node is a leaf
+    double value                     # Value of node if leaf
+    int    feature                   # Chosen split feature if decision node
+    Node*  left                      # Left child node
+    Node*  right                     # Right child node
 
     # Extra information
-    int    depth                 # Depth of node
-    bint   is_left               # Whether this node is a left child
+    int    depth                     # Depth of node
+    bint   is_left                   # Whether this node is a left child
 
     # Metadata necessary for efficient updating
-    int      count               # Number of samples in the node
-    int      pos_count           # Number of pos samples in the node
-    int      features_count      # Number of features in the node
-    int*     features            # Array of valid features, shape=[feature_count]
-    int*     left_counts         # Array of left sample counts, shape=[feature_count]
-    int*     left_pos_counts     # Array of left positive sample counts, shape=[feature_count]
-    int*     right_counts        # Array of right sample counts, shape=[feature_count]
-    int*     right_pos_counts    # Array of right positive sample counts, shape=[feature_count]
-    int*     leaf_samples        # Array of sample indices if leaf, shape=[feature_count]
+    int      count                   # Number of samples in the node
+    int      pos_count               # Number of pos samples in the node
+    int      features_count          # Number of features in the node
+    int      invalid_features_count  # Number of invalid features in the node
+    int*     features                # Array of valid features, shape=[feature_count]
+    int*     invalid_features        # Array of invalid features, shape=[feature_count]
+    int*     left_counts             # Array of left sample counts, shape=[feature_count]
+    int*     left_pos_counts         # Array of left positive sample counts, shape=[feature_count]
+    int*     right_counts            # Array of right sample counts, shape=[feature_count]
+    int*     right_pos_counts        # Array of right positive sample counts, shape=[feature_count]
+    int*     leaf_samples            # Array of sample indices if leaf, shape=[feature_count]
 
 cdef class _Tree:
     """
@@ -36,12 +38,7 @@ cdef class _Tree:
     TreeBuilder. The tree structure is used for predictions.
     """
 
-    # data specific stucture
-    cdef int  n_feature_indices          # Number of features this tree builds on
-    cdef int* feature_indices            # Array of features, shape=[n_features]
-
     # Inner structures
-    cdef double* layer_budget            # Array of budgets, shape=[max_depth]
     cdef Node*   root                    # Root node
 
     # Python/C API
@@ -83,9 +80,11 @@ cdef class _TreeBuilder:
     cdef int          max_depth            # Maximal tree depth
     cdef int          topd                 # Number of top semi-random layers
     cdef int          min_support          # Minimum number of samples to be a semi-random node
+    cdef int          max_features         # Maximum number of features to consider at each split
     cdef UINT32_t     rand_r_state         # sklearn_rand_r random number state
     cdef bint         sim_mode             # Activates simulation mode
     cdef int          sim_depth            # Depth of previous operation completion
+    cdef int*         features             # Features to use whn retraining a node
 
     # Python API
     cpdef void set_sim_mode(self, bint sim_mode)
@@ -93,7 +92,7 @@ cdef class _TreeBuilder:
 
     # C API
     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,
-                      int* features, int n_features,
+                      int* invalid_features, int n_invalid_features,
                       int depth, bint is_left) nogil
 
     cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,

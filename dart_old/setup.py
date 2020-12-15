@@ -7,7 +7,7 @@ from Cython.Build import cythonize
 
 
 def configuration(parent_package='', top_path=None):
-    config = Configuration('dart_rf', parent_name=parent_package, top_path=top_path)
+    config = Configuration('dart_old', parent_name=parent_package, top_path=top_path)
 
     libraries = []
     if os.name == 'posix':

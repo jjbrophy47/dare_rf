@@ -217,7 +217,6 @@ cdef void dealloc(Node *node) nogil:
     # free contents of the node
     if node.features:
         free(node.features)
-        free(node.invalid_features)
         free(node.left_counts)
         free(node.left_pos_counts)
         free(node.right_counts)

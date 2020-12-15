@@ -13,9 +13,9 @@ cdef struct SplitRecord:
     int  left_count              # Number of samples in left branch.
     int* right_indices           # Samples in right branch of feature.
     int  right_count             # Number of samples in right branch.
-    int* invalid_left_features   # Invalid features to consider for left children.
-    int* invalid_right_features  # Invalid features to consider for right children.
-    int  invalid_features_count  # Number of invalid features after split.
+    int* left_features           # Valid features to consider for left children.
+    int* right_features          # Valid features to consider for right children.
+    int  features_count          # Number of valid features after split.
 
     # Extra metadata
     int     count               # Number of samples in the node
@@ -37,8 +37,5 @@ cdef class _Splitter:
                         SplitRecord *split) nogil
 
     cdef int compute_splits(self, Node** node_ptr, int** X, int* y,
-                            int* samples, int n_samples) nogil
-
-    cdef void select_features(self, Node** node, int n_features, int n_max_features,
-                              int* invalid_features, int n_invalid_features,
-                              UINT32_t* random_state, int* features) nogil
+                            int* samples, int n_samples,
+                            int* features, int n_features) nogil

@@ -1,5 +1,5 @@
 """
-Tree and tree builder objects.
+Tree and Tree Builder objects.
 """
 cimport cython
 
@@ -41,7 +41,6 @@ cdef class _TreeBuilder:
                   int max_depth,
                   int topd,
                   int min_support,
-                  int max_features,
                   object random_state):
 
         self.manager = manager
@@ -51,12 +50,10 @@ cdef class _TreeBuilder:
         self.max_depth = max_depth
         self.topd = topd
         self.min_support = min_support
-        self.max_features = max_features
         self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
         self.sim_mode = 0
         self.sim_depth = -1
-        self.features = NULL
 
     cpdef void set_sim_mode(self, bint sim_mode):
         """
@@ -77,20 +74,19 @@ cdef class _TreeBuilder:
 
         cdef int* samples
         cdef int  n_samples = self.manager.n_samples
-        cdef int* invalid_features = NULL
-        cdef int  n_invalid_features = 0
+        cdef int* features = tree.feature_indices
+        cdef int  n_features = tree.n_feature_indices
 
         # fill in samples
         samples = <int *>malloc(n_samples * sizeof(int))
         for i in range(n_samples):
             samples[i] = i
 
-        tree.root = self._build(X, y, samples, n_samples,
-                                invalid_features, n_invalid_features, 0, 0)
+        tree.root = self._build(X, y, samples, n_samples, features, n_features, 0, 0)
 
     @cython.cdivision(True)
     cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,
-                      int* invalid_features, int n_invalid_features,
+                      int* features, int n_features,
                       int depth, bint is_left) nogil:
         """
         Builds a subtree given samples to train from.
@@ -101,27 +97,20 @@ cdef class _TreeBuilder:
         cdef int topd = self.topd
         cdef int min_support = self.min_support
         cdef UINT32_t* random_state = &self.rand_r_state
-        cdef int n_features = self.manager.n_features
-        cdef int n_max_features = self.max_features
 
         cdef Node *node = self._initialize_node(depth, is_left)
 
-        cdef bint is_bottom_leaf = (depth >= self.max_depth or
-                                    n_features - n_invalid_features < 1)
+        cdef bint is_bottom_leaf = (depth >= self.max_depth or n_features < 1)
         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
                                     n_samples < 2 * self.min_samples_leaf)
 
         if is_bottom_leaf:
             self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
-            free(invalid_features)
+            free(features)
 
         else:
-            self.splitter.select_features(&node, n_features, n_max_features,
-                                          invalid_features, n_invalid_features,
-                                          random_state, self.features)
-            self.features = NULL
-
-            self.splitter.compute_splits(&node, X, y, samples, n_samples)
+            self.splitter.compute_splits(&node, X, y, samples, n_samples, features,
+                                         n_features)
 
             if not is_middle_leaf:
                 is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
@@ -136,11 +125,11 @@ cdef class _TreeBuilder:
                 self._set_decision_node(&node, &split)
 
                 node.left = self._build(X, y, split.left_indices, split.left_count,
-                                        split.invalid_left_features, split.invalid_features_count,
+                                        split.left_features, split.features_count,
                                         depth + 1, 1)
 
                 node.right = self._build(X, y, split.right_indices, split.right_count,
-                                         split.invalid_right_features, split.invalid_features_count,
+                                         split.right_features, split.features_count,
                                          depth + 1, 0)
 
         return node
@@ -160,9 +149,7 @@ cdef class _TreeBuilder:
 
         if is_bottom_leaf:
             node.features_count = UNDEF
-            node.invalid_features_count = UNDEF
             node.features = NULL
-            node.invalid_features = NULL
             node.left_counts = NULL
             node.left_pos_counts = NULL
             node.right_counts = NULL
@@ -213,10 +200,17 @@ cdef class _TreeBuilder:
 
 cdef class _Tree:
 
-    def __cinit__(self):
+    def __cinit__(self, np.ndarray features):
         """
         Constructor.
         """
+
+        # features this tree is built on
+        self.n_feature_indices = features.shape[0]
+        self.feature_indices = convert_int_ndarray(features)
+
+        # internal data structures
+        self.layer_budget = NULL
         self.root = NULL
 
     def __dealloc__(self):

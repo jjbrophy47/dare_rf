@@ -25,7 +25,8 @@ cdef class _Splitter:
         ----------
         min_samples_leaf : int
             The minimal number of samples each leaf can have, where splits
-            which would result in having less samples in a leaf are not considered.
+            which would result in having less samples in a leaf are not
+            considered.
         use_gini : bool
             If True, use the Gini index splitting criterion; otherwise
             use entropy.
@@ -96,17 +97,16 @@ cdef class _Splitter:
             split.right_count = k
             split.feature = chosen_feature
 
-            # add chosen feature to list of invalid nodes
-            split.invalid_features_count = node.invalid_features_count + 1
-            split.invalid_left_features = <int *>malloc(split.invalid_features_count * sizeof(int))
-            split.invalid_right_features = <int *>malloc(split.invalid_features_count * sizeof(int))
-
-            for i in range(node.invalid_features_count):
-                split.invalid_left_features[i] = node.invalid_features[i]
-                split.invalid_right_features[i] = node.invalid_features[i]
-
-            split.invalid_left_features[split.invalid_features_count - 1] = chosen_feature
-            split.invalid_right_features[split.invalid_features_count - 1] = chosen_feature
+            # remove chosen feature from descendent nodes
+            split.features_count = node.features_count - 1
+            split.left_features = <int *>malloc(split.features_count * sizeof(int))
+            split.right_features = <int *>malloc(split.features_count * sizeof(int))
+            j = 0
+            for i in range(node.features_count):
+                if node.features[i] != split.feature:
+                    split.left_features[j] = node.features[i]
+                    split.right_features[j] = node.features[i]
+                    j += 1
 
         # leaf
         else:
@@ -118,7 +118,8 @@ cdef class _Splitter:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef int compute_splits(self, Node** node_ptr, int** X, int* y,
-                            int* samples, int n_samples) nogil:
+                            int* samples, int n_samples,
+                            int* features, int n_features) nogil:
         """
         Update the metadata of this node.
         """
@@ -127,10 +128,10 @@ cdef class _Splitter:
         cdef int count = n_samples
         cdef int pos_count = 0
 
-        cdef int* left_counts = <int *>malloc(node.features_count * sizeof(int))
-        cdef int* left_pos_counts = <int *>malloc(node.features_count * sizeof(int))
-        cdef int* right_counts = <int *>malloc(node.features_count * sizeof(int))
-        cdef int* right_pos_counts = <int *>malloc(node.features_count * sizeof(int))
+        cdef int* left_counts = <int *>malloc(n_features * sizeof(int))
+        cdef int* left_pos_counts = <int *>malloc(n_features * sizeof(int))
+        cdef int* right_counts = <int *>malloc(n_features * sizeof(int))
+        cdef int* right_pos_counts = <int *>malloc(n_features * sizeof(int))
 
         cdef int left_count
         cdef int left_pos_count
@@ -143,13 +144,13 @@ cdef class _Splitter:
                 pos_count += 1
 
         # compute statistics for each attribute
-        for j in range(node.features_count):
+        for j in range(n_features):
 
             left_count = 0
             left_pos_count = 0
 
             for i in range(n_samples):
-                if X[samples[i]][node.features[j]] == 1:
+                if X[samples[i]][features[j]] == 1:
                     left_count += 1
                     left_pos_count += y[samples[i]]
 
@@ -160,68 +161,9 @@ cdef class _Splitter:
 
         node.count = count
         node.pos_count = pos_count
+        node.features_count = n_features
+        node.features = features
         node.left_counts = left_counts
         node.left_pos_counts = left_pos_counts
         node.right_counts = right_counts
         node.right_pos_counts = right_pos_counts
-
-
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    @cython.cdivision(True)
-    cdef void select_features(self, Node** node_ptr, int n_features, int n_max_features,
-                              int* invalid_features, int n_invalid_features,
-                              UINT32_t* random_state, int* features) nogil:
-        """
-        Select a random subset of features that are not alread used.
-        """
-        cdef Node* node = node_ptr[0]
-
-        cdef int n_elem = n_max_features
-        if n_features - n_invalid_features < n_max_features:
-            n_elem = n_features - n_invalid_features
-
-        # use the same features from the node being retrained
-        if features:
-            node.features = features
-            node.features_count = n_elem
-            node.invalid_features = invalid_features
-            node.invalid_features_count = n_invalid_features
-            return
-
-        cdef int ndx
-
-        cdef int* new_arr = <int *>malloc(n_elem * sizeof(int))
-        cdef int* generated_arr = <int *>malloc(n_elem * sizeof(int))
-
-        cdef int i = 0
-        cdef bint valid = True
-
-        while i < n_elem:
-            valid = True
-            ndx = int(rand_uniform(0, 1, random_state) / (1.0 / n_features))
-
-            # prevent repeating features
-            for j in range(i):
-                if ndx == generated_arr[j]:
-                    valid = False
-                    break
-
-            # prevent already used features
-            for j in range(n_invalid_features):
-                if ndx == invalid_features[j]:
-                    valid = False
-                    break
-
-            # add feature to feature pool
-            if valid:
-                new_arr[i] = ndx
-                generated_arr[i] = ndx
-                i += 1
-
-        free(generated_arr)
-
-        node.features = new_arr
-        node.features_count = n_elem
-        node.invalid_features = invalid_features
-        node.invalid_features_count = n_invalid_features
