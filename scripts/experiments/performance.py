@@ -252,7 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
 
     # data settings
-    parser.add_argument('--continuous', action='store_true', default=False, help='If True, continuous, else binary.')
+    parser.add_argument('--continuous', action='store_true', default=True, help='If True, continuous, else binary.')
 
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')

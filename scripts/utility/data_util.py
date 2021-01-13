@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 
-def get_data(dataset, data_dir='data', continuous=False):
+def get_data(dataset, data_dir='data', continuous=True):
     """
     Returns a train and test set from the desired dataset.
     """
