@@ -40,7 +40,7 @@ cdef class _TreeBuilder:
                   int min_samples_leaf,
                   int max_depth,
                   int topd,
-                  int min_support,
+                  int k,
                   int max_features,
                   object random_state):
 
@@ -50,7 +50,7 @@ cdef class _TreeBuilder:
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = max_depth
         self.topd = topd
-        self.min_support = min_support
+        self.k = k
         self.max_features = max_features
         self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
@@ -71,139 +71,120 @@ cdef class _TreeBuilder:
         """
 
         # Data containers
-        cdef int** X = NULL
-        cdef int* y = NULL
+        cdef double** X = NULL
+        cdef int*     y = NULL
         self.manager.get_data(&X, &y)
 
         cdef int* samples
         cdef int  n_samples = self.manager.n_samples
-        cdef int* invalid_features = NULL
-        cdef int  n_invalid_features = 0
 
         # fill in samples
         samples = <int *>malloc(n_samples * sizeof(int))
         for i in range(n_samples):
             samples[i] = i
 
-        tree.root = self._build(X, y, samples, n_samples,
-                                invalid_features, n_invalid_features, 0, 0)
+        tree.root = self._build(X, y, samples, n_samples, 0, 0)
 
     @cython.cdivision(True)
-    cdef Node* _build(self, int** X, int* y, int* samples, int n_samples,
-                      int* invalid_features, int n_invalid_features,
-                      int depth, bint is_left) nogil:
+    cdef Node* _build(self,
+                      double** X,
+                      int*     y,
+                      int*     samples,
+                      int      n_samples,
+                      int      depth,
+                      bint     is_left) nogil:
         """
-        Builds a subtree given samples to train from.
+        Build a subtree given a partition of samples.
         """
-        cdef SplitRecord split
-        cdef int result
-
         cdef int topd = self.topd
-        cdef int min_support = self.min_support
         cdef UINT32_t* random_state = &self.rand_r_state
-        cdef int n_features = self.manager.n_features
+        cdef int n_total_features = self.manager.n_features
         cdef int n_max_features = self.max_features
 
-        cdef Node *node = self._initialize_node(depth, is_left)
+        cdef Node *node = self._initialize_node(depth, is_left, y, samples, n_samples)
 
-        cdef bint is_bottom_leaf = (depth >= self.max_depth or
-                                    n_features - n_invalid_features < 1)
+        cdef bint is_bottom_leaf = (depth >= self.max_depth)
         cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
-                                    n_samples < 2 * self.min_samples_leaf)
+                                    n_samples < 2 * self.min_samples_leaf or
+                                    node.n_pos_samples == 0 or
+                                    node.n_pos_samples == node.n_samples)
 
-        if is_bottom_leaf:
-            self._set_leaf_node(&node, y, samples, n_samples, is_bottom_leaf)
-            free(invalid_features)
+        cdef SplitRecord split
 
+        # printf('\n[B] n_samples: %d, depth: %d, is_left: %d\n', n_samples, depth, is_left)
+
+        # leaf node
+        if is_bottom_leaf or is_middle_leaf:
+            self._set_leaf_node(&node, samples)
+            # printf('[B] leaf.value: %.2f\n', node.value)
+
+        # decision node
         else:
-            self.splitter.select_features(&node, n_features, n_max_features,
-                                          invalid_features, n_invalid_features,
-                                          random_state, self.features)
-            self.features = NULL
 
-            self.splitter.compute_splits(&node, X, y, samples, n_samples)
+            # randomly select a subset of features to use at this node
+            self.splitter.select_features(&node, n_total_features, n_max_features, random_state)
 
-            if not is_middle_leaf:
-                is_middle_leaf = self.splitter.split_node(node, X, y, samples, n_samples,
-                                                          topd, min_support, random_state,
-                                                          &split)
+            # identify and compute metadata for all thresholds in each feature
+            self.splitter.compute_metadata(&node, X, y, samples, n_samples)
 
-            if is_middle_leaf:
-                self._set_leaf_node(&node, y, samples, n_samples, 0)
+            # choose a feature / threshold and partition the data
+            self.splitter.split_node(&node, X, y, samples, n_samples, topd, random_state, &split)
+            # printf('[B] chosen_feature.index: %d, chosen_threshold.value: %.2f\n',
+            #       node.chosen_feature.index, node.chosen_threshold.value)
 
-            else:
-                free(samples)
-                self._set_decision_node(&node, &split)
+            # clean up
+            free(samples)
 
-                node.left = self._build(X, y, split.left_indices, split.left_count,
-                                        split.invalid_left_features, split.invalid_features_count,
-                                        depth + 1, 1)
-
-                node.right = self._build(X, y, split.right_indices, split.right_count,
-                                         split.invalid_right_features, split.invalid_features_count,
-                                         depth + 1, 0)
+            # traverse to left and right branches
+            node.left = self._build(X, y, split.left_samples, split.n_left_samples, depth + 1, 1)
+            node.right = self._build(X, y, split.right_samples, split.n_right_samples, depth + 1, 0)
 
         return node
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef void _set_leaf_node(self, Node** node_ptr, int* y, int* samples, int n_samples,
-                        bint is_bottom_leaf) nogil:
+    cdef void _set_leaf_node(self,
+                             Node** node_ptr,
+                             int*   samples) nogil:
         """
         Compute leaf value and set all other attributes.
         """
-        cdef int pos_count = 0
-        cdef int i
-
         cdef Node *node = node_ptr[0]
 
-        if is_bottom_leaf:
-            node.features_count = UNDEF
-            node.invalid_features_count = UNDEF
-            node.features = NULL
-            node.invalid_features = NULL
-            node.left_counts = NULL
-            node.left_pos_counts = NULL
-            node.right_counts = NULL
-            node.right_pos_counts = NULL
-
-            for i in range(n_samples):
-                pos_count += y[samples[i]]
-
-            node.count = n_samples
-            node.pos_count = pos_count
-
+        # set leaf node variables
         node.is_leaf = 1
         node.leaf_samples = samples
-        if node.count > 0:
-            node.value = node.pos_count / <double> node.count
+        if node.n_samples > 0:
+            node.value = node.n_pos_samples / <double> node.n_samples
         else:
             node.value = UNDEF_LEAF_VAL
 
-        node.feature = UNDEF
+        # clear decision node variables
+        node.features = NULL
+        node.n_features = UNDEF
+        node.chosen_feature = NULL
+        node.chosen_threshold = NULL
 
+        # no children
         node.left = NULL
         node.right = NULL
 
-    cdef void _set_decision_node(self, Node** node_ptr, SplitRecord* split) nogil:
-        """
-        Set all attributes for decision node.
-        """
-        cdef Node* node = node_ptr[0]
-
-        node.is_leaf = 0
-        node.value = UNDEF
-        node.leaf_samples = NULL
-        node.feature = split.feature
-
-    cdef Node* _initialize_node(self, int depth, int is_left) nogil:
+    cdef Node* _initialize_node(self, int depth, int is_left,
+                                int* y, int* samples, int n_samples) nogil:
         """
         Create and initialize a new node.
         """
+        # compute number of positive samples
+        cdef int n_pos_samples = 0
+        for i in range(n_samples):
+            n_pos_samples += y[samples[i]]
+
         cdef Node *node = <Node *>malloc(sizeof(Node))
         node.depth = depth
         node.is_left = is_left
+        node.n_samples = n_samples
+        node.n_pos_samples = n_pos_samples
         return node
 
 
@@ -229,7 +210,7 @@ cdef class _Tree:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef np.ndarray predict(self, int[:,:] X):
+    cpdef np.ndarray predict(self, double[:,:] X):
         """
         Predict probability of positive label for X.
         """
@@ -248,7 +229,7 @@ cdef class _Tree:
                 node = self.root
 
                 while not node.is_leaf:
-                    if X[i, node.feature] == 1:
+                    if X[i, node.chosen_feature.index] <= node.chosen_threshold.value:
                         node = node.left
                     else:
                         node = node.right
@@ -271,25 +252,25 @@ cdef class _Tree:
         """
         return self._get_node_count(self.root)
 
-    cpdef int get_exact_node_count(self, int topd, int min_support):
+    cpdef int get_exact_node_count(self, int topd):
         """
         Get number of exact nodes in the top d layers.
         """
-        return self._get_exact_node_count(self.root, topd, min_support)
+        return self._get_exact_node_count(self.root, topd)
 
-    cpdef int get_random_node_count(self, int topd, int min_support):
+    cpdef int get_random_node_count(self, int topd):
         """
         Get number of semi-random nodes in the top d layers.
         """
-        return self._get_random_node_count(self.root, topd, min_support)
+        return self._get_random_node_count(self.root, topd)
 
-    cpdef void print_node_type_count(self, int topd, int min_support):
+    cpdef void print_node_type_count(self, int topd):
         """
         Print the number of exact and semi-random nodes in the
         top d layers.
         """
-        cdef int exact_node_count = self._get_exact_node_count(self.root, topd, min_support)
-        cdef int random_node_count = self._get_random_node_count(self.root, topd, min_support)
+        cdef int exact_node_count = self._get_exact_node_count(self.root, topd)
+        cdef int random_node_count = self._get_random_node_count(self.root, topd)
         printf('no. exact: %d, no. semi-random: %d\n', exact_node_count, random_node_count)
 
     # node information
@@ -332,7 +313,7 @@ cdef class _Tree:
         else:
             return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)
 
-    cdef int _get_exact_node_count(self, Node* node, int topd, int min_support) nogil:
+    cdef int _get_exact_node_count(self, Node* node, int topd) nogil:
         cdef int result = 0
 
         if not node or node.is_leaf:
@@ -342,29 +323,29 @@ cdef class _Tree:
             if node.depth >= topd:
                 result = 1
 
-            result += self._get_exact_node_count(node.left, topd, min_support)
-            result += self._get_exact_node_count(node.right, topd, min_support)
+            result += self._get_exact_node_count(node.left, topd)
+            result += self._get_exact_node_count(node.right, topd)
 
         return result
 
-    cdef int _get_random_node_count(self, Node* node, int topd, int min_support) nogil:
+    cdef int _get_random_node_count(self, Node* node, int topd) nogil:
         cdef int result = 0
 
         if not node or node.is_leaf:
             result = 0
 
         else:
-            if node.depth < topd and node.count >= min_support:
+            if node.depth < topd:
                 result = 1
 
-            result += self._get_random_node_count(node.left, topd, min_support)
-            result += self._get_random_node_count(node.right, topd, min_support)
+            result += self._get_random_node_count(node.left, topd)
+            result += self._get_random_node_count(node.right, topd)
 
         return result
 
     cdef void _print_n_samples(self, Node* node) nogil:
         if node:
-            printf('%d ', node.count)
+            printf('%d ', node.n_samples)
             self._print_n_samples(node.left)
             self._print_n_samples(node.right)
 
@@ -376,7 +357,7 @@ cdef class _Tree:
 
     cdef void _print_feature(self, Node* node) nogil:
         if node:
-            printf('%d ', node.feature)
+            printf('%d ', node.chosen_feature.index)
             self._print_feature(node.left)
             self._print_feature(node.right)
 

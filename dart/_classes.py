@@ -35,11 +35,13 @@ class Forest(object):
 
     Parameters:
     -----------
-    topd: int (default=1)
+    topd: int (default=0)
         Number of non-random layers that share the indistinguishability budget.
-    min_support: int (default=2,500)
-        Minimum number of samples in a node to enable a stochastic split; otherwise
-        exact unlearning is used instead.
+    k: int (default=25)
+        Number of candidate thresholds per feature to consider
+        through uniform sampling.
+        TODO: make this auto? Maybe square root of the max. no. unique values
+              across all features if this number is greater than, say, 25?
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -60,8 +62,8 @@ class Forest(object):
         Verbosity level.
     """
     def __init__(self,
-                 topd=1,
-                 min_support=2500,
+                 topd=0,
+                 k=25,
                  n_estimators=100,
                  max_features='sqrt',
                  max_depth=10,
@@ -71,7 +73,7 @@ class Forest(object):
                  random_state=None,
                  verbose=0):
         self.topd = topd
-        self.min_support = min_support
+        self.k = k
         self.n_estimators = n_estimators
         self.max_features = max_features
         self.max_depth = max_depth
@@ -84,7 +86,7 @@ class Forest(object):
     def __str__(self):
         s = 'Forest:'
         s += '\ntopd={}'.format(self.topd)
-        s += '\nmin_support={}'.format(self.min_support)
+        s += '\nk={}'.format(self.k)
         s += '\nn_estimators={}'.format(self.n_estimators)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_depth={}'.format(self.max_depth)
@@ -129,7 +131,10 @@ class Forest(object):
         # set top d
         self.topd_ = min(self.topd, self.max_depth_ + 1)
 
-        # # one central location for the data
+        # make sure k is positive
+        assert self.k > 0
+
+        # one central location for the data
         self.manager_ = _DataManager(X, y)
 
         # build forest
@@ -138,7 +143,7 @@ class Forest(object):
 
             # build tree
             tree = Tree(topd=self.topd_,
-                        min_support=self.min_support,
+                        k=self.k,
                         max_depth=self.max_depth_,
                         criterion=self.criterion,
                         min_samples_split=self.min_samples_split,
@@ -323,7 +328,7 @@ class Forest(object):
         """
         d = {}
         d['topd'] = self.topd
-        d['min_support'] = self.min_support
+        d['k'] = self.k
         d['n_estimators'] = self.n_estimators
         d['max_features'] = self.max_features
         d['max_depth'] = self.max_depth
@@ -355,11 +360,10 @@ class Tree(object):
 
     Parameters:
     -----------
-    topd: int (default=1)
-        Number of non-random layers that share the indistinguishability budget.
-    min_support: int (default=2,500)
-        Minimum number of samples in a node to enable a stochastic split; otherwise
-        exact unlearning is used instead.
+    topd: int (default=0)
+        Number of non-random layers that contain random nodes.
+    k: int (default=25)
+        No. candidate thresholds to consider through uniform sampling.
     max_depth: int (default=None)
         The maximum depth of a tree.
     criterion: str (default='gini')
@@ -374,8 +378,8 @@ class Tree(object):
         Verbosity level.
     """
     def __init__(self,
-                 topd=1,
-                 min_support=2,
+                 topd=0,
+                 k=25,
                  max_depth=10,
                  criterion='gini',
                  min_samples_split=2,
@@ -383,7 +387,7 @@ class Tree(object):
                  random_state=None,
                  verbose=0):
         self.topd = topd
-        self.min_support = min_support
+        self.k = k
         self.max_depth = max_depth
         self.criterion = criterion
         self.min_samples_split = min_samples_split
@@ -394,7 +398,7 @@ class Tree(object):
     def __str__(self):
         s = 'Tree:'
         s += '\ntopd={}'.format(self.topd)
-        s += '\nmin_support={}'.format(self.min_support)
+        s += '\nk={}'.format(self.k)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\ncriterion={}'.format(self.criterion)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
@@ -431,6 +435,9 @@ class Tree(object):
         self.topd_ = min(self.topd, self.max_depth_ + 1)
         self.use_gini_ = True if self.criterion == 'gini' else False
 
+        # make sure k is positive
+        assert self.k > 0
+
         # create tree objects
         self.tree_ = _Tree()
 
@@ -443,7 +450,7 @@ class Tree(object):
                                           self.min_samples_leaf,
                                           self.max_depth_,
                                           self.topd_,
-                                          self.min_support,
+                                          self.k,
                                           self.max_features_,
                                           self.random_state_)
 
@@ -483,7 +490,7 @@ class Tree(object):
         """
         print('\nTREE:')
         self.tree_.print_node_count()
-        self.tree_.print_node_type_count(self.lmbda, self.topd_, self.min_support)
+        self.tree_.print_node_type_count(self.lmbda, self.topd_)
         if show_nodes:
             self.tree_.print_n_samples()
             self.tree_.print_depth()
@@ -598,10 +605,8 @@ class Tree(object):
             Semi-random node count in the top d layers.
         """
         n_nodes = self.tree_.get_node_count()
-        n_exact_nodes = self.tree_.get_exact_node_count(self.topd_,
-                                                        self.min_support)
-        n_semi_random_nodes = self.tree_.get_random_node_count(self.topd_,
-                                                               self.min_support)
+        n_exact_nodes = self.tree_.get_exact_node_count(self.topd_)
+        n_semi_random_nodes = self.tree_.get_random_node_count(self.topd_)
         return n_nodes, n_exact_nodes, n_semi_random_nodes
 
     def set_sim_mode(self, sim_mode=False):
@@ -616,7 +621,7 @@ class Tree(object):
         """
         d = {}
         d['topd'] = self.topd
-        d['min_support'] = self.min_support
+        d['k'] = self.k
         d['max_depth'] = self.max_depth
         d['criterion'] = self.criterion
         d['min_samples_split'] = self.min_samples_split
@@ -676,12 +681,13 @@ def check_random_state(seed):
 
 def check_data(X, y=None):
     """
-    Makes sure data is an integer type.
+    Makes sure data is of double type,
+    and labels are of integer type.
     """
     result = None
 
-    if X.dtype != np.int32:
-        X = X.astype(np.int32)
+    if X.dtype != np.float64:
+        X = X.astype(np.float64)
 
     if y is not None:
         if y.dtype != np.int32:

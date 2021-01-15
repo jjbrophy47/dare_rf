@@ -30,7 +30,7 @@ cdef double compute_entropy(double count, double left_count, double right_count,
                             int left_pos_count, int right_pos_count) nogil
 
 # adder / remover utility methods
-cdef void split_samples(Node* node, int** X, int* y,
+cdef void split_samples(Node* node, double** X, int* y,
                         int* samples, int n_samples,
                         SplitRecord *split) nogil
 

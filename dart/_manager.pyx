@@ -47,15 +47,15 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def __cinit__(self, int[:, :] X_in, int[:] y_in):
+    def __cinit__(self, double[:, :] X_in, int[:] y_in):
         """
         Constructor.
         """
         cdef int n_samples = X_in.shape[0]
         cdef int n_features = X_in.shape[1]
 
-        cdef int** X = <int **>malloc(n_samples * sizeof(int *))
-        cdef int* y = <int *>malloc(n_samples * sizeof(int))
+        cdef double** X = <double **>malloc(n_samples * sizeof(double *))
+        cdef int*     y = <int *>malloc(n_samples * sizeof(int))
 
         cdef int *vacant = NULL
 
@@ -65,7 +65,7 @@ cdef class _DataManager:
 
         # copy data into C pointer arrays
         for i in range(n_samples):
-            X[i] = <int *>malloc(n_features * sizeof(int))
+            X[i] = <double *>malloc(n_features * sizeof(double))
             for j in range(n_features):
                 X[i][j] = X_in[i][j]
             y[i] = y_in[i]
@@ -81,7 +81,6 @@ cdef class _DataManager:
         """
         Destructor.
         """
-        # printf('[MD] freeing manager\n')
         for i in range(self.n_samples + self.n_vacant):
             if self.X[i]:
                 free(self.X[i])
@@ -89,7 +88,6 @@ cdef class _DataManager:
         free(self.y)
         if self.vacant:
             free(self.vacant)
-        # printf('[MD] done freeing manager\n')
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -125,7 +123,7 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void get_data(self, int*** X_ptr, int** y_ptr) nogil:
+    cdef void get_data(self, double*** X_ptr, int** y_ptr) nogil:
         """
         Receive pointers to the data.
         """
@@ -140,10 +138,10 @@ cdef class _DataManager:
         """
 
         # parameters
-        cdef int** X = self.X
-        cdef int* y = self.y
-        cdef int *vacant = self.vacant
-        cdef int n_vacant = self.n_vacant
+        cdef double** X = self.X
+        cdef int*     y = self.y
+        cdef int*     vacant = self.vacant
+        cdef int      n_vacant = self.n_vacant
 
         cdef int n_samples = samples.shape[0]
         cdef int updated_n_vacant = n_vacant + n_samples
@@ -170,18 +168,18 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef void add_data(self, int[:, :] X_in, int[:] y_in):
+    cpdef void add_data(self, double[:, :] X_in, int[:] y_in):
         """
         Adds data to the database.
         """
 
         # parameters
-        cdef int** X = self.X
-        cdef int*  y = self.y
-        cdef int*  vacant = self.vacant
-        cdef int   n_vacant = self.n_vacant
-        cdef int   n_samples = self.n_samples
-        cdef int   n_features = self.n_features
+        cdef double** X = self.X
+        cdef int*     y = self.y
+        cdef int*     vacant = self.vacant
+        cdef int      n_vacant = self.n_vacant
+        cdef int      n_samples = self.n_samples
+        cdef int      n_features = self.n_features
 
         cdef int  n_new_samples = X_in.shape[0]
         cdef int  updated_n_samples = n_samples + n_new_samples
@@ -193,7 +191,7 @@ cdef class _DataManager:
 
         # grow database
         if updated_n_samples > n_samples + n_vacant:
-            X = <int **>realloc(X, updated_n_samples * sizeof(int *))
+            X = <double **>realloc(X, updated_n_samples * sizeof(double *))
             y = <int *>realloc(y, updated_n_samples * sizeof(int))
 
         # copy samples to the database
@@ -209,7 +207,7 @@ cdef class _DataManager:
                 j = n_samples
 
             # copy sample
-            X[j] = <int *>malloc(n_features * sizeof(int))
+            X[j] = <double *>malloc(n_features * sizeof(double))
             for k in range(n_features):
                 X[j][k] = X_in[i][k]
             y[j] = y_in[i]

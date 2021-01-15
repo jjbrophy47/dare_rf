@@ -58,8 +58,11 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
 
 
 @cython.cdivision(True)
-cdef double compute_split_score(bint use_gini, double count, double left_count,
-                                double right_count, int left_pos_count,
+cdef double compute_split_score(bint use_gini,
+                                double count,
+                                double left_count,
+                                double right_count,
+                                int left_pos_count,
                                 int right_pos_count) nogil:
     """
     Computes either the Gini index or entropy given this attribute.
@@ -79,8 +82,11 @@ cdef double compute_split_score(bint use_gini, double count, double left_count,
 
 
 @cython.cdivision(True)
-cdef double compute_gini(double count, double left_count, double right_count,
-                         int left_pos_count, int right_pos_count) nogil:
+cdef double compute_gini(double count,
+                         double left_count,
+                         double right_count,
+                         int left_pos_count,
+                         int right_pos_count) nogil:
     """
     Compute the Gini index given this attribute.
     """
@@ -109,8 +115,11 @@ cdef double compute_gini(double count, double left_count, double right_count,
     return left_weighted_index + right_weighted_index
 
 @cython.cdivision(True)
-cdef double compute_entropy(double count, double left_count, double right_count,
-                            int left_pos_count, int right_pos_count) nogil:
+cdef double compute_entropy(double count,
+                            double left_count,
+                            double right_count,
+                            int left_pos_count,
+                            int right_pos_count) nogil:
     """
     Compute the mutual information given this attribute.
     """
@@ -152,30 +161,34 @@ cdef double compute_entropy(double count, double left_count, double right_count,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef void split_samples(Node* node, int** X, int* y,
-                        int* samples, int n_samples,
+cdef void split_samples(Node* node,
+                        double** X,
+                        int* y,
+                        int* samples,
+                        int n_samples,
                         SplitRecord *split) nogil:
     """
     Split samples based on the chosen feature.
     """
 
+    cdef int i = 0
     cdef int j = 0
     cdef int k = 0
 
     # assign results from chosen feature
-    split.left_indices = <int *>malloc(n_samples * sizeof(int))
-    split.right_indices = <int *>malloc(n_samples * sizeof(int))
+    split.left_samples = <int *>malloc(n_samples * sizeof(int))
+    split.right_samples = <int *>malloc(n_samples * sizeof(int))
     for i in range(n_samples):
-        if X[samples[i]][node.feature] == 1:
-            split.left_indices[j] = samples[i]
+        if X[samples[i]][node.chosen_feature.index] <= node.chosen_threshold.value:
+            split.left_samples[j] = samples[i]
             j += 1
         else:
-            split.right_indices[k] = samples[i]
+            split.right_samples[k] = samples[i]
             k += 1
-    split.left_indices = <int *>realloc(split.left_indices, j * sizeof(int))
-    split.right_indices = <int *>realloc(split.right_indices, k * sizeof(int))
-    split.left_count = j
-    split.right_count = k
+    split.left_samples = <int *>realloc(split.left_samples, j * sizeof(int))
+    split.right_samples = <int *>realloc(split.right_samples, k * sizeof(int))
+    split.n_left_samples = j
+    split.n_right_samples = k
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -207,25 +220,42 @@ cdef int* copy_int_array(int* arr, int n_elem) nogil:
 cdef void dealloc(Node *node) nogil:
     """
     Recursively free all nodes in the subtree.
+
+    NOTE: Does deallocate "top" node, that must
+          be done by the caller!
     """
     if not node:
         return
 
+    # traverse to the bottom nodes first
     dealloc(node.left)
     dealloc(node.right)
 
-    # free contents of the node
-    if node.features:
-        free(node.features)
-        free(node.invalid_features)
-        free(node.left_counts)
-        free(node.left_pos_counts)
-        free(node.right_counts)
-        free(node.right_pos_counts)
-
+    # leaf node
     if node.is_leaf:
         free(node.leaf_samples)
 
+    # decision node
     else:
+
+        # loop through each feature
+        for j in range(node.n_features):
+
+            # loop through each threshold of this feature
+            for k in range(node.features[j].n_thresholds):
+
+                # free this threshold
+                free(node.features[j].thresholds[k])
+
+            # free threshold array
+            free(node.features[j].thresholds)
+
+            # free this feature
+            free(node.features[j])
+
+        # free feature array
+        free(node.features)
+
+        # free children
         free(node.left)
         free(node.right)

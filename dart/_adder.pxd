@@ -32,20 +32,20 @@ cdef class _Adder:
     cpdef void clear_add_metrics(self)
 
     # C API
-    cdef void _add(self, Node** node_ptr, int** X, int* y,
+    cdef void _add(self, Node** node_ptr, double** X, int* y,
                    int* samples, int n_samples) nogil
 
-    cdef int _check_node(self, Node* node, int** X, int* y,
+    cdef int _check_node(self, Node* node, double** X, int* y,
                           int* samples, int n_samples, int pos_count,
                           SplitRecord *split) nogil
 
-    cdef int _update_splits(self, Node** node_ptr, int** X, int* y,
+    cdef int _update_splits(self, Node** node_ptr, double** X, int* y,
                             int* samples, int n_samples, int pos_count) nogil
 
     cdef void _update_leaf(self, Node** node_ptr, int* y,
                            int* samples, int n_samples, int pos_count) nogil
 
-    cdef void _retrain(self, Node*** node_ptr, int** X, int* y, int* samples,
+    cdef void _retrain(self, Node*** node_ptr, double** X, int* y, int* samples,
                        int n_samples) nogil
 
     cdef void _get_leaf_samples(self, Node* node, int** leaf_samples_ptr,

@@ -1,5 +1,5 @@
-import numpy as np
-cimport numpy as np
+# import numpy as np
+# cimport numpy as np
 
 from ._tree cimport Node
 from ._utils cimport UINT32_t
@@ -8,18 +8,17 @@ from ._utils cimport UINT32_t
 cdef struct SplitRecord:
 
     # Data to track sample split
-    int  feature                 # Which feature to split on.
-    int* left_indices            # Samples in left branch of feature.
-    int  left_count              # Number of samples in left branch.
-    int* right_indices           # Samples in right branch of feature.
-    int  right_count             # Number of samples in right branch.
-    int* invalid_left_features   # Invalid features to consider for left children.
-    int* invalid_right_features  # Invalid features to consider for right children.
-    int  invalid_features_count  # Number of invalid features after split.
-
-    # Extra metadata
-    int     count               # Number of samples in the node
-    int     pos_count           # Number of positive samples in the node
+    # Feature *  chosen_feature     # Chosen feature to split on
+    # Threshold* chosen_threshold   # Chosen threshold to split on
+    int*       left_samples       # Samples in left branch of feature
+    int*       right_samples      # Samples in right branch of feature
+    int        n_left_samples     # Number of samples in left branch
+    int        n_right_samples    # Number of samples in right branch
+    # int        n_samples          # Number of samples in the node
+    # int        n_pos_samples      # Number of positive samples in the node
+    # int* invalid_left_features   # Invalid features to consider for left children
+    # int* invalid_right_features  # Invalid features to consider for right children
+    # int  invalid_features_count  # Number of invalid features after split
 
 cdef class _Splitter:
     """
@@ -30,15 +29,25 @@ cdef class _Splitter:
     cdef bint use_gini                     # Controls splitting criterion
 
     # Methods
-    cdef int split_node(self, Node* node, int** X, int* y,
-                        int* samples, int n_samples,
-                        int topd, int min_support,
-                        UINT32_t* random_state,
-                        SplitRecord *split) nogil
+    cdef int split_node(self,
+                        Node**       node_ptr,
+                        double**     X,
+                        int*         y,
+                        int*         samples,
+                        int          n_samples,
+                        int          topd,
+                        UINT32_t*    random_state,
+                        SplitRecord* split) nogil
 
-    cdef int compute_splits(self, Node** node_ptr, int** X, int* y,
-                            int* samples, int n_samples) nogil
+    cdef int compute_metadata(self,
+                              Node**   node_ptr,
+                              double** X,
+                              int*     y,
+                              int*     samples,
+                              int      n_samples) nogil
 
-    cdef void select_features(self, Node** node, int n_features, int n_max_features,
-                              int* invalid_features, int n_invalid_features,
-                              UINT32_t* random_state, int* features) nogil
+    cdef void select_features(self,
+                              Node**    node_ptr,
+                              int       n_total_features,
+                              int       n_max_features,
+                              UINT32_t* random_state) nogil
