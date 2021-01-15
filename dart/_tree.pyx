@@ -123,9 +123,11 @@ cdef class _TreeBuilder:
 
             # randomly select a subset of features to use at this node
             self.splitter.select_features(&node, n_total_features, n_max_features, random_state)
+            # printf('[B] no. features: %d\n', node.n_features)
 
             # identify and compute metadata for all thresholds in each feature
-            self.splitter.compute_metadata(&node, X, y, samples, n_samples)
+            self.splitter.compute_metadata(&node, X, y, samples, n_samples, random_state)
+            # printf('[B] computed metadata\n')
 
             # choose a feature / threshold and partition the data
             self.splitter.split_node(&node, X, y, samples, n_samples, topd, random_state, &split)

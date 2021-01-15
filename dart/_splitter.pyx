@@ -25,19 +25,27 @@ cdef class _Splitter:
     Finds the best splits on dense data, one split at a time.
     """
 
-    def __cinit__(self, int min_samples_leaf, bint use_gini):
+    def __cinit__(self,
+                  int  min_samples_leaf,
+                  bint use_gini,
+                  int  k):
         """
         Parameters
         ----------
         min_samples_leaf : int
-            The minimal number of samples each leaf can have, where splits
-            which would result in having less samples in a leaf are not considered.
+            The minimal number of samples each leaf can have,
+            where splits which would result in having less
+            samples in a leaf are not considered.
         use_gini : bool
-            If True, use the Gini index splitting criterion; otherwise
-            use entropy.
+            If True, use the Gini index splitting criterion,
+            otherwise entropy.
+        k : int
+            Number of candidate thresholds to sample
+            uniformly at random.
         """
         self.min_samples_leaf = min_samples_leaf
         self.use_gini = use_gini
+        self.k = k
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -99,6 +107,8 @@ cdef class _Splitter:
                                                       threshold.n_left_pos_samples,
                                                       threshold.n_right_pos_samples)
 
+                    # printf('[SN] threshold.value: %.3f, split_score: %.3f\n', threshold.value, split_score)
+
                     # keep best score
                     if split_score < best_score:
                         best_score = split_score
@@ -150,7 +160,8 @@ cdef class _Splitter:
                               double** X,
                               int*     y,
                               int*     samples,
-                              int      n_samples) nogil:
+                              int      n_samples,
+                              UINT32_t* random_state) nogil:
         """
         For each feature:
           Sort the values,
@@ -191,7 +202,6 @@ cdef class _Splitter:
         cdef int i = 0
         cdef int k = 0
         cdef int j = 0
-        cdef int threshold_count = 0
         cdef int ndx = 0
 
         # intermediate variables
@@ -199,7 +209,7 @@ cdef class _Splitter:
         cdef double v2 = -1
         cdef double v1_label_ratio = -1
         cdef double v2_label_ratio = -1
-        cdef bint save_threshold = 0
+        cdef bint   save_threshold = 0
 
         # threshold info to save
         cdef double value = -1
@@ -210,9 +220,22 @@ cdef class _Splitter:
         cdef int left_count = -1
         cdef int left_pos_count = -1
 
-        # pointer variables
-        cdef Feature*   feature = NULL
-        cdef Threshold* threshold = NULL
+        # counts
+        cdef int feature_value_count = -1
+        cdef int threshold_count = -1
+
+        # container variables
+        cdef int         feature_index = -1
+        cdef Threshold*  threshold = NULL
+        cdef Threshold** thresholds = NULL
+        cdef int         n_thresholds = -1
+        cdef int         k_samples = self.k
+
+        # variables for sampling
+        cdef int*        sampled_indices = NULL
+        cdef Threshold** sampled_thresholds = NULL
+        cdef Feature*    feature = NULL
+        cdef bint        valid = True
 
         # count number of pos labels
         for i in range(n_samples):
@@ -223,10 +246,12 @@ cdef class _Splitter:
         # compute statistics for each attribute
         for j in range(node.n_features):
 
+            # PART 1: compute unique feature value set information
+
             # access feature object
             feature = node.features[j]
-            feature.thresholds = <Threshold **>malloc(n_samples * sizeof(Threshold*))
-            feature.n_thresholds = 0
+
+            # printf('[CM - PART 1] feature %d\n', feature.index)
 
             # copy values for this feature
             for i in range(n_samples):
@@ -240,9 +265,12 @@ cdef class _Splitter:
             pos_count = labels[indices[0]]
             v_count = 1
             v_pos_count = labels[indices[0]]
-            threshold_count = 0
+            feature_value_count = 0
             prev_val = values[indices[0]]
             prev_label = labels[indices[0]]
+
+            # result container
+            thresholds = <Threshold **>malloc(n_samples * sizeof(Threshold *))
 
             # loop through sorted feature values
             for i in range(1, n_samples):
@@ -254,12 +282,12 @@ cdef class _Splitter:
                 if cur_val > prev_val + 1e-7:
 
                     # save previous feature counts
-                    threshold_values[threshold_count] = prev_val
-                    counts[threshold_count] = count
-                    pos_counts[threshold_count] = pos_count
-                    v_counts[threshold_count] = v_count
-                    v_pos_counts[threshold_count] = v_pos_count
-                    threshold_count += 1
+                    threshold_values[feature_value_count] = prev_val
+                    counts[feature_value_count] = count
+                    pos_counts[feature_value_count] = pos_count
+                    v_counts[feature_value_count] = v_count
+                    v_pos_counts[feature_value_count] = v_pos_count
+                    feature_value_count += 1
 
                     # reset counts for this new feature
                     v_count = 1
@@ -284,17 +312,18 @@ cdef class _Splitter:
             if v_count > 0:
 
                 # save previous feature counts
-                threshold_values[threshold_count] = prev_val
-                counts[threshold_count] = count
-                pos_counts[threshold_count] = pos_count
-                v_counts[threshold_count] = v_count
-                v_pos_counts[threshold_count] = v_pos_count
-                threshold_count += 1
+                threshold_values[feature_value_count] = prev_val
+                counts[feature_value_count] = count
+                pos_counts[feature_value_count] = pos_count
+                v_counts[feature_value_count] = v_count
+                v_pos_counts[feature_value_count] = v_pos_count
+                feature_value_count += 1
 
-            # printf('[CM] no. feature value sets: %d\n', threshold_count)
+            # printf('[CM - PART 1] no. feature value sets: %d\n', feature_value_count)
 
-            # evaluate each pair of feature sets
-            for k in range(1, threshold_count):
+            # PART 2: evaluate each pair of feature sets to get candidate thresholds
+            threshold_count = 0
+            for k in range(1, feature_value_count):
 
                 # extract both of the feature set counts
                 v1 = threshold_values[k-1]
@@ -330,14 +359,69 @@ cdef class _Splitter:
                     threshold.n_right_pos_samples = n_pos_samples - left_pos_count
 
                     # save threshold to this feature
-                    feature.thresholds[feature.n_thresholds] = threshold
-                    feature.n_thresholds += 1
+                    thresholds[threshold_count] = threshold
+                    threshold_count += 1
 
-                    # printf('[CM] feature: %d, threshold.value: %.2f\n', feature.index, threshold.value)
+                    # printf('[CM - PART 2] candidate threshold.value: %.2f\n', threshold.value)
+            # printf('[CM - PART 2] no. candidate thresholds: %d\n', threshold_count)
 
-            # adjust thresholds to appropriate length
-            feature.thresholds = <Threshold **>realloc(feature.thresholds,
-                                                       feature.n_thresholds * sizeof(Threshold *))
+            # PART 3: sample k candidate thresholds uniformly at random
+            if threshold_count < k_samples:
+                n_thresholds = threshold_count
+            else:
+                n_thresholds = k_samples
+
+            # create new (smaller) thresholds array
+            sampled_thresholds = <Threshold **>malloc(n_thresholds * sizeof(Threshold *))
+            sampled_indices = <int *>malloc(n_thresholds * sizeof(int))
+
+            # sample threshold indices uniformly at random
+            i = 0
+            while i < n_thresholds:
+                valid = True
+
+                # sample feature index
+                ndx = int(rand_uniform(0, 1, random_state) / (1.0 / threshold_count))
+
+                # invalid: already sampled
+                for k in range(i):
+                    if ndx == sampled_indices[k]:
+                        valid = False
+                        break
+
+                # valid: add threshold to sampled list of candidate thresholds
+                if valid:
+
+                    # copy threshold
+                    threshold = thresholds[ndx]
+                    t2 = <Threshold *>malloc(sizeof(Threshold))
+                    t2.value = threshold.value
+                    t2.n_v1_samples = threshold.n_v1_samples
+                    t2.n_v1_pos_samples = threshold.n_v1_pos_samples
+                    t2.n_v2_samples = threshold.n_v2_samples
+                    t2.n_v2_pos_samples = threshold.n_v2_pos_samples
+                    t2.n_left_samples = threshold.n_left_samples
+                    t2.n_left_pos_samples = threshold.n_left_pos_samples
+                    t2.n_right_samples = threshold.n_right_samples
+                    t2.n_right_pos_samples = threshold.n_right_pos_samples
+
+                    # add copied threshold to pool
+                    sampled_thresholds[i] = t2
+                    sampled_indices[i] = ndx
+                    i += 1
+
+                    # printf('[CM - PART 3] sampled threshold.value: %.2f\n', t2.value)
+            # printf('[CM - PART 3] no. sampled thresholds: %d\n', i)
+
+            # set thresholds property on this feature
+            feature.thresholds = sampled_thresholds
+            feature.n_thresholds = n_thresholds
+
+            # free thresholds array and its contents
+            for i in range(threshold_count):
+                free(thresholds[i])
+            free(thresholds)
+            free(sampled_indices)
 
         # clean up
         free(values)
@@ -372,7 +456,7 @@ cdef class _Splitter:
 
         cdef Feature*  feature = NULL
         cdef Feature** features = <Feature **>malloc(n_elem * sizeof(Feature*))
-        cdef int*      sample_indices = <int *>malloc(n_elem * sizeof(int))
+        cdef int*      sampled_indices = <int *>malloc(n_elem * sizeof(int))
 
         cdef int i = 0
         cdef bint valid = True
@@ -386,7 +470,7 @@ cdef class _Splitter:
 
             # invalid: already sampled
             for j in range(i):
-                if ndx == sample_indices[j]:
+                if ndx == sampled_indices[j]:
                     valid = False
                     break
 
@@ -396,10 +480,10 @@ cdef class _Splitter:
                 feature.index = ndx
 
                 features[i] = feature
-                sample_indices[i] = ndx
+                sampled_indices[i] = ndx
                 i += 1
 
-        free(sample_indices)
+        free(sampled_indices)
 
         node.features = features
         node.n_features = n_elem

@@ -436,13 +436,14 @@ class Tree(object):
         self.use_gini_ = True if self.criterion == 'gini' else False
 
         # make sure k is positive
-        assert self.k > 0
+        assert self.k > 0, 'k must be greater than zero!'
 
         # create tree objects
         self.tree_ = _Tree()
 
         self.splitter_ = _Splitter(self.min_samples_leaf,
-                                   self.use_gini_)
+                                   self.use_gini_,
+                                   self.k)
 
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
