@@ -16,9 +16,9 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
-from ._utils cimport copy_int_array
+from ._utils cimport copy_indices
 
-cdef int UNDEF = -1
+cdef INT32_t UNDEF = -1
 
 # =====================================
 # Manager
@@ -47,25 +47,24 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def __cinit__(self, double[:, :] X_in, int[:] y_in):
+    def __cinit__(self, float[:, :] X_in, int[:] y_in):
         """
         Constructor.
         """
-        cdef int n_samples = X_in.shape[0]
-        cdef int n_features = X_in.shape[1]
+        cdef SIZE_t n_samples = X_in.shape[0]
+        cdef SIZE_t n_features = X_in.shape[1]
 
-        cdef double** X = <double **>malloc(n_samples * sizeof(double *))
-        cdef int*     y = <int *>malloc(n_samples * sizeof(int))
+        cdef DTYPE_t** X = <DTYPE_t **>malloc(n_samples * sizeof(DTYPE_t *))
+        cdef INT32_t*  y = <INT32_t *>malloc(n_samples * sizeof(INT32_t))
 
-        cdef int *vacant = NULL
+        cdef SIZE_t *vacant = NULL
 
-        cdef int i
-        cdef int j
-        cdef int result
+        cdef SIZE_t i
+        cdef SIZE_t j
 
         # copy data into C pointer arrays
         for i in range(n_samples):
-            X[i] = <double *>malloc(n_features * sizeof(double))
+            X[i] = <DTYPE_t *>malloc(n_features * sizeof(DTYPE_t))
             for j in range(n_features):
                 X[i][j] = X_in[i][j]
             y[i] = y_in[i]
@@ -91,17 +90,17 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int check_sample_validity(self, int *samples, int n_samples) nogil:
+    cdef INT32_t check_sample_validity(self, SIZE_t *samples, SIZE_t n_samples) nogil:
         """
         Checks to make sure `samples` are in the database.
         Returns -1 if a sample is not available; 0 otherwise.
         """
-        cdef int *vacant = self.vacant
-        cdef int n_vacant = self.n_vacant
+        cdef SIZE_t *vacant = self.vacant
+        cdef SIZE_t n_vacant = self.n_vacant
 
-        cdef int result = 0
-        cdef int i
-        cdef int j
+        cdef INT32_t result = 0
+        cdef SIZE_t i
+        cdef SIZE_t j
 
         for i in range(n_samples):
 
@@ -123,7 +122,7 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void get_data(self, double*** X_ptr, int** y_ptr) nogil:
+    cdef void get_data(self, DTYPE_t*** X_ptr, INT32_t** y_ptr) nogil:
         """
         Receive pointers to the data.
         """
@@ -138,22 +137,22 @@ cdef class _DataManager:
         """
 
         # parameters
-        cdef double** X = self.X
-        cdef int*     y = self.y
-        cdef int*     vacant = self.vacant
-        cdef int      n_vacant = self.n_vacant
+        cdef DTYPE_t** X = self.X
+        cdef INT32_t*  y = self.y
+        cdef SIZE_t*   vacant = self.vacant
+        cdef SIZE_t       n_vacant = self.n_vacant
 
-        cdef int n_samples = samples.shape[0]
-        cdef int updated_n_vacant = n_vacant + n_samples
+        cdef SIZE_t n_samples = samples.shape[0]
+        cdef SIZE_t updated_n_vacant = n_vacant + n_samples
 
-        cdef int i
+        cdef SIZE_t i
 
         # realloc vacant array
         if n_vacant == 0:
-            vacant = <int *>malloc(updated_n_vacant * sizeof(int))
+            vacant = <SIZE_t *>malloc(updated_n_vacant * sizeof(SIZE_t))
 
         elif updated_n_vacant > n_vacant:
-            vacant = <int *>realloc(vacant, updated_n_vacant * sizeof(int))
+            vacant = <SIZE_t *>realloc(vacant, updated_n_vacant * sizeof(SIZE_t))
 
         # remove data and save the deleted indices
         for i in range(n_samples):
@@ -168,31 +167,31 @@ cdef class _DataManager:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef void add_data(self, double[:, :] X_in, int[:] y_in):
+    cpdef void add_data(self, float[:, :] X_in, int[:] y_in):
         """
         Adds data to the database.
         """
 
         # parameters
-        cdef double** X = self.X
-        cdef int*     y = self.y
-        cdef int*     vacant = self.vacant
-        cdef int      n_vacant = self.n_vacant
-        cdef int      n_samples = self.n_samples
-        cdef int      n_features = self.n_features
+        cdef DTYPE_t** X = self.X
+        cdef INT32_t*  y = self.y
+        cdef SIZE_t*   vacant = self.vacant
+        cdef SIZE_t    n_vacant = self.n_vacant
+        cdef SIZE_t    n_samples = self.n_samples
+        cdef SIZE_t    n_features = self.n_features
 
-        cdef int  n_new_samples = X_in.shape[0]
-        cdef int  updated_n_samples = n_samples + n_new_samples
-        cdef int* add_indices = <int *>malloc(n_new_samples * sizeof(int))
+        cdef SIZE_t  n_new_samples = X_in.shape[0]
+        cdef SIZE_t  updated_n_samples = n_samples + n_new_samples
+        cdef SIZE_t* add_indices = <SIZE_t *>malloc(n_new_samples * sizeof(SIZE_t))
 
-        cdef int i
-        cdef int j
-        cdef int k
+        cdef SIZE_t i
+        cdef SIZE_t j
+        cdef SIZE_t k
 
         # grow database
         if updated_n_samples > n_samples + n_vacant:
-            X = <double **>realloc(X, updated_n_samples * sizeof(double *))
-            y = <int *>realloc(y, updated_n_samples * sizeof(int))
+            X = <DTYPE_t **>realloc(X, updated_n_samples * sizeof(DTYPE_t *))
+            y = <INT32_t *>realloc(y, updated_n_samples * sizeof(INT32_t))
 
         # copy samples to the database
         for i in range(n_new_samples):
@@ -207,7 +206,7 @@ cdef class _DataManager:
                 j = n_samples
 
             # copy sample
-            X[j] = <double *>malloc(n_features * sizeof(double))
+            X[j] = <DTYPE_t *>malloc(n_features * sizeof(DTYPE_t))
             for k in range(n_features):
                 X[j][k] = X_in[i][k]
             y[j] = y_in[i]
@@ -220,7 +219,7 @@ cdef class _DataManager:
             free(vacant)
             vacant = NULL
         elif n_vacant > 0:
-            vacant = <int *>realloc(vacant, n_vacant * sizeof(int))
+            vacant = <SIZE_t *>realloc(vacant, n_vacant * sizeof(SIZE_t))
 
         self.X = X
         self.y = y
@@ -239,18 +238,18 @@ cdef class _DataManager:
         self.n_add_indices = 0
         self.add_indices = NULL
 
-    cdef int* get_add_indices(self) nogil:
+    cdef SIZE_t* get_add_indices(self) nogil:
         """
         Return a copy of the add indices.
         """
-        return copy_int_array(self.add_indices, self.n_add_indices)
+        return copy_indices(self.add_indices, self.n_add_indices)
 
-    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
+    cdef np.ndarray _get_int_ndarray(self, SIZE_t *data, SIZE_t n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.
         """
-        cdef np.npy_intp shape[1]
+        cdef SIZE_t shape[1]
         shape[0] = n_elem
         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
         Py_INCREF(self)

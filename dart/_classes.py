@@ -19,8 +19,8 @@ import numpy as np
 
 from ._manager import _DataManager
 from ._splitter import _Splitter
-from ._adder import _Adder
-from ._remover import _Remover
+# from ._adder import _Adder
+# from ._remover import _Remover
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -140,6 +140,7 @@ class Forest(object):
         # build forest
         self.trees_ = []
         for i in range(self.n_estimators):
+            # print('\n\nTree {:,}'.format(i))
 
             # build tree
             tree = Tree(topd=self.topd_,
@@ -182,47 +183,47 @@ class Forest(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
-    def add(self, X, y, get_indices=False):
-        """
-        Adds instances to the database and updates the model.
-        """
-        assert X.ndim == 2 and y.ndim == 1
-        assert X.shape[1] == self.n_features_
-        X, y = check_data(X, y)
+    # def add(self, X, y, get_indices=False):
+    #     """
+    #     Adds instances to the database and updates the model.
+    #     """
+    #     assert X.ndim == 2 and y.ndim == 1
+    #     assert X.shape[1] == self.n_features_
+    #     X, y = check_data(X, y)
 
-        # add data to the database
-        self.manager_.add_data(X, y)
+    #     # add data to the database
+    #     self.manager_.add_data(X, y)
 
-        # update trees
-        for i in range(len(self.trees_)):
-            self.trees_[i].add()
+    #     # update trees
+    #     for i in range(len(self.trees_)):
+    #         self.trees_[i].add()
 
-        # cleanup
-        if get_indices:
-            return np.array(self.manager_.add_indices, dtype=np.int32)
-        else:
-            self.manager_.clear_add_indices()
+    #     # cleanup
+    #     if get_indices:
+    #         return np.array(self.manager_.add_indices, dtype=np.int32)
+    #     else:
+    #         self.manager_.clear_add_indices()
 
-    def delete(self, remove_indices):
-        """
-        Removes instances from the database and updates the model.
-        """
+    # def delete(self, remove_indices):
+    #     """
+    #     Removes instances from the database and updates the model.
+    #     """
 
-        # copy indices to an int array
-        if isinstance(remove_indices, int):
-            remove_indices = [remove_indices]
+    #     # copy indices to an int array
+    #     if isinstance(remove_indices, int):
+    #         remove_indices = [remove_indices]
 
-        if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
-            remove_indices = np.array(remove_indices, dtype=np.int32)
+    #     if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
+    #         remove_indices = np.array(remove_indices, dtype=np.int32)
 
-        remove_indices = np.unique(remove_indices).astype(np.int32)
+    #     remove_indices = np.unique(remove_indices).astype(np.int32)
 
-        # update trees
-        for i in range(len(self.trees_)):
-            self.trees_[i].delete(remove_indices)
+    #     # update trees
+    #     for i in range(len(self.trees_)):
+    #         self.trees_[i].delete(remove_indices)
 
-        # remove data from the database
-        self.manager_.remove_data(remove_indices)
+    #     # remove data from the database
+    #     self.manager_.remove_data(remove_indices)
 
     def print(self, show_nodes=False):
         """
@@ -231,61 +232,61 @@ class Forest(object):
         for tree in self.trees_:
             tree.print(show_nodes=show_nodes)
 
-    def clear_add_indices(self):
-        """
-        Delete the add index statistics.
-        """
-        self.manager_.clear_add_indices()
+    # def clear_add_indices(self):
+    #     """
+    #     Delete the add index statistics.
+    #     """
+    #     self.manager_.clear_add_indices()
 
-    def get_add_retrain_depths(self):
-        """
-        Retrieve addition statistics.
-        """
-        types_list, depths_list = [], []
+    # def get_add_retrain_depths(self):
+    #     """
+    #     Retrieve addition statistics.
+    #     """
+    #     types_list, depths_list = [], []
 
-        for tree in self.trees_:
-            types, depths = tree.get_add_retrain_depths()
-            types_list.append(types)
-            depths_list.append(depths)
+    #     for tree in self.trees_:
+    #         types, depths = tree.get_add_retrain_depths()
+    #         types_list.append(types)
+    #         depths_list.append(depths)
 
-        types = np.concatenate(types_list)
-        depths = np.concatenate(depths_list)
+    #     types = np.concatenate(types_list)
+    #     depths = np.concatenate(depths_list)
 
-        return types, depths
+    #     return types, depths
 
-    def get_removal_retrain_depths(self):
-        """
-        Retrieve deletion statistics.
-        """
-        types_list, depths_list = [], []
+    # def get_removal_retrain_depths(self):
+    #     """
+    #     Retrieve deletion statistics.
+    #     """
+    #     types_list, depths_list = [], []
 
-        for tree in self.trees_:
-            types, depths = tree.get_removal_retrain_depths()
-            types_list.append(types)
-            depths_list.append(depths)
+    #     for tree in self.trees_:
+    #         types, depths = tree.get_removal_retrain_depths()
+    #         types_list.append(types)
+    #         depths_list.append(depths)
 
-        types = np.concatenate(types_list)
-        depths = np.concatenate(depths_list)
+    #     types = np.concatenate(types_list)
+    #     depths = np.concatenate(depths_list)
 
-        return types, depths
+    #     return types, depths
 
-    def get_add_retrain_sample_count(self):
-        """
-        Retrieve number of samples used for retrainings.
-        """
-        result = 0
-        for tree in self.trees_:
-            result += tree.get_add_retrain_sample_count()
-        return result
+    # def get_add_retrain_sample_count(self):
+    #     """
+    #     Retrieve number of samples used for retrainings.
+    #     """
+    #     result = 0
+    #     for tree in self.trees_:
+    #         result += tree.get_add_retrain_sample_count()
+    #     return result
 
-    def get_removal_retrain_sample_count(self):
-        """
-        Retrieve number of samples used for retrainings.
-        """
-        result = 0
-        for tree in self.trees_:
-            result += tree.get_removal_retrain_sample_count()
-        return result
+    # def get_removal_retrain_sample_count(self):
+    #     """
+    #     Retrieve number of samples used for retrainings.
+    #     """
+    #     result = 0
+    #     for tree in self.trees_:
+    #         result += tree.get_removal_retrain_sample_count()
+    #     return result
 
     def get_node_statistics(self):
         """
@@ -301,19 +302,19 @@ class Forest(object):
 
         return n_nodes_avg, n_exact_avg, n_semi_avg
 
-    def clear_removal_metrics(self):
-        """
-        Delete removal statistics.
-        """
-        for tree in self.trees_:
-            tree.clear_removal_metrics()
+    # def clear_removal_metrics(self):
+    #     """
+    #     Delete removal statistics.
+    #     """
+    #     for tree in self.trees_:
+    #         tree.clear_removal_metrics()
 
-    def clear_add_metrics(self):
-        """
-        Delete add statistics.
-        """
-        for tree in self.trees_:
-            tree.clear_add_metrics()
+    # def clear_add_metrics(self):
+    #     """
+    #     Delete add statistics.
+    #     """
+    #     for tree in self.trees_:
+    #         tree.clear_add_metrics()
 
     def set_sim_mode(self, sim_mode=False):
         """
@@ -455,13 +456,13 @@ class Tree(object):
                                           self.max_features_,
                                           self.random_state_)
 
-        self.remover_ = _Remover(self.manager_,
-                                 self.tree_builder_,
-                                 self.use_gini_)
+        # self.remover_ = _Remover(self.manager_,
+        #                          self.tree_builder_,
+        #                          self.use_gini_)
 
-        self.adder_ = _Adder(self.manager_,
-                             self.tree_builder_,
-                             self.use_gini_)
+        # self.adder_ = _Adder(self.manager_,
+        #                      self.tree_builder_,
+        #                      self.use_gini_)
 
         self.tree_builder_.build(self.tree_)
 
@@ -499,104 +500,104 @@ class Tree(object):
             self.tree_.print_value()
             print()
 
-    def add(self, X=None, y=None, get_indices=False):
-        """
-        Adds instances to the database and updates the model.
-        """
+    # def add(self, X=None, y=None, get_indices=False):
+    #     """
+    #     Adds instances to the database and updates the model.
+    #     """
 
-        if X is None:
-            assert not self.single_tree_
+    #     if X is None:
+    #         assert not self.single_tree_
 
-        else:
-            assert self.single_tree_
-            assert X.ndim == 2 and y.ndim == 1
-            assert X.shape[1] == self.n_features_
+    #     else:
+    #         assert self.single_tree_
+    #         assert X.ndim == 2 and y.ndim == 1
+    #         assert X.shape[1] == self.n_features_
 
-            X, y = check_data(X, y)
-            self.manager_.add_data(X, y)
+    #         X, y = check_data(X, y)
+    #         self.manager_.add_data(X, y)
 
-        # update model
-        self.adder_.add(self.tree_)
+    #     # # update model
+    #     # self.adder_.add(self.tree_)
 
-        # cleanup
-        if self.single_tree_:
-            if get_indices:
-                return np.array(self.manager_.add_indices, dtype=np.int32)
-            else:
-                self.manager_.clear_add_indices()
+    #     # cleanup
+    #     if self.single_tree_:
+    #         if get_indices:
+    #             return np.array(self.manager_.add_indices, dtype=np.int32)
+    #         else:
+    #             self.manager_.clear_add_indices()
 
-    def delete(self, remove_indices):
-        """
-        Removes instances from the database and updates the model.
-        """
+    # def delete(self, remove_indices):
+    #     """
+    #     Removes instances from the database and updates the model.
+    #     """
 
-        # copy remove indices to int array
-        if self.single_tree_:
+    #     # copy remove indices to int array
+    #     if self.single_tree_:
 
-            if isinstance(remove_indices, int):
-                remove_indices = [remove_indices]
+    #         if isinstance(remove_indices, int):
+    #             remove_indices = [remove_indices]
 
-            if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
-                remove_indices = np.array(remove_indices, dtype=np.int32)
+    #         if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
+    #             remove_indices = np.array(remove_indices, dtype=np.int32)
 
-            remove_indices = np.unique(remove_indices).astype(np.int32)
+    #         remove_indices = np.unique(remove_indices).astype(np.int32)
 
-        # update model
-        rc = self.remover_.remove(self.tree_, remove_indices)
-        if rc == -1:
-            exit('Removal index invalid!')
+    #     # update model
+    #     rc = self.remover_.remove(self.tree_, remove_indices)
+    #     if rc == -1:
+    #         exit('Removal index invalid!')
 
-        # remove data
-        if self.single_tree_:
-            self.manager_.remove_data(remove_indices)
+    #     # remove data
+    #     if self.single_tree_:
+    #         self.manager_.remove_data(remove_indices)
 
-    def clear_add_indices(self):
-        """
-        Delete the add index statistics.
-        """
-        self.manager_.clear_add_indices()
+    # def clear_add_indices(self):
+    #     """
+    #     Delete the add index statistics.
+    #     """
+    #     self.manager_.clear_add_indices()
 
-    def get_add_retrain_depths(self):
-        """
-        Retrieve addition statistics.
-        """
-        add_types = np.array(self.adder_.add_types, dtype=np.int32)
-        add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
-        return add_types, add_depths
+    # def get_add_retrain_depths(self):
+    #     """
+    #     Retrieve addition statistics.
+    #     """
+    #     add_types = np.array(self.adder_.add_types, dtype=np.int32)
+    #     add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
+    #     return add_types, add_depths
 
-    def get_removal_retrain_depths(self):
-        """
-        Retrieve deletion statistics.
-        """
-        remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
-        remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
-        return remove_types, remove_depths
+    # def get_removal_retrain_depths(self):
+    #     """
+    #     Retrieve deletion statistics.
+    #     """
+    #     remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
+    #     remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
+    #     return remove_types, remove_depths
 
-    def get_add_retrain_sample_count(self):
-        """
-        Return number of samples used in any retrainings.
-        """
-        result = self.adder_.retrain_sample_count
-        return result
+    # def get_add_retrain_sample_count(self):
+    #     """
+    #     Return number of samples used in any retrainings.
+    #     """
+    #     result = self.adder_.retrain_sample_count
+    #     return result
 
-    def get_removal_retrain_sample_count(self):
-        """
-        Return number of samples used in any retrainings.
-        """
-        result = self.remover_.retrain_sample_count
-        return result
+    # def get_removal_retrain_sample_count(self):
+    #     """
+    #     Return number of samples used in any retrainings.
+    #     """
+    #     result = self.remover_.retrain_sample_count
+    #     return result
 
-    def clear_removal_metrics(self):
-        """
-        Delete removal statistics.
-        """
-        self.remover_.clear_remove_metrics()
+    # def clear_removal_metrics(self):
+    #     """
+    #     Delete removal statistics.
+    #     """
+    #     self.remover_.clear_remove_metrics()
 
-    def clear_add_metrics(self):
-        """
-        Delete add statistics.
-        """
-        self.adder_.clear_add_metrics()
+    # def clear_add_metrics(self):
+    #     """
+    #     Delete add statistics.
+    #     """
+    #     self.adder_.clear_add_metrics()
 
     def get_node_statistics(self):
         """
@@ -687,8 +688,8 @@ def check_data(X, y=None):
     """
     result = None
 
-    if X.dtype != np.float64:
-        X = X.astype(np.float64)
+    if X.dtype != np.float32:
+        X = X.astype(np.float32)
 
     if y is not None:
         if y.dtype != np.int32:

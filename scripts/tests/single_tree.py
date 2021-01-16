@@ -41,7 +41,7 @@ def main(args):
     print(X)
 
     # train decision tree
-    model = dart.Tree(topd=0, k=5, max_depth=3, random_state=1)
+    model = dart.Tree(topd=0, k=20, max_depth=10, random_state=1)
     model = model.fit(X, y)
 
     # predict

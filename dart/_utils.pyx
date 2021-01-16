@@ -58,16 +58,16 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
 
 
 @cython.cdivision(True)
-cdef double compute_split_score(bint use_gini,
-                                double count,
-                                double left_count,
-                                double right_count,
-                                int left_pos_count,
-                                int right_pos_count) nogil:
+cdef DTYPE_t compute_split_score(bint    use_gini,
+                                 DTYPE_t count,
+                                 DTYPE_t left_count,
+                                 DTYPE_t right_count,
+                                 SIZE_t  left_pos_count,
+                                 SIZE_t  right_pos_count) nogil:
     """
     Computes either the Gini index or entropy given this attribute.
     """
-    cdef double result
+    cdef DTYPE_t result
 
     if use_gini:
         result = compute_gini(count, left_count, right_count,
@@ -82,21 +82,21 @@ cdef double compute_split_score(bint use_gini,
 
 
 @cython.cdivision(True)
-cdef double compute_gini(double count,
-                         double left_count,
-                         double right_count,
-                         int left_pos_count,
-                         int right_pos_count) nogil:
+cdef DTYPE_t compute_gini(DTYPE_t count,
+                          DTYPE_t left_count,
+                          DTYPE_t right_count,
+                          SIZE_t  left_pos_count,
+                          SIZE_t  right_pos_count) nogil:
     """
     Compute the Gini index given this attribute.
     """
-    cdef double weight
-    cdef double pos_prob
-    cdef double neg_prob
+    cdef DTYPE_t weight
+    cdef DTYPE_t pos_prob
+    cdef DTYPE_t neg_prob
 
-    cdef double index
-    cdef double left_weighted_index = 0
-    cdef double right_weighted_index = 0
+    cdef DTYPE_t index
+    cdef DTYPE_t left_weighted_index = 0
+    cdef DTYPE_t right_weighted_index = 0
 
     if left_count > 0:
         weight = left_count / count
@@ -115,21 +115,21 @@ cdef double compute_gini(double count,
     return left_weighted_index + right_weighted_index
 
 @cython.cdivision(True)
-cdef double compute_entropy(double count,
-                            double left_count,
-                            double right_count,
-                            int left_pos_count,
-                            int right_pos_count) nogil:
+cdef DTYPE_t compute_entropy(DTYPE_t count,
+                             DTYPE_t left_count,
+                             DTYPE_t right_count,
+                             SIZE_t  left_pos_count,
+                             SIZE_t  right_pos_count) nogil:
     """
     Compute the mutual information given this attribute.
     """
-    cdef double weight
-    cdef double pos_prob
-    cdef double neg_prob
+    cdef DTYPE_t weight
+    cdef DTYPE_t pos_prob
+    cdef DTYPE_t neg_prob
 
-    cdef double entropy
-    cdef double left_weighted_entropy = 0
-    cdef double right_weighted_entropy = 0
+    cdef DTYPE_t entropy
+    cdef DTYPE_t left_weighted_entropy = 0
+    cdef DTYPE_t right_weighted_entropy = 0
 
     if left_count > 0:
         weight = left_count / count
@@ -161,23 +161,23 @@ cdef double compute_entropy(double count,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef void split_samples(Node* node,
-                        double** X,
-                        int* y,
-                        int* samples,
-                        int n_samples,
-                        SplitRecord *split) nogil:
+cdef void split_samples(Node*        node,
+                        DTYPE_t**    X,
+                        INT32_t*     y,
+                        SIZE_t*      samples,
+                        SIZE_t       n_samples,
+                        SplitRecord* split) nogil:
     """
     Split samples based on the chosen feature.
     """
 
-    cdef int i = 0
-    cdef int j = 0
-    cdef int k = 0
+    cdef SIZE_t i = 0
+    cdef SIZE_t j = 0
+    cdef SIZE_t k = 0
 
     # assign results from chosen feature
-    split.left_samples = <int *>malloc(n_samples * sizeof(int))
-    split.right_samples = <int *>malloc(n_samples * sizeof(int))
+    split.left_samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+    split.right_samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
     for i in range(n_samples):
         if X[samples[i]][node.chosen_feature.index] <= node.chosen_threshold.value:
             split.left_samples[j] = samples[i]
@@ -185,19 +185,19 @@ cdef void split_samples(Node* node,
         else:
             split.right_samples[k] = samples[i]
             k += 1
-    split.left_samples = <int *>realloc(split.left_samples, j * sizeof(int))
-    split.right_samples = <int *>realloc(split.right_samples, k * sizeof(int))
+    split.left_samples = <SIZE_t *>realloc(split.left_samples, j * sizeof(SIZE_t))
+    split.right_samples = <SIZE_t *>realloc(split.right_samples, k * sizeof(SIZE_t))
     split.n_left_samples = j
     split.n_right_samples = k
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int* convert_int_ndarray(np.ndarray arr):
+cdef INT32_t* convert_int_ndarray(np.ndarray arr):
     """
     Converts a numpy array into a C int array.
     """
-    cdef int n_elem = arr.shape[0]
-    cdef int* new_arr = <int *>malloc(n_elem * sizeof(int))
+    cdef SIZE_t n_elem = arr.shape[0]
+    cdef INT32_t* new_arr = <INT32_t *>malloc(n_elem * sizeof(INT32_t))
 
     for i in range(n_elem):
         new_arr[i] = arr[i]
@@ -206,11 +206,24 @@ cdef int* convert_int_ndarray(np.ndarray arr):
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int* copy_int_array(int* arr, int n_elem) nogil:
+cdef INT32_t* copy_int_array(INT32_t* arr, SIZE_t n_elem) nogil:
     """
     Copies a C int array into a new C int array.
     """
-    cdef int* new_arr = <int *>malloc(n_elem * sizeof(int))
+    cdef INT32_t* new_arr = <INT32_t *>malloc(n_elem * sizeof(INT32_t))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef SIZE_t* copy_indices(SIZE_t* arr, SIZE_t n_elem) nogil:
+    """
+    Copies a C int array into a new C int array.
+    """
+    cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
 
     for i in range(n_elem):
         new_arr[i] = arr[i]
@@ -221,7 +234,7 @@ cdef void dealloc(Node *node) nogil:
     """
     Recursively free all nodes in the subtree.
 
-    NOTE: Does deallocate "top" node, that must
+    NOTE: Does not deallocate "root" node, that must
           be done by the caller!
     """
     if not node:

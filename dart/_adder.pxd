@@ -6,6 +6,10 @@ from ._splitter cimport SplitRecord
 from ._tree cimport Node
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
+from ._utils cimport DTYPE_t
+from ._utils cimport SIZE_t
+from ._utils cimport INT32_t
+from ._utils cimport UINT32_t
 
 cdef class _Adder:
     """
@@ -14,22 +18,22 @@ cdef class _Adder:
     """
 
     # Inner structures
-    cdef _DataManager manager        # Database manager
-    cdef _TreeBuilder tree_builder   # Tree Builder
-    cdef bint use_gini               # Controls splitting criterion
-    cdef int min_samples_leaf        # Minimum number of samples for a leaf
-    cdef int min_samples_split       # Minimum number of samples for a split
+    cdef _DataManager manager              # Database manager
+    cdef _TreeBuilder tree_builder         # Tree Builder
+    cdef bint         use_gini             # Controls splitting criterion
+    cdef SIZE_t       min_samples_leaf     # Minimum number of samples for a leaf
+    cdef SIZE_t       min_samples_split    # Minimum number of samples for a split
 
     # Metric structures
-    cdef int  capacity               # Number of addition allocations for space
-    cdef int  add_count              # Number of additions
-    cdef int* add_types              # Add type
-    cdef int* add_depths             # Depth of leaf or node needing retraining
-    cdef int  retrain_sample_count   # Number of samples used for retraining
+    cdef SIZE_t   capacity                 # Number of addition allocations for space
+    cdef SIZE_t   add_count                # Number of additions
+    cdef INT32_t* add_types                # Add types
+    cdef INT32_t* add_depths               # Depth of leaf or node needing retraining
+    cdef SIZE_t   retrain_sample_count     # Number of samples used for retraining
 
     # Python API
-    cpdef int  add(self, _Tree tree)
-    cpdef void clear_add_metrics(self)
+    cpdef INT32_t add(self, _Tree tree)
+    cpdef void    clear_add_metrics(self)
 
     # C API
     cdef void _add(self, Node** node_ptr, double** X, int* y,
