@@ -9,7 +9,7 @@
 # ./jobs/performance/primer.sh 'census' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
 # ./jobs/performance/primer.sh 'credit_card' 'dart' 1.0 'average_precision' 'gini' 6 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'dart' 0.5 'accuracy' 'gini' 40 1440 short
-# ./jobs/performance/primer.sh 'higgs' 'dart' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/primer.sh 'higgs' 'dart' 0.1 'accuracy' 'gini' 45 1440 short
 
 ./jobs/performance/primer.sh 'no_show' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
 ./jobs/performance/primer.sh 'skin' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
@@ -63,7 +63,7 @@
 # ./jobs/performance/primer.sh twitter 'sklearn' 1.0 roc_auc $criterion 30 1440 short
 # ./jobs/performance/primer.sh gas_sensor 'sklearn' 1.0 roc_auc $criterion 30 1440 short
 # ./jobs/performance/primer.sh synthetic 'sklearn' 0.5 accuracy $criterion 60 4320 long
-# ./jobs/performance/primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
 
 ./jobs/performance/primer.sh 'no_show' 'sklearn' 1.0 'accuracy' 'gini' 20 1440 short
 ./jobs/performance/primer.sh 'skin' 'sklearn' 1.0 'accuracy' 'gini' 20 1440 short
@@ -85,7 +85,7 @@
 # ./jobs/performance/bootstrap_primer.sh twitter 'sklearn' 1.0 roc_auc $criterion 30 1440 short
 # ./jobs/performance/bootstrap_primer.sh gas_sensor 'sklearn' 1.0 roc_auc $criterion 30 1440 short
 # ./jobs/performance/bootstrap_primer.sh synthetic 'sklearn' 0.5 accuracy $criterion 40 1440 short
-# ./jobs/performance/bootstrap_primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/bootstrap_primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
 
 ./jobs/performance/bootstrap_primer.sh.sh 'no_show' 'sklearn' 1.0 'accuracy' 'gini' 20 1440 short
 ./jobs/performance/bootstrap_primer.sh.sh 'skin' 'sklearn' 1.0 'accuracy' 'gini' 20 1440 short
