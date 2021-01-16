@@ -13,8 +13,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv(os.path.join('raw', 'diabetic_data.csv'))
+    df = pd.read_csv(os.path.join('diabetic_data.csv'))
 
     # remove select columns
     remove_cols = ['encounter_id', 'patient_nbr', 'weight',

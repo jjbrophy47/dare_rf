@@ -14,8 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv(os.path.join('raw', 'Skin_NonSkin.txt'), header=None, sep='\t')
+    df = pd.read_csv(os.path.join('Skin_NonSkin.txt'), header=None, sep='\t')
     df.columns = ['b', 'g', 'r', 'label']
 
     # remove select columns

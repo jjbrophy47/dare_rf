@@ -24,9 +24,8 @@ def dataset_specific(random_state, test_size):
                'veterans_benfits', 'label']
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    train_df = pd.read_csv('raw/census-income.data', header=None, names=columns)
-    test_df = pd.read_csv('raw/census-income.test', header=None, names=columns)
+    train_df = pd.read_csv('census-income.data', header=None, names=columns)
+    test_df = pd.read_csv('census-income.test', header=None, names=columns)
 
     # remove select columns
     remove_cols = ['industry_code', 'occupation_code', 'n_persons_employer',

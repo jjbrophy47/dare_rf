@@ -13,8 +13,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv('raw/athlete_events.csv')
+    df = pd.read_csv('athlete_events.csv')
 
     pd.set_option('display.max_columns', 100)
 

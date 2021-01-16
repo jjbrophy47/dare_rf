@@ -21,9 +21,8 @@ def dataset_specific(random_state, test_size):
                'hours-per-week', 'native-country', 'label']
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    train_df = pd.read_csv('raw/adult.data.txt', header=None, names=columns)
-    test_df = pd.read_csv('raw/adult.test.txt', header=None, names=columns)
+    train_df = pd.read_csv('adult.data', header=None, names=columns)
+    test_df = pd.read_csv('adult.test', header=None, names=columns)
 
     # remove select columns
     remove_cols = ['education-num']

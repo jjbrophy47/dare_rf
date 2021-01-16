@@ -14,8 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size, n_instances):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv('raw/comments.csv', nrows=n_instances)
+    df = pd.read_csv('comments.csv', nrows=n_instances)
 
     # engineer some basic text features
     df['num_chs'] = df['text'].str.len()

@@ -17,9 +17,8 @@ def dataset_specific(random_state, test_size):
     metadata_cols = ['id', 'date', 'class', 't0', 'dt']
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    dataset = np.loadtxt(os.path.join('raw', 'HT_Sensor_dataset.dat'), skiprows=1)
-    metadata = np.loadtxt(os.path.join('raw', 'HT_Sensor_metadata.dat'), skiprows=1, dtype=str)
+    dataset = np.loadtxt(os.path.join('HT_Sensor_dataset.dat'), skiprows=1)
+    metadata = np.loadtxt(os.path.join('HT_Sensor_metadata.dat'), skiprows=1, dtype=str)
     df = pd.DataFrame(dataset, columns=dataset_cols)
     meta_df = pd.DataFrame(metadata, columns=metadata_cols)
 

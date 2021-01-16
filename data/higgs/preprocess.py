@@ -14,8 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv(os.path.join('raw', 'HIGGS.csv'), header=None)
+    df = pd.read_csv(os.path.join('HIGGS.csv'), header=None)
     df.columns = ['label'] + ['f{}'.format(i) for i in range(len(df.columns) - 1)]
     df['label'] = df['label'].astype(int)
 

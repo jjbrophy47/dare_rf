@@ -26,6 +26,10 @@ data/*/raw
 data/*/continuous/*
 data/*/*.npy
 data/*/*.csv
+data/*/*.dat
+data/*/*.txt
+data/*/*.data
+data/*/*.test
 data/5xor
 data/6xor
 data/activity

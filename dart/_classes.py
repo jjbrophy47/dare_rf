@@ -111,7 +111,7 @@ class Forest(object):
         self.random_state_ = get_random_int(self.random_state)
 
         # set max_features
-        if self.max_features == -1 or not self.max_features or self.max_features == 'sqrt':
+        if self.max_features in [-1, None, 'sqrt']:
             self.max_features_ = int(np.sqrt(self.n_features_))
 
         elif isinstance(self.max_features, int):

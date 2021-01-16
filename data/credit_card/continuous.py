@@ -13,8 +13,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv('raw/creditcard.csv')
+    df = pd.read_csv('creditcard.csv')
 
     print(df)
     for c in df.columns:

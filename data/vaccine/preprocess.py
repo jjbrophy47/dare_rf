@@ -14,9 +14,8 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    feature_df = pd.read_csv(os.path.join('raw', 'training_set_features.csv'))
-    label_df = pd.read_csv(os.path.join('raw', 'training_set_labels.csv'))
+    feature_df = pd.read_csv(os.path.join('training_set_features.csv'))
+    label_df = pd.read_csv(os.path.join('training_set_labels.csv'))
     df = feature_df.merge(label_df, on='respondent_id', how='left')
 
     # remove select columns

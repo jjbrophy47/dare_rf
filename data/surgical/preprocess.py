@@ -14,8 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    assert os.path.exists('raw')
-    df = pd.read_csv('raw/Surgical-deepnet.csv')
+    df = pd.read_csv('Surgical-deepnet.csv')
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]

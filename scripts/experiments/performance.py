@@ -92,7 +92,7 @@ def _get_model_dict(args, params):
     return model
 
 
-def _get_best_params(gs, param_grid, keys, logger, tol=0.01):
+def _get_best_params(gs, param_grid, keys, logger, tol=1e-3):
     """
     Chooses the set of hyperparameters whose `mean_fit_score` is within
     `tol` of the best `mean_fit_score` and has the lowest `mean_fit_time`.
@@ -149,10 +149,19 @@ def performance(args, out_dir, logger):
     n_estimators = [10, 50, 100, 250]
     max_depth = [1, 3, 5, 10, 20]
 
+    # reduce search space for Higgs
+    if args.dataset == 'higgs':
+        n_estimators.remove(250)
+
+    # set hyperparameter grid
     param_grid = {'max_depth': max_depth,
                   'n_estimators': n_estimators}
+
+    # add additional parameter for DART
     if args.model == 'dart':
         param_grid['k'] = [1, 10, 100]
+
+    # get hyperparameter names
     keys = list(param_grid.keys())
 
     # test model
@@ -171,8 +180,6 @@ def performance(args, out_dir, logger):
         gs = gs.fit(X_train_sub, y_train_sub)
 
         best_params = _get_best_params(gs, param_grid, keys, logger, args.tol)
-        # best_params = gs.best_params_
-        # logger.info('best_params: {}'.format(best_params))
         model = _get_model_dict(args, best_params)
 
     # train best model
