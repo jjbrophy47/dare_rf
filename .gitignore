@@ -22,10 +22,10 @@ jobs/logs/
 **.cb.json
 
 # data
-data/*/raw/*
+data/*/raw
 data/*/continuous/*
-!data/*/raw/readme.txt
 data/*/*.npy
+data/*/*.csv
 data/5xor
 data/6xor
 data/activity

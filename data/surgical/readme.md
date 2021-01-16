@@ -1,7 +1,9 @@
 Surgical Dataset
 ---
-* Download: [https://www.kaggle.com/omnamahshivai/surgical-dataset-binary-classification/version/1#](https://www.kaggle.com/omnamahshivai/surgical-dataset-binary-classification/version/1#).
+* Download the following files from [https://www.kaggle.com/omnamahshivai/surgical-dataset-binary-classification/version/1#](https://www.kaggle.com/omnamahshivai/surgical-dataset-binary-classification/version/1#) to this directory.
+	* `Surgical-deepnet.csv`.
 
-* Preprocess: `python3 continuous.py`.
+* Preprocess the data.
+	* Run `python3 continuous.py`.
 
 This creates a `continuous/train.csv` and `continuous/test.csv`.

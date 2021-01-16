@@ -1,7 +1,10 @@
 Vaccine Dataset
 ---
-* Download: [https://www.drivendata.org/competitions/66/flu-shot-learning/page/210/](https://www.drivendata.org/competitions/66/flu-shot-learning/page/210/).
+* Download the following files from [https://www.drivendata.org/competitions/66/flu-shot-learning/data/](https://www.drivendata.org/competitions/66/flu-shot-learning/data/) (you may have to register with DrivenData to access the dataset) to this directory.
+	* `training_set_features.csv`.
+	* `training_set_labels.csv`.
 
-* Preprocess: `python3 continuous.py`.
+* Preprocess the data.
+	* Run `python3 continuous.py`.
 
 This creates a `continuous/train.csv` and `continuous/test.csv`.

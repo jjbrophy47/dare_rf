@@ -13,5 +13,4 @@ rs=$6
 
 python3 scripts/experiments/performance.py --dataset $dataset \
     --tune_frac $tune_frac --scoring $scoring \
-    --criterion $criterion --model $model --rs $rs \
-    --continuous
+    --criterion $criterion --model $model --rs $rs
