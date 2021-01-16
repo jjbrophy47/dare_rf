@@ -1,36 +1,36 @@
 criterion='gini'
 
 # D-DART
-# ./jobs/performance/primer.sh surgical 'exact' 1.0 accuracy $criterion 3 1440 short
-# ./jobs/performance/primer.sh vaccine 'exact' 1.0 accuracy $criterion 3 1440 short
-# ./jobs/performance/primer.sh adult 'exact' 1.0 accuracy $criterion 3 1440 short
-# ./jobs/performance/primer.sh bank_marketing 'exact' 1.0 roc_auc $criterion 3 1440 short
-# ./jobs/performance/primer.sh flight_delays 'exact' 1.0 roc_auc $criterion 20 1440 short
-# ./jobs/performance/primer.sh diabetes 'exact' 1.0 accuracy $criterion 20 1440 short
-# ./jobs/performance/primer.sh olympics 'exact' 1.0 roc_auc $criterion 20 1440 short
-# ./jobs/performance/primer.sh skin 'exact' 1.0 roc_auc $criterion 20 1440 short
-# ./jobs/performance/primer.sh census 'exact' 1.0 roc_auc $criterion 20 1440 short
-# ./jobs/performance/primer.sh credit_card 'exact' 1.0 average_precision $criterion 6 1440 short
-# ./jobs/performance/primer.sh twitter 'exact' 1.0 roc_auc $criterion 30 1440 short
-# ./jobs/performance/primer.sh gas_sensor 'exact' 1.0 roc_auc $criterion 30 1440 short
-# ./jobs/performance/primer.sh synthetic 'exact' 0.5 accuracy $criterion 40 1440 short
-# ./jobs/performance/notune_primer.sh higgs 100 10 0.25 'exact' accuracy $criterion 45 1440 short
+./jobs/performance/primer.sh surgical 'dart' 1.0 accuracy $criterion 3 1440 short
+./jobs/performance/primer.sh vaccine 'dart' 1.0 accuracy $criterion 3 1440 short
+./jobs/performance/primer.sh adult 'dart' 1.0 accuracy $criterion 3 1440 short
+./jobs/performance/primer.sh bank_marketing 'dart' 1.0 roc_auc $criterion 3 1440 short
+./jobs/performance/primer.sh flight_delays 'dart' 1.0 roc_auc $criterion 20 1440 short
+./jobs/performance/primer.sh diabetes 'dart' 1.0 accuracy $criterion 20 1440 short
+./jobs/performance/primer.sh olympics 'dart' 1.0 roc_auc $criterion 20 1440 short
+./jobs/performance/primer.sh skin 'dart' 1.0 roc_auc $criterion 20 1440 short
+./jobs/performance/primer.sh census 'dart' 1.0 roc_auc $criterion 20 1440 short
+./jobs/performance/primer.sh credit_card 'dart' 1.0 average_precision $criterion 6 1440 short
+./jobs/performance/primer.sh twitter 'dart' 1.0 roc_auc $criterion 30 1440 short
+./jobs/performance/primer.sh gas_sensor 'dart' 1.0 roc_auc $criterion 30 1440 short
+./jobs/performance/primer.sh synthetic 'dart' 0.5 accuracy $criterion 40 1440 short
+./jobs/performance/notune_primer.sh higgs 100 10 0.25 'dart' accuracy $criterion 45 1440 short
 
 # Random
-./jobs/performance/primer.sh surgical 'random' 1.0 accuracy $criterion 3 1440 short
-./jobs/performance/primer.sh vaccine 'random' 1.0 accuracy $criterion 3 1440 short
-./jobs/performance/primer.sh adult 'random' 1.0 accuracy $criterion 3 1440 short
-./jobs/performance/primer.sh bank_marketing 'random' 1.0 roc_auc $criterion 3 1440 short
-./jobs/performance/primer.sh flight_delays 'random' 1.0 roc_auc $criterion 20 1440 short
-./jobs/performance/primer.sh diabetes 'random' 1.0 accuracy $criterion 20 1440 short
-./jobs/performance/primer.sh olympics 'random' 1.0 roc_auc $criterion 20 1440 short
-./jobs/performance/primer.sh skin 'random' 1.0 roc_auc $criterion 20 1440 short
-./jobs/performance/primer.sh census 'random' 1.0 roc_auc $criterion 20 1440 short
-./jobs/performance/primer.sh credit_card 'random' 1.0 average_precision $criterion 6 1440 short
-./jobs/performance/primer.sh twitter 'random' 1.0 roc_auc $criterion 30 1440 short
-./jobs/performance/primer.sh gas_sensor 'random' 1.0 roc_auc $criterion 30 1440 short
-./jobs/performance/primer.sh synthetic 'random' 0.5 accuracy $criterion 40 1440 short
-./jobs/performance/notune_primer.sh higgs 100 10 0.25 'random' accuracy $criterion 45 1440 short
+# ./jobs/performance/primer.sh surgical 'random' 1.0 accuracy $criterion 3 1440 short
+# ./jobs/performance/primer.sh vaccine 'random' 1.0 accuracy $criterion 3 1440 short
+# ./jobs/performance/primer.sh adult 'random' 1.0 accuracy $criterion 3 1440 short
+# ./jobs/performance/primer.sh bank_marketing 'random' 1.0 roc_auc $criterion 3 1440 short
+# ./jobs/performance/primer.sh flight_delays 'random' 1.0 roc_auc $criterion 20 1440 short
+# ./jobs/performance/primer.sh diabetes 'random' 1.0 accuracy $criterion 20 1440 short
+# ./jobs/performance/primer.sh olympics 'random' 1.0 roc_auc $criterion 20 1440 short
+# ./jobs/performance/primer.sh skin 'random' 1.0 roc_auc $criterion 20 1440 short
+# ./jobs/performance/primer.sh census 'random' 1.0 roc_auc $criterion 20 1440 short
+# ./jobs/performance/primer.sh credit_card 'random' 1.0 average_precision $criterion 6 1440 short
+# ./jobs/performance/primer.sh twitter 'random' 1.0 roc_auc $criterion 30 1440 short
+# ./jobs/performance/primer.sh gas_sensor 'random' 1.0 roc_auc $criterion 30 1440 short
+# ./jobs/performance/primer.sh synthetic 'random' 0.5 accuracy $criterion 40 1440 short
+# ./jobs/performance/notune_primer.sh higgs 100 10 0.25 'random' accuracy $criterion 45 1440 short
 
 # BORAT
 # ./jobs/performance/primer.sh surgical 'borat' 1.0 accuracy $criterion 3 1440 short

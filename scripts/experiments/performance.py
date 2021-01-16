@@ -26,14 +26,24 @@ from utility import print_util
 
 def _get_model(args):
     """
-    Return the appropriate model model.
+    Return the appropriate model.
     """
 
-    if args.model in ['exact', 'random']:
-        Forest = dart.Forest
+    if args.model in ['dart']:
+        model = dart.Forest(criterion=args.criterion,
+                            max_depth=args.max_depth,
+                            n_estimators=args.n_estimators,
+                            max_features=args.max_features,
+                            topd=args.topd,
+                            k = args.k,
+                            verbose=args.verbose,
+                            random_state=args.rs)
+
+    elif args.model == 'random':
+        pass
 
     elif args.model == 'borat':
-        Forest = borat.Forest
+        pass
 
     elif args.model == 'sklearn':
         model = RandomForestClassifier(n_estimators=args.n_estimators,
@@ -45,16 +55,6 @@ def _get_model(args):
     else:
         raise ValueError('model {} unknown!'.format(args.model))
 
-    if args.model != 'sklearn':
-        model = Forest(criterion=args.criterion,
-                       max_depth=args.max_depth,
-                       n_estimators=args.n_estimators,
-                       max_features=args.max_features,
-                       topd=args.topd,
-                       min_support=2,
-                       verbose=args.verbose,
-                       random_state=args.rs)
-
     return model
 
 
@@ -63,31 +63,31 @@ def _get_model_dict(args, params):
     Return the appropriate model.
     """
 
-    if args.model in ['exact', 'random']:
-        Forest = dart.Forest
+    if args.model == 'dart':
+        model = dart.Forest(criterion=args.criterion,
+                            max_depth=params['max_depth'],
+                            n_estimators=params['n_estimators'],
+                            max_features=args.max_features,
+                            topd=args.topd,
+                            k = params['k'],
+                            verbose=args.verbose,
+                            random_state=args.rs)
+
+    elif args.model == 'random':
+        pass
 
     elif args.model == 'borat':
-        Forest = borat.Forest
+        pass
 
     elif args.model == 'sklearn':
         model = RandomForestClassifier(n_estimators=params['n_estimators'],
                                        max_depth=params['max_depth'],
-                                       max_features=params['max_features'],
+                                       max_features=args.max_features,
                                        criterion=args.criterion,
                                        random_state=args.rs,
                                        bootstrap=args.bootstrap)
     else:
         raise ValueError('model {} unknown!'.format(args.model))
-
-    if args.model != 'sklearn':
-        model = Forest(criterion=args.criterion,
-                       max_depth=params['max_depth'],
-                       n_estimators=params['n_estimators'],
-                       max_features=params['max_features'],
-                       topd=args.topd,
-                       min_support=2,
-                       verbose=args.verbose,
-                       random_state=args.rs)
 
     return model
 
@@ -123,9 +123,7 @@ def performance(args, out_dir, logger):
     begin = time.time()
 
     # obtain data
-    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset,
-                                                          data_dir=args.data_dir,
-                                                          continuous=args.continuous)
+    X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     # dataset statistics
     logger.info('train instances: {:,}'.format(X_train.shape[0]))
@@ -150,11 +148,11 @@ def performance(args, out_dir, logger):
     # hyperparameter values
     n_estimators = [10, 50, 100, 250]
     max_depth = [1, 3, 5, 10, 20]
-    max_features = [None, 0.25]
 
     param_grid = {'max_depth': max_depth,
-                  'n_estimators': n_estimators,
-                  'max_features': max_features}
+                  'n_estimators': n_estimators}
+    if args.model == 'dart':
+        param_grid['k'] = [1, 10, 100]
     keys = list(param_grid.keys())
 
     # test model
@@ -162,23 +160,28 @@ def performance(args, out_dir, logger):
     start = time.time()
     model = _get_model(args)
 
+    # tune hyperparametrers
     if not args.no_tune:
-
         logger.info('param_grid: {}'.format(param_grid))
 
+        # cross-validation
         skf = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=args.rs)
         gs = GridSearchCV(model, param_grid, scoring=args.scoring,
                           cv=skf, verbose=args.verbose, refit=False)
         gs = gs.fit(X_train_sub, y_train_sub)
 
         best_params = _get_best_params(gs, param_grid, keys, logger, args.tol)
+        # best_params = gs.best_params_
+        # logger.info('best_params: {}'.format(best_params))
         model = _get_model_dict(args, best_params)
 
+    # train best model
     start = time.time()
     model = model.fit(X_train, y_train)
     train_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(train_time))
 
+    # evaluate
     auc, acc, ap = exp_util.performance(model, X_test, y_test, name=args.model, logger=logger)
 
     # save results
@@ -189,7 +192,6 @@ def performance(args, out_dir, logger):
     results['acc'] = acc
     results['ap'] = ap
     results['train_time'] = train_time
-    results['continuous'] = args.continuous
     np.save(os.path.join(out_dir, 'results.npy'), results)
 
     logger.info('total time: {:.3f}s'.format(time.time() - begin))
@@ -198,12 +200,9 @@ def performance(args, out_dir, logger):
 def main(args):
 
     # create output dir
-    out_dir = os.path.join(args.out_dir, args.dataset,
-                           args.criterion)
+    out_dir = os.path.join(args.out_dir, args.dataset, args.criterion)
 
-    if args.continuous:
-        out_dir = os.path.join(out_dir, 'continuous')
-
+    # add tuning to filepath
     if args.no_tune:
         out_dir = os.path.join(out_dir, 'no_tune', 'rs_{}'.format(args.rs))
     else:
@@ -216,10 +215,10 @@ def main(args):
         if args.bootstrap:
             out_dir = os.path.join(out_dir, 'bootstrap')
 
-    elif args.model == 'exact':
+    elif args.model == 'dart':
         args.topd = 0
         assert args.topd == 0
-        out_dir = os.path.join(out_dir, 'exact')
+        out_dir = os.path.join(out_dir, 'dart')
 
     elif args.model == 'random':
         args.topd = 1000
@@ -251,14 +250,12 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/performance/', help='output directory.')
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
 
-    # data settings
-    parser.add_argument('--continuous', action='store_true', default=True, help='If True, continuous, else binary.')
-
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--model', type=str, default='exact', help='type of deletion model.')
+    parser.add_argument('--model', type=str, default='dart', help='type of model.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     parser.add_argument('--topd', type=int, default=0, help='0 for exact, 1000 for random.')
+    parser.add_argument('--k', type=int, default=10, help='no. of candidate thresholds to sample.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping with sklearn.')
 
     # tuning settings
@@ -266,11 +263,11 @@ if __name__ == '__main__':
     parser.add_argument('--tune_frac', type=float, default=1.0, help='fraction of training to use for tuning.')
     parser.add_argument('--cv', type=int, default=5, help='number of cross-validation folds for tuning.')
     parser.add_argument('--scoring', type=str, default='roc_auc', help='metric for tuning.')
-    parser.add_argument('--tol', type=float, default=1e-4, help='allowable accuracy difference from the best.')
+    parser.add_argument('--tol', type=float, default=1e-3, help='allowable accuracy difference from the best.')
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=float, default=0.25, help='maximum features to sample.')
+    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum no. features to sample.')
     parser.add_argument('--max_depth', type=int, default=10, help='maximum depth of the tree.')
 
     # display settings
