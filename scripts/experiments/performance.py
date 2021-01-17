@@ -40,12 +40,15 @@ def _get_model(args):
                             verbose=args.verbose,
                             random_state=args.rs)
 
-    elif args.model == 'random':
+    elif args.model == 'extra_trees':
         model = ExtraTreesClassifier(n_estimators=args.n_estimators,
                                      max_depth=args.max_depth,
                                      max_features=args.max_features,
                                      criterion=args.criterion,
                                      random_state=args.rs)
+
+    elif args.model == 'random':
+        pass
 
     elif args.model == 'borat':
         pass
@@ -78,12 +81,15 @@ def _get_model_dict(args, params):
                             verbose=args.verbose,
                             random_state=args.rs)
 
-    elif args.model == 'random':
+    elif args.model == 'extra_trees':
         model = ExtraTreesClassifier(n_estimators=params['n_estimators'],
                                      max_depth=params['max_depth'],
                                      max_features=args.max_features,
                                      criterion=args.criterion,
                                      random_state=args.rs)
+
+    elif args.model == 'random':
+        pass
 
     elif args.model == 'borat':
         pass
@@ -237,13 +243,13 @@ def main(args):
             out_dir = os.path.join(out_dir, 'bootstrap')
 
     elif args.model == 'dart':
-        args.topd = 0
         assert args.topd == 0
         out_dir = os.path.join(out_dir, 'dart')
 
+    elif args.model == 'extra_trees':
+        out_dir = os.path.join(out_dir, 'random')
+
     elif args.model == 'random':
-        args.topd = 1000
-        assert args.topd == 1000
         out_dir = os.path.join(out_dir, 'random')
 
     elif args.model == 'borat':
