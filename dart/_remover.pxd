@@ -6,26 +6,30 @@ from ._splitter cimport SplitRecord
 from ._tree cimport Node
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
+from ._utils cimport DTYPE_t
+from ._utils cimport SIZE_t
+from ._utils cimport INT32_t
+from ._utils cimport UINT32_t
 
 cdef class _Remover:
     """
-    Recursively removes data from a _Tree built using _TreeBuilder; retrains
-    when the indistinguishability bounds epsilon has been violated.
+    Recursively removes data from a _Tree built using _TreeBuilder;
+    retrains a node / subtree when a better feature / threshold is optimal.
     """
 
     # Inner structures
-    cdef _DataManager manager        # Database manager
-    cdef _TreeBuilder tree_builder   # Tree Builder
-    cdef bint use_gini               # Controls splitting criterion
-    cdef int min_samples_leaf        # Minimum number of samples for a leaf
-    cdef int min_samples_split       # Minimum number of samples for a split
+    cdef _DataManager manager                # Database manager
+    cdef _TreeBuilder tree_builder           # Tree Builder
+    cdef bint         use_gini               # Controls splitting criterion
+    cdef SIZE_t       min_samples_leaf       # Minimum number of samples for a leafs
+    cdef SIZE_t       min_samples_split      # Minimum number of samples for a split
 
     # Metric structures
-    cdef int  capacity               # Number of removal allocations for space
-    cdef int  remove_count           # Number of removals
-    cdef int* remove_types           # Removal type
-    cdef int* remove_depths          # Depth of leaf or node needing retraining
-    cdef int  retrain_sample_count   # Number of samples used for retraining
+    cdef SIZE_t  capacity                    # Number of removal allocations for space
+    cdef SIZE_t  remove_count                # Number of removals
+    cdef SIZE_t* remove_types                # Removal type
+    cdef SIZE_t* remove_depths               # Depth of leaf or node needing retraining
+    cdef SIZE_t  retrain_sample_count        # Number of samples used for retraining
 
     # Python API
     cpdef int remove(self, _Tree tree, np.ndarray remove_indices)

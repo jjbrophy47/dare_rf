@@ -46,19 +46,30 @@ def process_utility(gf):
     auc_list = []
     ap_list = []
 
+    train_time_list = []
+    k_list = []
+
     for row in gf.itertuples(index=False):
         acc_list.append(row.acc)
         auc_list.append(row.auc)
         ap_list.append(row.ap)
+        train_time_list.append(row.train_time)
+
+        k_list.append(row.k)
 
     result['acc_mean'] = np.mean(acc_list)
-    result['acc_std'] = sem(acc_list)
+    result['acc_sem'] = sem(acc_list)
 
     result['auc_mean'] = np.mean(auc_list)
-    result['auc_std'] = sem(auc_list)
+    result['auc_sem'] = sem(auc_list)
 
     result['ap_mean'] = np.mean(ap_list)
-    result['ap_std'] = sem(ap_list)
+    result['ap_sem'] = sem(ap_list)
+
+    result['train_time_mean'] = np.mean(train_time_list)
+    result['train_time_std'] = np.std(train_time_list)
+
+    result['k'] = np.median(k_list)
 
     return result
 
@@ -68,9 +79,7 @@ def process_results(df):
     Averages utility results over different random states.
     """
 
-    df['continuous'] = df['continuous'].fillna(False)
-
-    groups = ['dataset', 'criterion', 'model', 'bootstrap', 'continuous']
+    groups = ['dataset', 'criterion', 'model', 'bootstrap']
 
     main_result_list = []
 
@@ -138,9 +147,6 @@ def create_csv(args, out_dir, logger):
     main_df = process_results(df)
     logger.info('\nProcessed results:\n{}'.format(main_df))
 
-    # uncomment to see performance differences between continuous and binary feature transformations
-    print(main_df[(main_df['model'] == 'sklearn') & (main_df['bootstrap'] == False)])
-
     main_df.to_csv(os.path.join(out_dir, 'results.csv'), index=None)
 
 
@@ -167,11 +173,12 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
-                                 'olympics', 'skin', 'census', 'credit_card', 'twitter', 'gas_sensor',
-                                 'synthetic', 'higgs'], help='dataset.')
+                                 'olympics', 'census', 'credit_card', 'synthetic', 'higgs', 'no_show', 'skin',
+                                 'activity', 'gas_sensor', 'twitter'],
+                                 help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
-    parser.add_argument('--model', type=int, nargs='+', default=['exact', 'random', 'sklearn', 'borat'], help='model.')
+    parser.add_argument('--model', type=int, nargs='+', default=['dart', 'random', 'sklearn', 'borat'], help='model.')
     parser.add_argument('--tuning', type=int, nargs='+', default=['tuned', 'no_tune'], help='tuning option.')
 
     args = parser.parse_args()

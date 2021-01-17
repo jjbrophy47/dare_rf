@@ -13,6 +13,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
@@ -40,7 +41,11 @@ def _get_model(args):
                             random_state=args.rs)
 
     elif args.model == 'random':
-        pass
+        model = ExtraTreesClassifier(n_estimators=args.n_estimators,
+                                     max_depth=args.max_depth,
+                                     max_features=args.max_features,
+                                     criterion=args.criterion,
+                                     random_state=args.rs)
 
     elif args.model == 'borat':
         pass
@@ -74,7 +79,11 @@ def _get_model_dict(args, params):
                             random_state=args.rs)
 
     elif args.model == 'random':
-        pass
+        model = ExtraTreesClassifier(n_estimators=params['n_estimators'],
+                                     max_depth=parameters['max_depth'],
+                                     max_features=args.max_features,
+                                     criterion=args.criterion,
+                                     random_state=args.rs)
 
     elif args.model == 'borat':
         pass
@@ -183,6 +192,9 @@ def performance(args, out_dir, logger):
         best_params = _get_best_params(gs, param_grid, keys, logger, args.tol)
         model = _get_model_dict(args, best_params)
 
+    # record time it takes to tune the model
+    tune_time = time().time() - start
+
     # train best model
     start = time.time()
     model = model.fit(X_train, y_train)
@@ -200,6 +212,7 @@ def performance(args, out_dir, logger):
     results['acc'] = acc
     results['ap'] = ap
     results['train_time'] = train_time
+    results['tune_train_time'] = tune_time + train_time
     np.save(os.path.join(out_dir, 'results.npy'), results)
 
     logger.info('total time: {:.3f}s'.format(time.time() - begin))

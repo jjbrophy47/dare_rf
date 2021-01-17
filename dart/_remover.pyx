@@ -48,8 +48,10 @@ cdef class _Remover:
         def __get__(self):
             return self.retrain_sample_count
 
-    def __cinit__(self, _DataManager manager, _TreeBuilder tree_builder,
-                  bint use_gini):
+    def __cinit__(self,
+                  _DataManager manager,
+                  _TreeBuilder tree_builder,
+                  bint         use_gini):
         """
         Constructor.
         """
@@ -59,74 +61,113 @@ cdef class _Remover:
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
+        # initialize metric properties
         self.capacity = 10
         self.remove_count = 0
-        self.remove_types = <int *>malloc(self.capacity * sizeof(int))
-        self.remove_depths = <int *>malloc(self.capacity * sizeof(int))
+        self.remove_types = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
+        self.remove_depths = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
 
     def __dealloc__(self):
         """
         Destructor.
         """
+        # free removal types
         if self.remove_types:
             free(self.remove_types)
+
+        # free removal depths
         if self.remove_depths:
             free(self.remove_depths)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef int remove(self, _Tree tree, np.ndarray remove_indices):
+    cpdef INT32_t remove(self, _Tree tree, np.ndarray remove_indices):
         """
-        Remove the data from remove_indices from the learned _Tree.
+        Remove the data specified by the `remove_indices` from the
+        learned _Tree.
         """
 
         # Data containers
-        cdef double** X = NULL
-        cdef int* y = NULL
+        cdef DTYPE_t** X = NULL
+        cdef INT32_t*  y = NULL
         self.manager.get_data(&X, &y)
 
-        cdef int* samples = convert_int_ndarray(remove_indices)
-        cdef int  n_samples = remove_indices.shape[0]
+        cdef SIZE_t* samples = convert_int_ndarray(remove_indices)
+        cdef SIZE_t  n_samples = remove_indices.shape[0]
 
         # check if any sample has already been deleted
-        cdef int result = self.manager.check_sample_validity(samples, n_samples)
+        cdef INT32_t result = self.manager.check_sample_validity(samples, n_samples)
         if result == -1:
             return -1
 
-        # check if any node at any layer needs to retrain
+        # recurse through the tree and retrain nodes / substrees as necessary
         self._remove(&tree.root, X, y, samples, n_samples)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _remove(self, Node** node_ptr, double** X, int* y,
-                      int* samples, int n_samples) nogil:
+    cdef void _remove(self,
+                      Node**    node_ptr,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples) nogil:
         """
-        Recursively update and detect any layers that need retraining.
+        Update and retrain this node if necessary, otherwise traverse
+        to its children.
         """
-
         cdef Node *node = node_ptr[0]
 
+        # result containers
         cdef SplitRecord split
-        cdef int result = 0
+        cdef INT32_t     result = 0
 
-        cdef int topd = self.tree_builder.topd
-        # cdef int min_support = self.tree_builder.min_support
+        # object properties
+        cdef SIZE_t topd = self.tree_builder.topd
 
-        cdef bint is_bottom_leaf = node.is_leaf and not node.features
+        # boolean variables
+        # cdef bint is_bottom_leaf = node.is_leaf and not node.features
 
-        cdef int i = 0
-        cdef int pos_count = 0
+        # counters
+        # cdef SIZE_t i = 0
+        cdef SIZE_t n_pos_samples = 0
 
-        # compute positive count
-        for i in range(n_samples):
-            if y[samples[i]] == 1:
-                pos_count += 1
+        # update node counts
+        n_pos_samples = self.update_node(&node, y, samples, n_samples)
 
-        # bottom node
-        if is_bottom_leaf:
-            self._add_removal_type(result, node.depth)
-            self._update_leaf(&node, y, samples, n_samples, pos_count)
+        # leaf
+        if node.is_leaf:
+            self.update_leaf(&node, samples, n_samples)
+            self.add_removal_type(result, node.depth)
             free(samples)
+
+        # decision node, but all samples are now in the same class, convert to leaf
+        elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
+            pass
+
+        # decision node
+        else:
+
+            # update metadata
+            self.update_metadata(&node, X, y, samples, n_samples)
+
+            # if no usable thresholds
+                # convert to leaf
+
+            # check optimal split
+
+            # if different split is optimal
+                # retrain
+
+            # else
+                # traverse left
+                # traverse right
+
+
+        # # bottom node
+        # if is_bottom_leaf:
+        #     self._add_removal_type(result, node.depth)
+        #     self._update_leaf(&node, y, samples, n_samples, pos_count)
+        #     free(samples)
 
         # middle node
         else:
@@ -180,33 +221,72 @@ cdef class _Remover:
                         free(split.right_samples)
 
     # private
+    cdef SIZE_t update_node(self,
+                            Node**   node_ptr,
+                            INT32_t* y,
+                            SIZE_t*  samples,
+                            SIZE_t   n_samples) nogil:
+        """
+        Update node counts based on the `samples` being deleted.
+        """
+        cdef Node *node = node_ptr[0]
+
+        # compute number of positive samples being deleted
+        cdef SIZE_t n_pos_samples = 0
+        for i in range(n_samples):
+            n_pos_samples += y[samples[i]]
+
+        # update node counts
+        cdef Node *node = <Node *>malloc(sizeof(Node))
+        node.n_samples -= n_samples
+        node.n_pos_samples -= n_pos_samples
+
+        # 
+        if updated_pos_count > 0 and updated_pos_count < updated_count:
+
+        # return the number of positive samples being deleted
+        return n_pos_samples
+
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples, int n_samples,
-                           int pos_count) nogil:
+    cdef void update_leaf(self,
+                          Node** node_ptr,
+                          int*   samples,
+                          int    n_samples) nogil:
         """
-        Update leaf node: count, pos_count, value, leaf_samples.
+        Update leaf node properties: value and leaf_samples.
         """
         cdef Node* node = node_ptr[0]
 
-        if self.tree_builder.sim_mode:
-            self.tree_builder.sim_depth = node.depth
-            return
+        # if self.tree_builder.sim_mode:
+        #     self.tree_builder.sim_depth = node.depth
+        #     return
 
-        # remove samples from leaf
-        cdef int* leaf_samples = <int *>malloc((node.n_samples - n_samples) * sizeof(int))
-        cdef int  leaf_samples_count = 0
-        self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
-        free(node.leaf_samples)
+        # remove deleted samples from leaf
+        # cdef SIZE_t* leaf_samples = <SIZE_t *>malloc((node.n_samples - n_samples) * sizeof(SIZE_t))
 
-        node.n_samples -= n_samples
-        node.n_pos_samples -= pos_count
-        node.leaf_samples = leaf_samples
+        # update leaf value
         if node.n_samples > 0:
             node.value = node.n_pos_samples / <double> node.n_samples
         else:
             node.value = UNDEF_LEAF_VAL
+
+        # update leaf samples array
+        cdef SIZE_t* leaf_samples = <SIZE_t *>malloc((node.n_samples) * sizeof(SIZE_t))
+        cdef SIZE_t  leaf_samples_count = 0
+
+        # remove deleted samples from leaf
+        self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
+
+        # free old leaf samples array
+        free(node.leaf_samples)
+
+        # node.n_samples -= n_samples
+        # node.n_pos_samples -= pos_count
+
+        # assign new leaf samples and value
+        node.leaf_samples = leaf_samples
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -287,48 +367,69 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _get_leaf_samples(self, Node* node, int* remove_samples, int n_remove_samples,
-                                int** leaf_samples_ptr, int* leaf_samples_count_ptr) nogil:
+    cdef void get_leaf_samples(self,
+                               Node*    node,
+                               SIZE_t*  remove_samples,
+                               SIZE_t   n_remove_samples,
+                               SIZE_t** leaf_samples_ptr,
+                               SIZE_t*  leaf_samples_count_ptr) nogil:
         """
-        Recursively obtain and filter the samples at the leaves.
+        Recursively obtain the samples at the leaves and filter out
+        deleted samples.
         """
-        cdef bint add_sample
-        cdef int i
-        cdef int j
+        cdef bint add_sample = 1
+        cdef SIZE_t i = 0
+        cdef SIZE_t j = 0
 
+        # leaf
         if node.is_leaf:
 
+            # loop through all samples at this leaf
             for i in range(node.n_samples):
                 add_sample = 1
 
+                # loop through all deleted samples
                 for j in range(n_remove_samples):
+
+                    # do not add sample to results if it has been deleted
                     if node.leaf_samples[i] == remove_samples[j]:
                         add_sample = 0
                         break
 
+                # add sample to results if it has not been deleted
                 if add_sample:
                     leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]
                     leaf_samples_count_ptr[0] += 1
 
+        # decision node
         else:
+
+            # traverse left
             if node.left:
-                self._get_leaf_samples(node.left, remove_samples, n_remove_samples,
-                                       leaf_samples_ptr, leaf_samples_count_ptr)
+                self.get_leaf_samples(node.left,
+                                      remove_samples,
+                                      n_remove_samples,
+                                      leaf_samples_ptr,
+                                      leaf_samples_count_ptr)
 
+            # traverse right
             if node.right:
-                self._get_leaf_samples(node.right, remove_samples, n_remove_samples,
-                                       leaf_samples_ptr, leaf_samples_count_ptr)
+                self.get_leaf_samples(node.right,
+                                      remove_samples,
+                                      n_remove_samples,
+                                      leaf_samples_ptr,
+                                      leaf_samples_count_ptr)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil:
-        """
-        Update tree with node metadata.
-        """
-        if self.tree_builder.sim_mode:
-            return
+    # @cython.boundscheck(False)
+    # @cython.wraparound(False)
+    # cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil:
+    #     """
+    #     Update tree with node metadata.
+    #     """
+    #     if self.tree_builder.sim_mode:
+    #         return
 
-        cdef Node* node = node_ptr[0]
+    #     cdef Node* node = node_ptr[0]
         # node.n_samples = split.n_samples
         # node.n_pos_samples = split.n_pos_samples
 
@@ -406,10 +507,14 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int _update_splits(self, Node** node_ptr, double** X, int* y,
-                            int* samples, int n_samples, int pos_count) nogil:
+    cdef SIZE_t update_metadata(self,
+                                Node**    node_ptr,
+                                DTYPE_t** X,
+                                INT32_t*  y,
+                                SIZE_t*   samples,
+                                SIZE_t    n_samples) nogil:
         """
-        Update the metadata of this node.
+        Update each threshold for all features at this node.
         """
         cdef Node* node = node_ptr[0]
 
@@ -418,40 +523,64 @@ cdef class _Remover:
 
         cdef int i
 
-        # compute statistics for each attribute
+        cdef Feature*   feature = NULL
+        cdef Threshold* threshold = NULL
+
+        # update statistics for each feature
         for j in range(node.n_features):
+            feature = node.features[j]
 
-            left_count = 0
-            left_pos_count = 0
+            # update statistics for each threshold in this feature
+            for k in range(feature.n_thresholds):
+                threshold = feature.thresholds[k]
 
-            for i in range(n_samples):
+                # loop through each deleted sample
+                for i in range(n_samples):
 
-                if X[samples[i]][node.features[j].index] == 1:
-                    left_count += 1
-                    left_pos_count += y[samples[i]]
+                    # decrement left branch of this threshold
+                    if X[samples[i]][feature.index] <= threshold.value:
+                        threshold.n_left_samples -= 1
+                        threshold.n_left_pos_samples -= y[samples[i]]
 
-            # node.left_counts[j] -= left_count
-            # node.left_pos_counts[j] -= left_pos_count
-            # node.right_counts[j] -= (n_samples - left_count)
-            # node.right_pos_counts[j] -= (pos_count - left_pos_count)
+                    # decrement right branch of this threshold
+                    else:
+                        threshold.n_right_samples -= 1
+                        threshold.n_right_pos_samples -= y[samples[i]]
+
+                    # decrement left value of this threshold
+                    if X[samples[i]][feature.index] == threshold.v1:
+                        threshold.n_v1_samples -= 1
+                        threshold.n_v1_pos_samples -= 1
+
+                    # decrement right value of this threshold
+                    elif X[samples[i]][feature.index] == threshold.v2:
+                        threshold.n_v2_samples -= 1
+                        threshold.n_v2_pos_samples -= 1
+
+                    # check to see if this threshold is invalid
+                    if threshold.n_left_samples == 0 or threshold.n_right_samples == 0 or ratio_stuff:
+                        # TODO: flag this threshold to get rid of
+                        break
+
+
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil:
+    cdef void _add_removal_type(self, SIZE_t remove_type, SIZE_t remove_depth) nogil:
         """
-        Adds to the removal metrics.
+        Add type and depth to the removal metrics.
         """
         if self.remove_types and self.remove_depths:
             if self.remove_count + 1 == self.capacity:
                 self.capacity *= 2
 
-            self.remove_types = <int *>realloc(self.remove_types, self.capacity * sizeof(int))
-            self.remove_depths = <int *>realloc(self.remove_depths, self.capacity * sizeof(int))
+            self.remove_types = <SIZE_t *>realloc(self.remove_types, self.capacity * sizeof(SIZE_t))
+            self.remove_depths = <SIZE_t *>realloc(self.remove_depths, self.capacity * sizeof(SIZE_t))
 
         else:
             self.capacity = 10
-            self.remove_types = <int *>malloc(self.capacity * sizeof(int))
-            self.remove_depths = <int *>malloc(self.capacity * sizeof(int))
+            self.remove_types = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
+            self.remove_depths = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
 
         self.remove_types[self.remove_count] = remove_type
         self.remove_depths[self.remove_count] = remove_depth
@@ -468,12 +597,12 @@ cdef class _Remover:
         self.remove_depths = NULL
         self.retrain_sample_count = 0
 
-    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem):
+    cdef np.ndarray _get_int_ndarray(self, INT32_t *data, SIZE_t n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.
         """
-        cdef np.npy_intp shape[1]
+        cdef SIZE_t shape[1]
         shape[0] = n_elem
         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
         Py_INCREF(self)

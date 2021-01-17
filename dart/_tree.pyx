@@ -99,9 +99,9 @@ cdef class _TreeBuilder:
         cdef Node *node = self._initialize_node(depth, is_left, y, samples, n_samples)
 
         # class parameters
-        cdef SIZE_t     topd = self.topd
-        cdef SIZE_t     n_total_features = self.manager.n_features
-        cdef SIZE_t     n_max_features = self.max_features
+        cdef SIZE_t    topd = self.topd
+        cdef SIZE_t    n_total_features = self.manager.n_features
+        cdef SIZE_t    n_max_features = self.max_features
         cdef UINT32_t* random_state = &self.rand_r_state
 
         # boolean variables
@@ -113,7 +113,7 @@ cdef class _TreeBuilder:
 
         # result containers
         cdef SplitRecord split
-        cdef SIZE_t n_usable_thresholds = 0
+        cdef SIZE_t      n_usable_thresholds = 0
 
         # printf('\n[B] n_samples: %d, depth: %d, is_left: %d\n', n_samples, depth, is_left)
 
@@ -187,6 +187,8 @@ cdef class _TreeBuilder:
         node.left = NULL
         node.right = NULL
 
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     cdef Node* _initialize_node(self,
                                 SIZE_t   depth,
                                 bint     is_left,
