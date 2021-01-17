@@ -80,7 +80,7 @@ def _get_model_dict(args, params):
 
     elif args.model == 'random':
         model = ExtraTreesClassifier(n_estimators=params['n_estimators'],
-                                     max_depth=parameters['max_depth'],
+                                     max_depth=params['max_depth'],
                                      max_features=args.max_features,
                                      criterion=args.criterion,
                                      random_state=args.rs)
