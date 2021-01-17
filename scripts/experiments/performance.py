@@ -193,7 +193,7 @@ def performance(args, out_dir, logger):
         model = _get_model_dict(args, best_params)
 
     # record time it takes to tune the model
-    tune_time = time().time() - start
+    tune_time = time.time() - start
 
     # train best model
     start = time.time()
