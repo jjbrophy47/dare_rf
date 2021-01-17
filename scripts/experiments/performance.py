@@ -237,12 +237,16 @@ def main(args):
 
     # create filename
     if args.model == 'sklearn':
-        out_dir = os.path.join(out_dir, 'sklearn')
+        out_dir = os.path.join(out_dir, args.model)
 
         if args.bootstrap:
             out_dir = os.path.join(out_dir, 'bootstrap')
 
-    else:
+    elif args.model == 'dart':
+        assert args.topd == 0
+        out_dir = os.path.join(out_dir, args.model)
+
+    elif args.model in ['random', 'extra_trees', 'borat']:
         out_dir = os.path.join(out_dir, args.model)
 
     else:
