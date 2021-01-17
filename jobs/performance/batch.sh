@@ -11,11 +11,11 @@
 # ./jobs/performance/primer.sh 'synthetic' 'dart' 0.5 'accuracy' 'gini' 40 1440 short
 # ./jobs/performance/primer.sh 'higgs' 'dart' 0.1 'accuracy' 'gini' 45 1440 short
 
-./jobs/performance/primer.sh 'no_show' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'skin' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'activity' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'gas_sensor' 'dart' 1.0 'accuracy' 'gini' 30 1440 short
-./jobs/performance/primer.sh 'twitter' 'dart' 0.5 'roc_auc' 'gini' 35 1440 short
+# ./jobs/performance/primer.sh 'no_show' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
+# ./jobs/performance/primer.sh 'skin' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
+# ./jobs/performance/primer.sh 'activity' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
+# ./jobs/performance/primer.sh 'gas_sensor' 'dart' 1.0 'accuracy' 'gini' 30 1440 short
+# ./jobs/performance/primer.sh 'twitter' 'dart' 0.5 'roc_auc' 'gini' 35 1440 short
 
 # ExtrTrees
 ./jobs/performance/primer.sh 'surgical' 'extra_trees' 1.0 'accuracy' 'gini' 3 1440 short
@@ -34,10 +34,10 @@
 ./jobs/performance/primer.sh 'higgs' 'extra_trees' 0.1 'accuracy' 'gini' 45 1440 short
 
 ./jobs/performance/primer.sh 'no_show' 'extra_trees' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'skin' 'extra_trees' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'activity' 'extra_trees' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'gas_sensor' 'extra_trees' 1.0 'accuracy' 'gini' 30 1440 short
 ./jobs/performance/primer.sh 'twitter' 'extra_trees' 0.5 'roc_auc' 'gini' 35 1440 short
+# ./jobs/performance/primer.sh 'skin' 'extra_trees' 1.0 'accuracy' 'gini' 20 1440 short
+# ./jobs/performance/primer.sh 'activity' 'extra_trees' 1.0 'accuracy' 'gini' 20 1440 short
+# ./jobs/performance/primer.sh 'gas_sensor' 'extra_trees' 1.0 'accuracy' 'gini' 30 1440 short
 
 # Random
 # ./jobs/performance/primer.sh 'surgical' 'random' 1.0 'accuracy' 'gini' 3 1440 short
