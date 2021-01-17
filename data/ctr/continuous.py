@@ -62,7 +62,7 @@ def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
     return train_df, test_df, label, numeric, categorical
 
 
-def main(random_state=1, test_size=0.2, n_instances=1000000, max_feature_vals=500, out_dir='continuous'):
+def main(random_state=1, test_size=0.2, n_instances=20000000, max_feature_vals=500, out_dir='continuous'):
 
     train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
                                                                       test_size=test_size,
