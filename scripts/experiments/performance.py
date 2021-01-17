@@ -242,18 +242,8 @@ def main(args):
         if args.bootstrap:
             out_dir = os.path.join(out_dir, 'bootstrap')
 
-    elif args.model == 'dart':
-        assert args.topd == 0
-        out_dir = os.path.join(out_dir, 'dart')
-
-    elif args.model == 'extra_trees':
-        out_dir = os.path.join(out_dir, 'random')
-
-    elif args.model == 'random':
-        out_dir = os.path.join(out_dir, 'random')
-
-    elif args.model == 'borat':
-        out_dir = os.path.join(out_dir, 'borat')
+    else:
+        out_dir = os.path.join(out_dir, args.model)
 
     else:
         raise ValueError('model {} unknown!'.format(args.model))

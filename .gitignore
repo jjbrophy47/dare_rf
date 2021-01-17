@@ -30,6 +30,7 @@ data/*/*.dat
 data/*/*.txt
 data/*/*.data
 data/*/*.test
+data/ctr/train
 data/5xor
 data/6xor
 data/activity
