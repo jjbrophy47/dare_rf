@@ -124,101 +124,53 @@ cdef class _Remover:
         # object properties
         cdef SIZE_t topd = self.tree_builder.topd
 
-        # boolean variables
-        # cdef bint is_bottom_leaf = node.is_leaf and not node.features
-
         # counters
-        # cdef SIZE_t i = 0
         cdef SIZE_t n_pos_samples = 0
 
         # update node counts
         n_pos_samples = self.update_node(&node, y, samples, n_samples)
 
-        # leaf
+        # leaf, check complete
         if node.is_leaf:
             self.update_leaf(&node, samples, n_samples)
-            self.add_removal_type(result, node.depth)
-            free(samples)
 
-        # decision node, but all samples are now in the same class, convert to leaf
+        # decision node, but samples in same class, convert to leaf, check complete
         elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
-            pass
+            self.convert_to_leaf(&node, samples, n_samples, &split)
 
         # decision node
         else:
 
             # update metadata
-            self.update_metadata(&node, X, y, samples, n_samples)
+            n_usable_thresholds = self.update_metadata(&node, X, y, samples, n_samples)
 
-            # if no usable thresholds
-                # convert to leaf
+            # no more usable thresholds, convert to leaf, check complete
+            if n_usable_thresholds == 0:
+                self.convert_to_leaf(&node, samples, n_samples, &split)
 
-            # check optimal split
-
-            # if different split is optimal
-                # retrain
-
-            # else
-                # traverse left
-                # traverse right
-
-
-        # # bottom node
-        # if is_bottom_leaf:
-        #     self._add_removal_type(result, node.depth)
-        #     self._update_leaf(&node, y, samples, n_samples, pos_count)
-        #     free(samples)
-
-        # middle node
-        else:
-            self._update_splits(&node, X, y, samples, n_samples, pos_count)
-
-            # leaf node
-            if node.is_leaf:
-                self._add_removal_type(result, node.depth)
-                self._update_leaf(&node, y, samples, n_samples, pos_count)
-                free(samples)
-
-            # decision node
+            # viable decision node
             else:
-                result = self._check_node(node, X, y, samples, n_samples,
-                                          pos_count, &split)
 
-                # convert to leaf
+                # check optimal split
+                result = self.check_optimal_split(node, X, y, samples, n_samples, pos_count, &split)
+
+                # optimal split has changed, retrain, check complete
                 if result == 1:
-                    self._add_removal_type(result, node.depth)
-                    self._convert_to_leaf(&node, samples, n_samples, &split)
-                    free(samples)
+                    self.retrain(&node_ptr, X, y, samples, n_samples)
 
-                # exact node, retrain
-                elif result == 2:
-                    self._add_removal_type(result, node.depth)
-                    self._retrain(&node_ptr, X, y, samples, n_samples)
-                    free(samples)
+                # no retraining necessary, split samples and recurse
+                else:
 
-                # update and recurse
-                elif result == 0:
+                    # split deleted samples and free original samples
+                    split_samples(node, X, y, samples, n_samples, split)
 
-                    self._update_decision_node(&node, &split)
-                    free(samples)
-
-                    # prevent sim mode from updating beyond the deletion point
-                    if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
-                        free(split.left_samples)
-                        free(split.right_samples)
-                        return
-
-                    # traverse left
+                    # traverse left if any deleted samples go left
                     if split.n_left_samples > 0:
                         self._remove(&node.left, X, y, split.left_samples, split.n_left_samples)
-                    else:
-                        free(split.left_samples)
 
-                    # traverse right
+                    # traverse right if any deleted samples go right
                     if split.n_right_samples > 0:
                         self._remove(&node.right, X, y, split.right_samples, split.n_right_samples)
-                    else:
-                        free(split.right_samples)
 
     # private
     cdef SIZE_t update_node(self,
@@ -241,10 +193,7 @@ cdef class _Remover:
         node.n_samples -= n_samples
         node.n_pos_samples -= n_pos_samples
 
-        # 
-        if updated_pos_count > 0 and updated_pos_count < updated_count:
-
-        # return the number of positive samples being deleted
+        # return no. positive samples being deleted
         return n_pos_samples
 
     @cython.boundscheck(False)
@@ -255,16 +204,9 @@ cdef class _Remover:
                           int*   samples,
                           int    n_samples) nogil:
         """
-        Update leaf node properties: value and leaf_samples.
+        Update leaf node properties: value and leaf_samples. Check complete.
         """
         cdef Node* node = node_ptr[0]
-
-        # if self.tree_builder.sim_mode:
-        #     self.tree_builder.sim_depth = node.depth
-        #     return
-
-        # remove deleted samples from leaf
-        # cdef SIZE_t* leaf_samples = <SIZE_t *>malloc((node.n_samples - n_samples) * sizeof(SIZE_t))
 
         # update leaf value
         if node.n_samples > 0:
@@ -282,88 +224,90 @@ cdef class _Remover:
         # free old leaf samples array
         free(node.leaf_samples)
 
-        # node.n_samples -= n_samples
-        # node.n_pos_samples -= pos_count
-
         # assign new leaf samples and value
         node.leaf_samples = leaf_samples
+
+        # check complete: add deletion type and depth, and clean up
+        self.add_removal_type(0, node.depth)
+        free(samples)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
-                               SplitRecord *split) nogil:
+    cdef void _convert_to_leaf(self,
+                               Node**       node_ptr,
+                               SIZE_t*      samples,
+                               SIZE_t       n_samples,
+                               SplitRecord* split) nogil:
         """
-        Convert decision node to a leaf node.
+        Convert decision node to a leaf node. Check complete.
         """
         cdef Node* node = node_ptr[0]
 
-        if self.tree_builder.sim_mode:
-            self.tree_builder.sim_depth = node.depth
-            return
+        #  updated leaf samples array
+        cdef SIZE_t* leaf_samples = <SIZE_t *>malloc(node.n_samples * sizeof(SIZE_t))
+        cdef SIZE_t  leaf_samples_count = 0
 
-        # cdef int* leaf_samples = <int *>malloc(split.n_samples * sizeof(int))
-        cdef int* leaf_samples = NULL
-        cdef int  leaf_samples_count = 0
-        self._get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
-        leaf_samples = <int *>realloc(leaf_samples, leaf_samples_count * sizeof(int))
+        # get leaf samples and remove deleted samples
+        self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
 
-        dealloc(node.left)
-        dealloc(node.right)
-        free(node.leaf_samples)
+        # deallocate node / subtree
+        dealloc(node)
 
-        # node.n_samples = split.n_samples
-        # node.n_pos_samples = split.n_pos_samples
-
-        node.is_leaf = 1
-        node.value = node.n_pos_samples / <double> node.n_samples
+        # set leaf properties
+        node.is_leaf = True
+        node.value = node.n_pos_samples / <DTYPE_t> node.n_samples
         node.leaf_samples = leaf_samples
 
+        # reset decision node properties
+        node.features = NULL
+        node.n_features = 0
         node.chosen_feature = NULL
+        node.chosen_threshold = NULL
 
+        # reset children properties
         node.left = NULL
         node.right = NULL
 
+        # check complete: add deletion type and depth, and clean up
+        self.add_removal_type(0, node.depth)
+        free(samples)
+
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _retrain(self, Node*** node_pp, double** X, int* y, int* samples,
-                       int n_samples) nogil:
+    cdef void retrain(self,
+                      Node***   node_pp,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples) nogil:
         """
         Rebuild subtree at this node.
         """
         cdef Node*  node = node_pp[0][0]
-
-        if self.tree_builder.sim_mode:
-            self.tree_builder.sim_depth = node.depth
-            self.retrain_sample_count += node.n_samples - n_samples
-            return
-
         cdef Node** node_ptr = node_pp[0]
 
-        cdef int* leaf_samples = <int *>malloc(node.n_samples * sizeof(int))
-        cdef int  leaf_samples_count = 0
+        # updated leaf samples array
+        cdef SIZE_t* leaf_samples = <SIZE_t *>malloc(node.n_samples * sizeof(SIZE_t))
+        cdef SIZE_t  leaf_samples_count = 0
 
-        cdef int depth = node.depth
-        cdef int is_left = node.is_left
+        # node properties
+        cdef SIZE_t depth = node.depth
+        cdef bint   is_left = node.is_left
 
-        # cdef int* invalid_features = NULL
-        # cdef int  invalid_features_count = node.invalid_features_count
+        # get updated list of samples
+        self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
 
-        self._get_leaf_samples(node, samples, n_samples,
-                               &leaf_samples, &leaf_samples_count)
-        leaf_samples = <int *>realloc(leaf_samples, leaf_samples_count * sizeof(int))
-
-        self.retrain_sample_count += leaf_samples_count
-
-        # invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
-        # self.tree_builder.features = copy_int_array(node.features, node.features_count)
-
+        # free node / subtree
         dealloc(node)
         free(node)
 
-        node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
-                                               # invalid_features, invalid_features_count,
-                                               depth, is_left)
+        # retrain node / subtree
+        node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count, depth, is_left)
+
+        # check complete: add deletion type and depth, and clean up
+        self.add_removal_type(1, node.depth)
+        free(samples)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -377,7 +321,7 @@ cdef class _Remover:
         Recursively obtain the samples at the leaves and filter out
         deleted samples.
         """
-        cdef bint add_sample = 1
+        cdef bint   add_sample = 1
         cdef SIZE_t i = 0
         cdef SIZE_t j = 0
 
@@ -420,88 +364,70 @@ cdef class _Remover:
                                       leaf_samples_ptr,
                                       leaf_samples_count_ptr)
 
-    # @cython.boundscheck(False)
-    # @cython.wraparound(False)
-    # cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil:
-    #     """
-    #     Update tree with node metadata.
-    #     """
-    #     if self.tree_builder.sim_mode:
-    #         return
-
-    #     cdef Node* node = node_ptr[0]
-        # node.n_samples = split.n_samples
-        # node.n_pos_samples = split.n_pos_samples
-
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef int _check_node(self, Node* node, double** X, int* y,
-                          int* samples, int n_samples, int pos_count,
-                          SplitRecord *split) nogil:
+    cdef int check_optimal_split(self,
+                                 Node* node) nogil:
         """
-        Checks node for retraining and splits the removal samples.
+        Compare all feature thresholds against the chosen feature / threshold.
         """
 
         # parameters
-        cdef bint use_gini = self.use_gini
+        cdef bint   use_gini = self.use_gini
+        cdef SIZE_t topd = self.tree_builder.topd
 
-        cdef double split_score = -1
-        cdef double best_score = 1
-        cdef int chosen_ndx = -1
+        # keep track of the best feature / threshold
+        cdef DTYPE_t best_score = 1000000
+        cdef DTYPE_t split_score = -1
 
-        cdef int updated_count = node.n_samples - n_samples
-        cdef int updated_pos_count = node.n_pos_samples - pos_count
+        # record the best feature / threshold
+        cdef INT32_t chosen_feature_ndx = 0
+        cdef INT32_t chosen_threshold_ndx = 0
 
-        cdef int i
-        cdef int j
-        cdef int k
+        # object pointers
+        cdef Feature*   feature = NULL
+        cdef Threshold* threshold = NULL
 
-        cdef int topd = self.tree_builder.topd
-        # cdef int min_support = self.tree_builder.min_support
+        # counters
+        cdef SIZE_t i = 0
+        cdef SIZE_t j = 0
+        cdef SIZE_t k = 0
 
-        cdef int result = 0
+        # return 1 if retraining is necessary, 0 otherwise
+        cdef INT32_t result = 0
 
-        if updated_pos_count > 0 and updated_pos_count < updated_count:
+        # greedy node, check if the best feature / threshold has changed
+        if node.depth >= topd:
+            best_score = 1000000
 
-            # exact, check if best feature has changed
-            if node.depth >= topd:
-                best_score = 1
-                chosen_ndx = -1
+            # get thresholds for each feature
+            for j in range(node.n_features):
+                feature = node.features[j]
 
-                for j in range(node.n_features):
+                # compute split score for each threshold
+                for k in range(feature.n_thresholds):
+                    threshold = feature.thresholds[k]
 
-                    # split_score = compute_split_score(use_gini, updated_count, node.left_counts[j],
-                    #                                    node.right_counts[j], node.left_pos_counts[j],
-                    #                                    node.right_pos_counts[j])
+                    # compute split score, entropy or Gini index
+                    split_score = compute_split_score(use_gini,
+                                                      node.n_samples,
+                                                      threshold.n_left_samples,
+                                                      threshold.n_right_samples,
+                                                      threshold.n_left_pos_samples,
+                                                      threshold.n_right_pos_samples)
 
-                    # TODO
-                    split_score = 1.0
+                    # printf('[SN] threshold.value: %.3f, split_score: %.3f\n', threshold.value, split_score)
 
+                    # keep threshold with the best score
                     if split_score < best_score:
                         best_score = split_score
-                        chosen_ndx = j
+                        chosen_feature_ndx = feature.index
+                        chosen_threshold_value = threshold.value
 
-                # same feature is still best
-                if node.chosen_feature.index == node.features[chosen_ndx].index:
-                    split_samples(node, X, y, samples, n_samples, split)
-                    result = 0
-
-                # new feature is best, retrain
-                else:
-                    result = 2
-
-            # random node
-            else:
-                split_samples(node, X, y, samples, n_samples, split)
-                result = 0
-
-        # all samples in one class => leaf
-        else:
-            result = 1
-
-        # split.n_samples = updated_count
-        # split.n_pos_samples = updated_pos_count
+            # check to see if the same feature / threshold is still the best
+            result = (node.chosen_feature.index == chosen_feature_ndx and
+                      node.chosen_threshold.value == chosen_threshold_value)
 
         return result
 
@@ -566,7 +492,9 @@ cdef class _Remover:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _add_removal_type(self, SIZE_t remove_type, SIZE_t remove_depth) nogil:
+    cdef void add_removal_type(self,
+                               SIZE_t remove_type,
+                               SIZE_t remove_depth) nogil:
         """
         Add type and depth to the removal metrics.
         """
@@ -597,7 +525,9 @@ cdef class _Remover:
         self.remove_depths = NULL
         self.retrain_sample_count = 0
 
-    cdef np.ndarray _get_int_ndarray(self, INT32_t *data, SIZE_t n_elem):
+    cdef np.ndarray _get_int_ndarray(self,
+                                     INT32_t* data,
+                                     SIZE_t   n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.

@@ -168,27 +168,49 @@ cdef void split_samples(Node*        node,
                         SIZE_t       n_samples,
                         SplitRecord* split) nogil:
     """
-    Split samples based on the chosen feature.
+    Split samples based on the chosen feature / threshold.
+
+    NOTE: frees samples.
     """
 
+    # counters
     cdef SIZE_t i = 0
     cdef SIZE_t j = 0
     cdef SIZE_t k = 0
 
-    # assign results from chosen feature
+    # split samples based on the chosen feature / threshold
     split.left_samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
     split.right_samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+
+    # loop through the deleted samples
     for i in range(n_samples):
+
+        # add sample to the left branch
         if X[samples[i]][node.chosen_feature.index] <= node.chosen_threshold.value:
             split.left_samples[j] = samples[i]
             j += 1
+
+        # add sample to the right branch
         else:
             split.right_samples[k] = samples[i]
             k += 1
-    split.left_samples = <SIZE_t *>realloc(split.left_samples, j * sizeof(SIZE_t))
-    split.right_samples = <SIZE_t *>realloc(split.right_samples, k * sizeof(SIZE_t))
-    split.n_left_samples = j
-    split.n_right_samples = k
+
+    # assign left branch deleted samples
+    if j > 0:
+        split.n_left_samples = j
+        split.left_samples = <SIZE_t *>realloc(split.left_samples, j * sizeof(SIZE_t))
+    else:
+        free(split.left_samples)
+
+    # assign right branch deleted samples
+    if k > 0:
+        split.n_right_samples = k
+        split.right_samples = <SIZE_t *>realloc(split.right_samples, k * sizeof(SIZE_t))
+    else:
+        free(split.right_samples)
+
+    # clean up, no more use for the original samples array
+    free(samples)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
