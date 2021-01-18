@@ -15,11 +15,14 @@ def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
 
     # retrieve dataset
     df = pd.read_csv('train', nrows=n_instances)
+    print(df)
 
     # crete month, day, and hour columns
     df['month'] = df['hour'].apply(lambda x: int(str(x)[2:4]))
     df['day'] = df['hour'].apply(lambda x: int(str(x)[4:6]))
     df['hour'] = df['hour'].apply(lambda x: int(str(x)[6:8]))
+
+    print(df)
 
     # check data type and no. unique values for each column
     for c in df.columns:
