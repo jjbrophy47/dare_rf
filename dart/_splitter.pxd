@@ -9,10 +9,10 @@ from ._utils cimport UINT32_t
 Object to keep track of the data parition during a split.
 """
 cdef struct SplitRecord:
-    SIZE_t*    left_samples       # Samples in left branch of feature
-    SIZE_t*    right_samples      # Samples in right branch of feature
-    SIZE_t     n_left_samples     # Number of samples in left branch
-    SIZE_t     n_right_samples    # Number of samples in right branch
+    SIZE_t*    left_samples                # Samples in left branch of feature 
+    SIZE_t*    right_samples               # Samples in right branch of feature
+    SIZE_t     n_left_samples              # Number of samples in left branch
+    SIZE_t     n_right_samples             # Number of samples in right branch
 
 cdef class _Splitter:
     """
@@ -20,8 +20,8 @@ cdef class _Splitter:
     """
     # Internal structures
     cdef public SIZE_t min_samples_leaf    # Min samples in a leaf
-    cdef bint use_gini                     # Controls splitting criterion
-    cdef SIZE_t  k                         # Number of thresholds to sample
+    cdef bint          use_gini            # Controls splitting criterion
+    cdef SIZE_t        k                   # Number of thresholds to sample
 
     # Methods
     cdef void split_node(self,

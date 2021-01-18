@@ -2,33 +2,56 @@
 Preprocess dataset.
 """
 import os
+import logging
 
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
+def get_logger(filename=''):
+    """
+    Return a logger object to easily save textual output.
+    """
 
-def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    log_handler = logging.FileHandler(filename, mode='w')
+    formatter = logging.Formatter('%(message)s')
+
+    stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(formatter)
+    log_handler.setLevel(logging.INFO)
+    log_handler.setFormatter(formatter)
+
+    logger.addHandler(stream_handler)
+    logger.addHandler(log_handler)
+
+    return logger
+
+
+def dataset_specific(random_state, test_size,
+                     n_instances, max_feature_vals,
+                     logger):
 
     # retrieve dataset
     df = pd.read_csv('train', nrows=n_instances)
-    print(df)
+    logger.info('{}'.format(df))
 
     # crete month, day, and hour columns
-    df['month'] = df['hour'].apply(lambda x: int(str(x)[2:4]))
-    df['day'] = df['hour'].apply(lambda x: int(str(x)[4:6]))
-    df['hour'] = df['hour'].apply(lambda x: int(str(x)[6:8]))
-
-    print(df)
+    # df['month'] = df['hour'].apply(lambda x: int(str(x)[2:4]))
+    # df['day'] = df['hour'].apply(lambda x: int(str(x)[4:6]))
+    # df['hour'] = df['hour'].apply(lambda x: int(str(x)[6:8]))
 
     # check data type and no. unique values for each column
-    for c in df.columns:
-        print(c, df[c].dtype, len(df[c].unique()))
+    # for c in df.columns:
+    #     logger.info('{}, {}, {}'.format(c, df[c].dtype, len(df[c].unique())))
 
     # remove select columns
+    logger.info('removing columns...')
     remove_cols = ['id', 'site_id', 'site_domain', 'app_id',
                    'device_id', 'device_ip', 'device_model']
 
@@ -43,8 +66,8 @@ def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
-    print('nan rows: {}'.format(len(nan_rows)))
     df = df.dropna()
+    logger.info('nan rows: {}'.format(len(nan_rows)))
 
     # split into train and test
     indices = np.arange(len(df))
@@ -62,19 +85,23 @@ def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
     label = ['click']
     numeric = ['month', 'day', 'hour']
     categorical = list(set(columns) - set(numeric) - set(label))
-    print('label', label)
-    print('numeric', numeric)
-    print('categorical', categorical)
+    logger.info('label: {}'.format(label))
+    logger.info('numeric: {}'.format(numeric))
+    logger.info('categorical: {}'.format(categorical))
 
     return train_df, test_df, label, numeric, categorical
 
 
-def main(random_state=1, test_size=0.2, n_instances=20000000, max_feature_vals=250, out_dir='continuous'):
+def main(random_state=1, test_size=0.2, n_instances=20000000,
+         max_feature_vals=250, out_dir='continuous'):
+
+    logger = get_logger('log.txt')
 
     train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
                                                                       test_size=test_size,
                                                                       n_instances=n_instances,
-                                                                      max_feature_vals=max_feature_vals)
+                                                                      max_feature_vals=max_feature_vals,
+                                                                      logger=logger)
 
     # binarize inputs
     ct = ColumnTransformer([('kbd', 'passthrough', numeric),
@@ -91,11 +118,11 @@ def main(random_state=1, test_size=0.2, n_instances=20000000, max_feature_vals=2
     train = np.hstack([train, train_label]).astype(np.int32)
     test = np.hstack([test, test_label]).astype(np.int32)
 
-    print('train.shape: {}, label sum: {}'.format(train.shape, train[:, -1].sum()))
-    print('test.shape: {}, label sum: {}'.format(test.shape, test[:, -1].sum()))
+    logger.info('train.shape: {}, label sum: {}'.format(train.shape, train[:, -1].sum()))
+    logger.info('test.shape: {}, label sum: {}'.format(test.shape, test[:, -1].sum()))
 
     # save to numpy format
-    print('saving...')
+    logger.info('saving...')
     os.makedirs(out_dir, exist_ok=True)
     np.save(os.path.join(out_dir, 'train.npy'), train)
     np.save(os.path.join(out_dir, 'test.npy'), test)

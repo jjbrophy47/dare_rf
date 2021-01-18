@@ -51,13 +51,15 @@ cdef class _Remover:
     def __cinit__(self,
                   _DataManager manager,
                   _TreeBuilder tree_builder,
-                  bint         use_gini):
+                  bint         use_gini,
+                  SIZE_t       k):
         """
         Constructor.
         """
         self.manager = manager
         self.tree_builder = tree_builder
         self.use_gini = use_gini
+        self.k = k
         self.min_samples_leaf = tree_builder.min_samples_leaf
         self.min_samples_split = tree_builder.min_samples_split
 
@@ -162,7 +164,7 @@ cdef class _Remover:
                 else:
 
                     # split deleted samples and free original samples
-                    split_samples(node, X, y, samples, n_samples, split)
+                    split_samples(node, X, y, samples, n_samples, &split)
 
                     # traverse left if any deleted samples go left
                     if split.n_left_samples > 0:
@@ -444,19 +446,25 @@ cdef class _Remover:
         """
         cdef Node* node = node_ptr[0]
 
+        # class properties
+        cdef SIZE_t k_samples = self.k
+
         # counters
-        cdef int i
+        cdef int i = 0
+        cdef int j = 0
+        cdef int k = 0
 
         # object pointers
         cdef Feature*   feature = NULL
         cdef Threshold* threshold = NULL
 
         # 2d array of indices designating invalid feautures / thresholds
-        cdef SIZE_t* thresholds = NULL
-        cdef SIZE_t  n_thresholds = 0
+        cdef SIZE_t* invalid_thresholds = NULL
+        cdef SIZE_t  n_invalid_thresholds = 0
 
         # no. of viable thresholds at this feature
-        cdef n_usable_thresholds = 0
+        cdef bint   valid_threshold = False
+        cdef SIZE_t n_usable_thresholds = 0
 
         # update statistics for each feature
         for j in range(node.n_features):
@@ -493,28 +501,43 @@ cdef class _Remover:
                         threshold.n_v2_samples -= 1
                         threshold.n_v2_pos_samples -= 1
 
-                    # check to see if this threshold is invalid
-                    if threshold.n_left_samples == 0 or threshold.n_right_samples == 0 or ratio_stuff:
-                        thresholds[j][n_thresholds[j]] = k
-                        n_thresholds[j] += 1
+                    # compute label ratios for values on either side of threshold
+                    v1_label_ratio = v1_pos_count / (1.0 * v1_count)
+                    v2_label_ratio = v2_pos_count / (1.0 * v2_count)
 
-                    # viable threshold
+                    # check to see if threshold is still valid
+                    valid_threshold = ((threshold.n_left_samples == 0) or
+                                       (threshold.n_right_samples == 0) or
+                                       (v1_label_ratio != v2_label_ratio) or
+                                       (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
+                                       (v2_label_ratio > 0.0 and v2_label_ratio < 1.0))
+
+                    # invalid threshold, flag for removal
+                    if threshold.n_left_samples == 0 or threshold.n_right_samples == 0 or ratio_stuff:
+                        invalid_thresholds[n_invalid_thresholds] = k
+                        n_invalid_thresholds += 1
+
+                    # valid threshold
                     else:
                         n_usable_thresholds += 1
 
-            # if n_thresholds > 0
+            # sample new viable thresholds, if any
+            if n_invalid_thresholds > 0:
 
-                # sort feature values and get list of candidate thresholds
+                # make sure no. thresholds is at least k, otherwise there are no other thresholds
+                if feature.n_thresholds == k_samples:
 
-                # sample a new threshold uniformly at random
+                    # sort feature values and get list of candidate thresholds
 
-                # make sure new threshold is not already being used by this feature
+                    # sample a new threshold uniformly at random
 
-                # if viable threshold
+                    # make sure new threshold is not already being used by this feature
 
-                    # replace old threshold with this new threshold
+                    # if viable threshold
 
-                    # increment n_usable_thresholds
+                        # increment n_usable_thresholds
+
+                # merge old thresholds and new thresholds into a new array
 
             # free thresholds array
 

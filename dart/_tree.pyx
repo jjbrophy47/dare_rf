@@ -149,8 +149,8 @@ cdef class _TreeBuilder:
                 # printf('[B] chosen_feature.index: %d, chosen_threshold.value: %.2f\n',
                 #       node.chosen_feature.index, node.chosen_threshold.value)
 
-                # clean up
-                free(samples)
+                # clean up, already taken care of in split_node()
+                # free(samples)
 
                 # traverse to left and right branches
                 node.left = self._build(X, y, split.left_samples, split.n_left_samples, depth + 1, 1)

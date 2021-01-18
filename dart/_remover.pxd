@@ -23,6 +23,7 @@ cdef class _Remover:
     cdef bint         use_gini               # Controls splitting criterion
     cdef SIZE_t       min_samples_leaf       # Minimum number of samples for a leafs
     cdef SIZE_t       min_samples_split      # Minimum number of samples for a split
+    cdef SIZE_t       k                      # Number of thresholds to sample
 
     # Metric structures
     cdef SIZE_t  capacity                    # Number of removal allocations for space

@@ -27,9 +27,9 @@ cdef class _Splitter:
     """
 
     def __cinit__(self,
-                  SIZE_t  min_samples_leaf,
-                  bint use_gini,
-                  SIZE_t  k):
+                  SIZE_t min_samples_leaf,
+                  bint   use_gini,
+                  SIZE_t k):
         """
         Parameters
         ----------
@@ -117,7 +117,8 @@ cdef class _Splitter:
                         chosen_threshold = threshold
 
         # random, choose random feature and threshold
-        # TODO: is this random too good? Should we just be picking a random
+        # TODO: is this random too good? Yes, we don't compute metadata for random nodes.
+        #       Should we just be picking a random
         #       number inside the feature range?
         else:
 
@@ -130,19 +131,21 @@ cdef class _Splitter:
             chosen_threshold = chosen_feature.thresholds[chosen_threshold_ndx]
 
         # split node samples based on the chosen feature / threshold
-        split.left_samples = <SIZE_t *>malloc(chosen_threshold.n_left_samples * sizeof(SIZE_t))
-        split.right_samples = <SIZE_t *>malloc(chosen_threshold.n_right_samples * sizeof(SIZE_t))
-        j = 0
-        k = 0
-        for i in range(n_samples):
-            if X[samples[i]][chosen_feature.index] <= chosen_threshold.value:
-                split.left_samples[j] = samples[i]
-                j += 1
-            else:
-                split.right_samples[k] = samples[i]
-                k += 1
-        split.n_left_samples = chosen_threshold.n_left_samples
-        split.n_right_samples = chosen_threshold.n_right_samples
+        split_samples(node, X, y, samples, n_samples, &split)
+
+        # split.left_samples = <SIZE_t *>malloc(chosen_threshold.n_left_samples * sizeof(SIZE_t))
+        # split.right_samples = <SIZE_t *>malloc(chosen_threshold.n_right_samples * sizeof(SIZE_t))
+        # j = 0
+        # k = 0
+        # for i in range(n_samples):
+        #     if X[samples[i]][chosen_feature.index] <= chosen_threshold.value:
+        #         split.left_samples[j] = samples[i]
+        #         j += 1
+        #     else:
+        #         split.right_samples[k] = samples[i]
+        #         k += 1
+        # split.n_left_samples = chosen_threshold.n_left_samples
+        # split.n_right_samples = chosen_threshold.n_right_samples
 
         # clear leaf node properties
         node.is_leaf = 0
@@ -226,9 +229,9 @@ cdef class _Splitter:
         cdef SIZE_t threshold_count = 0
 
         # container variables
-        cdef SIZE_t      feature_index = 0
         cdef Threshold*  threshold = NULL
         cdef Threshold** thresholds = NULL
+        cdef SIZE_t      threshold_count = 0
         cdef SIZE_t      n_thresholds = 0
         cdef SIZE_t      k_samples = self.k
 
@@ -261,135 +264,146 @@ cdef class _Splitter:
             # access feature object
             feature = node.features[j]
 
-            # printf('\n[CM - PART 1] feature %ld\n', feature.index)
+            thresholds = <Threshold **>malloc(n_samples * sizeof(Threshold *))
+            thresholds_count = 0
 
-            # copy values and indices for this feature
-            for i in range(n_samples):
-                values[i] = X[samples[i]][feature.index]
-                indices[i] = i
+            n_usable_thresholds = get_candidate_thresholds(feature, X, y, n_samples, n_samples,
+                                                           &thresholds, &thresholds_count)
 
-            # sort feature values
-            # printf('sorting\n')
-            sort(values, indices, n_samples)
-            # printf('sorted\n')
-
-            # for i in range(n_samples):
-            #     printf('values[%ld]: %.2f, indices[%ld]: %ld, labels[%ld]: %d\n',
-            #            i, values[i], i, indices[i], i, labels[indices[i]])
-
-            # check to see if this feature is constant
-            # printf('vlast: %.2f, vfirst: %.2f\n', values[n_samples - 1], values[0])
-            if values[n_samples - 1] <= values[0] + FEATURE_THRESHOLD:
+            if n_usable_thresholds == 0:
                 feature.thresholds = NULL
                 feature.n_thresholds = 0
                 continue
 
-            # initialize starting values
-            count = 1
-            pos_count = labels[indices[0]]
-            v_count = 1
-            v_pos_count = labels[indices[0]]
-            feature_value_count = 0
-            prev_val = values[0]
-            prev_label = labels[indices[0]]
+            # printf('\n[CM - PART 1] feature %ld\n', feature.index)
 
-            # printf('prev_label: %d\n', prev_label)
+            # # copy values and indices for this feature
+            # for i in range(n_samples):
+            #     values[i] = X[samples[i]][feature.index]
+            #     indices[i] = i
 
-            # result container
-            thresholds = <Threshold **>malloc(n_samples * sizeof(Threshold *))
+            # # sort feature values
+            # # printf('sorting\n')
+            # sort(values, indices, n_samples)
+            # # printf('sorted\n')
 
-            # loop through sorted feature values
-            for i in range(1, n_samples):
-                # printf('i: %ld\n', i)
-                # printf('  indices[%ld]: %ld\n', i, indices[i])
-                # printf('    labels[%ld]: %d\n', indices[i], labels[indices[i]])
-                cur_val = values[i]
-                cur_label = labels[indices[i]]
+            # # for i in range(n_samples):
+            # #     printf('values[%ld]: %.2f, indices[%ld]: %ld, labels[%ld]: %d\n',
+            # #            i, values[i], i, indices[i], i, labels[indices[i]])
 
-                # next feature value
-                if cur_val > prev_val + FEATURE_THRESHOLD:
+            # # check to see if this feature is constant
+            # # printf('vlast: %.2f, vfirst: %.2f\n', values[n_samples - 1], values[0])
+            # if values[n_samples - 1] <= values[0] + FEATURE_THRESHOLD:
+                # feature.thresholds = NULL
+                # feature.n_thresholds = 0
+                # continue
 
-                    # save previous feature counts
-                    threshold_values[feature_value_count] = prev_val
-                    counts[feature_value_count] = count
-                    pos_counts[feature_value_count] = pos_count
-                    v_counts[feature_value_count] = v_count
-                    v_pos_counts[feature_value_count] = v_pos_count
-                    feature_value_count += 1
+            # # initialize starting values
+            # count = 1
+            # pos_count = labels[indices[0]]
+            # v_count = 1
+            # v_pos_count = labels[indices[0]]
+            # feature_value_count = 0
+            # prev_val = values[0]
+            # prev_label = labels[indices[0]]
 
-                    # reset counts for this new feature
-                    v_count = 1
-                    v_pos_count = cur_label
+            # # printf('prev_label: %d\n', prev_label)
 
-                # same feature value
-                else:
+            # # result container
+            # thresholds = <Threshold **>malloc(n_samples * sizeof(Threshold *))
 
-                    # increment counts for this feature
-                    v_count += 1
-                    v_pos_count += cur_label
+            # # loop through sorted feature values
+            # for i in range(1, n_samples):
+            #     # printf('i: %ld\n', i)
+            #     # printf('  indices[%ld]: %ld\n', i, indices[i])
+            #     # printf('    labels[%ld]: %d\n', indices[i], labels[indices[i]])
+            #     cur_val = values[i]
+            #     cur_label = labels[indices[i]]
 
-                # increment left branch counts
-                count += 1
-                pos_count += cur_label
+            #     # next feature value
+            #     if cur_val > prev_val + FEATURE_THRESHOLD:
 
-                # move pointers to the next feature
-                prev_val = cur_val
-                prev_label = cur_label
+            #         # save previous feature counts
+            #         threshold_values[feature_value_count] = prev_val
+            #         counts[feature_value_count] = count
+            #         pos_counts[feature_value_count] = pos_count
+            #         v_counts[feature_value_count] = v_count
+            #         v_pos_counts[feature_value_count] = v_pos_count
+            #         feature_value_count += 1
 
-            # handle last feature value
-            if v_count > 0:
+            #         # reset counts for this new feature
+            #         v_count = 1
+            #         v_pos_count = cur_label
 
-                # save previous feature counts
-                threshold_values[feature_value_count] = prev_val
-                counts[feature_value_count] = count
-                pos_counts[feature_value_count] = pos_count
-                v_counts[feature_value_count] = v_count
-                v_pos_counts[feature_value_count] = v_pos_count
-                feature_value_count += 1
+            #     # same feature value
+            #     else:
 
-            # printf('[CM - PART 1] no. feature value sets: %ld\n', feature_value_count)
+            #         # increment counts for this feature
+            #         v_count += 1
+            #         v_pos_count += cur_label
 
-            # PART 2: evaluate each pair of feature sets to get candidate thresholds
-            threshold_count = 0
-            for k in range(1, feature_value_count):
+            #     # increment left branch counts
+            #     count += 1
+            #     pos_count += cur_label
 
-                # extract both of the feature set counts
-                v1 = threshold_values[k-1]
-                v2 = threshold_values[k]
-                v1_count = v_counts[k-1]
-                v2_count = v_counts[k]
-                v1_pos_count = v_pos_counts[k-1]
-                v2_pos_count = v_pos_counts[k]
-                left_count = counts[k-1]
-                left_pos_count = pos_counts[k-1]
+            #     # move pointers to the next feature
+            #     prev_val = cur_val
+            #     prev_label = cur_label
 
-                # compute label ratios of the two groups
-                v1_label_ratio = v1_pos_count / (1.0 * v1_count)
-                v2_label_ratio = v2_pos_count / (1.0 * v2_count)
+            # # handle last feature value
+            # if v_count > 0:
 
-                save_threshold = ((v1_label_ratio != v2_label_ratio) or
-                                  (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
-                                  (v2_label_ratio > 0.0 and v2_label_ratio < 1.0))
+            #     # save previous feature counts
+            #     threshold_values[feature_value_count] = prev_val
+            #     counts[feature_value_count] = count
+            #     pos_counts[feature_value_count] = pos_count
+            #     v_counts[feature_value_count] = v_count
+            #     v_pos_counts[feature_value_count] = v_pos_count
+            #     feature_value_count += 1
 
-                # save threshold
-                if save_threshold:
+            # # printf('[CM - PART 1] no. feature value sets: %ld\n', feature_value_count)
 
-                    # create threshold
-                    threshold = <Threshold *>malloc(sizeof(Threshold))
-                    threshold.value = (v1 + v2) / 2.0
-                    threshold.n_v1_samples = v1_count
-                    threshold.n_v1_pos_samples = v1_pos_count
-                    threshold.n_v2_samples = v2_count
-                    threshold.n_v2_pos_samples = v2_pos_count
-                    threshold.n_left_samples = left_count
-                    threshold.n_left_pos_samples = left_pos_count
-                    threshold.n_right_samples = n_samples - left_count
-                    threshold.n_right_pos_samples = n_pos_samples - left_pos_count
+            # # PART 2: evaluate each pair of feature sets to get candidate thresholds
+            # threshold_count = 0
+            # for k in range(1, feature_value_count):
 
-                    # save threshold to this feature
-                    thresholds[threshold_count] = threshold
-                    threshold_count += 1
-                    n_usable_thresholds += 1
+            #     # extract both of the feature set counts
+            #     v1 = threshold_values[k-1]
+            #     v2 = threshold_values[k]
+            #     v1_count = v_counts[k-1]
+            #     v2_count = v_counts[k]
+            #     v1_pos_count = v_pos_counts[k-1]
+            #     v2_pos_count = v_pos_counts[k]
+            #     left_count = counts[k-1]
+            #     left_pos_count = pos_counts[k-1]
+
+            #     # compute label ratios of the two groups
+            #     v1_label_ratio = v1_pos_count / (1.0 * v1_count)
+            #     v2_label_ratio = v2_pos_count / (1.0 * v2_count)
+
+            #     save_threshold = ((v1_label_ratio != v2_label_ratio) or
+            #                       (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
+            #                       (v2_label_ratio > 0.0 and v2_label_ratio < 1.0))
+
+            #     # save threshold
+            #     if save_threshold:
+
+            #         # create threshold
+            #         threshold = <Threshold *>malloc(sizeof(Threshold))
+            #         threshold.value = (v1 + v2) / 2.0
+            #         threshold.n_v1_samples = v1_count
+            #         threshold.n_v1_pos_samples = v1_pos_count
+            #         threshold.n_v2_samples = v2_count
+            #         threshold.n_v2_pos_samples = v2_pos_count
+            #         threshold.n_left_samples = left_count
+            #         threshold.n_left_pos_samples = left_pos_count
+            #         threshold.n_right_samples = n_samples - left_count
+            #         threshold.n_right_pos_samples = n_pos_samples - left_pos_count
+
+            #         # save threshold to this feature
+            #         thresholds[threshold_count] = threshold
+            #         threshold_count += 1
+            #         n_usable_thresholds += 1
 
                     # printf('[CM - PART 2] candidate threshold.value: %.2f\n', threshold.value)
             # printf('[CM - PART 2] no. candidate thresholds: %ld\n', threshold_count)
@@ -451,6 +465,212 @@ cdef class _Splitter:
                 free(thresholds[i])
             free(thresholds)
             free(sampled_indices)
+
+        # clean up
+        free(values)
+        free(labels)
+        free(indices)
+
+        free(threshold_values)
+        free(counts)
+        free(pos_counts)
+        free(v_counts)
+        free(v_pos_counts)
+
+        return n_usable_thresholds
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef SIZE_t get_candidate_thresholds(self,
+                                         Feature*     feature,
+                                         DTYPE_t**    X,
+                                         INT32_t*     y,
+                                         SIZE_t*      samples,
+                                         SIZE_t       n_samples,
+                                         Threshold*** thresholds_ptr,
+                                         SIZE_t*      thresholds_count_ptr) nogil:
+        """
+        For this feature:
+          Sort the values,
+          Identify ALL candidate thresholds.
+            ->Reference: https://www.biostat.wisc.edu/~page/decision-trees.pdf
+          Save metadata for each threshold.
+        """
+        # total number of positive samples
+        cdef SIZE_t n_pos_samples = 0
+
+        # keeps track of left and right branch info
+        cdef SIZE_t count = 0
+        cdef SIZE_t pos_count = 0
+        cdef SIZE_t v_count = 0
+        cdef SIZE_t v_pos_count = 0
+
+        # keep track of the current feature set
+        cdef DTYPE_t prev_val = -1
+        cdef DTYPE_t cur_val = -1
+        cdef INT32_t cur_label = -1
+
+        # helper arrays
+        cdef DTYPE_t* values = <DTYPE_t *>malloc(n_samples * sizeof(DTYPE_t))
+        cdef INT32_t* labels = <INT32_t *>malloc(n_samples * sizeof(INT32_t))
+        cdef SIZE_t*  indices = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+
+        # containers to hold feature value set information
+        cdef DTYPE_t* threshold_values = <DTYPE_t *>malloc(n_samples * sizeof(DTYPE_t))
+        cdef SIZE_t*  counts = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+        cdef SIZE_t*  pos_counts = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+        cdef SIZE_t*  v_counts = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+        cdef SIZE_t*  v_pos_counts = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+
+        # iterators
+        cdef SIZE_t  i = 0
+        cdef SIZE_t  k = 0
+
+        # intermediate variables
+        cdef DTYPE_t v1 = -1
+        cdef DTYPE_t v2 = -1
+        cdef DTYPE_t v1_label_ratio = -1
+        cdef DTYPE_t v2_label_ratio = -1
+        cdef bint    save_threshold = False
+
+        # threshold info to save
+        cdef DTYPE_t value = -1
+        cdef SIZE_t  v1_count = 0
+        cdef SIZE_t  v1_pos_count = 0
+        cdef SIZE_t  v2_count = 0
+        cdef SIZE_t  v2_pos_count = 0
+        cdef SIZE_t  left_count = 0
+        cdef SIZE_t  left_pos_count = 0
+
+        # counts
+        cdef SIZE_t feature_value_count = 0
+        cdef SIZE_t threshold_count = 0
+
+        # object pointers
+        cdef Threshold*  threshold = NULL
+
+        # return variable
+        cdef SIZE_t n_usable_thresholds = 0
+
+        # count number of pos labels
+        for i in range(n_samples):
+            labels[i] = y[samples[i]]
+            if y[samples[i]] == 1:
+                n_pos_samples += 1
+
+        # copy values and indices for this feature
+        for i in range(n_samples):
+            values[i] = X[samples[i]][feature.index]
+            indices[i] = i
+
+        # sort feature values
+        sort(values, indices, n_samples)
+
+        # check to see if this feature is constant
+        if values[n_samples - 1] <= values[0] + FEATURE_THRESHOLD:
+            feature.thresholds = NULL
+            feature.n_thresholds = 0
+            continue
+
+        # initialize starting values
+        count = 1
+        pos_count = labels[indices[0]]
+        v_count = 1
+        v_pos_count = labels[indices[0]]
+        feature_value_count = 0
+        prev_val = values[0]
+
+        # result container
+        # thresholds = <Threshold **>malloc(n_samples * sizeof(Threshold *))
+
+        # loop through sorted feature values
+        for i in range(1, n_samples):
+            cur_val = values[i]
+            cur_label = labels[indices[i]]
+
+            # next feature value
+            if cur_val > prev_val + FEATURE_THRESHOLD:
+
+                # save previous feature counts
+                threshold_values[feature_value_count] = prev_val
+                counts[feature_value_count] = count
+                pos_counts[feature_value_count] = pos_count
+                v_counts[feature_value_count] = v_count
+                v_pos_counts[feature_value_count] = v_pos_count
+                feature_value_count += 1
+
+                # reset counts for this new feature
+                v_count = 1
+                v_pos_count = cur_label
+
+            # same feature value
+            else:
+
+                # increment counts for this feature
+                v_count += 1
+                v_pos_count += cur_label
+
+            # increment left branch counts
+            count += 1
+            pos_count += cur_label
+
+            # move pointers to the next feature
+            prev_val = cur_val
+
+        # handle last feature value
+        if v_count > 0:
+
+            # save previous feature counts
+            threshold_values[feature_value_count] = prev_val
+            counts[feature_value_count] = count
+            pos_counts[feature_value_count] = pos_count
+            v_counts[feature_value_count] = v_count
+            v_pos_counts[feature_value_count] = v_pos_count
+            feature_value_count += 1
+
+            # printf('[CM - PART 1] no. feature value sets: %ld\n', feature_value_count)
+
+        # PART 2: evaluate each pair of feature sets to get candidate thresholds
+        thresholds_count_ptr[0] = 0
+        for k in range(1, feature_value_count):
+
+            # extract both of the feature set counts
+            v1 = threshold_values[k-1]
+            v2 = threshold_values[k]
+            v1_count = v_counts[k-1]
+            v2_count = v_counts[k]
+            v1_pos_count = v_pos_counts[k-1]
+            v2_pos_count = v_pos_counts[k]
+            left_count = counts[k-1]
+            left_pos_count = pos_counts[k-1]
+
+            # compute label ratios of the two groups
+            v1_label_ratio = v1_pos_count / (1.0 * v1_count)
+            v2_label_ratio = v2_pos_count / (1.0 * v2_count)
+
+            save_threshold = ((v1_label_ratio != v2_label_ratio) or
+                              (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
+                              (v2_label_ratio > 0.0 and v2_label_ratio < 1.0))
+
+            # save threshold
+            if save_threshold:
+
+                # create threshold
+                threshold = <Threshold *>malloc(sizeof(Threshold))
+                threshold.value = (v1 + v2) / 2.0
+                threshold.n_v1_samples = v1_count
+                threshold.n_v1_pos_samples = v1_pos_count
+                threshold.n_v2_samples = v2_count
+                threshold.n_v2_pos_samples = v2_pos_count
+                threshold.n_left_samples = left_count
+                threshold.n_left_pos_samples = left_pos_count
+                threshold.n_right_samples = n_samples - left_count
+                threshold.n_right_pos_samples = n_pos_samples - left_pos_count
+
+                # save threshold to thresholds array
+                thresholds_ptr[0][thresholds_count_ptr[0]] = threshold
+                thresholds_count_ptr[0] += 1
+                n_usable_thresholds += 1
 
         # clean up
         free(values)
