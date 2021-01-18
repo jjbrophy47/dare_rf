@@ -7,6 +7,7 @@ ctypedef np.npy_int32   INT32_t          # Signed 32 bit integer
 ctypedef np.npy_uint32  UINT32_t         # Unsigned 32 bit integer
 
 from ._tree cimport Node
+from ._tree cimport Threshold
 from ._splitter cimport SplitRecord
 
 cdef enum:
@@ -50,6 +51,8 @@ cdef void split_samples(Node*        node,
                         SIZE_t*      samples,
                         SIZE_t       n_samples,
                         SplitRecord* split) nogil
+
+cdef Threshold* copy_threshold(Threshold* threshold)
 
 # helper methods
 cdef INT32_t* convert_int_ndarray(np.ndarray arr)

@@ -19,6 +19,7 @@ np.import_array()
 
 from ._utils cimport compute_split_score
 from ._utils cimport split_samples
+from ._utils cimport copy_threshold
 from ._utils cimport convert_int_ndarray
 from ._utils cimport copy_int_array
 from ._utils cimport dealloc
@@ -401,6 +402,9 @@ cdef class _Remover:
 
         # greedy node, check if the best feature / threshold has changed
         if node.depth >= topd:
+
+            # TODO: check to see if chosen feature / threshold is invalid, retrain
+
             best_score = 1000000
 
             # get thresholds for each feature
@@ -455,24 +459,44 @@ cdef class _Remover:
         cdef int k = 0
 
         # object pointers
-        cdef Feature*   feature = NULL
-        cdef Threshold* threshold = NULL
+        cdef Feature*    feature = NULL
+        cdef Threshold*  threshold = NULL
 
-        # 2d array of indices designating invalid feautures / thresholds
-        cdef SIZE_t* invalid_thresholds = NULL
+        # variables to keep track of invalid thresholds
+        cdef DTYPE_t v1_label_ratio = -1
+        cdef DTYPE_t v2_label_ratio = -1
+        cdef SIZE_t* threshold_validities = NULL
         cdef SIZE_t  n_invalid_thresholds = 0
+        cdef SIZE_t  n_valid_thresholds = 0
+        cdef bint    valid_threshold = False
 
-        # no. of viable thresholds at this feature
-        cdef bint   valid_threshold = False
-        cdef SIZE_t n_usable_thresholds = 0
+        # leaf samples array
+        cdef SIZE_t* leaf_samples = NULL
+        cdef SIZE_t  n_leaf_samples = 0
+
+        # candidate thresholds array
+        cdef Threshold** candidate_thresholds = NULL
+        cdef SIZE_t      n_candidate_thresholds = 0
+
+        # unused candidate thresholds array
+        cdef bint        used = False
+        cdef Threshold** unused_thresholds = NULL
+        cdef SIZE_t      n_unused_thresholds = 0
+
+        # variables for sampling the unused candidate array
+        cdef SIZE_t      n_vacancies = 0
+        cdef SIZE_t      n_thresholds_to_sample = 0
+        cdef Threshold** sampled_thresholds = NULL
+        cdef SIZE_t      n_sampled_thresholds
+        cdef INT32_t     ndx = -1
+        cdef SIZE_t*     sampled_indices = NULL
 
         # update statistics for each feature
         for j in range(node.n_features):
             feature = node.features[j]
 
             # array holding indices of invalid thresholds for this feature
-            thresholds = <SIZE_t *>malloc(feature.n_thresholds * sizeof(SIZE_t))
-            n_thresholds = 0
+            threshold_validities = <SIZE_t *>malloc(feature.n_thresholds * sizeof(SIZE_t))
 
             # update statistics for each threshold in this feature
             for k in range(feature.n_thresholds):
@@ -501,48 +525,128 @@ cdef class _Remover:
                         threshold.n_v2_samples -= 1
                         threshold.n_v2_pos_samples -= 1
 
-                    # compute label ratios for values on either side of threshold
-                    v1_label_ratio = v1_pos_count / (1.0 * v1_count)
-                    v2_label_ratio = v2_pos_count / (1.0 * v2_count)
+                # compute label ratios for both values of the threshold
+                v1_label_ratio = threshold.n_v1_pos_samples / (1.0 * threshold.n_v1_samples)
+                v2_label_ratio = threshold.n_v2_pos_samples / (1.0 * threshold.n_v2_samples)
 
-                    # check to see if threshold is still valid
-                    valid_threshold = ((threshold.n_left_samples == 0) or
-                                       (threshold.n_right_samples == 0) or
-                                       (v1_label_ratio != v2_label_ratio) or
-                                       (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
-                                       (v2_label_ratio > 0.0 and v2_label_ratio < 1.0))
+                # check to see if threshold is still valid
+                valid_threshold = ((threshold.n_left_samples > 0 and threshold.n_right_samples > 0) and
+                                  ((v1_label_ratio != v2_label_ratio) or
+                                   (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
+                                   (v2_label_ratio > 0.0 and v2_label_ratio < 1.0)))
 
-                    # invalid threshold, flag for removal
-                    if threshold.n_left_samples == 0 or threshold.n_right_samples == 0 or ratio_stuff:
-                        invalid_thresholds[n_invalid_thresholds] = k
-                        n_invalid_thresholds += 1
+                # save whether this threshold was valid or not
+                threshold_validities[k] = valid_threshold
 
-                    # valid threshold
-                    else:
-                        n_usable_thresholds += 1
+                # invalid threshold, flag for removal
+                if not valid_threshold:
+                    n_invalid_thresholds += 1
+
+                    # if the chosen feature / threshold is invalid, clear those properties
+                    if (feature.index == node.chosen_feature.index) and
+                       (threshold.value == node.chosen_threshold.value):
+                        node.chosen_feature = NULL
+                        node.chosen_threshold = NULL
+
+                # valid threshold
+                else:
+                    n_valid_thresholds += 1
 
             # sample new viable thresholds, if any
             if n_invalid_thresholds > 0:
 
-                # make sure no. thresholds is at least k, otherwise there are no other thresholds
+                # if no. original thresholds < k, there are no other candidate thresholds
                 if feature.n_thresholds == k_samples:
 
-                    # sort feature values and get list of candidate thresholds
+                    # get instances for this node, filter out deleted instances
+                    leaf_samples = <SIZE_t *>malloc(node.n_samples * sizeof(SIZE_t))
+                    n_leaf_samples = 0
+                    self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &n_leaf_samples)
 
-                    # sample a new threshold uniformly at random
+                    # extract candidate thresholds
+                    candidate_thresholds = <Threshold **>malloc(n_leaf_samples * sizeof(Threshold *))
+                    n_candidate_thresholds = get_candidate_thresholds(feature, X, y, leaf_samples,
+                                                                      n_leaf_samples, &thresholds)
+                    unused_thresholds = <Threshold **>malloc(n_candidate_thresholds * sizeof(Threshold *))
+                    n_unused_thresholds = 0
 
-                    # make sure new threshold is not already being used by this feature
+                    # filter out already used thresholds
+                    for i in range(n_candidate_thresholds):
+                        used = False
 
-                    # if viable threshold
+                        # disregard threshold if it is already being used by the feature
+                        for k in range(feature.n_thresholds)
+                            if feature.thresholds[k].value == candidate_thresholds[i].value:
+                                used = True
+                                break
 
-                        # increment n_usable_thresholds
+                        # add candidate threshold to list of unused candidate thresholds
+                        if not used:
+                            unused_thresholds[n_unused_thresholds] = candidate_thresholds[i]
+                            n_unused_thresholds += 1
 
-                # merge old thresholds and new thresholds into a new array
+                    # compute number of unused thresholds to sample
+                    n_vacancies = k_samples - n_valid_thresholds
+                    if n_unused_thresholds > n_vacancies:
+                        n_thresholds_to_sample = n_vacancies
+                    else:
+                        n_thresholds_to_sample = n_unused_thresholds
 
-            # free thresholds array
+                    # allocate memory for the new thresholds array
+                    n_sampled_thresholds = n_thresholds_to_sample + n_valid_thresholds
+                    sampled_thresholds = <Threshold **>malloc(n_sampled_thresholds * sizeof(Threshold *))
+                    sampled_indices = <SIZE_t *>malloc(n_thresholds_to_sample * sizeof(SIZE_t))
+
+                    # sample unused threshold indices uniformly at random
+                    i = 0
+                    while i < n_thresholds_to_sample:
+                        valid = True
+
+                        # sample an unused threshold index
+                        ndx = <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / n_unused_thresholds))
+
+                        # invalid: already sampled
+                        for k in range(i):
+                            if ndx == sampled_indices[k]:
+                                valid = False
+                                break
+
+                        # valid: add copied threshold to sampled list of candidate thresholds
+                        if valid:
+                            sampled_thresholds[i] = copy_threshold(unused_thresholds[ndx])
+                            sampled_indices[i] = ndx
+                            i += 1
+
+                    # add original thresholds to the new thresholds array
+                    for k in range(feature.n_thresholds):
+
+                        # original valid threshold
+                        if threshold_validities[k] == 1:
+                            sampled_thresholds[i] = copy_threshold(feature.thresholds[k])
+                            i += 1
+
+                        # free threshold
+                        free(feature.thresholds[k])
+
+                    # free candidate thresholds array
+                    for k in range(n_candidate_thresholds):
+                        free(candidate_thresholds[k])
+                    free(candidate_thresholds)
+
+                    # clean up
+                    free(unused_thresholds)
+                    free(leaf_samples)
+                    free(sampled_indices)
+                    free(feature.thresholds)
+
+                    # assign new thresholds array to this feature
+                    feature.thresholds = sampled_thresholds
+                    feature.n_thresholds = i
+
+            # clean up
+            free(threshold_validities)
 
         return n_usable_thresholds
-
 
 
     @cython.boundscheck(False)

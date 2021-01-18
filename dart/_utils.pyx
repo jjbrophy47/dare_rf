@@ -212,6 +212,26 @@ cdef void split_samples(Node*        node,
     # clean up, no more use for the original samples array
     free(samples)
 
+cdef Threshold* copy_threshold(Threshold* threshold):
+    """
+    Copies the contents of a threshold to a new threshold.
+    """
+    Threshold *t2 = <Threshold *>malloc(sizeof(Threshold))
+
+    t2.v1 = threshold.v1
+    t2.v2 = threshold.v2
+    t2.value = threshold.value
+    t2.n_v1_samples = threshold.n_v1_samples
+    t2.n_v1_pos_samples = threshold.n_v1_pos_samples
+    t2.n_v2_samples = threshold.n_v2_samples
+    t2.n_v2_pos_samples = threshold.n_v2_pos_samples
+    t2.n_left_samples = threshold.n_left_samples
+    t2.n_left_pos_samples = threshold.n_left_pos_samples
+    t2.n_right_samples = threshold.n_right_samples
+    t2.n_right_pos_samples = threshold.n_right_pos_samples
+
+    return threshold
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef INT32_t* convert_int_ndarray(np.ndarray arr):

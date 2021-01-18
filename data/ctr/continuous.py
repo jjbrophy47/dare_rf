@@ -94,7 +94,7 @@ def dataset_specific(random_state, test_size,
 
 
 def main(random_state=1, test_size=0.2, n_instances=20000000,
-         max_feature_vals=250, out_dir='continuous'):
+         max_feature_vals=25, out_dir='continuous'):
 
     logger = get_logger('log.txt')
 
