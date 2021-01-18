@@ -84,7 +84,7 @@ def dataset_specific(random_state, test_size,
     # categorize attributes
     columns = list(df.columns)
     label = ['click']
-    numeric = ['month', 'day', 'hour']
+    numeric = []
     categorical = list(set(columns) - set(numeric) - set(label))
     logger.info('label: {}'.format(label))
     logger.info('numeric: {}'.format(numeric))
@@ -107,10 +107,13 @@ def main(random_state=1, test_size=0.2, n_instances=20000000,
     # binarize inputs
     ct = ColumnTransformer([('kbd', 'passthrough', numeric),
                             ('ohe', OneHotEncoder(sparse=False, handle_unknown='ignore'), categorical)])
+    logger.info('transforming train data...')
     train = ct.fit_transform(train_df)
+    logger.info('transforming test data...')
     test = ct.transform(test_df)
 
     # binarize outputs
+    logger.info('transforming labels...')
     le = LabelEncoder()
     train_label = le.fit_transform(train_df[label].to_numpy().ravel()).reshape(-1, 1)
     test_label = le.transform(test_df[label].to_numpy().ravel()).reshape(-1, 1)
