@@ -444,17 +444,27 @@ cdef class _Remover:
         """
         cdef Node* node = node_ptr[0]
 
-        cdef int left_count
-        cdef int left_pos_count
-
+        # counters
         cdef int i
 
+        # object pointers
         cdef Feature*   feature = NULL
         cdef Threshold* threshold = NULL
+
+        # 2d array of indices designating invalid feautures / thresholds
+        cdef SIZE_t* thresholds = NULL
+        cdef SIZE_t  n_thresholds = 0
+
+        # no. of viable thresholds at this feature
+        cdef n_usable_thresholds = 0
 
         # update statistics for each feature
         for j in range(node.n_features):
             feature = node.features[j]
+
+            # array holding indices of invalid thresholds for this feature
+            thresholds = <SIZE_t *>malloc(feature.n_thresholds * sizeof(SIZE_t))
+            n_thresholds = 0
 
             # update statistics for each threshold in this feature
             for k in range(feature.n_thresholds):
@@ -485,8 +495,30 @@ cdef class _Remover:
 
                     # check to see if this threshold is invalid
                     if threshold.n_left_samples == 0 or threshold.n_right_samples == 0 or ratio_stuff:
-                        # TODO: flag this threshold to get rid of
-                        break
+                        thresholds[j][n_thresholds[j]] = k
+                        n_thresholds[j] += 1
+
+                    # viable threshold
+                    else:
+                        n_usable_thresholds += 1
+
+            # if n_thresholds > 0
+
+                # sort feature values and get list of candidate thresholds
+
+                # sample a new threshold uniformly at random
+
+                # make sure new threshold is not already being used by this feature
+
+                # if viable threshold
+
+                    # replace old threshold with this new threshold
+
+                    # increment n_usable_thresholds
+
+            # free thresholds array
+
+        return n_usable_thresholds
 
 
 

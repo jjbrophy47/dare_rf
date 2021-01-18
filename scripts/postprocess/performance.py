@@ -173,12 +173,12 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
-                                 'olympics', 'census', 'credit_card', 'synthetic', 'higgs', 'no_show', 'skin',
-                                 'activity', 'gas_sensor', 'twitter'],
-                                 help='dataset.')
+                                 'no_show', 'olympics', 'census', 'credit_card', 'twitter', 'synthetic',
+                                 'higgs', 'ctr'], help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
-    parser.add_argument('--model', type=int, nargs='+', default=['dart', 'random', 'sklearn', 'borat'], help='model.')
+    parser.add_argument('--model', type=int, nargs='+', help='model to extract the results.',
+                        default=['dart', 'sklearn', 'extra_trees', 'random', 'borat'])
     parser.add_argument('--tuning', type=int, nargs='+', default=['tuned', 'no_tune'], help='tuning option.')
 
     args = parser.parse_args()

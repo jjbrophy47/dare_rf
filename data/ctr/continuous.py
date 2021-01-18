@@ -21,6 +21,10 @@ def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
     df['day'] = df['hour'].apply(lambda x: int(str(x)[4:6]))
     df['hour'] = df['hour'].apply(lambda x: int(str(x)[6:8]))
 
+    # check data type and no. unique values for each column
+    for c in df.columns:
+        print(c, df[c].dtype, len(df[c].unique()))
+
     # remove select columns
     remove_cols = ['id', 'site_id', 'site_domain', 'app_id',
                    'device_id', 'device_ip', 'device_model']
@@ -62,7 +66,7 @@ def dataset_specific(random_state, test_size, n_instances, max_feature_vals):
     return train_df, test_df, label, numeric, categorical
 
 
-def main(random_state=1, test_size=0.2, n_instances=20000000, max_feature_vals=500, out_dir='continuous'):
+def main(random_state=1, test_size=0.2, n_instances=20000000, max_feature_vals=250, out_dir='continuous'):
 
     train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
                                                                       test_size=test_size,
