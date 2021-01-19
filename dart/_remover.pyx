@@ -75,8 +75,8 @@ cdef class _Remover:
         # initialize metric properties
         self.capacity = 10
         self.remove_count = 0
-        self.remove_types = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
-        self.remove_depths = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
+        self.remove_types = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
+        self.remove_depths = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
 
     def __dealloc__(self):
         """
@@ -135,42 +135,56 @@ cdef class _Remover:
         cdef SIZE_t n_pos_samples = 0
         cdef SIZE_t n_usable_thresholds = 0
 
+        printf('\n[R] n_samples: %ld, depth: %ld, is_left: %d\n', n_samples, node.depth, node.is_left)
+
         # update node counts
         n_pos_samples = self.update_node(&node, y, samples, n_samples)
 
         # leaf, check complete
         if node.is_leaf:
+            printf('[R] update leaf\n')
             self.update_leaf(&node, samples, n_samples)
+            printf('[R] leaf.value: %.2f\n', node.value)
 
         # decision node, but samples in same class, convert to leaf, check complete
         elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
+            printf('[R] convert to leaf\n')
             self.convert_to_leaf(&node, samples, n_samples, &split)
+            printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
         # decision node
         else:
 
             # update metadata
+            printf('[R] update metadata\n')
             n_usable_thresholds = self.update_metadata(&node, X, y, samples, n_samples)
+            printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
 
             # no more usable thresholds, convert to leaf, check complete
             if n_usable_thresholds == 0:
+                printf('[R] convert to leaf\n')
                 self.convert_to_leaf(&node, samples, n_samples, &split)
+                printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
             # viable decision node
             else:
 
                 # check optimal split
+                printf('[R] check optimal split\n')
                 result = self.check_optimal_split(node)
 
                 # optimal split has changed, retrain, check complete
                 if result == 1:
+                    printf('[R] retrain\n')
                     self.retrain(&node_ptr, X, y, samples, n_samples)
+                    printf('[R] retrain, n_samples: %.ld\n', node.n_samples)
 
                 # no retraining necessary, split samples and recurse
                 else:
 
                     # split deleted samples and free original samples
                     split_samples(node, X, y, samples, n_samples, &split)
+                    printf('[R] split samples\n')
 
                     # traverse left if any deleted samples go left
                     if split.n_left_samples > 0:
@@ -205,8 +219,8 @@ cdef class _Remover:
 
     cdef void update_leaf(self,
                           Node**  node_ptr,
-                          SIZE_t* samples,
-                          SIZE_t  n_samples) nogil:
+                          SIZE_t* remove_samples,
+                          SIZE_t  n_remove_samples) nogil:
         """
         Update leaf node properties: value and leaf_samples. Check complete.
         """
@@ -223,7 +237,9 @@ cdef class _Remover:
         cdef SIZE_t  leaf_samples_count = 0
 
         # remove deleted samples from leaf
-        self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
+        node.n_samples += n_remove_samples  # must check ALL leaf samples, even deleted ones
+        self.get_leaf_samples(node, remove_samples, n_remove_samples, &leaf_samples, &leaf_samples_count)
+        node.n_samples -= n_remove_samples
 
         # free old leaf samples array
         free(node.leaf_samples)
@@ -233,7 +249,7 @@ cdef class _Remover:
 
         # check complete: add deletion type and depth, and clean up
         self.add_removal_type(0, node.depth)
-        free(samples)
+        free(remove_samples)
 
     cdef void convert_to_leaf(self,
                               Node**       node_ptr,
@@ -318,7 +334,7 @@ cdef class _Remover:
         Recursively obtain the samples at the leaves and filter out
         deleted samples.
         """
-        cdef bint   add_sample = 1
+        cdef bint   add_sample = True
         cdef SIZE_t i = 0
         cdef SIZE_t j = 0
 
@@ -327,14 +343,17 @@ cdef class _Remover:
 
             # loop through all samples at this leaf
             for i in range(node.n_samples):
-                add_sample = 1
+                add_sample = True
 
                 # loop through all deleted samples
                 for j in range(n_remove_samples):
+                    # printf('[R - GLS] samples[%ld]: %ld, remove_samples[%ld]: %ld\n',
+                           # i, node.leaf_samples[i], j, remove_samples[j])
 
                     # do not add sample to results if it has been deleted
                     if node.leaf_samples[i] == remove_samples[j]:
-                        add_sample = 0
+                        # printf('[R - GLS] DO NOT ADD!\n')
+                        add_sample = False
                         break
 
                 # add sample to results if it has not been deleted
@@ -376,7 +395,7 @@ cdef class _Remover:
         cdef DTYPE_t split_score = -1
 
         # record the best feature / threshold
-        cdef INT32_t chosen_feature_ndx = 0
+        cdef SIZE_t  chosen_feature_ndx = 0
         cdef DTYPE_t chosen_threshold_value = 0
 
         # object pointers
@@ -425,9 +444,16 @@ cdef class _Remover:
                         chosen_feature_ndx = feature.index
                         chosen_threshold_value = threshold.value
 
+            # printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
+            #       node.chosen_feature.index, node.chosen_threshold.value)
+            # printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
+            #       chosen_feature_ndx, chosen_threshold_value)
+
             # check to see if the same feature / threshold is still the best
-            result = (node.chosen_feature.index == chosen_feature_ndx and
-                      node.chosen_threshold.value == chosen_threshold_value)
+            result = not (node.chosen_feature.index == chosen_feature_ndx and
+                          node.chosen_threshold.value == chosen_threshold_value)
+
+            # printf('[R - COS] result: %d\n', result)
 
         return result
 
@@ -553,8 +579,13 @@ cdef class _Remover:
                     n_valid_thresholds += 1
                     n_usable_thresholds += 1
 
+            printf('[R - UM] feature.index: %ld, n_valid_thresholds: %ld, n_invalid_thresholds: %ld\n',
+                   feature.index, n_valid_thresholds, n_invalid_thresholds)
+
             # sample new viable thresholds, if any
             if n_invalid_thresholds > 0:
+                printf('[R - UM] sample new thresholds, feauture.n_thresholds: %ld, k_samples: %ld\n',
+                       feature.n_thresholds, k_samples)
 
                 # if no. original thresholds < k, there are no other candidate thresholds
                 if feature.n_thresholds == k_samples:
@@ -564,10 +595,14 @@ cdef class _Remover:
                     n_leaf_samples = 0
                     self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &n_leaf_samples)
 
+                    printf('[R - UM] n_leaf_samples: %ld\n', n_leaf_samples)
+
                     # extract candidate thresholds
                     candidate_thresholds = <Threshold **>malloc(n_leaf_samples * sizeof(Threshold *))
                     n_candidate_thresholds = get_candidate_thresholds(feature, X, y, leaf_samples,
                                                                       n_leaf_samples, &candidate_thresholds)
+                    printf('[R - UM] n_candidate_thresholds: %ld\n', n_candidate_thresholds)
+
                     unused_thresholds = <Threshold **>malloc(n_candidate_thresholds * sizeof(Threshold *))
                     n_unused_thresholds = 0
 
@@ -644,6 +679,8 @@ cdef class _Remover:
                 # remove invalid thresholds
                 else:
 
+                    printf('[R - UM] remove invalid thresholds\n')
+
                     # create final thresholds array
                     n_final_thresholds = feature.n_thresholds - n_invalid_thresholds
                     final_thresholds = <Threshold **>malloc(n_final_thresholds  * sizeof(Threshold *))
@@ -670,8 +707,8 @@ cdef class _Remover:
         return n_usable_thresholds
 
     cdef void add_removal_type(self,
-                               SIZE_t remove_type,
-                               SIZE_t remove_depth) nogil:
+                               INT32_t remove_type,
+                               INT32_t remove_depth) nogil:
         """
         Add type and depth to the removal metrics.
         """
@@ -679,13 +716,13 @@ cdef class _Remover:
             if self.remove_count + 1 == self.capacity:
                 self.capacity *= 2
 
-            self.remove_types = <SIZE_t *>realloc(self.remove_types, self.capacity * sizeof(SIZE_t))
-            self.remove_depths = <SIZE_t *>realloc(self.remove_depths, self.capacity * sizeof(SIZE_t))
+            self.remove_types = <INT32_t *>realloc(self.remove_types, self.capacity * sizeof(INT32_t))
+            self.remove_depths = <INT32_t *>realloc(self.remove_depths, self.capacity * sizeof(INT32_t))
 
         else:
             self.capacity = 10
-            self.remove_types = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
-            self.remove_depths = <SIZE_t *>malloc(self.capacity * sizeof(SIZE_t))
+            self.remove_types = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
+            self.remove_depths = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
 
         self.remove_types[self.remove_count] = remove_type
         self.remove_depths[self.remove_count] = remove_depth
@@ -703,8 +740,8 @@ cdef class _Remover:
         self.retrain_sample_count = 0
 
     cdef np.ndarray get_int_ndarray(self,
-                                    SIZE_t* data,
-                                    SIZE_t  n_elem):
+                                    INT32_t* data,
+                                    SIZE_t   n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.

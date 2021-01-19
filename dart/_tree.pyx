@@ -19,7 +19,6 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
-from ._utils cimport convert_int_ndarray
 from ._utils cimport dealloc
 from ._utils cimport RAND_R_MAX
 
@@ -117,7 +116,7 @@ cdef class _TreeBuilder:
         cdef SplitRecord split
         cdef SIZE_t      n_usable_thresholds = 0
 
-        # printf('\n[B] n_samples: %d, depth: %d, is_left: %d\n', n_samples, depth, is_left)
+        # printf('\n[B] n_samples: %ld, depth: %ld, is_left: %d\n', n_samples, depth, is_left)
 
         # leaf node
         if is_bottom_leaf or is_middle_leaf:
@@ -129,14 +128,14 @@ cdef class _TreeBuilder:
 
             # randomly select a subset of features to use at this node
             self.splitter.select_features(&node, n_total_features, n_max_features, random_state)
-            # printf('[B] no. features: %d\n', node.n_features)
+            # printf('[B] no. features: %ld\n', node.n_features)
 
             # identify and compute metadata for all thresholds for each feature
             n_usable_thresholds = self.splitter.compute_metadata(&node, X, y, samples, n_samples, random_state)
             # printf('[B] computed metadata\n')
 
             # no usable thresholds, create leaf
-            # printf('[B] n_usable_thresholds: %d\n', n_usable_thresholds)
+            # printf('[B] n_usable_thresholds: %ld\n', n_usable_thresholds)
             if n_usable_thresholds == 0:
                 dealloc(node)  # free allocated memory
                 self._set_leaf_node(&node, samples)
@@ -148,11 +147,8 @@ cdef class _TreeBuilder:
 
                 # choose a feature / threshold and partition the data
                 self.splitter.split_node(&node, X, y, samples, n_samples, topd, random_state, &split)
-                # printf('[B] chosen_feature.index: %d, chosen_threshold.value: %.2f\n',
+                # printf('[B] chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
                 #       node.chosen_feature.index, node.chosen_threshold.value)
-
-                # clean up, already taken care of in split_node()
-                # free(samples)
 
                 # traverse to left and right branches
                 node.left = self._build(X, y, split.left_samples, split.n_left_samples, depth + 1, 1)
@@ -167,6 +163,10 @@ cdef class _TreeBuilder:
         Compute leaf value and set all other attributes.
         """
         cdef Node *node = node_ptr[0]
+
+        # cdef SIZE_t i = 0
+        # for i in range(node.n_samples):
+        #     printf('[B - SLN] samples[%ld]: %ld\n', i, samples[i])
 
         # set leaf node variables
         node.is_leaf = 1

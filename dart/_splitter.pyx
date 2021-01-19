@@ -133,9 +133,6 @@ cdef class _Splitter:
             chosen_threshold_ndx = <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / chosen_feature.n_thresholds))
             chosen_threshold = chosen_feature.thresholds[chosen_threshold_ndx]
 
-        # split node samples based on the chosen feature / threshold
-        split_samples(node, X, y, samples, n_samples, split)
-
         # clear leaf node properties
         node.is_leaf = 0
         node.value = UNDEF_LEAF_VAL
@@ -144,6 +141,9 @@ cdef class _Splitter:
         # set decision node properties
         node.chosen_feature = chosen_feature
         node.chosen_threshold = chosen_threshold
+
+        # split node samples based on the chosen feature / threshold
+        split_samples(node, X, y, samples, n_samples, split)
 
     cdef SIZE_t compute_metadata(self,
                                  Node**    node_ptr,
@@ -232,7 +232,7 @@ cdef class _Splitter:
                     sampled_indices[i] = ndx
                     i += 1
 
-                    # printf('[CM - PART 3] sampled threshold.value: %.2f\n', t2.value)
+            #         printf('[CM - PART 3] sampled threshold.value: %.2f\n', sampled_thresholds[i-1].value)
             # printf('[CM - PART 3] no. sampled thresholds: %ld\n', i)
 
             # set threshold properties for this feature
@@ -367,8 +367,11 @@ cdef SIZE_t get_candidate_thresholds(Feature*     feature,
     # object pointers
     cdef Threshold*  threshold = NULL
 
+    printf('[S - GCT] n_samples: %ld\n', n_samples)
+
     # copy values and labels into new arrays, and count no. pos. labels
     for i in range(n_samples):
+        # printf('[S - GCT] samples[%ld]: %ld\n', i, samples[i])
         values[i] = X[samples[i]][feature.index]
         labels[i] = y[samples[i]]
         indices[i] = i
@@ -376,6 +379,8 @@ cdef SIZE_t get_candidate_thresholds(Feature*     feature,
         # increment pos. label count
         if labels[i] == 1:
             n_pos_samples += 1
+
+    # printf('[S - GCT] n_pos_samples: %ld\n', n_pos_samples)
 
     # sort feature values, and their corresponding indices
     sort(values, indices, n_samples)
@@ -446,7 +451,7 @@ cdef SIZE_t get_candidate_thresholds(Feature*     feature,
         v_pos_counts[feature_value_count] = v_pos_count
         feature_value_count += 1
 
-        # printf('[CM - PART 1] no. feature value sets: %ld\n', feature_value_count)
+    printf('[S - GCT] no. feature value sets: %ld\n', feature_value_count)
 
     # evaluate adjacent pairs of feature sets to get candidate thresholds
     for k in range(1, feature_value_count):

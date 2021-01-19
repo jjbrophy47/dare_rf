@@ -41,12 +41,26 @@ def main(args):
     print(X)
 
     # train decision tree
-    model = dart.Tree(topd=0, k=20, max_depth=10, random_state=1)
+    model = dart.Tree(topd=0, k=10, max_depth=10, random_state=1)
     model = model.fit(X, y)
 
     # predict
-    print(X[0])
-    print(model.predict_proba(X[[0]]))
+    print('instance to predict: {}'.format(X[0]))
+    print('prediction: {}'.format(model.predict_proba(X[[0]])))
+
+    # delete training data
+    if args.delete:
+        delete_indices = np.random.default_rng().choice(X.shape[0], size=50, replace=False)
+        delete_indices = np.arange(99)
+        print('instances to delete: {}'.format(delete_indices))
+
+        for delete_ndx in delete_indices:
+            print('\ninstance to delete, {}: {}'.format(delete_ndx, X[delete_ndx]))
+            model.delete(delete_ndx)
+
+        types, depths = model.get_removal_types_depths()
+        print('types: {}'.format(types))
+        print('depths: {}'.format(depths))
 
 
 if __name__ == '__main__':
@@ -55,5 +69,6 @@ if __name__ == '__main__':
     # I/O settings
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='iris', help='dataset to use for the experiment.')
+    parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
     args = parser.parse_args()
     main(args)

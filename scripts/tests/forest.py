@@ -56,12 +56,13 @@ def main(args):
     print(X_train, X_train.shape)
 
     # train
+    k = 10
     n_estimators = 100
     max_depth = 10
     random_state = 1
 
     if args.model == 'dart':
-        model = dart.Forest(topd=0, k=5, n_estimators=n_estimators,
+        model = dart.Forest(topd=0, k=k, n_estimators=n_estimators,
                             max_depth=max_depth, random_state=random_state)
 
     elif args.model == 'sklearn':

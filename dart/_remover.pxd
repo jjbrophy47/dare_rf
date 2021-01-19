@@ -27,8 +27,8 @@ cdef class _Remover:
     # Metric structures
     cdef SIZE_t   capacity                   # Number of removal allocations for space
     cdef SIZE_t   remove_count               # Number of removals
-    cdef SIZE_t*  remove_types               # Removal type
-    cdef SIZE_t*  remove_depths              # Depth of leaf or node needing retraining
+    cdef INT32_t* remove_types               # Removal type
+    cdef INT32_t* remove_depths              # Depth of leaf or node needing retraining
     cdef SIZE_t   retrain_sample_count       # Number of samples used for retraining
 
     # Python API
@@ -85,9 +85,9 @@ cdef class _Remover:
                                 SIZE_t    n_samples) nogil
 
     cdef void add_removal_type(self,
-                               SIZE_t remove_type,
-                               SIZE_t remove_depth) nogil
+                               INT32_t remove_type,
+                               INT32_t remove_depth) nogil
 
     cdef np.ndarray get_int_ndarray(self,
-                                    SIZE_t *data,
+                                    INT32_t *data,
                                     SIZE_t n_elem)

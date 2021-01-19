@@ -199,6 +199,7 @@ cdef void split_samples(Node*        node,
         split.n_left_samples = j
         split.left_samples = <SIZE_t *>realloc(split.left_samples, j * sizeof(SIZE_t))
     else:
+        split.n_left_samples = 0
         free(split.left_samples)
 
     # assign right branch deleted samples
@@ -206,6 +207,7 @@ cdef void split_samples(Node*        node,
         split.n_right_samples = k
         split.right_samples = <SIZE_t *>realloc(split.right_samples, k * sizeof(SIZE_t))
     else:
+        split.n_right_samples
         free(split.right_samples)
 
     # clean up, no more use for the original samples array
@@ -230,28 +232,15 @@ cdef Threshold* copy_threshold(Threshold* threshold) nogil:
     t2.n_right_samples = threshold.n_right_samples
     t2.n_right_pos_samples = threshold.n_right_pos_samples
 
-    return threshold
+    return t2
 
 
 cdef SIZE_t* convert_int_ndarray(np.ndarray arr):
     """
     Converts a numpy array into a C int array.
     """
-    cdef SIZE_t n_elem = arr.shape[0]
+    cdef SIZE_t  n_elem = arr.shape[0]
     cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
-
-    for i in range(n_elem):
-        new_arr[i] = arr[i]
-
-    return new_arr
-
-
-cdef INT32_t* convert_int32_ndarray(np.ndarray arr):
-    """
-    Converts a numpy array into a C int array.
-    """
-    cdef SIZE_t n_elem = arr.shape[0]
-    cdef INT32_t* new_arr = <INT32_t *>malloc(n_elem * sizeof(INT32_t))
 
     for i in range(n_elem):
         new_arr[i] = arr[i]
