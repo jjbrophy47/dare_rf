@@ -1,4 +1,6 @@
 from ._tree cimport Node
+from ._tree cimport Feature
+from ._tree cimport Threshold
 from ._utils cimport DTYPE_t
 from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
@@ -47,3 +49,12 @@ cdef class _Splitter:
                               SIZE_t    n_total_features,
                               SIZE_t    n_max_features,
                               UINT32_t* random_state) nogil
+
+
+# helper methods
+cdef SIZE_t get_candidate_thresholds(Feature*     feature,
+                                     DTYPE_t**    X,
+                                     INT32_t*     y,
+                                     SIZE_t*      samples,
+                                     SIZE_t       n_samples,
+                                     Threshold*** thresholds_ptr) nogil

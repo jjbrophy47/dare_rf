@@ -1,3 +1,6 @@
+# cython: cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
 """
 Tree and tree builder objects.
 """
@@ -85,7 +88,6 @@ cdef class _TreeBuilder:
 
         tree.root = self._build(X, y, samples, n_samples, 0, 0)
 
-    @cython.cdivision(True)
     cdef Node* _build(self,
                       DTYPE_t** X,
                       INT32_t*  y,
@@ -158,9 +160,6 @@ cdef class _TreeBuilder:
 
         return node
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    @cython.cdivision(True)
     cdef void _set_leaf_node(self,
                              Node**  node_ptr,
                              SIZE_t* samples) nogil:
@@ -187,8 +186,6 @@ cdef class _TreeBuilder:
         node.left = NULL
         node.right = NULL
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef Node* _initialize_node(self,
                                 SIZE_t   depth,
                                 bint     is_left,
@@ -243,8 +240,6 @@ cdef class _Tree:
             dealloc(self.root)
             free(self.root)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cpdef np.ndarray predict(self, float[:,:] X):
         """
         Predict probability of positive label for X.
@@ -279,7 +274,7 @@ cdef class _Tree:
         Get number of nodes total.
         """
         cdef SIZE_t node_count = self._get_node_count(self.root)
-        printf('node_count: %d\n', node_count)
+        printf('node_count: %ld\n', node_count)
 
     cpdef SIZE_t get_node_count(self):
         """
@@ -306,7 +301,7 @@ cdef class _Tree:
         """
         cdef SIZE_t exact_node_count = self._get_exact_node_count(self.root, topd)
         cdef SIZE_t random_node_count = self._get_random_node_count(self.root, topd)
-        printf('no. exact: %d, no. semi-random: %d\n', exact_node_count, random_node_count)
+        printf('no. exact: %ld, no. semi-random: %ld\n', exact_node_count, random_node_count)
 
     # node information
     cpdef void print_n_samples(self):
@@ -380,19 +375,19 @@ cdef class _Tree:
 
     cdef void _print_n_samples(self, Node* node) nogil:
         if node:
-            printf('%d ', node.n_samples)
+            printf('%ld ', node.n_samples)
             self._print_n_samples(node.left)
             self._print_n_samples(node.right)
 
     cdef void _print_depth(self, Node* node) nogil:
         if node:
-            printf('%d ', node.depth)
+            printf('%ld ', node.depth)
             self._print_depth(node.left)
             self._print_depth(node.right)
 
     cdef void _print_feature(self, Node* node) nogil:
         if node:
-            printf('%d ', node.chosen_feature.index)
+            printf('%ld ', node.chosen_feature.index)
             self._print_feature(node.left)
             self._print_feature(node.right)
 

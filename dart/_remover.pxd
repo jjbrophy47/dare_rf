@@ -21,47 +21,73 @@ cdef class _Remover:
     cdef _DataManager manager                # Database manager
     cdef _TreeBuilder tree_builder           # Tree Builder
     cdef bint         use_gini               # Controls splitting criterion
-    cdef SIZE_t       min_samples_leaf       # Minimum number of samples for a leafs
-    cdef SIZE_t       min_samples_split      # Minimum number of samples for a split
     cdef SIZE_t       k                      # Number of thresholds to sample
+    cdef UINT32_t     rand_r_state           # sklearn_rand_r random number state
 
     # Metric structures
-    cdef SIZE_t  capacity                    # Number of removal allocations for space
-    cdef SIZE_t  remove_count                # Number of removals
-    cdef SIZE_t* remove_types                # Removal type
-    cdef SIZE_t* remove_depths               # Depth of leaf or node needing retraining
-    cdef SIZE_t  retrain_sample_count        # Number of samples used for retraining
+    cdef SIZE_t   capacity                   # Number of removal allocations for space
+    cdef SIZE_t   remove_count               # Number of removals
+    cdef SIZE_t*  remove_types               # Removal type
+    cdef SIZE_t*  remove_depths              # Depth of leaf or node needing retraining
+    cdef SIZE_t   retrain_sample_count       # Number of samples used for retraining
 
     # Python API
-    cpdef int remove(self, _Tree tree, np.ndarray remove_indices)
+    cpdef INT32_t remove(self, _Tree tree, np.ndarray remove_indices)
     cpdef void clear_remove_metrics(self)
 
     # C API
-    cdef void _remove(self, Node** node_ptr,
-                      double** X, int* y,
-                      int* samples, int n_samples) nogil
+    cdef void _remove(self,
+                      Node**    node_ptr,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples) nogil
 
-    cdef int _check_node(self, Node* node, double** X, int* y,
-                          int* samples, int n_samples, int pos_count,
-                          SplitRecord *split) nogil
+    cdef SIZE_t update_node(self,
+                            Node**   node_ptr,
+                            INT32_t* y,
+                            SIZE_t*  samples,
+                            SIZE_t   n_samples) nogil
 
-    cdef int _update_splits(self, Node** node_ptr, double** X, int* y,
-                            int* samples, int n_samples, int pos_count) nogil
+    cdef void update_leaf(self,
+                          Node**  node_ptr,
+                          SIZE_t* samples,
+                          SIZE_t  n_samples) nogil
 
-    cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples,
-                           int n_samples, int pos_count) nogil
+    cdef void convert_to_leaf(self,
+                              Node**       node_ptr,
+                              SIZE_t*      samples,
+                              SIZE_t       n_samples,
+                              SplitRecord* split) nogil
 
-    cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
-                               SplitRecord *split) nogil
+    cdef void retrain(self,
+                      Node***   node_pp,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples) nogil
 
-    cdef void _retrain(self, Node*** node_ptr, double** X, int* y, int* samples,
-                       int n_samples) nogil
+    cdef void get_leaf_samples(self,
+                               Node*    node,
+                               SIZE_t*  remove_samples,
+                               SIZE_t   n_remove_samples,
+                               SIZE_t** leaf_samples_ptr,
+                               SIZE_t*  leaf_samples_count_ptr) nogil
 
-    cdef void _get_leaf_samples(self, Node* node, int* remove_samples,
-                                int n_remove_samples, int** leaf_samples_ptr,
-                                int* leaf_samples_count_ptr) nogil
+    cdef INT32_t check_optimal_split(self,
+                                 Node* node) nogil
 
-    cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
+    cdef SIZE_t update_metadata(self,
+                                Node**    node_ptr,
+                                DTYPE_t** X,
+                                INT32_t*  y,
+                                SIZE_t*   samples,
+                                SIZE_t    n_samples) nogil
 
-    cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil
-    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
+    cdef void add_removal_type(self,
+                               SIZE_t remove_type,
+                               SIZE_t remove_depth) nogil
+
+    cdef np.ndarray get_int_ndarray(self,
+                                    SIZE_t *data,
+                                    SIZE_t n_elem)

@@ -1,3 +1,6 @@
+# cython: cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
 """
 Utility methods.
 """
@@ -57,7 +60,6 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
     return seed[0] % <UINT32_t>(RAND_R_MAX + 1)
 
 
-@cython.cdivision(True)
 cdef DTYPE_t compute_split_score(bint    use_gini,
                                  DTYPE_t count,
                                  DTYPE_t left_count,
@@ -80,8 +82,6 @@ cdef DTYPE_t compute_split_score(bint    use_gini,
     return result
 
 
-
-@cython.cdivision(True)
 cdef DTYPE_t compute_gini(DTYPE_t count,
                           DTYPE_t left_count,
                           DTYPE_t right_count,
@@ -114,7 +114,7 @@ cdef DTYPE_t compute_gini(DTYPE_t count,
 
     return left_weighted_index + right_weighted_index
 
-@cython.cdivision(True)
+
 cdef DTYPE_t compute_entropy(DTYPE_t count,
                              DTYPE_t left_count,
                              DTYPE_t right_count,
@@ -159,8 +159,7 @@ cdef DTYPE_t compute_entropy(DTYPE_t count,
 
     return left_weighted_entropy + right_weighted_entropy
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
+
 cdef void split_samples(Node*        node,
                         DTYPE_t**    X,
                         INT32_t*     y,
@@ -212,11 +211,12 @@ cdef void split_samples(Node*        node,
     # clean up, no more use for the original samples array
     free(samples)
 
-cdef Threshold* copy_threshold(Threshold* threshold):
+
+cdef Threshold* copy_threshold(Threshold* threshold) nogil:
     """
     Copies the contents of a threshold to a new threshold.
     """
-    Threshold *t2 = <Threshold *>malloc(sizeof(Threshold))
+    cdef Threshold* t2 = <Threshold *>malloc(sizeof(Threshold))
 
     t2.v1 = threshold.v1
     t2.v2 = threshold.v2
@@ -232,9 +232,21 @@ cdef Threshold* copy_threshold(Threshold* threshold):
 
     return threshold
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef INT32_t* convert_int_ndarray(np.ndarray arr):
+
+cdef SIZE_t* convert_int_ndarray(np.ndarray arr):
+    """
+    Converts a numpy array into a C int array.
+    """
+    cdef SIZE_t n_elem = arr.shape[0]
+    cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
+
+cdef INT32_t* convert_int32_ndarray(np.ndarray arr):
     """
     Converts a numpy array into a C int array.
     """
@@ -246,8 +258,7 @@ cdef INT32_t* convert_int_ndarray(np.ndarray arr):
 
     return new_arr
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
+
 cdef INT32_t* copy_int_array(INT32_t* arr, SIZE_t n_elem) nogil:
     """
     Copies a C int array into a new C int array.
@@ -259,8 +270,7 @@ cdef INT32_t* copy_int_array(INT32_t* arr, SIZE_t n_elem) nogil:
 
     return new_arr
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
+
 cdef SIZE_t* copy_indices(SIZE_t* arr, SIZE_t n_elem) nogil:
     """
     Copies a C int array into a new C int array.
@@ -271,6 +281,7 @@ cdef SIZE_t* copy_indices(SIZE_t* arr, SIZE_t n_elem) nogil:
         new_arr[i] = arr[i]
 
     return new_arr
+
 
 cdef void dealloc(Node *node) nogil:
     """

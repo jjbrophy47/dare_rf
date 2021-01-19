@@ -1,3 +1,6 @@
+# cython: cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
 """
 Data remover.
 """
@@ -17,15 +20,20 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
+from ._tree cimport Feature
+from ._tree cimport Threshold
+from ._splitter cimport get_candidate_thresholds
 from ._utils cimport compute_split_score
+from ._utils cimport rand_uniform
 from ._utils cimport split_samples
 from ._utils cimport copy_threshold
 from ._utils cimport convert_int_ndarray
 from ._utils cimport copy_int_array
 from ._utils cimport dealloc
+from ._utils cimport RAND_R_MAX
 
-cdef int UNDEF = -1
-cdef double UNDEF_LEAF_VAL = 0.5
+cdef INT32_t UNDEF = -1
+cdef DTYPE_t UNDEF_LEAF_VAL = 0.5
 
 # =====================================
 # Remover
@@ -39,11 +47,11 @@ cdef class _Remover:
     # removal metrics
     property remove_types:
         def __get__(self):
-            return self._get_int_ndarray(self.remove_types, self.remove_count)
+            return self.get_int_ndarray(self.remove_types, self.remove_count)
 
     property remove_depths:
         def __get__(self):
-            return self._get_int_ndarray(self.remove_depths, self.remove_count)
+            return self.get_int_ndarray(self.remove_depths, self.remove_count)
 
     property retrain_sample_count:
         def __get__(self):
@@ -53,7 +61,8 @@ cdef class _Remover:
                   _DataManager manager,
                   _TreeBuilder tree_builder,
                   bint         use_gini,
-                  SIZE_t       k):
+                  SIZE_t       k,
+                  object       random_state):
         """
         Constructor.
         """
@@ -61,8 +70,7 @@ cdef class _Remover:
         self.tree_builder = tree_builder
         self.use_gini = use_gini
         self.k = k
-        self.min_samples_leaf = tree_builder.min_samples_leaf
-        self.min_samples_split = tree_builder.min_samples_split
+        self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
         # initialize metric properties
         self.capacity = 10
@@ -82,8 +90,6 @@ cdef class _Remover:
         if self.remove_depths:
             free(self.remove_depths)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cpdef INT32_t remove(self, _Tree tree, np.ndarray remove_indices):
         """
         Remove the data specified by the `remove_indices` from the
@@ -106,8 +112,6 @@ cdef class _Remover:
         # recurse through the tree and retrain nodes / substrees as necessary
         self._remove(&tree.root, X, y, samples, n_samples)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef void _remove(self,
                       Node**    node_ptr,
                       DTYPE_t** X,
@@ -129,6 +133,7 @@ cdef class _Remover:
 
         # counters
         cdef SIZE_t n_pos_samples = 0
+        cdef SIZE_t n_usable_thresholds = 0
 
         # update node counts
         n_pos_samples = self.update_node(&node, y, samples, n_samples)
@@ -155,7 +160,7 @@ cdef class _Remover:
             else:
 
                 # check optimal split
-                result = self.check_optimal_split(node, X, y, samples, n_samples, pos_count, &split)
+                result = self.check_optimal_split(node)
 
                 # optimal split has changed, retrain, check complete
                 if result == 1:
@@ -192,20 +197,16 @@ cdef class _Remover:
             n_pos_samples += y[samples[i]]
 
         # update node counts
-        cdef Node *node = <Node *>malloc(sizeof(Node))
         node.n_samples -= n_samples
         node.n_pos_samples -= n_pos_samples
 
         # return no. positive samples being deleted
         return n_pos_samples
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    @cython.cdivision(True)
     cdef void update_leaf(self,
-                          Node** node_ptr,
-                          int*   samples,
-                          int    n_samples) nogil:
+                          Node**  node_ptr,
+                          SIZE_t* samples,
+                          SIZE_t  n_samples) nogil:
         """
         Update leaf node properties: value and leaf_samples. Check complete.
         """
@@ -234,14 +235,11 @@ cdef class _Remover:
         self.add_removal_type(0, node.depth)
         free(samples)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    @cython.cdivision(True)
-    cdef void _convert_to_leaf(self,
-                               Node**       node_ptr,
-                               SIZE_t*      samples,
-                               SIZE_t       n_samples,
-                               SplitRecord* split) nogil:
+    cdef void convert_to_leaf(self,
+                              Node**       node_ptr,
+                              SIZE_t*      samples,
+                              SIZE_t       n_samples,
+                              SplitRecord* split) nogil:
         """
         Convert decision node to a leaf node. Check complete.
         """
@@ -276,8 +274,6 @@ cdef class _Remover:
         self.add_removal_type(0, node.depth)
         free(samples)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef void retrain(self,
                       Node***   node_pp,
                       DTYPE_t** X,
@@ -312,8 +308,6 @@ cdef class _Remover:
         self.add_removal_type(1, node.depth)
         free(samples)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef void get_leaf_samples(self,
                                Node*    node,
                                SIZE_t*  remove_samples,
@@ -367,10 +361,7 @@ cdef class _Remover:
                                       leaf_samples_ptr,
                                       leaf_samples_count_ptr)
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    @cython.cdivision(True)
-    cdef int check_optimal_split(self,
+    cdef INT32_t check_optimal_split(self,
                                  Node* node) nogil:
         """
         Compare all feature thresholds against the chosen feature / threshold.
@@ -386,7 +377,7 @@ cdef class _Remover:
 
         # record the best feature / threshold
         cdef INT32_t chosen_feature_ndx = 0
-        cdef INT32_t chosen_threshold_ndx = 0
+        cdef DTYPE_t chosen_threshold_value = 0
 
         # object pointers
         cdef Feature*   feature = NULL
@@ -403,8 +394,11 @@ cdef class _Remover:
         # greedy node, check if the best feature / threshold has changed
         if node.depth >= topd:
 
-            # TODO: check to see if chosen feature / threshold is invalid, retrain
+            # retrain if the chosen feature / threshold is invalid
+            if node.chosen_feature == NULL and node.chosen_threshold == NULL:
+                return 1
 
+            # find the best feature / threshold
             best_score = 1000000
 
             # get thresholds for each feature
@@ -437,8 +431,6 @@ cdef class _Remover:
 
         return result
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef SIZE_t update_metadata(self,
                                 Node**    node_ptr,
                                 DTYPE_t** X,
@@ -451,7 +443,8 @@ cdef class _Remover:
         cdef Node* node = node_ptr[0]
 
         # class properties
-        cdef SIZE_t k_samples = self.k
+        cdef SIZE_t    k_samples = self.k
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         # counters
         cdef int i = 0
@@ -486,10 +479,13 @@ cdef class _Remover:
         # variables for sampling the unused candidate array
         cdef SIZE_t      n_vacancies = 0
         cdef SIZE_t      n_thresholds_to_sample = 0
-        cdef Threshold** sampled_thresholds = NULL
-        cdef SIZE_t      n_sampled_thresholds
+        cdef Threshold** final_thresholds = NULL
+        cdef SIZE_t      n_final_thresholds = 0
         cdef INT32_t     ndx = -1
         cdef SIZE_t*     sampled_indices = NULL
+
+        # return variable
+        cdef SIZE_t n_usable_thresholds = 0
 
         # update statistics for each feature
         for j in range(node.n_features):
@@ -497,6 +493,10 @@ cdef class _Remover:
 
             # array holding indices of invalid thresholds for this feature
             threshold_validities = <SIZE_t *>malloc(feature.n_thresholds * sizeof(SIZE_t))
+
+            # initialize counters
+            n_invalid_thresholds = 0
+            n_valid_thresholds = 0
 
             # update statistics for each threshold in this feature
             for k in range(feature.n_thresholds):
@@ -543,14 +543,15 @@ cdef class _Remover:
                     n_invalid_thresholds += 1
 
                     # if the chosen feature / threshold is invalid, clear those properties
-                    if (feature.index == node.chosen_feature.index) and
-                       (threshold.value == node.chosen_threshold.value):
+                    if ((feature.index == node.chosen_feature.index) and
+                        (threshold.value == node.chosen_threshold.value)):
                         node.chosen_feature = NULL
                         node.chosen_threshold = NULL
 
                 # valid threshold
                 else:
                     n_valid_thresholds += 1
+                    n_usable_thresholds += 1
 
             # sample new viable thresholds, if any
             if n_invalid_thresholds > 0:
@@ -566,7 +567,7 @@ cdef class _Remover:
                     # extract candidate thresholds
                     candidate_thresholds = <Threshold **>malloc(n_leaf_samples * sizeof(Threshold *))
                     n_candidate_thresholds = get_candidate_thresholds(feature, X, y, leaf_samples,
-                                                                      n_leaf_samples, &thresholds)
+                                                                      n_leaf_samples, &candidate_thresholds)
                     unused_thresholds = <Threshold **>malloc(n_candidate_thresholds * sizeof(Threshold *))
                     n_unused_thresholds = 0
 
@@ -575,7 +576,7 @@ cdef class _Remover:
                         used = False
 
                         # disregard threshold if it is already being used by the feature
-                        for k in range(feature.n_thresholds)
+                        for k in range(feature.n_thresholds):
                             if feature.thresholds[k].value == candidate_thresholds[i].value:
                                 used = True
                                 break
@@ -591,10 +592,11 @@ cdef class _Remover:
                         n_thresholds_to_sample = n_vacancies
                     else:
                         n_thresholds_to_sample = n_unused_thresholds
+                    n_usable_thresholds += n_thresholds_to_sample
 
                     # allocate memory for the new thresholds array
-                    n_sampled_thresholds = n_thresholds_to_sample + n_valid_thresholds
-                    sampled_thresholds = <Threshold **>malloc(n_sampled_thresholds * sizeof(Threshold *))
+                    n_final_thresholds = n_thresholds_to_sample + n_valid_thresholds
+                    final_thresholds = <Threshold **>malloc(n_final_thresholds * sizeof(Threshold *))
                     sampled_indices = <SIZE_t *>malloc(n_thresholds_to_sample * sizeof(SIZE_t))
 
                     # sample unused threshold indices uniformly at random
@@ -613,7 +615,7 @@ cdef class _Remover:
 
                         # valid: add copied threshold to sampled list of candidate thresholds
                         if valid:
-                            sampled_thresholds[i] = copy_threshold(unused_thresholds[ndx])
+                            final_thresholds[i] = copy_threshold(unused_thresholds[ndx])
                             sampled_indices[i] = ndx
                             i += 1
 
@@ -622,11 +624,12 @@ cdef class _Remover:
 
                         # original valid threshold
                         if threshold_validities[k] == 1:
-                            sampled_thresholds[i] = copy_threshold(feature.thresholds[k])
+                            final_thresholds[i] = copy_threshold(feature.thresholds[k])
                             i += 1
 
                         # free threshold
                         free(feature.thresholds[k])
+                    free(feature.thresholds)
 
                     # free candidate thresholds array
                     for k in range(n_candidate_thresholds):
@@ -637,20 +640,35 @@ cdef class _Remover:
                     free(unused_thresholds)
                     free(leaf_samples)
                     free(sampled_indices)
+
+                # remove invalid thresholds
+                else:
+
+                    # create final thresholds array
+                    n_final_thresholds = feature.n_thresholds - n_invalid_thresholds
+                    final_thresholds = <Threshold **>malloc(n_final_thresholds  * sizeof(Threshold *))
+
+                    # filter out invalid thresholds and free original thresholds array
+                    i = 0
+                    for k in range(feature.n_thresholds):
+
+                        # add valid threshold to final thresholds
+                        if threshold_validities[k] == 1:
+                            final_thresholds[i] = copy_threshold(feature.thresholds[k])
+                            i +=1
+
+                        free(feature.thresholds[k])
                     free(feature.thresholds)
 
-                    # assign new thresholds array to this feature
-                    feature.thresholds = sampled_thresholds
-                    feature.n_thresholds = i
+                # assign final thresholds array to this feature
+                feature.thresholds = final_thresholds
+                feature.n_thresholds = n_final_thresholds
 
             # clean up
             free(threshold_validities)
 
         return n_usable_thresholds
 
-
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef void add_removal_type(self,
                                SIZE_t remove_type,
                                SIZE_t remove_depth) nogil:
@@ -684,9 +702,9 @@ cdef class _Remover:
         self.remove_depths = NULL
         self.retrain_sample_count = 0
 
-    cdef np.ndarray _get_int_ndarray(self,
-                                     INT32_t* data,
-                                     SIZE_t   n_elem):
+    cdef np.ndarray get_int_ndarray(self,
+                                    SIZE_t* data,
+                                    SIZE_t  n_elem):
         """
         Wraps value as a 1-d NumPy array.
         The array keeps a reference to this Tree, which manages the underlying memory.

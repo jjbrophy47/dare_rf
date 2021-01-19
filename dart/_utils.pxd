@@ -52,10 +52,12 @@ cdef void split_samples(Node*        node,
                         SIZE_t       n_samples,
                         SplitRecord* split) nogil
 
-cdef Threshold* copy_threshold(Threshold* threshold)
+cdef Threshold* copy_threshold(Threshold* threshold) nogil
 
 # helper methods
-cdef INT32_t* convert_int_ndarray(np.ndarray arr)
+cdef SIZE_t* convert_int_ndarray(np.ndarray arr)
+
+cdef INT32_t* convert_int32_ndarray(np.ndarray arr)
 
 cdef INT32_t* copy_int_array(INT32_t* arr,
                              SIZE_t n_elem) nogil

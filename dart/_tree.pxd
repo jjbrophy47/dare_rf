@@ -48,10 +48,12 @@ Struct to hold metadata pertaining to a particular feature threshold.
 """
 cdef struct Threshold:
     DTYPE_t    value                 # Midway point between two adjacent feature values
-    SIZE_t     n_v1_samples          # Number of samples for feature 1
-    SIZE_t     n_v1_pos_samples      # Number of positive samples for feature 1
-    SIZE_t     n_v2_samples          # Number of samples for feature 2
-    SIZE_t     n_v2_pos_samples      # Number of positive samples for feature 2
+    DTYPE_t    v1                    # Lower value of adjacent values
+    DTYPE_t    v2                    # Upper value of adjacent values
+    SIZE_t     n_v1_samples          # Number of samples for value 1
+    SIZE_t     n_v1_pos_samples      # Number of positive samples for value 1
+    SIZE_t     n_v2_samples          # Number of samples for value 2
+    SIZE_t     n_v2_pos_samples      # Number of positive samples for value 2
     SIZE_t     n_left_samples        # Number of samples for the left branch
     SIZE_t     n_left_pos_samples    # Number of positive samples for the left branch
     SIZE_t     n_right_samples       # Number of samples for the right branch
