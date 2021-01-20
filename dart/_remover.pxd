@@ -22,7 +22,6 @@ cdef class _Remover:
     cdef _TreeBuilder tree_builder           # Tree Builder
     cdef bint         use_gini               # Controls splitting criterion
     cdef SIZE_t       k                      # Number of thresholds to sample
-    cdef UINT32_t     rand_r_state           # sklearn_rand_r random number state
 
     # Metric structures
     cdef SIZE_t   capacity                   # Number of removal allocations for space
@@ -40,8 +39,8 @@ cdef class _Remover:
                       Node**    node_ptr,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      SIZE_t*   samples,
-                      SIZE_t    n_samples) nogil
+                      SIZE_t*   remove_samples,
+                      SIZE_t    n_remove_samples) nogil
 
     cdef SIZE_t update_node(self,
                             Node**   node_ptr,

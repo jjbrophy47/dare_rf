@@ -18,6 +18,7 @@ np.import_array()
 from ._utils cimport compute_split_score
 from ._utils cimport rand_uniform
 from ._utils cimport split_samples
+from ._utils cimport copy_feature
 from ._utils cimport copy_threshold
 from ._argsort cimport sort
 
@@ -139,8 +140,8 @@ cdef class _Splitter:
         node.leaf_samples = NULL
 
         # set decision node properties
-        node.chosen_feature = chosen_feature
-        node.chosen_threshold = chosen_threshold
+        node.chosen_feature = copy_feature(chosen_feature)
+        node.chosen_threshold = copy_threshold(chosen_threshold)
 
         # split node samples based on the chosen feature / threshold
         split_samples(node, X, y, samples, n_samples, split)
@@ -367,7 +368,7 @@ cdef SIZE_t get_candidate_thresholds(Feature*     feature,
     # object pointers
     cdef Threshold*  threshold = NULL
 
-    printf('[S - GCT] n_samples: %ld\n', n_samples)
+    # printf('[S - GCT] n_samples: %ld\n', n_samples)
 
     # copy values and labels into new arrays, and count no. pos. labels
     for i in range(n_samples):
@@ -451,7 +452,7 @@ cdef SIZE_t get_candidate_thresholds(Feature*     feature,
         v_pos_counts[feature_value_count] = v_pos_count
         feature_value_count += 1
 
-    printf('[S - GCT] no. feature value sets: %ld\n', feature_value_count)
+    # printf('[S - GCT] no. feature value sets: %ld\n', feature_value_count)
 
     # evaluate adjacent pairs of feature sets to get candidate thresholds
     for k in range(1, feature_value_count):

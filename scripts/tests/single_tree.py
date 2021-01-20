@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.datasets import load_boston
+from sklearn.metrics import roc_auc_score
 
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
@@ -24,7 +25,6 @@ def load_data(dataset):
 
     elif dataset == 'boston':
         data = load_boston()
-        print(data)
         X = data['data']
         y = data['target']
 
@@ -38,24 +38,25 @@ def main(args):
 
     X, y = load_data(args.dataset)
 
-    print(X)
+    print(X.shape)
 
     # train decision tree
-    model = dart.Tree(topd=0, k=10, max_depth=10, random_state=1)
+    seed = 1
+    model = dart.Tree(topd=0, k=10, max_depth=20, random_state=seed)
     model = model.fit(X, y)
 
     # predict
-    print('instance to predict: {}'.format(X[0]))
-    print('prediction: {}'.format(model.predict_proba(X[[0]])))
+    y_proba = model.predict_proba(X)[:, 1]
+    auc = roc_auc_score(y, y_proba)
+    print('AUC: {:.3f}'.format(auc))
 
     # delete training data
     if args.delete:
-        delete_indices = np.random.default_rng().choice(X.shape[0], size=50, replace=False)
-        delete_indices = np.arange(99)
+        delete_indices = np.random.default_rng(seed=seed).choice(X.shape[0], size=10, replace=False)
         print('instances to delete: {}'.format(delete_indices))
 
         for delete_ndx in delete_indices:
-            print('\ninstance to delete, {}: {}'.format(delete_ndx, X[delete_ndx]))
+            print('\ninstance to delete, {}'.format(delete_ndx))
             model.delete(delete_ndx)
 
         types, depths = model.get_removal_types_depths()

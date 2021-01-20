@@ -207,11 +207,26 @@ cdef void split_samples(Node*        node,
         split.n_right_samples = k
         split.right_samples = <SIZE_t *>realloc(split.right_samples, k * sizeof(SIZE_t))
     else:
-        split.n_right_samples
+        split.n_right_samples = 0
         free(split.right_samples)
 
     # clean up, no more use for the original samples array
     free(samples)
+
+
+cdef Feature* copy_feature(Feature* feature) nogil:
+    """
+    Copies the contents of a feature to a new feature.
+    """
+    cdef Feature* f2 = <Feature *>malloc(sizeof(Feature))
+
+    f2.index = feature.index
+    f2.n_thresholds = feature.n_thresholds
+    f2.thresholds = <Threshold **>malloc(feature.n_thresholds * sizeof(Threshold *))
+    for k in range(feature.n_thresholds):
+        f2.thresholds[k] = copy_threshold(feature.thresholds[k])
+
+    return f2
 
 
 cdef Threshold* copy_threshold(Threshold* threshold) nogil:
@@ -292,6 +307,16 @@ cdef void dealloc(Node *node) nogil:
 
     # decision node
     else:
+
+        # clear chosen feature
+        if node.chosen_feature != NULL:
+            for k in range(node.chosen_feature.n_thresholds):
+                free(node.chosen_feature.thresholds[k])
+            free(node.chosen_feature)
+
+        # clear chosen threshold
+        if node.chosen_threshold != NULL:
+            free(node.chosen_threshold)
 
         # loop through each feature
         for j in range(node.n_features):

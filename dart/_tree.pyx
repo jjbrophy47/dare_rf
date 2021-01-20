@@ -147,8 +147,8 @@ cdef class _TreeBuilder:
 
                 # choose a feature / threshold and partition the data
                 self.splitter.split_node(&node, X, y, samples, n_samples, topd, random_state, &split)
-                # printf('[B] chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
-                #       node.chosen_feature.index, node.chosen_threshold.value)
+                # printf('[B] depth: %ld, chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
+                #       node.depth, node.chosen_feature.index, node.chosen_threshold.value)
 
                 # traverse to left and right branches
                 node.left = self._build(X, y, split.left_samples, split.n_left_samples, depth + 1, 1)

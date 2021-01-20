@@ -459,8 +459,7 @@ class Tree(object):
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
                                  self.use_gini_,
-                                 self.k,
-                                 self.random_state_)
+                                 self.k)
 
         # self.adder_ = _Adder(self.manager_,
         #                      self.tree_builder_,

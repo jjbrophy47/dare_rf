@@ -61,8 +61,7 @@ cdef class _Remover:
                   _DataManager manager,
                   _TreeBuilder tree_builder,
                   bint         use_gini,
-                  SIZE_t       k,
-                  object       random_state):
+                  SIZE_t       k):
         """
         Constructor.
         """
@@ -70,7 +69,6 @@ cdef class _Remover:
         self.tree_builder = tree_builder
         self.use_gini = use_gini
         self.k = k
-        self.rand_r_state = random_state.randint(0, RAND_R_MAX)
 
         # initialize metric properties
         self.capacity = 10
@@ -116,8 +114,8 @@ cdef class _Remover:
                       Node**    node_ptr,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      SIZE_t*   samples,
-                      SIZE_t    n_samples) nogil:
+                      SIZE_t*   remove_samples,
+                      SIZE_t    n_remove_samples) nogil:
         """
         Update and retrain this node if necessary, otherwise traverse
         to its children.
@@ -132,38 +130,39 @@ cdef class _Remover:
         cdef SIZE_t topd = self.tree_builder.topd
 
         # counters
-        cdef SIZE_t n_pos_samples = 0
+        cdef SIZE_t n_pos_remove_samples = 0
         cdef SIZE_t n_usable_thresholds = 0
 
-        printf('\n[R] n_samples: %ld, depth: %ld, is_left: %d\n', n_samples, node.depth, node.is_left)
+        # printf('\n[R] n_remove_samples: %ld, depth: %ld, is_left: %d\n', n_remove_samples, node.depth, node.is_left)
 
         # update node counts
-        n_pos_samples = self.update_node(&node, y, samples, n_samples)
+        n_pos_remove_samples = self.update_node(&node, y, remove_samples, n_remove_samples)
 
         # leaf, check complete
         if node.is_leaf:
-            printf('[R] update leaf\n')
-            self.update_leaf(&node, samples, n_samples)
+            # printf('[R] update leaf\n')
+            self.update_leaf(&node, remove_samples, n_remove_samples)
             printf('[R] leaf.value: %.2f\n', node.value)
 
         # decision node, but samples in same class, convert to leaf, check complete
         elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
-            printf('[R] convert to leaf\n')
-            self.convert_to_leaf(&node, samples, n_samples, &split)
+            # printf('[R] convert to leaf\n')
+            self.convert_to_leaf(&node, remove_samples, n_remove_samples, &split)
             printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
         # decision node
         else:
 
             # update metadata
-            printf('[R] update metadata\n')
-            n_usable_thresholds = self.update_metadata(&node, X, y, samples, n_samples)
+            # printf('[R] update metadata\n')
+            n_usable_thresholds = self.update_metadata(&node, X, y, remove_samples, n_remove_samples)
+            # printf('[R] done updating metadata\n')
             printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
 
             # no more usable thresholds, convert to leaf, check complete
-            if n_usable_thresholds == 0:
-                printf('[R] convert to leaf\n')
-                self.convert_to_leaf(&node, samples, n_samples, &split)
+            if n_usable_thresholds <= 0:
+                # printf('[R] convert to leaf\n')
+                self.convert_to_leaf(&node, remove_samples, n_remove_samples, &split)
                 printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
             # viable decision node
@@ -172,19 +171,21 @@ cdef class _Remover:
                 # check optimal split
                 printf('[R] check optimal split\n')
                 result = self.check_optimal_split(node)
+                printf('[R] result: %d\n', result)
 
                 # optimal split has changed, retrain, check complete
                 if result == 1:
                     printf('[R] retrain\n')
-                    self.retrain(&node_ptr, X, y, samples, n_samples)
-                    printf('[R] retrain, n_samples: %.ld\n', node.n_samples)
+                    self.retrain(&node_ptr, X, y, remove_samples, n_remove_samples)
+                    printf('[R] retrain, n_samples: %.ld\n', node_ptr[0].n_samples)
 
                 # no retraining necessary, split samples and recurse
                 else:
 
                     # split deleted samples and free original samples
-                    split_samples(node, X, y, samples, n_samples, &split)
-                    printf('[R] split samples\n')
+                    split_samples(node, X, y, remove_samples, n_remove_samples, &split)
+                    printf('[R] split samples, split.n_left_samples: %ld, split.n_right_samples: %ld\n',
+                           split.n_left_samples, split.n_right_samples)
 
                     # traverse left if any deleted samples go left
                     if split.n_left_samples > 0:
@@ -294,8 +295,8 @@ cdef class _Remover:
                       Node***   node_pp,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      SIZE_t*   samples,
-                      SIZE_t    n_samples) nogil:
+                      SIZE_t*   remove_samples,
+                      SIZE_t    n_remove_samples) nogil:
         """
         Rebuild subtree at this node.
         """
@@ -311,18 +312,23 @@ cdef class _Remover:
         cdef bint   is_left = node.is_left
 
         # get updated list of samples
-        self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
+        self.get_leaf_samples(node, remove_samples, n_remove_samples, &leaf_samples, &leaf_samples_count)
+
+        printf('[R - R] retrain, leaf_samples_count: %ld\n', leaf_samples_count)
 
         # free node / subtree
         dealloc(node)
         free(node)
 
+        printf('done freeing node\n')
+
         # retrain node / subtree
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count, depth, is_left)
 
         # check complete: add deletion type and depth, and clean up
-        self.add_removal_type(1, node.depth)
-        free(samples)
+        # printf('[R - R] retrain, node.depth: %ld\n', node.depth)
+        self.add_removal_type(1, node_ptr[0].depth)
+        free(remove_samples)
 
     cdef void get_leaf_samples(self,
                                Node*    node,
@@ -413,6 +419,8 @@ cdef class _Remover:
         # greedy node, check if the best feature / threshold has changed
         if node.depth >= topd:
 
+            # printf('node.depth: %ld\n', node.depth)
+
             # retrain if the chosen feature / threshold is invalid
             if node.chosen_feature == NULL and node.chosen_threshold == NULL:
                 return 1
@@ -444,10 +452,10 @@ cdef class _Remover:
                         chosen_feature_ndx = feature.index
                         chosen_threshold_value = threshold.value
 
-            # printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
-            #       node.chosen_feature.index, node.chosen_threshold.value)
-            # printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
-            #       chosen_feature_ndx, chosen_threshold_value)
+            printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
+                  node.chosen_feature.index, node.chosen_threshold.value)
+            printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
+                  chosen_feature_ndx, chosen_threshold_value)
 
             # check to see if the same feature / threshold is still the best
             result = not (node.chosen_feature.index == chosen_feature_ndx and
@@ -470,12 +478,12 @@ cdef class _Remover:
 
         # class properties
         cdef SIZE_t    k_samples = self.k
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.tree_builder.rand_r_state
 
         # counters
-        cdef int i = 0
-        cdef int j = 0
-        cdef int k = 0
+        cdef SIZE_t i = 0
+        cdef SIZE_t j = 0
+        cdef SIZE_t k = 0
 
         # object pointers
         cdef Feature*    feature = NULL
@@ -524,6 +532,9 @@ cdef class _Remover:
             n_invalid_thresholds = 0
             n_valid_thresholds = 0
 
+            # printf('[R - UM] feature.index: %ld, feature.n_thresholds: %ld\n',
+            #        feature.index, feature.n_thresholds)
+
             # update statistics for each threshold in this feature
             for k in range(feature.n_thresholds):
                 threshold = feature.thresholds[k]
@@ -551,6 +562,9 @@ cdef class _Remover:
                         threshold.n_v2_samples -= 1
                         threshold.n_v2_pos_samples -= 1
 
+                # printf('[R - UM] threshold %.5f, n_left_samples: %ld, n_right_samples: %ld\n',
+                #        threshold.value, threshold.n_left_samples, threshold.n_right_samples)
+
                 # compute label ratios for both values of the threshold
                 v1_label_ratio = threshold.n_v1_pos_samples / (1.0 * threshold.n_v1_samples)
                 v2_label_ratio = threshold.n_v2_pos_samples / (1.0 * threshold.n_v2_samples)
@@ -561,6 +575,8 @@ cdef class _Remover:
                                    (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
                                    (v2_label_ratio > 0.0 and v2_label_ratio < 1.0)))
 
+                # printf('[R - UM] valid_threshold: %d\n', valid_threshold)
+
                 # save whether this threshold was valid or not
                 threshold_validities[k] = valid_threshold
 
@@ -568,24 +584,32 @@ cdef class _Remover:
                 if not valid_threshold:
                     n_invalid_thresholds += 1
 
+                    # printf('[R - UM] testing\n')
+
                     # if the chosen feature / threshold is invalid, clear those properties
-                    if ((feature.index == node.chosen_feature.index) and
-                        (threshold.value == node.chosen_threshold.value)):
+                    if ((node.chosen_feature != NULL and feature.index == node.chosen_feature.index) and
+                        (node.chosen_threshold != NULL and threshold.value == node.chosen_threshold.value)):
+                        for i in range(node.chosen_feature.n_thresholds):
+                            free(node.chosen_feature.thresholds[i])
+                        free(node.chosen_feature)
+                        free(node.chosen_threshold)
                         node.chosen_feature = NULL
                         node.chosen_threshold = NULL
+
+                    # printf('[R - UM] done testing\n')
 
                 # valid threshold
                 else:
                     n_valid_thresholds += 1
                     n_usable_thresholds += 1
 
-            printf('[R - UM] feature.index: %ld, n_valid_thresholds: %ld, n_invalid_thresholds: %ld\n',
-                   feature.index, n_valid_thresholds, n_invalid_thresholds)
+            # printf('[R - UM] feature.index: %ld, n_valid_thresholds: %ld, n_invalid_thresholds: %ld\n',
+            #        feature.index, n_valid_thresholds, n_invalid_thresholds)
 
             # sample new viable thresholds, if any
             if n_invalid_thresholds > 0:
-                printf('[R - UM] sample new thresholds, feauture.n_thresholds: %ld, k_samples: %ld\n',
-                       feature.n_thresholds, k_samples)
+                # printf('[R - UM] sample new thresholds, feauture.n_thresholds: %ld, k_samples: %ld\n',
+                #        feature.n_thresholds, k_samples)
 
                 # if no. original thresholds < k, there are no other candidate thresholds
                 if feature.n_thresholds == k_samples:
@@ -595,13 +619,13 @@ cdef class _Remover:
                     n_leaf_samples = 0
                     self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &n_leaf_samples)
 
-                    printf('[R - UM] n_leaf_samples: %ld\n', n_leaf_samples)
+                    # printf('[R - UM] n_leaf_samples: %ld\n', n_leaf_samples)
 
                     # extract candidate thresholds
                     candidate_thresholds = <Threshold **>malloc(n_leaf_samples * sizeof(Threshold *))
                     n_candidate_thresholds = get_candidate_thresholds(feature, X, y, leaf_samples,
                                                                       n_leaf_samples, &candidate_thresholds)
-                    printf('[R - UM] n_candidate_thresholds: %ld\n', n_candidate_thresholds)
+                    # printf('[R - UM] n_candidate_thresholds: %ld\n', n_candidate_thresholds)
 
                     unused_thresholds = <Threshold **>malloc(n_candidate_thresholds * sizeof(Threshold *))
                     n_unused_thresholds = 0
@@ -629,6 +653,8 @@ cdef class _Remover:
                         n_thresholds_to_sample = n_unused_thresholds
                     n_usable_thresholds += n_thresholds_to_sample
 
+                    # printf('[R - UM] n_vacancies: %ld\n', n_vacancies)
+
                     # allocate memory for the new thresholds array
                     n_final_thresholds = n_thresholds_to_sample + n_valid_thresholds
                     final_thresholds = <Threshold **>malloc(n_final_thresholds * sizeof(Threshold *))
@@ -650,9 +676,12 @@ cdef class _Remover:
 
                         # valid: add copied threshold to sampled list of candidate thresholds
                         if valid:
+                            # printf('sampled: %d\n', ndx)
                             final_thresholds[i] = copy_threshold(unused_thresholds[ndx])
                             sampled_indices[i] = ndx
                             i += 1
+
+                    # printf('[R - UM] n_thresholds_to_sample: %ld\n', n_thresholds_to_sample)
 
                     # add original thresholds to the new thresholds array
                     for k in range(feature.n_thresholds):
@@ -664,12 +693,18 @@ cdef class _Remover:
 
                         # free threshold
                         free(feature.thresholds[k])
+
+                    # printf('[R - UM] free threhsolds\n')
                     free(feature.thresholds)
+
+                    # printf('[R - UM] free candidate_thresholds\n')
 
                     # free candidate thresholds array
                     for k in range(n_candidate_thresholds):
                         free(candidate_thresholds[k])
                     free(candidate_thresholds)
+
+                    # printf('[R - UM] clean up\n')
 
                     # clean up
                     free(unused_thresholds)
@@ -679,7 +714,7 @@ cdef class _Remover:
                 # remove invalid thresholds
                 else:
 
-                    printf('[R - UM] remove invalid thresholds\n')
+                    # printf('[R - UM] remove invalid thresholds\n')
 
                     # create final thresholds array
                     n_final_thresholds = feature.n_thresholds - n_invalid_thresholds
@@ -701,8 +736,12 @@ cdef class _Remover:
                 feature.thresholds = final_thresholds
                 feature.n_thresholds = n_final_thresholds
 
+            # printf('[R - UM] free threshold validities\n')
+
             # clean up
             free(threshold_validities)
+
+            # printf('[R - UM] done cleaning up\n')
 
         return n_usable_thresholds
 
