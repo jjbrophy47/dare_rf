@@ -53,27 +53,27 @@ def main(args):
 
     # get data
     X_train, X_test, y_train, y_test = load_data(args.dataset, args.data_dir)
-    print(X_train, X_train.shape)
 
     # train
-    k = 10
-    n_estimators = 100
-    max_depth = 10
-    random_state = 1
+    k = 100
+    n_estimators = 10
+    max_depth = 20
+    seed = 1
+    n_delete = 269
 
     if args.model == 'dart':
         model = dart.Forest(topd=0, k=k, n_estimators=n_estimators,
-                            max_depth=max_depth, random_state=random_state)
+                            max_depth=max_depth, random_state=seed)
 
     elif args.model == 'sklearn':
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth,
-                                       random_state=random_state)
+                                       random_state=seed)
 
     start = time.time()
     model = model.fit(X_train, y_train)
-    end = time.time() - start
+    train_time = time.time() - start
 
-    print('train time: {:.3f}s'.format(end))
+    print('train time: {:.3f}s'.format(train_time))
 
     # predict
     y_proba = model.predict_proba(X_test)
@@ -84,6 +84,27 @@ def main(args):
     auc = roc_auc_score(y_test, y_proba[:, 1])
     print('ACC: {:.3f}, AUC: {:.3f}'.format(acc, auc))
 
+    # delete training data
+    cum_delete_time = 0
+    if args.delete:
+        delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=n_delete, replace=False)
+        print('instances to delete: {}'.format(delete_indices))
+
+        for delete_ndx in delete_indices:
+            start = time.time()
+            model.delete(delete_ndx)
+            delete_time = time.time() - start
+            cum_delete_time += delete_time
+            print('\ninstance to delete, {}: {:.3f}s'.format(delete_ndx, delete_time))
+
+        types, depths = model.get_removal_types_depths()
+        print('types: {}'.format(types))
+        print('depths: {}'.format(depths))
+
+        avg_delete_time = cum_delete_time / len(delete_indices)
+        print('train time: {:.3f}s'.format(train_time))
+        print('avg. delete time: {:.3f}s'.format(avg_delete_time))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -92,5 +113,6 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='iris', help='dataset to use for the experiment.')
     parser.add_argument('--model', type=str, default='dart', help='dart or sklearn')
+    parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
     args = parser.parse_args()
     main(args)

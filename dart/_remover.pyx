@@ -142,13 +142,13 @@ cdef class _Remover:
         if node.is_leaf:
             # printf('[R] update leaf\n')
             self.update_leaf(&node, remove_samples, n_remove_samples)
-            printf('[R] leaf.value: %.2f\n', node.value)
+            # printf('[R] leaf.value: %.2f\n', node.value)
 
         # decision node, but samples in same class, convert to leaf, check complete
         elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
             # printf('[R] convert to leaf\n')
             self.convert_to_leaf(&node, remove_samples, n_remove_samples, &split)
-            printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
+            # printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
         # decision node
         else:
@@ -157,35 +157,35 @@ cdef class _Remover:
             # printf('[R] update metadata\n')
             n_usable_thresholds = self.update_metadata(&node, X, y, remove_samples, n_remove_samples)
             # printf('[R] done updating metadata\n')
-            printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
+            # printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
 
             # no more usable thresholds, convert to leaf, check complete
             if n_usable_thresholds <= 0:
                 # printf('[R] convert to leaf\n')
                 self.convert_to_leaf(&node, remove_samples, n_remove_samples, &split)
-                printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
+                # printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
             # viable decision node
             else:
 
                 # check optimal split
-                printf('[R] check optimal split\n')
+                # printf('[R] check optimal split\n')
                 result = self.check_optimal_split(node)
-                printf('[R] result: %d\n', result)
+                # printf('[R] result: %d\n', result)
 
                 # optimal split has changed, retrain, check complete
                 if result == 1:
-                    printf('[R] retrain\n')
+                    # printf('[R] retrain\n')
                     self.retrain(&node_ptr, X, y, remove_samples, n_remove_samples)
-                    printf('[R] retrain, n_samples: %.ld\n', node_ptr[0].n_samples)
+                    # printf('[R] retrain, n_samples: %.ld\n', node_ptr[0].n_samples)
 
                 # no retraining necessary, split samples and recurse
                 else:
 
                     # split deleted samples and free original samples
                     split_samples(node, X, y, remove_samples, n_remove_samples, &split)
-                    printf('[R] split samples, split.n_left_samples: %ld, split.n_right_samples: %ld\n',
-                           split.n_left_samples, split.n_right_samples)
+                    # printf('[R] split samples, split.n_left_samples: %ld, split.n_right_samples: %ld\n',
+                    #        split.n_left_samples, split.n_right_samples)
 
                     # traverse left if any deleted samples go left
                     if split.n_left_samples > 0:
@@ -314,13 +314,13 @@ cdef class _Remover:
         # get updated list of samples
         self.get_leaf_samples(node, remove_samples, n_remove_samples, &leaf_samples, &leaf_samples_count)
 
-        printf('[R - R] retrain, leaf_samples_count: %ld\n', leaf_samples_count)
+        # printf('[R - R] retrain, leaf_samples_count: %ld\n', leaf_samples_count)
 
         # free node / subtree
         dealloc(node)
         free(node)
 
-        printf('done freeing node\n')
+        # printf('done freeing node\n')
 
         # retrain node / subtree
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count, depth, is_left)
@@ -452,10 +452,10 @@ cdef class _Remover:
                         chosen_feature_ndx = feature.index
                         chosen_threshold_value = threshold.value
 
-            printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
-                  node.chosen_feature.index, node.chosen_threshold.value)
-            printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
-                  chosen_feature_ndx, chosen_threshold_value)
+            # printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
+            #       node.chosen_feature.index, node.chosen_threshold.value)
+            # printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
+            #       chosen_feature_ndx, chosen_threshold_value)
 
             # check to see if the same feature / threshold is still the best
             result = not (node.chosen_feature.index == chosen_feature_ndx and

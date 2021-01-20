@@ -254,14 +254,14 @@ class Forest(object):
 
     #     return types, depths
 
-    def get_removal_retrain_depths(self):
+    def get_removal_types_depths(self):
         """
         Retrieve deletion statistics.
         """
         types_list, depths_list = [], []
 
         for tree in self.trees_:
-            types, depths = tree.get_removal_retrain_depths()
+            types, depths = tree.get_removal_types_depths()
             types_list.append(types)
             depths_list.append(depths)
 
