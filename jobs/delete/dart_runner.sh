@@ -20,5 +20,5 @@ python3 scripts/experiments/delete.py \
   --n_estimators $n_estimators \
   --max_depth $max_depth \
   --topd $topd \
-  --K $k \
+  --k $k \
   --subsample_size $subsample_size
