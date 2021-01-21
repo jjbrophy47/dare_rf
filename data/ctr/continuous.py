@@ -3,6 +3,7 @@ Preprocess dataset.
 """
 import os
 import sys
+import time
 import logging
 
 import numpy as np
@@ -47,9 +48,11 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
     dtypes[0] = np.uint8
 
     # retrieve dataset
-    logger.info('reading in dataset...')
+    start = time.time()
     df = pd.read_csv('day_0', sep='\t', header=None, usecols=cols, dtype=dtypes, nrows=n_instances)
+    logger.info('reading in dataset...{:.3f}s'.format(time.time() - start))
     logger.info('{}'.format(df))
+    logger.info('Memory usage: {:,} bytes'.format(df.memory_usage(deep=True).sum()))
 
     # get numpy array
     X = df.values
