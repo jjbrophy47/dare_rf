@@ -47,7 +47,7 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
     dtypes[0] = np.uint8
 
     # retrieve dataset
-    logger = get_logger('reading in dataset...')
+    logger.info('reading in dataset...')
     df = pd.read_csv('day_0', sep='\t', header=None, usecols=cols, dtype=dtypes, nrows=n_instances)
     logger.info('{}'.format(df))
 
@@ -56,20 +56,20 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
     df = None
 
     # impute missing values with the mean
-    logger = get_logger('imputing missing values with the mean...')
+    logger.info('imputing missing values with the mean...')
     assert df[0].isna().sum() == 0
     col_mean = np.nanmean(X, axis=0)
     nan_indices = np.where(np.isnan(X))
     X[nan_indices] = np.take(col_mean, nan_indices[1])
 
     # move the label column in X to the last column
-    logger = get_logger('moving label column to the last column...')
+    logger.info('moving label column to the last column...')
     y = X[:, 0].copy()
     np.delete(X, 0, 1)
     X = np.hstack([X, y])
 
     # split into train and test
-    logger = get_logger('splitting into train and test sets...')
+    logger.info('splitting into train and test sets...')
     indices = np.arange(X.shape[0])
     n_train_samples = int(len(indices) * (1 - test_size))
 
