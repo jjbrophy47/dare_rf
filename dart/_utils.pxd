@@ -45,7 +45,7 @@ cdef DTYPE_t compute_entropy(DTYPE_t count,
                              SIZE_t  left_pos_count,
                              SIZE_t  right_pos_count) nogil
 
-# adder / remover utility methods
+# remover utility methods
 cdef void split_samples(Node*        node,
                         DTYPE_t**    X,
                         INT32_t*     y,
@@ -65,5 +65,8 @@ cdef INT32_t* copy_int_array(INT32_t* arr,
 
 cdef SIZE_t* copy_indices(SIZE_t* arr,
                           SIZE_t n_elem) nogil
+
+cdef void dealloc_features(Feature** features,
+                           SIZE_t n_features) nogil
 
 cdef void dealloc(Node *node) nogil

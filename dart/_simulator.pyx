@@ -25,6 +25,7 @@ from ._utils cimport compute_split_score
 from ._utils cimport rand_uniform
 from ._utils cimport copy_threshold
 from ._utils cimport copy_feature
+from ._utils cimport dealloc_features
 
 # =====================================
 # Remover
@@ -127,31 +128,38 @@ cdef class _Simulator:
             # no valid thresholds, convert to leaf, no retraining
             if n_valid_thresholds == 0:
                 # printf('[S] no valid thresholds, convert to leaf\n')
+                dealloc_features(features, n_features)
                 return 0
 
             # 1+ valid thresholds, but the chosen feature / threshold is invalid, retraining
             elif n_valid_thresholds < 0:
                 # printf('[S] chosen feature / threshold is invalid, retrain %ld samples\n', node_n_samples)
+                dealloc_features(features, n_features)
                 return node_n_samples
 
-            result = self.check_optimal_split(node, features, n_features)
-
-            # retraining necessary, return no. samples at this node
-            if result == 1:
-                # printf('[S] new optimal feature / threshold, depth: %ld, retrain %ld samples\n',
-                #        node.depth, node_n_samples)
-                return node_n_samples
-
-            # optimal feature / threshold has not changed, move to next node
+            # 1+ valid thresholds and the chosen feature / threshold is valid
             else:
 
-                # traverse left if deleted sample goes left
-                if X[remove_index][node.chosen_feature.index] <= node.chosen_threshold.value:
-                    return self._sim_delete(&node.left, X, y, remove_index)
+                # see if a new split is optimal
+                result = self.check_optimal_split(node, features, n_features)
+                dealloc_features(features, n_features)
 
-                # traverse right if deleted sample goes right
+                # retraining necessary, return no. samples at this node
+                if result == 1:
+                    # printf('[S] new optimal feature / threshold, depth: %ld, retrain %ld samples\n',
+                    #        node.depth, node_n_samples)
+                    return node_n_samples
+
+                # optimal feature / threshold has not changed, move to next node
                 else:
-                    return self._sim_delete(&node.right, X, y, remove_index)
+
+                    # traverse left if deleted sample goes left
+                    if X[remove_index][node.chosen_feature.index] <= node.chosen_threshold.value:
+                        return self._sim_delete(&node.left, X, y, remove_index)
+
+                    # traverse right if deleted sample goes right
+                    else:
+                        return self._sim_delete(&node.right, X, y, remove_index)
 
     # private
     cdef INT32_t check_optimal_split(self,

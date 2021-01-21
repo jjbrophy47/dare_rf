@@ -287,6 +287,33 @@ cdef SIZE_t* copy_indices(SIZE_t* arr, SIZE_t n_elem) nogil:
 
     return new_arr
 
+cdef void dealloc_features(Feature** features,
+                           SIZE_t n_features) nogil:
+    """
+    Deallocate a features array and all thresholds.
+    """
+    # object pointers
+    cdef Feature* feature = NULL
+
+    # loop through each feature in this array
+    for j in range(n_features):
+        feature = features[j]
+
+        # loop through each threshold for this feature
+        for k in range(feature.n_thresholds):
+
+            # free threshold
+            free(feature.thresholds[k])
+
+        # free thresholds array
+        free(feature.thresholds)
+
+        # free feature
+        free(feature)
+
+    # free features array
+    free(features)
+
 
 cdef void dealloc(Node *node) nogil:
     """

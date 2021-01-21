@@ -1,9 +1,9 @@
 
 # DART (Gini, Deletion)
-./jobs/delete/dart_primer.sh 'surgical' 'gini' 100 20 10 3 1440 short
-./jobs/delete/dart_primer.sh 'vaccine' 'gini' 100 20 10 3 1440 short
-./jobs/delete/dart_primer.sh 'adult' 'gini' 100 20 10 3 1440 short
-./jobs/delete/dart_primer.sh 'bank_marketing' 'gini' 100 20 10 3 1440 short
+./jobs/delete/dart_primer.sh 'surgical' 'gini' 100 20 10 25 1440 short
+./jobs/delete/dart_primer.sh 'vaccine' 'gini' 100 20 10 9 1440 short
+./jobs/delete/dart_primer.sh 'adult' 'gini' 100 20 10 9 1440 short
+./jobs/delete/dart_primer.sh 'bank_marketing' 'gini' 100 20 10 9 1440 short
 ./jobs/delete/dart_primer.sh 'flight_delays' 'gini' 250 20 100 18 1440 short
 ./jobs/delete/dart_primer.sh 'diabetes' 'gini' 100 20 10 18 1440 short
 ./jobs/delete/dart_primer.sh 'no_show' 'gini' 100 20 100 18 1440 short
