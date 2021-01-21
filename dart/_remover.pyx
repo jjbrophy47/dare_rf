@@ -53,22 +53,16 @@ cdef class _Remover:
         def __get__(self):
             return self.get_int_ndarray(self.remove_depths, self.remove_count)
 
-    property retrain_sample_count:
-        def __get__(self):
-            return self.retrain_sample_count
-
     def __cinit__(self,
                   _DataManager manager,
                   _TreeBuilder tree_builder,
-                  bint         use_gini,
-                  SIZE_t       k):
+                  _Config      config):
         """
         Constructor.
         """
         self.manager = manager
         self.tree_builder = tree_builder
-        self.use_gini = use_gini
-        self.k = k
+        self.config = config
 
         # initialize metric properties
         self.capacity = 10
@@ -103,11 +97,11 @@ cdef class _Remover:
         cdef SIZE_t  n_samples = remove_indices.shape[0]
 
         # check if any sample has already been deleted
-        cdef INT32_t result = self.manager.check_sample_validity(samples, n_samples)
+        cdef INT32_t result = self.manager.check_remove_samples_validity(samples, n_samples)
         if result == -1:
             return -1
 
-        # recurse through the tree and retrain nodes / substrees as necessary
+        # recurse through the tree and retrain nodes / subtrees as necessary
         self._remove(&tree.root, X, y, samples, n_samples)
 
     cdef void _remove(self,
@@ -124,19 +118,16 @@ cdef class _Remover:
 
         # result containers
         cdef SplitRecord split
+        cdef SIZE_t      n_usable_thresholds = 0
         cdef INT32_t     result = 0
 
-        # object properties
-        cdef SIZE_t topd = self.tree_builder.topd
-
-        # counters
-        cdef SIZE_t n_pos_remove_samples = 0
-        cdef SIZE_t n_usable_thresholds = 0
+        # class properties
+        cdef SIZE_t topd = self.config.topd
 
         # printf('\n[R] n_remove_samples: %ld, depth: %ld, is_left: %d\n', n_remove_samples, node.depth, node.is_left)
 
         # update node counts
-        n_pos_remove_samples = self.update_node(&node, y, remove_samples, n_remove_samples)
+        self.update_node(&node, y, remove_samples, n_remove_samples)
 
         # leaf, check complete
         if node.is_leaf:
@@ -177,7 +168,8 @@ cdef class _Remover:
                 if result == 1:
                     # printf('[R] retrain\n')
                     self.retrain(&node_ptr, X, y, remove_samples, n_remove_samples)
-                    # printf('[R] retrain, n_samples: %.ld\n', node_ptr[0].n_samples)
+                    # printf('[R] retrain, depth: %ld, n_samples: %.ld\n',
+                    #        node_ptr[0].depth, node_ptr[0].n_samples)
 
                 # no retraining necessary, split samples and recurse
                 else:
@@ -196,27 +188,24 @@ cdef class _Remover:
                         self._remove(&node.right, X, y, split.right_samples, split.n_right_samples)
 
     # private
-    cdef SIZE_t update_node(self,
-                            Node**   node_ptr,
-                            INT32_t* y,
-                            SIZE_t*  samples,
-                            SIZE_t   n_samples) nogil:
+    cdef void update_node(self,
+                          Node**   node_ptr,
+                          INT32_t* y,
+                          SIZE_t*  remove_samples,
+                          SIZE_t   n_remove_samples) nogil:
         """
-        Update node counts based on the `samples` being deleted.
+        Update node counts based on the `remove_samples` being deleted.
         """
         cdef Node *node = node_ptr[0]
 
         # compute number of positive samples being deleted
-        cdef SIZE_t n_pos_samples = 0
-        for i in range(n_samples):
-            n_pos_samples += y[samples[i]]
+        cdef SIZE_t n_pos_remove_samples = 0
+        for i in range(n_remove_samples):
+            n_pos_remove_samples += y[remove_samples[i]]
 
         # update node counts
-        node.n_samples -= n_samples
-        node.n_pos_samples -= n_pos_samples
-
-        # return no. positive samples being deleted
-        return n_pos_samples
+        node.n_samples -= n_remove_samples
+        node.n_pos_samples -= n_pos_remove_samples
 
     cdef void update_leaf(self,
                           Node**  node_ptr,
@@ -254,8 +243,8 @@ cdef class _Remover:
 
     cdef void convert_to_leaf(self,
                               Node**       node_ptr,
-                              SIZE_t*      samples,
-                              SIZE_t       n_samples,
+                              SIZE_t*      remove_samples,
+                              SIZE_t       n_remove_samples,
                               SplitRecord* split) nogil:
         """
         Convert decision node to a leaf node. Check complete.
@@ -267,7 +256,7 @@ cdef class _Remover:
         cdef SIZE_t  leaf_samples_count = 0
 
         # get leaf samples and remove deleted samples
-        self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &leaf_samples_count)
+        self.get_leaf_samples(node, remove_samples, n_remove_samples, &leaf_samples, &leaf_samples_count)
 
         # deallocate node / subtree
         dealloc(node)
@@ -289,7 +278,7 @@ cdef class _Remover:
 
         # check complete: add deletion type and depth, and clean up
         self.add_removal_type(0, node.depth)
-        free(samples)
+        free(remove_samples)
 
     cdef void retrain(self,
                       Node***   node_pp,
@@ -353,12 +342,12 @@ cdef class _Remover:
 
                 # loop through all deleted samples
                 for j in range(n_remove_samples):
-                    # printf('[R - GLS] samples[%ld]: %ld, remove_samples[%ld]: %ld\n',
-                           # i, node.leaf_samples[i], j, remove_samples[j])
+
+                    # printf('[R - GLS] node.leaf_samples[%ld]: %ld, remove_samples[%ld]: %ld\n',
+                    #        i, node.leaf_samples[i], j, remove_samples[j])
 
                     # do not add sample to results if it has been deleted
                     if node.leaf_samples[i] == remove_samples[j]:
-                        # printf('[R - GLS] DO NOT ADD!\n')
                         add_sample = False
                         break
 
@@ -393,8 +382,8 @@ cdef class _Remover:
         """
 
         # parameters
-        cdef bint   use_gini = self.use_gini
-        cdef SIZE_t topd = self.tree_builder.topd
+        cdef bint   use_gini = self.config.use_gini
+        cdef SIZE_t topd = self.config.topd
 
         # keep track of the best feature / threshold
         cdef DTYPE_t best_score = 1000000
@@ -444,7 +433,8 @@ cdef class _Remover:
                                                       threshold.n_left_pos_samples,
                                                       threshold.n_right_pos_samples)
 
-                    # printf('[SN] threshold.value: %.3f, split_score: %.3f\n', threshold.value, split_score)
+                    # printf('[SN] feature.index: %ld, threshold.value: %.3f, split_score: %.3f\n',
+                    #        feature.index, threshold.value, split_score)
 
                     # keep threshold with the best score
                     if split_score < best_score:
@@ -469,16 +459,16 @@ cdef class _Remover:
                                 Node**    node_ptr,
                                 DTYPE_t** X,
                                 INT32_t*  y,
-                                SIZE_t*   samples,
-                                SIZE_t    n_samples) nogil:
+                                SIZE_t*   remove_samples,
+                                SIZE_t    n_remove_samples) nogil:
         """
         Update each threshold for all features at this node.
         """
         cdef Node* node = node_ptr[0]
 
         # class properties
-        cdef SIZE_t    k_samples = self.k
-        cdef UINT32_t* random_state = &self.tree_builder.rand_r_state
+        cdef SIZE_t    k_samples = self.config.k
+        cdef UINT32_t* random_state = &self.config.rand_r_state
 
         # counters
         cdef SIZE_t i = 0
@@ -540,30 +530,27 @@ cdef class _Remover:
                 threshold = feature.thresholds[k]
 
                 # loop through each deleted sample
-                for i in range(n_samples):
+                for i in range(n_remove_samples):
 
                     # decrement left branch of this threshold
-                    if X[samples[i]][feature.index] <= threshold.value:
+                    if X[remove_samples[i]][feature.index] <= threshold.value:
                         threshold.n_left_samples -= 1
-                        threshold.n_left_pos_samples -= y[samples[i]]
+                        threshold.n_left_pos_samples -= y[remove_samples[i]]
 
                     # decrement right branch of this threshold
                     else:
                         threshold.n_right_samples -= 1
-                        threshold.n_right_pos_samples -= y[samples[i]]
+                        threshold.n_right_pos_samples -= y[remove_samples[i]]
 
                     # decrement left value of this threshold
-                    if X[samples[i]][feature.index] == threshold.v1:
+                    if X[remove_samples[i]][feature.index] == threshold.v1:
                         threshold.n_v1_samples -= 1
                         threshold.n_v1_pos_samples -= 1
 
                     # decrement right value of this threshold
-                    elif X[samples[i]][feature.index] == threshold.v2:
+                    elif X[remove_samples[i]][feature.index] == threshold.v2:
                         threshold.n_v2_samples -= 1
                         threshold.n_v2_pos_samples -= 1
-
-                # printf('[R - UM] threshold %.5f, n_left_samples: %ld, n_right_samples: %ld\n',
-                #        threshold.value, threshold.n_left_samples, threshold.n_right_samples)
 
                 # compute label ratios for both values of the threshold
                 v1_label_ratio = threshold.n_v1_pos_samples / (1.0 * threshold.n_v1_samples)
@@ -575,10 +562,11 @@ cdef class _Remover:
                                    (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
                                    (v2_label_ratio > 0.0 and v2_label_ratio < 1.0)))
 
-                # printf('[R - UM] valid_threshold: %d\n', valid_threshold)
-
                 # save whether this threshold was valid or not
                 threshold_validities[k] = valid_threshold
+
+                # printf('[R - UM] threshold %.5f, n_left_samples: %ld, n_right_samples: %ld, valid: %ld\n',
+                #        threshold.value, threshold.n_left_samples, threshold.n_right_samples, threshold_validities[k])
 
                 # invalid threshold, flag for removal
                 if not valid_threshold:
@@ -614,18 +602,17 @@ cdef class _Remover:
                 # if no. original thresholds < k, there are no other candidate thresholds
                 if feature.n_thresholds == k_samples:
 
+                    # printf('[R - UM] node.n_samples: %ld\n', node.n_samples)
+
                     # get instances for this node, filter out deleted instances
                     leaf_samples = <SIZE_t *>malloc(node.n_samples * sizeof(SIZE_t))
                     n_leaf_samples = 0
-                    self.get_leaf_samples(node, samples, n_samples, &leaf_samples, &n_leaf_samples)
-
-                    # printf('[R - UM] n_leaf_samples: %ld\n', n_leaf_samples)
+                    self.get_leaf_samples(node, remove_samples, n_remove_samples, &leaf_samples, &n_leaf_samples)
 
                     # extract candidate thresholds
                     candidate_thresholds = <Threshold **>malloc(n_leaf_samples * sizeof(Threshold *))
                     n_candidate_thresholds = get_candidate_thresholds(feature, X, y, leaf_samples,
                                                                       n_leaf_samples, &candidate_thresholds)
-                    # printf('[R - UM] n_candidate_thresholds: %ld\n', n_candidate_thresholds)
 
                     unused_thresholds = <Threshold **>malloc(n_candidate_thresholds * sizeof(Threshold *))
                     n_unused_thresholds = 0
@@ -776,7 +763,6 @@ cdef class _Remover:
         self.remove_count = 0
         self.remove_types = NULL
         self.remove_depths = NULL
-        self.retrain_sample_count = 0
 
     cdef np.ndarray get_int_ndarray(self,
                                     INT32_t* data,

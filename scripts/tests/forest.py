@@ -86,7 +86,7 @@ def main(args):
 
     # delete training data
     cum_delete_time = 0
-    if args.delete:
+    if args.delete and not args.simulate:
         delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=n_delete, replace=False)
         print('instances to delete: {}'.format(delete_indices))
 
@@ -95,7 +95,7 @@ def main(args):
             model.delete(delete_ndx)
             delete_time = time.time() - start
             cum_delete_time += delete_time
-            print('\ninstance to delete, {}: {:.3f}s'.format(delete_ndx, delete_time))
+            print('\ndeleted instance, {}: {:.3f}s'.format(delete_ndx, delete_time))
 
         types, depths = model.get_removal_types_depths()
         print('types: {}'.format(types))
@@ -114,5 +114,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, default='iris', help='dataset to use for the experiment.')
     parser.add_argument('--model', type=str, default='dart', help='dart or sklearn')
     parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
+    parser.add_argument('--simulate', action='store_true', help='whether to simulate deletions or not.')
     args = parser.parse_args()
     main(args)

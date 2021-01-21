@@ -26,7 +26,8 @@ np.import_array()
 cdef inline UINT32_t DEFAULT_SEED = 1
 cdef double MAX_DBL = 1.79768e+308
 
-cdef inline double rand_uniform(double low, double high,
+cdef inline double rand_uniform(double low,
+                                double high,
                                 UINT32_t* random_state) nogil:
     """
     Generate a random double in [low; high).

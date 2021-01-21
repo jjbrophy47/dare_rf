@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import argparse
 
 import numpy as np
@@ -52,9 +53,15 @@ def main(args):
 
     print(X_train.shape)
 
-    # train decision tree
+    # settings
+    topd = 0
+    k = 100
+    max_depth = 20
     seed = 1
-    model = dart.Tree(topd=0, k=10, max_depth=20, random_state=seed)
+    n_delete = 20
+
+    # train decision tree
+    model = dart.Tree(topd=topd, k=k, max_depth=max_depth, random_state=seed)
     model = model.fit(X_train, y_train)
 
     # predict
@@ -63,8 +70,8 @@ def main(args):
     print('AUC: {:.3f}'.format(auc))
 
     # delete training data
-    if args.delete:
-        delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=500, replace=False)
+    if args.delete and not args.simulate:
+        delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=n_delete, replace=False)
         print('instances to delete: {}'.format(delete_indices))
 
         for delete_ndx in delete_indices:
@@ -75,6 +82,43 @@ def main(args):
         print('types: {}'.format(types))
         print('depths: {}'.format(depths))
 
+    # simulate the deletion of each instance
+    elif args.delete and args.simulate:
+        delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=n_delete, replace=False)
+        print('instances to delete: {}'.format(delete_indices))
+
+        # cumulative time
+        cum_delete_time = 0
+        cum_sim_time = 0
+
+        # simulate and delete each sample
+        for delete_ndx in delete_indices:
+
+            # simulate the deletion
+            start = time.time()
+            n_samples_to_retrain = model.sim_delete(delete_ndx)
+            sim_time = time.time() - start
+            cum_sim_time += sim_time
+            print('\nsimulated instance, {}: {:.3f}s, no. samples: {:,}'.format(
+                  delete_ndx, sim_time, n_samples_to_retrain))
+
+            # delete
+            start = time.time()
+            model.delete(delete_ndx)
+            delete_time = time.time() - start
+            cum_delete_time += delete_time
+            print('deleted instance, {}: {:.3f}s'.format(delete_ndx, delete_time))
+
+        types, depths = model.get_removal_types_depths()
+        print('types: {}'.format(types))
+        print('depths: {}'.format(depths))
+
+        avg_sim_time = cum_sim_time / len(delete_indices)
+        avg_delete_time = cum_delete_time / len(delete_indices)
+
+        print('avg. sim. time: {:.5f}s'.format(avg_sim_time))
+        print('avg. delete time: {:.5f}s'.format(avg_delete_time))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -83,5 +127,6 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='iris', help='dataset to use for the experiment.')
     parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
+    parser.add_argument('--simulate', action='store_true', help='whether to simulate deletions or not.')
     args = parser.parse_args()
     main(args)

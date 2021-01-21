@@ -20,7 +20,6 @@ cimport numpy as np
 np.import_array()
 
 from ._utils cimport dealloc
-from ._utils cimport RAND_R_MAX
 
 # constants
 cdef INT32_t UNDEF = -1
@@ -38,34 +37,11 @@ cdef class _TreeBuilder:
     def __cinit__(self,
                   _DataManager manager,
                   _Splitter    splitter,
-                  SIZE_t       min_samples_split,
-                  SIZE_t       min_samples_leaf,
-                  SIZE_t       max_depth,
-                  SIZE_t       topd,
-                  SIZE_t       k,
-                  SIZE_t       max_features,
-                  object       random_state):
+                  _Config      config):
 
         self.manager = manager
         self.splitter = splitter
-        self.min_samples_split = min_samples_split
-        self.min_samples_leaf = min_samples_leaf
-        self.max_depth = max_depth
-        self.topd = topd
-        self.k = k
-        self.max_features = max_features
-        self.rand_r_state = random_state.randint(0, RAND_R_MAX)
-
-        self.sim_mode = 0
-        self.sim_depth = -1
-        self.features = NULL
-
-    cpdef void set_sim_mode(self, bint sim_mode):
-        """
-        Turns simulation mode on/off, and resets the simulation depth.
-        """
-        self.sim_mode = sim_mode
-        self.sim_depth = -1
+        self.config = config
 
     cpdef void build(self, _Tree tree):
         """
@@ -100,15 +76,15 @@ cdef class _TreeBuilder:
         cdef Node *node = self._initialize_node(depth, is_left, y, samples, n_samples)
 
         # class parameters
-        cdef SIZE_t    topd = self.topd
+        cdef SIZE_t    topd = self.config.topd
         cdef SIZE_t    n_total_features = self.manager.n_features
-        cdef SIZE_t    n_max_features = self.max_features
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef SIZE_t    n_max_features = self.config.max_features
+        cdef UINT32_t* random_state = &self.config.rand_r_state
 
         # boolean variables
-        cdef bint is_bottom_leaf = (depth >= self.max_depth)
-        cdef bint is_middle_leaf = (n_samples < self.min_samples_split or
-                                    n_samples < 2 * self.min_samples_leaf or
+        cdef bint is_bottom_leaf = (depth >= self.config.max_depth)
+        cdef bint is_middle_leaf = (n_samples < self.config.min_samples_split or
+                                    n_samples < 2 * self.config.min_samples_leaf or
                                     node.n_pos_samples == 0 or
                                     node.n_pos_samples == node.n_samples)
 

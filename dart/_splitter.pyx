@@ -33,26 +33,11 @@ cdef class _Splitter:
     """
 
     def __cinit__(self,
-                  SIZE_t min_samples_leaf,
-                  bint   use_gini,
-                  SIZE_t k):
+                  _Config config):
         """
-        Parameters
-        ----------
-        min_samples_leaf : SIZE_t
-            The minimal number of samples each leaf can have,
-            where splits which would result in having less
-            samples in a leaf are not considered.
-        use_gini : bool
-            If True, use the Gini index splitting criterion,
-            otherwise entropy.
-        k : SIZE_t
-            Number of candidate thresholds to sample
-            uniformly at random.
+        Consructor.
         """
-        self.min_samples_leaf = min_samples_leaf
-        self.use_gini = use_gini
-        self.k = k
+        self.config = config
 
     cdef void split_node(self,
                          Node**       node_ptr,
@@ -71,7 +56,7 @@ cdef class _Splitter:
         cdef Node* node = node_ptr[0]
 
         # use Gini index if true, otherwise entropy
-        cdef bint use_gini = self.use_gini
+        cdef bint use_gini = self.config.use_gini
 
         # keep track of the best feature / threshold
         cdef DTYPE_t best_score = 1000000
@@ -163,7 +148,7 @@ cdef class _Splitter:
         cdef Node* node = node_ptr[0]
 
         # class parameters
-        cdef SIZE_t k_samples = self.k
+        cdef SIZE_t k_samples = self.config.k
 
         # iterators
         cdef SIZE_t  i = 0

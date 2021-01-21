@@ -1,6 +1,7 @@
 from ._tree cimport Node
 from ._tree cimport Feature
 from ._tree cimport Threshold
+from ._config cimport _Config
 from ._utils cimport DTYPE_t
 from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
@@ -20,10 +21,8 @@ cdef class _Splitter:
     """
     The splitter searches in the input space for a feature to split on.
     """
-    # Internal structures
-    cdef public SIZE_t min_samples_leaf    # Min samples in a leaf
-    cdef bint          use_gini            # Controls splitting criterion
-    cdef SIZE_t        k                   # Number of thresholds to sample
+    # Internal properties
+    cdef _Config config                    # Configuration object
 
     # Methods
     cdef void split_node(self,

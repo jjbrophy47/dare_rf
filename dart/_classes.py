@@ -18,9 +18,11 @@ import numbers
 import numpy as np
 
 from ._manager import _DataManager
+from ._config import _Config
 from ._splitter import _Splitter
 # from ._adder import _Adder
 from ._remover import _Remover
+from ._simulator import _Simulator
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -224,6 +226,25 @@ class Forest(object):
 
         # remove data from the database
         self.manager_.remove_data(remove_indices)
+
+    def sim_delete(self, remove_index):
+        """
+        Simulate the deletion of a SINGLE example.
+
+        Returns the number of samples that needs to be retrained
+          if this example were to be deleted.
+        """
+
+        # change `remove_index` into the right data type
+        if not isinstance(remove_index, np.int64):
+            remove_index = np.int64(remove_index)
+
+        # simulate a deletion for each tree
+        n_samples_to_retrain = 0
+        for i in range(len(self.trees_)):
+            n_samples_to_retrain += self.trees_[i].sim_delete(remove_index)
+
+        return n_samples_to_retrain
 
     def print(self, show_nodes=False):
         """
@@ -442,24 +463,27 @@ class Tree(object):
         # create tree objects
         self.tree_ = _Tree()
 
-        self.splitter_ = _Splitter(self.min_samples_leaf,
-                                   self.use_gini_,
-                                   self.k)
+        self.config_ = _Config(self.min_samples_split,
+                               self.min_samples_leaf,
+                               self.max_depth_,
+                               self.topd_,
+                               self.k,
+                               self.max_features_,
+                               self.use_gini_,
+                               self.random_state_)
+
+        self.splitter_ = _Splitter(self.config_)
 
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
-                                          self.min_samples_split,
-                                          self.min_samples_leaf,
-                                          self.max_depth_,
-                                          self.topd_,
-                                          self.k,
-                                          self.max_features_,
-                                          self.random_state_)
+                                          self.config_)
 
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
-                                 self.use_gini_,
-                                 self.k)
+                                 self.config_)
+
+        self.simulator_ = _Simulator(self.manager_,
+                                     self.config_)
 
         # self.adder_ = _Adder(self.manager_,
         #                      self.tree_builder_,
@@ -551,6 +575,23 @@ class Tree(object):
         # remove data from the database
         if self.single_tree_:
             self.manager_.remove_data(remove_indices)
+
+    def sim_delete(self, remove_index):
+        """
+        Removes instances from the database and updates the model.
+        """
+
+        # change `remove_index` into the right data type
+        if self.single_tree_:
+            if not isinstance(remove_index, np.int64):
+                remove_index = np.int64(remove_index)
+
+        # update model
+        n_samples_to_retrain = self.simulator_.sim_delete(self.tree_, remove_index)
+        if n_samples_to_retrain == -1:
+            exit('Removal index invalid!')
+
+        return n_samples_to_retrain
 
     # def clear_add_indices(self):
     #     """

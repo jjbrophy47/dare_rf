@@ -4,6 +4,7 @@ cimport numpy as np
 from ._manager cimport _DataManager
 from ._splitter cimport SplitRecord
 from ._splitter cimport _Splitter
+from ._config cimport _Config
 from ._utils cimport DTYPE_t
 from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
@@ -100,19 +101,9 @@ cdef class _TreeBuilder:
 
     cdef _DataManager manager              # Database manager
     cdef _Splitter    splitter             # Splitter object that chooses the attribute to split on
-    cdef SIZE_t       min_samples_split    # Minimum number of samples in an internal node
-    cdef SIZE_t       min_samples_leaf     # Minimum number of samples in a leafs
-    cdef SIZE_t       max_depth            # Maximal tree depth
-    cdef SIZE_t       topd                 # Number of top semi-random layers
-    cdef SIZE_t       k                    # Number of candidate thresholds to consider for each feature
-    cdef SIZE_t       max_features         # Maximum number of features to consider at each split
-    cdef UINT32_t     rand_r_state         # sklearn_rand_r random number state
-    cdef bint         sim_mode             # Activates simulation mode
-    cdef SIZE_t       sim_depth            # Depth of previous operation completion
-    cdef SIZE_t*      features             # Features to use whn retraining a node
+    cdef _Config      config               # Configuration object holding training parameters
 
     # Python API
-    cpdef void set_sim_mode(self, bint sim_mode)
     cpdef void build(self, _Tree tree)
 
     # C API

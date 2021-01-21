@@ -18,16 +18,19 @@ cdef class _DataManager:
     cdef INT32_t*  y               # Label data
     cdef SIZE_t    n_vacant        # Number of empty indices in the database
     cdef SIZE_t*   vacant          # Empty indices in the database
-    cdef SIZE_t*   add_indices     # Added indices in the database
-    cdef SIZE_t    n_add_indices   # Number of indices added to the database
+    # cdef SIZE_t*   add_indices     # Added indices in the database
+    # cdef SIZE_t    n_add_indices   # Number of indices added to the database
 
     # Python API
     cpdef void remove_data(self, int[:] samples)
-    cpdef void add_data(self, float[:, :] X_in, int[:] y_in)
-    cpdef void clear_add_indices(self)
+    # cpdef void add_data(self, float[:, :] X_in, int[:] y_in)
+    # cpdef void clear_add_indices(self)
 
     # C API
-    cdef INT32_t check_sample_validity(self, SIZE_t *samples, SIZE_t n_samples) nogil
+    cdef INT32_t check_remove_samples_validity(self,
+                                               SIZE_t* remove_samples,
+                                               SIZE_t  n_remove_samples) nogil
+    cdef INT32_t check_single_remove_sample_validity(self, SIZE_t remove_index) nogil
     cdef void get_data(self, DTYPE_t*** X_ptr, INT32_t** y_ptr) nogil
-    cdef SIZE_t* get_add_indices(self) nogil
-    cdef np.ndarray _get_int_ndarray(self, SIZE_t *data, SIZE_t n_elem)
+    # cdef SIZE_t* get_add_indices(self) nogil
+    # cdef np.ndarray _get_int_ndarray(self, SIZE_t *data, SIZE_t n_elem)
