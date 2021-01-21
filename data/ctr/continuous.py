@@ -43,7 +43,7 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
     cols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 
     # data dtypes for each column
-    dtyes = {c: np.float32 for c in cols}
+    dtypes = {c: np.float32 for c in cols}
     dtypes[0] = np.uint8
 
     # retrieve dataset
