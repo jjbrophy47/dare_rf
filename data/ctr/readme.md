@@ -9,3 +9,5 @@ This dataset consists of one day of online ad clicks (day 0), [dataset homepage]
 	* Run `python3 continuous.py`.
 
 This creates a `continuous/train.csv` and `continuous/test.csv`.
+
+Example analysis of this dataset can be found on this [blog post](https://medium.com/@marthawhite_81346/learning-with-the-criteo-tb-dataset-e3ec12d9d77e).

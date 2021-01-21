@@ -59,7 +59,7 @@ def main(args):
     n_estimators = 10
     max_depth = 20
     seed = 1
-    n_delete = 269
+    n_delete = 100
 
     if args.model == 'dart':
         model = dart.Forest(topd=0, k=k, n_estimators=n_estimators,
@@ -104,6 +104,43 @@ def main(args):
         avg_delete_time = cum_delete_time / len(delete_indices)
         print('train time: {:.3f}s'.format(train_time))
         print('avg. delete time: {:.3f}s'.format(avg_delete_time))
+
+    # simulate the deletion of each instance
+    elif args.delete and args.simulate:
+        delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=n_delete, replace=False)
+        print('instances to delete: {}'.format(delete_indices))
+
+        # cumulative time
+        cum_delete_time = 0
+        cum_sim_time = 0
+
+        # simulate and delete each sample
+        for delete_ndx in delete_indices:
+
+            # simulate the deletion
+            start = time.time()
+            n_samples_to_retrain = model.sim_delete(delete_ndx)
+            sim_time = time.time() - start
+            cum_sim_time += sim_time
+            print('\nsimulated instance, {}: {:.3f}s, no. samples: {:,}'.format(
+                  delete_ndx, sim_time, n_samples_to_retrain))
+
+            # delete
+            start = time.time()
+            model.delete(delete_ndx)
+            delete_time = time.time() - start
+            cum_delete_time += delete_time
+            print('deleted instance, {}: {:.3f}s'.format(delete_ndx, delete_time))
+
+        types, depths = model.get_removal_types_depths()
+        print('types: {}'.format(types))
+        print('depths: {}'.format(depths))
+
+        avg_sim_time = cum_sim_time / len(delete_indices)
+        avg_delete_time = cum_delete_time / len(delete_indices)
+
+        print('avg. sim. time: {:.5f}s'.format(avg_sim_time))
+        print('avg. delete time: {:.5f}s'.format(avg_delete_time))
 
 
 if __name__ == '__main__':
