@@ -17,9 +17,9 @@ for rs in ${rs_list[@]}; do
         sbatch --mem=${mem}G \
                --time=$time \
                --partition=$partition \
-               --job-name=DEL_$dataset_$rs_$topd_$subsample_size \
-               --output=jobs/logs/delete/$dataset_$rs_$topd_$subsample_size \
-               --error=jobs/errors/delete/$dataset_$rs_$topd_$subsample_size \
+               --job-name=DEL_$dataset \
+               --output=jobs/logs/delete/$dataset \
+               --error=jobs/errors/delete/$dataset \
                jobs/delete/dart_runner.sh $dataset $rs $criterion \
                $n_estimators $max_depth $topd $k $subsample_size
     done
