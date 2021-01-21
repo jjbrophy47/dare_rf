@@ -57,7 +57,7 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
 
     # impute missing values with the mean
     logger.info('imputing missing values with the mean...')
-    assert df[0].isna().sum() == 0
+    assert np.isnan(X[:, 0]).sum() == 0
     col_mean = np.nanmean(X, axis=0)
     nan_indices = np.where(np.isnan(X))
     X[nan_indices] = np.take(col_mean, nan_indices[1])
