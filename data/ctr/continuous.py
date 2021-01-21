@@ -65,7 +65,7 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
     # move the label column in X to the last column
     logger.info('moving label column to the last column...')
     y = X[:, 0].copy()
-    np.delete(X, 0, 1)
+    X = np.delete(X, 0, 1)
     X = np.hstack([X, y])
 
     # split into train and test
