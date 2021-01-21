@@ -34,93 +34,51 @@ def get_logger(filename=''):
     return logger
 
 
-def dataset_specific(random_state, test_size,
-                     n_instances, max_feature_vals,
-                     logger):
+def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous'):
+
+    # create logger
+    logger = get_logger('log.txt')
+
+    # columns to use
+    cols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+
+    # data dtypes for each column
+    dtyes = {c: np.float32 for c in cols}
+    dtypes[0] = np.uint8
 
     # retrieve dataset
-    df = pd.read_csv('train', nrows=n_instances)
+    logger = get_logger('reading in dataset...')
+    df = pd.read_csv('day_0', sep='\t', header=None, usecols=cols, dtype=dtypes, nrows=n_instances)
     logger.info('{}'.format(df))
 
-    # crete month, day, and hour columns
-    # df['month'] = df['hour'].apply(lambda x: int(str(x)[2:4]))
-    # df['day'] = df['hour'].apply(lambda x: int(str(x)[4:6]))
-    # df['hour'] = df['hour'].apply(lambda x: int(str(x)[6:8]))
+    # get numpy array
+    X = df.values
+    df = None
 
-    # check data type and no. unique values for each column
-    # for c in df.columns:
-    #     logger.info('{}, {}, {}'.format(c, df[c].dtype, len(df[c].unique())))
+    # impute missing values with the mean
+    logger = get_logger('imputing missing values with the mean...')
+    assert df[0].isna().sum() == 0
+    col_mean = np.nanmean(X, axis=0)
+    nan_indices = np.where(np.isnan(X))
+    X[nan_indices] = np.take(col_mean, nan_indices[1])
 
-    # remove select columns
-    logger.info('removing columns...')
-    remove_cols = ['id', 'site_id', 'site_domain', 'app_id',
-                   'device_id', 'device_ip', 'device_model']
-
-    # remove columns that have too many feature values
-    for c in df.columns:
-        n_feature_vals = len(df[c].unique())
-        if n_feature_vals > max_feature_vals:
-            remove_cols.append(c)
-
-    if len(remove_cols) > 0:
-        df = df.drop(columns=remove_cols)
-
-    # remove nan rows
-    nan_rows = df[df.isnull().any(axis=1)]
-    df = df.dropna()
-    logger.info('nan rows: {}'.format(len(nan_rows)))
+    # move the label column in X to the last column
+    logger = get_logger('moving label column to the last column...')
+    y = X[:, 0].copy()
+    np.delete(X, 0, 1)
+    X = np.hstack([X, y])
 
     # split into train and test
-    indices = np.arange(len(df))
+    logger = get_logger('splitting into train and test sets...')
+    indices = np.arange(X.shape[0])
     n_train_samples = int(len(indices) * (1 - test_size))
 
     np.random.seed(random_state)
     train_indices = np.random.choice(indices, size=n_train_samples, replace=False)
     test_indices = np.setdiff1d(indices, train_indices)
 
-    train_df = df.iloc[train_indices]
-    test_df = df.iloc[test_indices]
-
-    # categorize attributes
-    columns = list(df.columns)
-    label = ['click']
-    numeric = []
-    categorical = list(set(columns) - set(numeric) - set(label))
-    logger.info('label: {}'.format(label))
-    logger.info('numeric: {}'.format(numeric))
-    logger.info('categorical: {}'.format(categorical))
-
-    return train_df, test_df, label, numeric, categorical
-
-
-def main(random_state=1, test_size=0.2, n_instances=20000000,
-         max_feature_vals=25, out_dir='continuous'):
-
-    logger = get_logger('log.txt')
-
-    train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
-                                                                      test_size=test_size,
-                                                                      n_instances=n_instances,
-                                                                      max_feature_vals=max_feature_vals,
-                                                                      logger=logger)
-
-    # binarize inputs
-    ct = ColumnTransformer([('kbd', 'passthrough', numeric),
-                            ('ohe', OneHotEncoder(sparse=False, handle_unknown='ignore'), categorical)])
-    logger.info('transforming train data...')
-    train = ct.fit_transform(train_df)
-    logger.info('transforming test data...')
-    test = ct.transform(test_df)
-
-    # binarize outputs
-    logger.info('transforming labels...')
-    le = LabelEncoder()
-    train_label = le.fit_transform(train_df[label].to_numpy().ravel()).reshape(-1, 1)
-    test_label = le.transform(test_df[label].to_numpy().ravel()).reshape(-1, 1)
-
-    # combine binarized data
-    train = np.hstack([train, train_label]).astype(np.int32)
-    test = np.hstack([test, test_label]).astype(np.int32)
+    train = X[train_indices]
+    test = X[test_indices]
 
     logger.info('train.shape: {}, label sum: {}'.format(train.shape, train[:, -1].sum()))
     logger.info('test.shape: {}, label sum: {}'.format(test.shape, test[:, -1].sum()))
