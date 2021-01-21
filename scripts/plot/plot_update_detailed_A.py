@@ -1,5 +1,7 @@
 """
 Plot detailed results for a single dataset using both adversaries.
+
+TODO: plot retrain numbers in terms of percentages.
 """
 import os
 import argparse

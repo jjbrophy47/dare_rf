@@ -25,14 +25,39 @@ from utility import exp_util
 from utility import print_util
 
 
-def process_retrains(types, depths):
+def count_depths(types, depths):
     """
-    Compress the information about retrain depth into counts.
+    Compress the information about deletion types and depths into counts.
     """
+
+    # get list of deletion types
     r = {k: defaultdict(int) for k in set(types)}
 
+    # count no. deletions at each depth for each deletion type
     for t, d in zip(types, depths):
         r[t][d] += 1
+
+    # convert defaultdicts to regular dicts
+    for k in r.keys():
+        r[k] = dict(r[k])
+
+    return r
+
+def count_costs(types, depths, costs):
+    """
+    For retrains (types = 1), compute the total cost
+    for each depth
+    """
+
+    # only use indices where a retrain occurred
+    retrain_indices = np.where(types == 1)[0]
+
+    # get list of all retrain depths
+    r = {d: 0 for d in set(depths[retrain_indices])}
+
+    # compute total cost for each depth
+    for d, c in zip(depths[retrain_indices], costs[retrain_indices]):
+        r[d] += c
 
     return r
 
@@ -139,50 +164,6 @@ def get_delete_index(model, X_train, y_train, indices):
     return best_ndx, search_time
 
 
-# def update_model(model, X_train, y_train, update_ndx, allotted_time):
-#     """
-#     Delete the specified sample.
-#     """
-#     start = time.time()
-#     model.delete(update_ndx)
-#     delete_time = time.time() - start
-
-#     sample_cost = model.get_removal_retrain_sample_count()
-#     types, depths = model.get_removal_types_depths()
-#     model.clear_removal_metrics()
-
-#     return model, delete_time, sample_cost, types, depths
-
-
-# def check_utility(model, X_train, y_train, X_test, y_test,
-#                   updated_indices, logger=None, name=''):
-#     """
-#     Utility check on the model and exact model.
-#     """
-#     logger.info('testing {} and exact utility...'.format(name))
-
-#     # check model performance
-#     auc_model, acc_model, ap_model = exp_util.performance(model, X_test, y_test,
-#                                                           logger=None, name=name)
-#     result = (auc_model, acc_model, ap_model)
-
-#     start = time.time()
-
-#     new_X_train = np.delete(X_train, updated_indices, axis=0)
-#     new_y_train = np.delete(y_train, updated_indices)
-
-#     exact_model = _get_naive(args)
-#     exact_model = exact_model.fit(new_X_train, new_y_train)
-#     end = time.time() - start
-
-#     logger.info('[exact] updating batch of {}: {:.3f}s'.format(len(updated_indices), end))
-#     auc_exact, acc_exact, ap_exact = exp_util.performance(exact_model, X_test, y_test,
-#                                                           logger=None, name='exact')
-#     result += (auc_exact, acc_exact, ap_exact)
-
-#     return result
-
-
 def experiment(args, logger, out_dir, seed):
     """
     Delete as many samples in the time it takes the naive
@@ -210,11 +191,6 @@ def experiment(args, logger, out_dir, seed):
     # train a naive model, before and after deleting 1 sample
     naive_avg_delete_time, naive_utility = train_naive(args, X_train, y_train, X_test, y_test, logger=logger)
 
-    # results = select_samples(args, X_train, y_train, X_test, y_test,
-    #                          allotted_time=allotted_time,
-    #                          initial_utility=initial_utility,
-    #                          logger=logger)
-
     # begin experiment
     begin = time.time()
 
@@ -223,8 +199,9 @@ def experiment(args, logger, out_dir, seed):
 
     # result containers
     total_delete_time = 0
-    delete_type_list = []
-    delete_depth_list = []
+    delete_types_list = []
+    delete_depths_list = []
+    delete_costs_list = []
 
     # train target model
     model = get_model(args)
@@ -239,18 +216,13 @@ def experiment(args, logger, out_dir, seed):
     naive_auc, naive_acc, naive_ap = naive_utility
     model_auc, model_acc, model_ap = exp_util.performance(model, X_test, y_test, logger=logger, name='model')
 
-    # # result containers
-    # aucs_model, accs_model, aps_model = [auc_model], [acc_model], [ap_model]
-    # aucs_exact, accs_exact, aps_exact = [auc_exact], [acc_exact], [ap_exact]
-
     # available indices
     indices = np.arange(len(X_train))
 
-    # updated_indices = []
-
     # find the most damaging samples heuristically
-    # i = 0
-    # j = 0
+    progress_str = '[{}] sample {}, sample_cost: {:,}, search time: {:3f}s, allotted: {:.3f}s, cum time: {:.3f}s'
+    logger.info('\nDelete samples:')
+
     n_deleted = 0
     while allotted_time > 0 and time.time() - begin <= args.time_limit:
 
@@ -263,11 +235,12 @@ def experiment(args, logger, out_dir, seed):
         delete_time = time.time() - start
 
         # get deletion statistics
-        # sample_cost = model.get_removal_retrain_sample_count()
-        delete_type, delete_depth = model.get_removal_types_depths()
-        delete_type_list.append(delete_type)
-        delete_depth_list.append(delete_depth)
-        model.clear_removal_metrics()
+        delete_types, delete_depths, delete_costs = model.get_delete_metrics()
+        delete_types_list.append(delete_types)
+        delete_depths_list.append(delete_depths)
+        delete_costs_list.append(delete_costs)
+        sample_cost = np.sum(delete_costs)  # sum over all trees
+        model.clear_delete_metrics()
 
         # update counters
         allotted_time -= delete_time  # available time
@@ -276,42 +249,21 @@ def experiment(args, logger, out_dir, seed):
         n_deleted += 1
 
         # progress update
-        logger.info('[{}] sample {}, sample_cost: {:,}, search: {:3f}s, allotted: {:.3f}s, cum time: {:.3f}s'.format(
-                    n_deleted, delete_ndx, sample_cost, search_time, allotted_time, cum_time))
+        logger.info(progress_str.format(n_deleted, delete_ndx, sample_cost, search_time, allotted_time, cum_time))
 
         # remove the chosen ndx from the list of available indices
-        indices = np.setdiff1d(indices, [update_ndx])
-
-        # updated_indices.append(update_ndx)
-
-        # if i == args.n_check:
-        #     check_point = int((starting_allotted_time / (total_update_time / len(updated_indices))) / args.n_check)
-        #     logger.info('checkpoint established, no. points: {}'.format(check_point))
-        #     j = 0
-
-        # # record performance
-        # if i >= args.n_check and j == check_point:
-        #     result = check_utility(model, X_train, y_train, X_test, y_test,
-        #                            updated_indices, logger=logger, name=name)
-        #     auc_model, acc_model, ap_model, auc_exact, acc_exact, ap_exact = result
-
-        #     l1 = [auc_model, acc_model, ap_model, auc_exact, acc_exact, ap_exact]
-        #     l2 = [aucs_model, accs_model, aps_model, aucs_exact, accs_exact, aps_exact]
-        #     [l.append(x) for x, l in zip(l1, l2)]
-
-        #     check_point = int((starting_allotted_time / (total_update_time / len(updated_indices))) / args.n_check)
-        #     logger.info('checkpoint re-established, no. points: {}'.format(check_point))
-        #     j = 0
+        indices = np.setdiff1d(indices, [delete_ndx])
 
     # estimate how many additional updates would finish in the remaining time
     if allotted_time > 0:
-        average_delete_time = total_update_time / n_deleted
+        average_delete_time = total_delete_time / n_deleted
         n_deleted += int(allotted_time) / average_delete_time
 
     # get model statistics
-    n_nodes_avg, n_exact_avg, n_semi_avg = model.get_node_statistics()
-    retrain_types = np.concatenate(retrain_types_list)
-    retrain_depths = np.concatenate(retrain_depths_list)
+    # n_nodes_avg, n_exact_avg, n_semi_avg = model.get_node_statistics()
+    delete_types = np.concatenate(delete_types_list)
+    delete_depths = np.concatenate(delete_depths_list)
+    delete_costs = np.concatenate(delete_costs_list)
 
     # save model results
     results = model.get_params()
@@ -320,58 +272,21 @@ def experiment(args, logger, out_dir, seed):
     results['naive_ap'] = naive_ap
     results['naive_avg_delete_time'] = naive_avg_delete_time
     results['naive_n_deleted'] = args.n_delete
-    results['model_n_deleted'] = i
-    results['model_train_%_deleted'] = i / len(X_train)
-    results['model_retrains'] = _process_retrains(retrain_types, retrain_depths)
-    results['model_auc'] = np.array(aucs_model)
-    results['model_acc'] = np.array(accs_model)
-    results['model_ap'] = np.array(aps_model)
-    results['model_n_avg_nodes'] = n_nodes_avg
-    results['model_n_exact_avg'] = n_exact_avg
-    results['model_n_semi_avg'] = n_semi_avg
+    results['model_n_deleted'] = n_deleted
+    results['model_train_%_deleted'] = n_deleted / len(X_train)
+    results['model_delete_depths'] = count_depths(delete_types, delete_depths)
+    results['model_delete_costs'] = count_costs(delete_types, delete_depths, delete_costs)
+    results['model_auc'] = model_auc
+    results['model_acc'] = model_acc
+    results['model_ap'] = model_ap
+    # results['model_n_avg_nodes'] = n_nodes_avg
+    # results['model_n_exact_avg'] = n_exact_avg
+    # results['model_n_semi_avg'] = n_semi_avg
 
-    logger.info('{}'.format(results))
+    logger.info('\nResults:\n{}'.format(results))
     np.save(os.path.join(out_dir, 'results.npy'), results)
 
     return results
-
-
-# def experiment(args, logger, out_dir, seed):
-#     """
-#     Obtains data, trains model, and computes adversaral instances.
-#     """
-
-#     # get data
-#     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
-
-#     # dataset statistics
-#     logger.info('\ntrain instances: {:,}'.format(X_train.shape[0]))
-#     logger.info('test instances: {:,}'.format(X_test.shape[0]))
-#     logger.info('features: {:,}'.format(X_train.shape[1]))
-
-#     # experiment settings
-#     logger.info('\nrandom state: {}'.format(seed))
-#     logger.info('criterion: {}'.format(args.criterion))
-#     logger.info('n_estimators: {}'.format(args.n_estimators))
-#     logger.info('max_depth: {}'.format(args.max_depth))
-#     logger.info('topd: {}'.format(args.topd))
-#     logger.info('min_support: {}'.format(args.min_support))
-#     logger.info('epsilon: {}'.format(args.epsilon))
-#     logger.info('lmbda: {}'.format(args.lmbda))
-#     logger.info('subsample_size: {}'.format(args.subsample_size))
-#     logger.info('n_update: {}'.format(args.n_update))
-#     logger.info('n_check: {}'.format(args.n_check))
-
-#     allotted_time, initial_utility = get_allotted_time(args, X_train, y_train, X_test, y_test,
-#                                                        logger=logger)
-
-#     results = select_samples(args, X_train, y_train, X_test, y_test,
-#                              allotted_time=allotted_time,
-#                              initial_utility=initial_utility,
-#                              logger=logger)
-
-#     logger.info('{}'.format(results))
-#     np.save(os.path.join(out_dir, 'results.npy'), results)
 
 
 def main(args):
@@ -425,10 +340,10 @@ if __name__ == '__main__':
     parser.add_argument('--time_limit', type=int, default=72000, help='seconds given for the entire experiment.')
 
     # tree hyperparameters
+    parser.add_argument('--criterion', type=str, default='gini', help='gini or entropy.')
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_depth', type=int, default=10, help='maximum depth of the tree.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
-    parser.add_argument('--criterion', type=str, default='gini', help='gini or entropy.')
 
     # DART
     parser.add_argument('--topd', type=int, default=0, help='no. top layers to be random.')

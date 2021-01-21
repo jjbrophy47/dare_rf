@@ -53,6 +53,10 @@ cdef class _Remover:
         def __get__(self):
             return self.get_int_ndarray(self.remove_depths, self.remove_count)
 
+    property remove_costs:
+        def __get__(self):
+            return self.get_int_ndarray(self.remove_costs, self.remove_count)
+
     def __cinit__(self,
                   _DataManager manager,
                   _TreeBuilder tree_builder,
@@ -69,6 +73,7 @@ cdef class _Remover:
         self.remove_count = 0
         self.remove_types = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
         self.remove_depths = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
+        self.remove_costs = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
 
     def __dealloc__(self):
         """
@@ -238,7 +243,7 @@ cdef class _Remover:
         node.leaf_samples = leaf_samples
 
         # check complete: add deletion type and depth, and clean up
-        self.add_removal_type(0, node.depth)
+        self.add_metric(0, node.depth, 0)
         free(remove_samples)
 
     cdef void convert_to_leaf(self,
@@ -277,7 +282,7 @@ cdef class _Remover:
         node.right = NULL
 
         # check complete: add deletion type and depth, and clean up
-        self.add_removal_type(0, node.depth)
+        self.add_metric(0, node.depth, 0)
         free(remove_samples)
 
     cdef void retrain(self,
@@ -316,7 +321,7 @@ cdef class _Remover:
 
         # check complete: add deletion type and depth, and clean up
         # printf('[R - R] retrain, node.depth: %ld\n', node.depth)
-        self.add_removal_type(1, node_ptr[0].depth)
+        self.add_metric(1, node_ptr[0].depth, node_ptr[0].n_samples)
         free(remove_samples)
 
     cdef void get_leaf_samples(self,
@@ -732,37 +737,43 @@ cdef class _Remover:
 
         return n_usable_thresholds
 
-    cdef void add_removal_type(self,
-                               INT32_t remove_type,
-                               INT32_t remove_depth) nogil:
+    cdef void add_metric(self,
+                         INT32_t remove_type,
+                         INT32_t remove_depth,
+                         INT32_t remove_cost) nogil:
         """
         Add type and depth to the removal metrics.
         """
-        if self.remove_types and self.remove_depths:
+        if self.remove_types:
             if self.remove_count + 1 == self.capacity:
                 self.capacity *= 2
 
             self.remove_types = <INT32_t *>realloc(self.remove_types, self.capacity * sizeof(INT32_t))
             self.remove_depths = <INT32_t *>realloc(self.remove_depths, self.capacity * sizeof(INT32_t))
+            self.remove_costs = <INT32_t *>realloc(self.remove_costs, self.capacity * sizeof(INT32_t))
 
         else:
             self.capacity = 10
             self.remove_types = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
             self.remove_depths = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
+            self.remove_costs = <INT32_t *>malloc(self.capacity * sizeof(INT32_t))
 
         self.remove_types[self.remove_count] = remove_type
         self.remove_depths[self.remove_count] = remove_depth
+        self.remove_costs[self.remove_count] = remove_cost
         self.remove_count += 1
 
-    cpdef void clear_remove_metrics(self):
+    cpdef void clear_metrics(self):
         """
         Resets deletion statistics.
         """
         free(self.remove_types)
         free(self.remove_depths)
+        free(self.remove_costs)
         self.remove_count = 0
         self.remove_types = NULL
         self.remove_depths = NULL
+        self.remove_costs = NULL
 
     cdef np.ndarray get_int_ndarray(self,
                                     INT32_t* data,

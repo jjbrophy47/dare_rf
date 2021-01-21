@@ -26,12 +26,13 @@ cdef class _Remover:
     # Metric structures
     cdef SIZE_t   capacity                   # Number of removal allocations for space
     cdef SIZE_t   remove_count               # Number of removals
-    cdef INT32_t* remove_types               # Removal type
+    cdef INT32_t* remove_types               # Type of deletion that occurs
     cdef INT32_t* remove_depths              # Depth of leaf or node needing retraining
+    cdef INT32_t* remove_costs               # No. samples that need to be retrained
 
     # Python API
     cpdef INT32_t remove(self, _Tree tree, np.ndarray remove_indices)
-    cpdef void clear_remove_metrics(self)
+    cpdef void clear_metrics(self)
 
     # C API
     cdef void _remove(self,
@@ -82,9 +83,11 @@ cdef class _Remover:
                                 SIZE_t*   samples,
                                 SIZE_t    n_samples) nogil
 
-    cdef void add_removal_type(self,
-                               INT32_t remove_type,
-                               INT32_t remove_depth) nogil
+    # metric methods
+    cdef void add_metric(self,
+                         INT32_t remove_type,
+                         INT32_t remove_depth,
+                         INT32_t remove_cost) nogil
 
     cdef np.ndarray get_int_ndarray(self,
                                     INT32_t *data,

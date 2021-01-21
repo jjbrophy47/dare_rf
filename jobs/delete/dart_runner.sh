@@ -9,20 +9,16 @@ rs=$2
 criterion=$3
 n_estimators=$4
 max_depth=$5
-max_features=$6
-topd=$7
+topd=$6
+k=$7
 subsample_size=$8
-operation=$9
 
-python3 scripts/experiments/update.py \
-  --append_results \
-  --dart \
+python3 scripts/experiments/delete.py \
   --dataset $dataset \
   --rs $rs \
   --criterion $criterion \
   --n_estimators $n_estimators \
   --max_depth $max_depth \
-  --max_features $max_features \
   --topd $topd \
-  --subsample_size $subsample_size \
-  --operation $operation
+  --K $k \
+  --subsample_size $subsample_size

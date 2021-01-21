@@ -275,21 +275,25 @@ class Forest(object):
 
     #     return types, depths
 
-    def get_removal_types_depths(self):
+    def get_delete_metrics(self):
         """
         Retrieve deletion statistics.
         """
-        types_list, depths_list = [], []
+        types_list, depths_list, costs_list = [], [], []
 
+        # get metrics for each tree
         for tree in self.trees_:
-            types, depths = tree.get_removal_types_depths()
+            types, depths, costs = tree.get_delete_metrics()
             types_list.append(types)
             depths_list.append(depths)
+            costs_list.append(costs)
 
+        # process metrics from all trees
         types = np.concatenate(types_list)
         depths = np.concatenate(depths_list)
+        costs = np.concatenate(costs_list)
 
-        return types, depths
+        return types, depths, costs
 
     # def get_add_retrain_sample_count(self):
     #     """
@@ -300,35 +304,35 @@ class Forest(object):
     #         result += tree.get_add_retrain_sample_count()
     #     return result
 
-    def get_removal_retrain_sample_count(self):
-        """
-        Retrieve number of samples used for retrainings.
-        """
-        result = 0
-        for tree in self.trees_:
-            result += tree.get_removal_retrain_sample_count()
-        return result
+    # def get_removal_retrain_sample_count(self):
+    #     """
+    #     Retrieve number of samples used for retrainings.
+    #     """
+    #     result = 0
+    #     for tree in self.trees_:
+    #         result += tree.get_removal_retrain_sample_count()
+    #     return result
 
-    def get_node_statistics(self):
-        """
-        Return average node counts, exact node counts, and
-        semi-random node counts among all trees.
-        """
-        counts = [tree.get_node_statistics() for tree in self.trees_]
-        n_nodes, n_exact, n_semi = tuple(zip(*counts))
+    # def get_node_statistics(self):
+    #     """
+    #     Return average node counts, exact node counts, and
+    #     semi-random node counts among all trees.
+    #     """
+    #     counts = [tree.get_node_statistics() for tree in self.trees_]
+    #     n_nodes, n_exact, n_semi = tuple(zip(*counts))
 
-        n_nodes_avg = sum(n_nodes) / len(n_nodes)
-        n_exact_avg = sum(n_exact) / len(n_exact)
-        n_semi_avg = sum(n_semi) / len(n_semi)
+    #     n_nodes_avg = sum(n_nodes) / len(n_nodes)
+    #     n_exact_avg = sum(n_exact) / len(n_exact)
+    #     n_semi_avg = sum(n_semi) / len(n_semi)
 
         return n_nodes_avg, n_exact_avg, n_semi_avg
 
-    def clear_removal_metrics(self):
+    def clear_delete_metrics(self):
         """
         Delete removal statistics.
         """
         for tree in self.trees_:
-            tree.clear_removal_metrics()
+            tree.clear_delete_metrics()
 
     # def clear_add_metrics(self):
     #     """
@@ -607,13 +611,14 @@ class Tree(object):
     #     add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
     #     return add_types, add_depths
 
-    def get_removal_types_depths(self):
+    def get_delete_metrics(self):
         """
         Retrieve deletion statistics.
         """
         remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
         remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
-        return remove_types, remove_depths
+        remove_costs = np.array(self.remover_.remove_costs, dtype=np.int32)
+        return remove_types, remove_depths, remove_costs
 
     # def get_add_retrain_sample_count(self):
     #     """
@@ -622,18 +627,18 @@ class Tree(object):
     #     result = self.adder_.retrain_sample_count
     #     return result
 
-    def get_removal_retrain_sample_count(self):
-        """
-        Return number of samples used in any retrainings.
-        """
-        result = self.remover_.retrain_sample_count
-        return result
+    # def get_removal_retrain_sample_count(self):
+    #     """
+    #     Return number of samples used in any retrainings.
+    #     """
+    #     result = self.remover_.retrain_sample_count
+    #     return result
 
-    def clear_removal_metrics(self):
+    def clear_delete_metrics(self):
         """
         Delete removal statistics.
         """
-        self.remover_.clear_remove_metrics()
+        self.remover_.clear_metrics()
 
     # def clear_add_metrics(self):
     #     """
