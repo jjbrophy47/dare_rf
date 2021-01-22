@@ -26,7 +26,6 @@ np.import_array()
 cdef inline UINT32_t DEFAULT_SEED = 1
 cdef double MAX_DBL = 1.79768e+308
 
-
 cdef inline double rand_uniform(double low,
                                 double high,
                                 UINT32_t* random_state) nogil:
@@ -35,7 +34,6 @@ cdef inline double rand_uniform(double low,
     """
     return ((high - low) * <double> our_rand_r(random_state) /
             <double> RAND_R_MAX) + low
-
 
 # rand_r replacement using a 32bit XorShift generator
 # See http://www.jstatsoft.org/v08/i14/paper for details
@@ -61,13 +59,6 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
     # or:
     # cdef np.uint32_t another_good_cast = <UINT32_t>RAND_R_MAX + 1
     return seed[0] % <UINT32_t>(RAND_R_MAX + 1)
-
-
-cdef inline INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil:
-    """
-    Generates a random integer between 0 and `upper`.
-    """
-    return <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / upper))
 
 
 cdef DTYPE_t compute_split_score(bint    use_gini,
@@ -173,56 +164,55 @@ cdef DTYPE_t compute_entropy(DTYPE_t count,
 cdef void split_samples(Node*        node,
                         DTYPE_t**    X,
                         INT32_t*     y,
-                        IntList*     samples,
+                        SIZE_t*      samples,
+                        SIZE_t       n_samples,
                         SplitRecord* split) nogil:
     """
     Split samples based on the chosen feature / threshold.
 
-    NOTE: frees `samples.arr` and `samples` object.
+    NOTE: frees samples.
     """
 
+    # counters
+    cdef SIZE_t i = 0
+    cdef SIZE_t j = 0
+    cdef SIZE_t k = 0
+
     # split samples based on the chosen feature / threshold
-    split.left_samples = create_intlist(samples.n, 0)
-    split.right_samples = create_intlist(samples.n, 0)
+    split.left_samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+    split.right_samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
 
     # loop through the deleted samples
-    for i in range(samples.n):
+    for i in range(n_samples):
 
         # add sample to the left branch
-        if X[samples.arr[i]][node.chosen_feature.index] <= node.chosen_threshold.value:
-            split.left_samples.arr[split.left_samples.n] = samples.arr[i]
-            split.left_samples.n += 1
+        if X[samples[i]][node.chosen_feature.index] <= node.chosen_threshold.value:
+            split.left_samples[j] = samples[i]
+            j += 1
 
         # add sample to the right branch
         else:
-            split.right_samples.arr[split.right_samples.n] = samples.arr[i]
-            split.right_samples.n += 1
+            split.right_samples[k] = samples[i]
+            k += 1
 
     # assign left branch deleted samples
-    if split.left_samples.n > 0:
-        split.left_samples.arr = <SIZE_t *>realloc(split.left_samples.arr,
-                                                   split.left_samples.n * sizeof(SIZE_t))
+    if j > 0:
+        split.n_left_samples = j
+        split.left_samples = <SIZE_t *>realloc(split.left_samples, j * sizeof(SIZE_t))
     else:
-        split.left_samples.n = 0
-        free_intlist(split.left_samples)
+        split.n_left_samples = 0
+        free(split.left_samples)
 
     # assign right branch deleted samples
-    if split.right_samples.n > 0:
-        split.right_samples.arr = <SIZE_t *>realloc(split.right_samples.arr,
-                                                    split.right_samples.n * sizeof(SIZE_t))
+    if k > 0:
+        split.n_right_samples = k
+        split.right_samples = <SIZE_t *>realloc(split.right_samples, k * sizeof(SIZE_t))
     else:
-        split.right_samples.n = 0
-        free_intlist(split.right_samples)
-
-    # copy constant features array for both branches
-    split.left_constant_features = create_intlist(node.constant_features.n, 1)
-    split.right_constant_features = create_intlist(node.constant_features.n, 1)
-    for i in range(node.constant_features.n):
-        split.left_constant_features[i] = node.constant_features[i]
-        split.right_constant_features[i] = node.constant_features[i]
+        split.n_right_samples = 0
+        free(split.right_samples)
 
     # clean up, no more use for the original samples array
-    free_intlist(samples)
+    free(samples)
 
 
 cdef Feature* copy_feature(Feature* feature) nogil:
@@ -259,75 +249,6 @@ cdef Threshold* copy_threshold(Threshold* threshold) nogil:
     t2.n_right_pos_samples = threshold.n_right_pos_samples
 
     return t2
-
-
-cdef Feature* create_feature(SIZE_t feature_index) nogil:
-    """
-    Allocate memory for a feature object.
-    """
-    cdef Feature* feature = <Feature *>malloc(sizeof(Feature))
-    feature.index = feature_index
-    feature.thresholds = NULL
-    feature.n_thresholds = 0
-    feature.n_min_val = 0
-    feature.n_max_val = 0
-    return feature
-
-
-cdef Threshold* create_threshold(DTYPE_t value,
-                                 SIZE_t  n_left_samples,
-                                 SIZE_t  n_right_samples) nogil:
-    """
-    Allocate memory for a threshold object.
-    """
-    cdef Threshold* threshold = <Threshold *>malloc(sizeof(Threshold))
-    threshold.value = value
-    threshold.n_left_samples = n_left_samples
-    threshold.n_right_samples = n_right_samples
-    threshold.v1 = 0
-    threshold.v2 = 0
-    threshold.n_v1_samples = 0
-    threshold.n_v1_pos_samples = 0
-    threshold.n_v2_samples = 0
-    threshold.n_v2_pos_samples = 0
-    threshold.n_left_pos_samples = 0
-    threshold.n_right_pos_samples = 0
-    return threshold
-
-
-cdef IntList* create_intlist(SIZE_t n_elem, bint initialize) nogil:
-    """
-    Allocate memory for:
-    -IntList object.
-    -IntList.arr object with size n_elem.
-    If `initialize` is True, Set IntList.n = n, IntList.n = 0.
-    """
-    cdef IntList* obj = <IntList *>malloc(sizeof(IntList))
-    obj.arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
-
-    # set n
-    if initialize:
-        obj.n = n_elem
-    else:
-        obj.n = 0
-
-    return obj
-
-cdef IntList* realloc_intlist(IntList* obj, SIZE_t n) nogil:
-    """
-    Resize allocted memory the IntList.arr.
-    """
-    obj.arr = <SIZE_t *>realloc(obj.arr, n * sizeof(SIZE_t))
-    return obj
-
-
-cdef void free_intlist(IntList* obj) nogil:
-    """
-    Deallocate IntList object.
-    """
-    free(obj.arr)
-    free(obj)
-    obj = NULL
 
 
 cdef SIZE_t* convert_int_ndarray(np.ndarray arr):
@@ -417,30 +338,31 @@ cdef void dealloc(Node *node) nogil:
 
         # clear chosen feature
         if node.chosen_feature != NULL:
-            if node.chosen_feature.thresholds != NULL:
-                for k in range(node.chosen_feature.n_thresholds):
-                    free(node.chosen_feature.thresholds[k])
-                free(node.chosen_feature.thresholds)
+            for k in range(node.chosen_feature.n_thresholds):
+                free(node.chosen_feature.thresholds[k])
             free(node.chosen_feature)
 
         # clear chosen threshold
         if node.chosen_threshold != NULL:
             free(node.chosen_threshold)
 
-        # clear constant features
-        if node.constant_features != NULL:
-            free_intlist(node.constant_features)
+        # loop through each feature
+        for j in range(node.n_features):
 
-        # clear features array
-        if node.features != NULL:
-            for j in range(node.n_features):
+            # loop through each threshold of this feature
+            for k in range(node.features[j].n_thresholds):
 
-                if node.features[j] != NULL:
-                    for k in range(node.features[j].n_thresholds):
-                        free(node.features[j].thresholds[k])
-                    free(node.features[j].thresholds)
-                    free(node.features[j])
-            free(node.features)
+                # free this threshold
+                free(node.features[j].thresholds[k])
+
+            # free threshold array
+            free(node.features[j].thresholds)
+
+            # free this feature
+            free(node.features[j])
+
+        # free feature array
+        free(node.features)
 
         # free children
         free(node.left)

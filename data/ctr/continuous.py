@@ -35,7 +35,7 @@ def get_logger(filename=''):
     return logger
 
 
-def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous'):
+def main(random_state=1, test_size=0.2, n_instances=200000000, out_dir='continuous'):
 
     # create logger
     logger = get_logger('log.txt')

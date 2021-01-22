@@ -4,7 +4,6 @@ cimport numpy as np
 from ._manager cimport _DataManager
 from ._splitter cimport SplitRecord
 from ._tree cimport Node
-from ._tree cimport IntList
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
 from ._config cimport _Config
@@ -37,34 +36,40 @@ cdef class _Remover:
 
     # C API
     cdef void _remove(self,
-                      Node*     node,
-                      DTYPE_t** X,
-                      INT32_t*  y,
-                      IntList*  remove_samples) nogil
-
-    cdef void update_node(self,
-                          Node*    node,
-                          INT32_t* y,
-                          IntList* remove_samples) nogil
-
-    cdef void update_leaf(self,
-                          Node*    node,
-                          IntList* remove_samples) nogil
-
-    cdef void convert_to_leaf(self,
-                              Node*        node,
-                              IntList*     remove_samples,
-                              SplitRecord* split) nogil
-
-    cdef void retrain(self,
                       Node**    node_ptr,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      IntList*  samples) nogil
+                      SIZE_t*   remove_samples,
+                      SIZE_t    n_remove_samples) nogil
+
+    cdef void update_node(self,
+                          Node**   node_ptr,
+                          INT32_t* y,
+                          SIZE_t*  remove_samples,
+                          SIZE_t   n_remove_samples) nogil
+
+    cdef void update_leaf(self,
+                          Node**  node_ptr,
+                          SIZE_t* remove_samples,
+                          SIZE_t  n_remove_samples) nogil
+
+    cdef void convert_to_leaf(self,
+                              Node**       node_ptr,
+                              SIZE_t*      remove_samples,
+                              SIZE_t       n_remove_samples,
+                              SplitRecord* split) nogil
+
+    cdef void retrain(self,
+                      Node***   node_pp,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples) nogil
 
     cdef void get_leaf_samples(self,
                                Node*    node,
-                               IntList* remove_samples,
+                               SIZE_t*  remove_samples,
+                               SIZE_t   n_remove_samples,
                                SIZE_t** leaf_samples_ptr,
                                SIZE_t*  leaf_samples_count_ptr) nogil
 
@@ -72,10 +77,11 @@ cdef class _Remover:
                                  Node* node) nogil
 
     cdef SIZE_t update_metadata(self,
-                                Node*     node,
+                                Node**    node_ptr,
                                 DTYPE_t** X,
                                 INT32_t*  y,
-                                IntList*  remove_samples) nogil
+                                SIZE_t*   samples,
+                                SIZE_t    n_samples) nogil
 
     # metric methods
     cdef void add_metric(self,

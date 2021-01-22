@@ -175,7 +175,7 @@ def performance(args, out_dir, logger):
 
     # add additional parameter for DART
     if args.model == 'dart':
-        param_grid['k'] = [1, 10, 100]
+        param_grid['k'] = [5, 10, 25, 50]
 
     # get hyperparameter names
     keys = list(param_grid.keys())

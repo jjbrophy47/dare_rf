@@ -90,9 +90,10 @@ cdef class _DataManager:
             free(self.vacant)
 
     cdef INT32_t check_remove_samples_validity(self,
-                                               IntList* remove_samples) nogil:
+                                               SIZE_t* remove_samples,
+                                               SIZE_t  n_remove_samples) nogil:
         """
-        Checks to make sure `remove_samples` are in the database.
+        Checks to make sure `samples` are in the database.
         Returns -1 if a sample is not available; 0 otherwise.
         """
         cdef SIZE_t *vacant = self.vacant
@@ -102,16 +103,16 @@ cdef class _DataManager:
         cdef SIZE_t i
         cdef SIZE_t j
 
-        for i in range(remove_samples.n):
+        for i in range(n_remove_samples):
 
             # check if index number is valid
-            if remove_samples.arr[i] < 0:
+            if remove_samples[i] < 0:
                 result = -1
 
             for j in range(n_vacant):
 
                 # check if sample has already been deleted
-                if remove_samples.arr[i] == vacant[j]:
+                if remove_samples[i] == vacant[j]:
                     result = -1
                     break
 

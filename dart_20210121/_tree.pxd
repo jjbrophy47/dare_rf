@@ -11,84 +11,54 @@ from ._utils cimport INT32_t
 from ._utils cimport UINT32_t
 
 """
-Struct that can be three different types of nodes.
-
-
-Greedy node:
--Maximizes a split criterion.
-
-Random node:
--Extremely Randomized Node (k=1): https://link.springer.com/article/10.1007/s10994-006-6226-1
-
-Leaf node:
--Stores average label values for prediction.
+Struct that holds high-level information about each node in the tree.
 """
 cdef struct Node:
 
-    # Mandatory node properties
-    SIZE_t   n_samples                 # Number of samples in the node
-    SIZE_t   n_pos_samples             # Number of pos. samples in the node
-    SIZE_t   depth                     # Depth of node
-    bint     is_left                   # Whether this node is a left child
-    Node*    left                      # Left child node
-    Node*    right                     # Right child node
-
-    # Greedy node properties
-    Feature**  features                # Array of valid feature pointers
-    SIZE_t     n_features              # Number of valid feature pointers
-
-    # Greedy / Random node properties
-    IntList*   constant_features       # Array of constant feature indices
-    Feature*   chosen_feature          # Chosen feature, if decision node
-    Threshold* chosen_threshold        # Chosen threshold, if decision node
-
-    # Leaf-specific properties
+    # Leaf information
     bint     is_leaf                   # Whether this node is a leaf
     DTYPE_t  value                     # Value, if leaf node
     SIZE_t*  leaf_samples              # Array of sample indices if leaf
+
+    # Decision node information
+    Feature**  features                # Array of valid feature pointers
+    SIZE_t     n_features              # Number of features in the array
+    Feature*   chosen_feature          # Chosen feature, if decision node
+    Threshold* chosen_threshold        # Chosen threshold, if decision node
+
+    # Structure variables
+    Node*    left                      # Left child node
+    Node*    right                     # Right child node
+
+    # Extra information
+    SIZE_t   n_samples                 # Number of samples in the node
+    SIZE_t   n_pos_samples             # Number of pos samples in the node
+    SIZE_t   depth                     # Depth of node
+    bint     is_left                   # Whether this node is a left child
 
 """
 Struct to hold feature information: index ID, candidate split array, etc.
 """
 cdef struct Feature:
-
-    # Greedy / Random node properties
     SIZE_t      index                 # Feature index pertaining to the original database
-
-    # Greedy node properties
     Threshold** thresholds            # Array of candidate threshold pointers
     SIZE_t      n_thresholds          # Number of candidate thresholds for this feature
-
-    # Random node properties
-    SIZE_t      n_min_val             # Number of minimum value samples
-    SIZE_t      n_max_val             # Number of maximum value samples
 
 """
 Struct to hold metadata pertaining to a particular feature threshold.
 """
 cdef struct Threshold:
-
-    # Greedy / Random node properties
-    DTYPE_t    value                 # Greedy node: midpoint of v1 and v2, Random node: value
-    SIZE_t     n_left_samples        # Number of samples for the left branch
-    SIZE_t     n_right_samples       # Number of samples for the right branch
-
-    # Greedy node properties
+    DTYPE_t    value                 # Midway point between two adjacent feature values
     DTYPE_t    v1                    # Lower value of adjacent values
     DTYPE_t    v2                    # Upper value of adjacent values
     SIZE_t     n_v1_samples          # Number of samples for value 1
     SIZE_t     n_v1_pos_samples      # Number of positive samples for value 1
     SIZE_t     n_v2_samples          # Number of samples for value 2
     SIZE_t     n_v2_pos_samples      # Number of positive samples for value 2
+    SIZE_t     n_left_samples        # Number of samples for the left branch
     SIZE_t     n_left_pos_samples    # Number of positive samples for the left branch
+    SIZE_t     n_right_samples       # Number of samples for the right branch
     SIZE_t     n_right_pos_samples   # Number of positive samples for the right branch
-
-"""
-Structure to hold an SIZE_t pointer and the no. elements.
-"""
-cdef struct IntList:
-    SIZE_t* arr
-    SIZE_t  n
 
 cdef class _Tree:
     """
@@ -140,18 +110,18 @@ cdef class _TreeBuilder:
     cdef Node* _build(self,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      IntList*  samples,
-                      IntList*  constant_features,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples,
                       SIZE_t    depth,
                       bint      is_left) nogil
 
-    cdef void set_leaf_node(self,
-                            Node*   node,
-                            IntList* samples) nogil
+    cdef void  _set_leaf_node(self,
+                              Node**  node_ptr,
+                              SIZE_t* samples) nogil
 
-    cdef Node* initialize_node(self,
-                               SIZE_t   depth,
-                               bint     is_left,
-                               INT32_t* y,
-                               IntList* samples,
-                               IntList* constant_features) nogil
+    cdef Node* _initialize_node(self,
+                                SIZE_t   depth,
+                                bint     is_left,
+                                INT32_t* y,
+                                SIZE_t*  samples,
+                                SIZE_t   n_samples) nogil

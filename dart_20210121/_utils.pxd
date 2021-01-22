@@ -9,7 +9,6 @@ ctypedef np.npy_uint32  UINT32_t         # Unsigned 32 bit integer
 from ._tree cimport Node
 from ._tree cimport Threshold
 from ._tree cimport Feature
-from ._tree cimport IntList
 from ._splitter cimport SplitRecord
 
 cdef enum:
@@ -19,16 +18,14 @@ cdef enum:
     RAND_R_MAX = 0x7FFFFFFF
 
 
-# sampling methods
+# random utility methods
 cdef UINT32_t our_rand_r(UINT32_t* seed) nogil
 
 cdef double rand_uniform(double    low,
                          double    high,
                          UINT32_t* random_state) nogil
 
-cdef INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil
-
-# split score methods
+# split score utility methods
 cdef DTYPE_t compute_split_score(bint    use_gini,
                                  DTYPE_t count,
                                  DTYPE_t left_count,
@@ -48,33 +45,28 @@ cdef DTYPE_t compute_entropy(DTYPE_t count,
                              SIZE_t  left_pos_count,
                              SIZE_t  right_pos_count) nogil
 
-# Feature / threshold methodss
-cdef Feature* copy_feature(Feature* feature) nogil
-cdef Threshold* copy_threshold(Threshold* threshold) nogil
-cdef Feature* create_feature(SIZE_t feature_index) nogil
-cdef Threshold* create_threshold(DTYPE_t value,
-                                 SIZE_t n_left_samples,
-                                 SIZE_t n_right_samples) nogil
-cdef void dealloc_features(Feature** features,
-                           SIZE_t n_features) nogil
-
-# IntList methods
-cdef IntList* create_intlist(SIZE_t n_elem, bint initialize) nogil
-cdef IntList* realloc_intlist(IntList* obj, SIZE_t n) nogil
-cdef void free_intlist(IntList* obj) nogil
-
-# helper methods
-cdef SIZE_t* convert_int_ndarray(np.ndarray arr)
-cdef INT32_t* copy_int_array(INT32_t* arr,
-                             SIZE_t n_elem) nogil
-cdef SIZE_t* copy_indices(SIZE_t* arr,
-                          SIZE_t n_elem) nogil
-
-# node methods
+# remover utility methods
 cdef void split_samples(Node*        node,
                         DTYPE_t**    X,
                         INT32_t*     y,
-                        IntList*     samples,
+                        SIZE_t*      samples,
+                        SIZE_t       n_samples,
                         SplitRecord* split) nogil
+
+cdef Feature* copy_feature(Feature* feature) nogil
+
+cdef Threshold* copy_threshold(Threshold* threshold) nogil
+
+# helper methods
+cdef SIZE_t* convert_int_ndarray(np.ndarray arr)
+
+cdef INT32_t* copy_int_array(INT32_t* arr,
+                             SIZE_t n_elem) nogil
+
+cdef SIZE_t* copy_indices(SIZE_t* arr,
+                          SIZE_t n_elem) nogil
+
+cdef void dealloc_features(Feature** features,
+                           SIZE_t n_features) nogil
 
 cdef void dealloc(Node *node) nogil

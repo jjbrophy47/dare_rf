@@ -19,9 +19,6 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
-from ._utils cimport split_samples
-from ._utils cimport create_intlist
-from ._utils cimport free_intlist
 from ._utils cimport dealloc
 
 # constants
@@ -56,37 +53,38 @@ cdef class _TreeBuilder:
         cdef INT32_t*  y = NULL
         self.manager.get_data(&X, &y)
 
-        # create list of sample indices
-        cdef IntList* samples = create_intlist(self.manager.n_samples, 1)
-        for i in range(samples.n):
-            samples.arr[i] = i
+        cdef SIZE_t* samples
+        cdef SIZE_t  n_samples = self.manager.n_samples
 
-        # initialize container for constant features
-        cdef IntList* constant_features = create_intlist(self.manager.n_features, 0)
+        # fill in samples
+        samples = <SIZE_t *>malloc(n_samples * sizeof(SIZE_t))
+        for i in range(n_samples):
+            samples[i] = i
 
-        tree.root = self._build(X, y, samples, constant_features, 0, 0)
+        tree.root = self._build(X, y, samples, n_samples, 0, 0)
 
     cdef Node* _build(self,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      IntList*  samples,
-                      IntList*  constant_features,
+                      SIZE_t*   samples,
+                      SIZE_t    n_samples,
                       SIZE_t    depth,
                       bint      is_left) nogil:
         """
         Build a subtree given a partition of samples.
         """
+        cdef Node *node = self._initialize_node(depth, is_left, y, samples, n_samples)
 
-        # create node
-        cdef Node *node = self.initialize_node(depth, is_left, y, samples, constant_features)
-
-        # data variables
-        cdef SIZE_t n_total_features = self.manager.n_features
+        # class parameters
+        cdef SIZE_t    topd = self.config.topd
+        cdef SIZE_t    n_total_features = self.manager.n_features
+        cdef SIZE_t    n_max_features = self.config.max_features
+        cdef UINT32_t* random_state = &self.config.rand_r_state
 
         # boolean variables
         cdef bint is_bottom_leaf = (depth >= self.config.max_depth)
-        cdef bint is_middle_leaf = (samples.n < self.config.min_samples_split or
-                                    samples.n < 2 * self.config.min_samples_leaf or
+        cdef bint is_middle_leaf = (n_samples < self.config.min_samples_split or
+                                    n_samples < 2 * self.config.min_samples_leaf or
                                     node.n_pos_samples == 0 or
                                     node.n_pos_samples == node.n_samples)
 
@@ -98,53 +96,65 @@ cdef class _TreeBuilder:
 
         # leaf node
         if is_bottom_leaf or is_middle_leaf:
-            self.set_leaf_node(node, samples)
+            self._set_leaf_node(&node, samples)
             # printf('[B] leaf.value: %.2f\n', node.value)
 
         # leaf or decision node
         else:
 
-            # select a threshold to to split the samples
-            n_usable_thresholds = self.splitter.select_threshold(node, X, y, samples, n_total_features)
+            # randomly select a subset of features to use at this node
+            self.splitter.select_features(&node, n_total_features, n_max_features, random_state)
+            # printf('[B] no. features: %ld\n', node.n_features)
+
+            # identify and compute metadata for all thresholds for each feature
+            n_usable_thresholds = self.splitter.compute_metadata(&node, X, y, samples, n_samples, random_state)
+            # printf('[B] computed metadata\n')
 
             # no usable thresholds, create leaf
+            # printf('[B] n_usable_thresholds: %ld\n', n_usable_thresholds)
             if n_usable_thresholds == 0:
                 dealloc(node)  # free allocated memory
-                self.set_leaf_node(node, samples)
+                self._set_leaf_node(&node, samples)
                 # printf('[B] leaf.value: %.2f\n', node.value)
 
             # decision node
             else:
-                split_samples(node, X, y, samples, &split)
+                # printf('[B] decision node\n')
+
+                # choose a feature / threshold and partition the data
+                self.splitter.split_node(&node, X, y, samples, n_samples, topd, random_state, &split)
                 # printf('[B] depth: %ld, chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
                 #       node.depth, node.chosen_feature.index, node.chosen_threshold.value)
 
                 # traverse to left and right branches
-                node.left = self._build(X, y, split.left_samples, split.left_constant_features, depth + 1, 1)
-                node.right = self._build(X, y, split.right_samples, split.right_constant_features, depth + 1, 0)
+                node.left = self._build(X, y, split.left_samples, split.n_left_samples, depth + 1, 1)
+                node.right = self._build(X, y, split.right_samples, split.n_right_samples, depth + 1, 0)
 
         return node
 
-    cdef void set_leaf_node(self,
-                            Node*    node,
-                            IntList* samples) nogil:
+    cdef void _set_leaf_node(self,
+                             Node**  node_ptr,
+                             SIZE_t* samples) nogil:
         """
         Compute leaf value and set all other attributes.
         """
+        cdef Node *node = node_ptr[0]
 
-        # set leaf node properties
+        # cdef SIZE_t i = 0
+        # for i in range(node.n_samples):
+        #     printf('[B - SLN] samples[%ld]: %ld\n', i, samples[i])
+
+        # set leaf node variables
         node.is_leaf = 1
-        node.leaf_samples = samples.arr
-        node.value = node.n_pos_samples / <double> node.n_samples
+        node.leaf_samples = samples
+        if node.n_samples > 0:
+            node.value = node.n_pos_samples / <double> node.n_samples
+        else:
+            node.value = UNDEF_LEAF_VAL
 
-        # set greedy node properties
+        # clear decision node variables
         node.features = NULL
-        node.n_features = 0
-
-        # set greedy / random node properties
-        if node.constant_features != NULL:
-            free_intlist(node.constant_features)
-        node.constant_features = NULL
+        node.n_features = UNDEF
         node.chosen_feature = NULL
         node.chosen_threshold = NULL
 
@@ -152,48 +162,36 @@ cdef class _TreeBuilder:
         node.left = NULL
         node.right = NULL
 
-        # clean up
-        free(samples)
-
-    cdef Node* initialize_node(self,
-                               SIZE_t   depth,
-                               bint     is_left,
-                               INT32_t* y,
-                               IntList* samples,
-                               IntList* constant_features) nogil:
+    cdef Node* _initialize_node(self,
+                                SIZE_t   depth,
+                                bint     is_left,
+                                INT32_t* y,
+                                SIZE_t*  samples,
+                                SIZE_t   n_samples) nogil:
         """
         Create and initialize a new node.
         """
-
         # compute number of positive samples
         cdef SIZE_t n_pos_samples = 0
-        for i in range(samples.n):
-            n_pos_samples += y[samples.arr[i]]
+        for i in range(n_samples):
+            n_pos_samples += y[samples[i]]
 
-        # create node
         cdef Node *node = <Node *>malloc(sizeof(Node))
-
-        # initialize mandatory properties
-        node.n_samples = samples.n
-        node.n_pos_samples = n_pos_samples
         node.depth = depth
         node.is_left = is_left
+        node.n_samples = n_samples
+        node.n_pos_samples = n_pos_samples
         node.left = NULL
         node.right = NULL
 
-        # initialize greedy node properties
-        node.features = NULL
-        node.n_features = 0
-
-        # initialize greedy / random node properties
-        node.constant_features = constant_features
-        node.chosen_feature = NULL
-        node.chosen_threshold = NULL
-
-        # initialize leaf-specific properties
         node.is_leaf = False
         node.value = UNDEF_LEAF_VAL
         node.leaf_samples = NULL
+
+        node.features = NULL
+        node.n_features = 0
+        node.chosen_feature = NULL
+        node.chosen_threshold = NULL
 
         return node
 

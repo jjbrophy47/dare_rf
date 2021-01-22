@@ -1,7 +1,6 @@
 import numpy as np
 cimport numpy as np
 
-from ._tree cimport IntList
 from ._utils cimport DTYPE_t
 from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
@@ -28,7 +27,9 @@ cdef class _DataManager:
     # cpdef void clear_add_indices(self)
 
     # C API
-    cdef INT32_t check_remove_samples_validity(self, IntList* remove_samples) nogil
+    cdef INT32_t check_remove_samples_validity(self,
+                                               SIZE_t* remove_samples,
+                                               SIZE_t  n_remove_samples) nogil
     cdef INT32_t check_single_remove_sample_validity(self, SIZE_t remove_index) nogil
     cdef void get_data(self, DTYPE_t*** X_ptr, INT32_t** y_ptr) nogil
     # cdef SIZE_t* get_add_indices(self) nogil
