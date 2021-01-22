@@ -24,10 +24,6 @@ from ._utils cimport create_intlist
 from ._utils cimport free_intlist
 from ._utils cimport dealloc
 
-# constants
-cdef INT32_t UNDEF = -1
-cdef DTYPE_t UNDEF_LEAF_VAL = 0.5
-
 # =====================================
 # TreeBuilder
 # =====================================
@@ -94,7 +90,7 @@ cdef class _TreeBuilder:
         cdef SplitRecord split
         cdef SIZE_t      n_usable_thresholds = 0
 
-        # printf('\n[B] n_samples: %ld, depth: %ld, is_left: %d\n', n_samples, depth, is_left)
+        # printf('\n[B] samples.n: %ld, depth: %ld, is_left: %d\n', samples.n, depth, is_left)
 
         # leaf node
         if is_bottom_leaf or is_middle_leaf:
@@ -109,6 +105,7 @@ cdef class _TreeBuilder:
 
             # no usable thresholds, create leaf
             if n_usable_thresholds == 0:
+                # printf('no usable thresholds\n')
                 dealloc(node)  # free allocated memory
                 self.set_leaf_node(node, samples)
                 # printf('[B] leaf.value: %.2f\n', node.value)
@@ -133,7 +130,7 @@ cdef class _TreeBuilder:
         """
 
         # set leaf node properties
-        node.is_leaf = 1
+        node.is_leaf = True
         node.leaf_samples = samples.arr
         node.value = node.n_pos_samples / <double> node.n_samples
 
@@ -152,7 +149,7 @@ cdef class _TreeBuilder:
         node.left = NULL
         node.right = NULL
 
-        # clean up
+        # free container but not contents
         free(samples)
 
     cdef Node* initialize_node(self,

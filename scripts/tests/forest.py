@@ -55,14 +55,15 @@ def main(args):
     X_train, X_test, y_train, y_test = load_data(args.dataset, args.data_dir)
 
     # train
+    topd = 20
     k = 100
-    n_estimators = 10
+    n_estimators = 100
     max_depth = 20
     seed = 1
     n_delete = 100
 
     if args.model == 'dart':
-        model = dart.Forest(topd=0, k=k, n_estimators=n_estimators,
+        model = dart.Forest(topd=topd, k=k, n_estimators=n_estimators,
                             max_depth=max_depth, random_state=seed)
 
     elif args.model == 'sklearn':
@@ -72,7 +73,6 @@ def main(args):
     start = time.time()
     model = model.fit(X_train, y_train)
     train_time = time.time() - start
-
     print('train time: {:.3f}s'.format(train_time))
 
     # predict

@@ -10,6 +10,10 @@ from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
 from ._utils cimport UINT32_t
 
+# constants
+cdef INT32_t UNDEF = -1
+cdef DTYPE_t UNDEF_LEAF_VAL = 0.5
+
 """
 Struct that can be three different types of nodes.
 

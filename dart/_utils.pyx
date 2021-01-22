@@ -22,20 +22,14 @@ import numpy as np
 cimport numpy as np
 np.import_array()
 
+from ._tree cimport UNDEF
+from ._tree cimport UNDEF_LEAF_VAL
+
 # constants
 cdef inline UINT32_t DEFAULT_SEED = 1
 cdef double MAX_DBL = 1.79768e+308
 
-
-cdef inline double rand_uniform(double low,
-                                double high,
-                                UINT32_t* random_state) nogil:
-    """
-    Generate a random double in [low; high).
-    """
-    return ((high - low) * <double> our_rand_r(random_state) /
-            <double> RAND_R_MAX) + low
-
+# SAMPLING METHODS
 
 # rand_r replacement using a 32bit XorShift generator
 # See http://www.jstatsoft.org/v08/i14/paper for details
@@ -63,12 +57,23 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
     return seed[0] % <UINT32_t>(RAND_R_MAX + 1)
 
 
+cdef inline double rand_uniform(double low,
+                                double high,
+                                UINT32_t* random_state) nogil:
+    """
+    Generate a random double in [low; high).
+    """
+    return ((high - low) * <double> our_rand_r(random_state) /
+            <double> RAND_R_MAX) + low
+
+
 cdef inline INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil:
     """
     Generates a random integer between 0 and `upper`.
     """
     return <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / upper))
 
+# SCORING METHODS
 
 cdef DTYPE_t compute_split_score(bint    use_gini,
                                  DTYPE_t count,
@@ -170,6 +175,202 @@ cdef DTYPE_t compute_entropy(DTYPE_t count,
     return left_weighted_entropy + right_weighted_entropy
 
 
+# FEATURE / THRESHOLD METHODS
+
+
+cdef Feature* create_feature(SIZE_t feature_index) nogil:
+    """
+    Allocate memory for a feature object.
+    """
+    cdef Feature* feature = <Feature *>malloc(sizeof(Feature))
+    feature.index = feature_index
+    feature.thresholds = NULL
+    feature.n_thresholds = 0
+    feature.n_min_val = 0
+    feature.n_max_val = 0
+    return feature
+
+
+cdef Threshold* create_threshold(DTYPE_t value,
+                                 SIZE_t  n_left_samples,
+                                 SIZE_t  n_right_samples) nogil:
+    """
+    Allocate memory for a threshold object.
+    """
+    cdef Threshold* threshold = <Threshold *>malloc(sizeof(Threshold))
+    threshold.value = value
+    threshold.n_left_samples = n_left_samples
+    threshold.n_right_samples = n_right_samples
+    threshold.v1 = 0
+    threshold.v2 = 0
+    threshold.n_v1_samples = 0
+    threshold.n_v1_pos_samples = 0
+    threshold.n_v2_samples = 0
+    threshold.n_v2_pos_samples = 0
+    threshold.n_left_pos_samples = 0
+    threshold.n_right_pos_samples = 0
+    return threshold
+
+
+cdef Feature* copy_feature(Feature* feature) nogil:
+    """
+    Copies the contents of a feature to a new feature.
+    """
+    cdef Feature* f2 = <Feature *>malloc(sizeof(Feature))
+
+    f2.index = feature.index
+    f2.n_thresholds = feature.n_thresholds
+    f2.thresholds = <Threshold **>malloc(feature.n_thresholds * sizeof(Threshold *))
+    for k in range(feature.n_thresholds):
+        f2.thresholds[k] = copy_threshold(feature.thresholds[k])
+
+    return f2
+
+
+cdef Threshold* copy_threshold(Threshold* threshold) nogil:
+    """
+    Copies the contents of a threshold to a new threshold.
+    """
+    cdef Threshold* t2 = <Threshold *>malloc(sizeof(Threshold))
+
+    t2.v1 = threshold.v1
+    t2.v2 = threshold.v2
+    t2.value = threshold.value
+    t2.n_v1_samples = threshold.n_v1_samples
+    t2.n_v1_pos_samples = threshold.n_v1_pos_samples
+    t2.n_v2_samples = threshold.n_v2_samples
+    t2.n_v2_pos_samples = threshold.n_v2_pos_samples
+    t2.n_left_samples = threshold.n_left_samples
+    t2.n_left_pos_samples = threshold.n_left_pos_samples
+    t2.n_right_samples = threshold.n_right_samples
+    t2.n_right_pos_samples = threshold.n_right_pos_samples
+
+    return t2
+
+
+cdef void dealloc_features(Feature** features,
+                           SIZE_t n_features) nogil:
+    """
+    Deallocate a features array and all thresholds.
+    """
+    # object pointers
+    cdef Feature* feature = NULL
+
+    # loop through each feature in this array
+    for j in range(n_features):
+        feature = features[j]
+
+        # loop through each threshold for this feature
+        for k in range(feature.n_thresholds):
+
+            # free threshold
+            free(feature.thresholds[k])
+
+        # free thresholds array
+        free(feature.thresholds)
+
+        # free feature
+        free(feature)
+
+    # free features array
+    free(features)
+
+
+# INTLIST METHODS
+
+
+cdef IntList* create_intlist(SIZE_t n_elem, bint initialize) nogil:
+    """
+    Allocate memory for:
+    -IntList object.
+    -IntList.arr object with size n_elem.
+    If `initialize` is True, Set IntList.n = n, IntList.n = 0.
+    """
+    cdef IntList* obj = <IntList *>malloc(sizeof(IntList))
+    obj.arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
+
+    # set n
+    if initialize:
+        obj.n = n_elem
+    else:
+        obj.n = 0
+
+    return obj
+
+
+cdef IntList* copy_intlist(IntList* obj, SIZE_t n_elem) nogil:
+    """
+    -Creates a new IntList object.
+    -Allocates the `arr` with size `n_elem`.
+    -Copies values from `obj.arr` up to `obj.n`.
+    -`n` is set to `obj.n`.
+
+    NOTE: n_elem >= obj.n.
+    """
+    cdef IntList* new_obj = create_intlist(n_elem, 0)
+
+    # copy array values
+    for i in range(obj.n):
+        new_obj.arr[i] = obj.arr[i]
+
+    # set n
+    new_obj.n = obj.n
+
+    return new_obj
+
+
+cdef void free_intlist(IntList* obj) nogil:
+    """
+    Deallocate IntList object.
+    """
+    free(obj.arr)
+    free(obj)
+    obj = NULL
+
+
+# ARRAY METHODS
+
+
+cdef SIZE_t* convert_int_ndarray(np.ndarray arr):
+    """
+    Converts a numpy array into a C int array.
+    """
+    cdef SIZE_t  n_elem = arr.shape[0]
+    cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
+
+cdef INT32_t* copy_int_array(INT32_t* arr, SIZE_t n_elem) nogil:
+    """
+    Copies a C int array into a new C int array.
+    """
+    cdef INT32_t* new_arr = <INT32_t *>malloc(n_elem * sizeof(INT32_t))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
+
+cdef SIZE_t* copy_indices(SIZE_t* arr, SIZE_t n_elem) nogil:
+    """
+    Copies a C int array into a new C int array.
+    """
+    cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
+
+    for i in range(n_elem):
+        new_arr[i] = arr[i]
+
+    return new_arr
+
+
+# NODE METHODS
+
+
 cdef void split_samples(Node*        node,
                         DTYPE_t**    X,
                         INT32_t*     y,
@@ -215,183 +416,12 @@ cdef void split_samples(Node*        node,
         free_intlist(split.right_samples)
 
     # copy constant features array for both branches
-    split.left_constant_features = create_intlist(node.constant_features.n, 1)
-    split.right_constant_features = create_intlist(node.constant_features.n, 1)
-    for i in range(node.constant_features.n):
-        split.left_constant_features[i] = node.constant_features[i]
-        split.right_constant_features[i] = node.constant_features[i]
+    # printf('node.constant_features.n: %ld\n', node.constant_features.n)
+    split.left_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
+    split.right_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
 
     # clean up, no more use for the original samples array
     free_intlist(samples)
-
-
-cdef Feature* copy_feature(Feature* feature) nogil:
-    """
-    Copies the contents of a feature to a new feature.
-    """
-    cdef Feature* f2 = <Feature *>malloc(sizeof(Feature))
-
-    f2.index = feature.index
-    f2.n_thresholds = feature.n_thresholds
-    f2.thresholds = <Threshold **>malloc(feature.n_thresholds * sizeof(Threshold *))
-    for k in range(feature.n_thresholds):
-        f2.thresholds[k] = copy_threshold(feature.thresholds[k])
-
-    return f2
-
-
-cdef Threshold* copy_threshold(Threshold* threshold) nogil:
-    """
-    Copies the contents of a threshold to a new threshold.
-    """
-    cdef Threshold* t2 = <Threshold *>malloc(sizeof(Threshold))
-
-    t2.v1 = threshold.v1
-    t2.v2 = threshold.v2
-    t2.value = threshold.value
-    t2.n_v1_samples = threshold.n_v1_samples
-    t2.n_v1_pos_samples = threshold.n_v1_pos_samples
-    t2.n_v2_samples = threshold.n_v2_samples
-    t2.n_v2_pos_samples = threshold.n_v2_pos_samples
-    t2.n_left_samples = threshold.n_left_samples
-    t2.n_left_pos_samples = threshold.n_left_pos_samples
-    t2.n_right_samples = threshold.n_right_samples
-    t2.n_right_pos_samples = threshold.n_right_pos_samples
-
-    return t2
-
-
-cdef Feature* create_feature(SIZE_t feature_index) nogil:
-    """
-    Allocate memory for a feature object.
-    """
-    cdef Feature* feature = <Feature *>malloc(sizeof(Feature))
-    feature.index = feature_index
-    feature.thresholds = NULL
-    feature.n_thresholds = 0
-    feature.n_min_val = 0
-    feature.n_max_val = 0
-    return feature
-
-
-cdef Threshold* create_threshold(DTYPE_t value,
-                                 SIZE_t  n_left_samples,
-                                 SIZE_t  n_right_samples) nogil:
-    """
-    Allocate memory for a threshold object.
-    """
-    cdef Threshold* threshold = <Threshold *>malloc(sizeof(Threshold))
-    threshold.value = value
-    threshold.n_left_samples = n_left_samples
-    threshold.n_right_samples = n_right_samples
-    threshold.v1 = 0
-    threshold.v2 = 0
-    threshold.n_v1_samples = 0
-    threshold.n_v1_pos_samples = 0
-    threshold.n_v2_samples = 0
-    threshold.n_v2_pos_samples = 0
-    threshold.n_left_pos_samples = 0
-    threshold.n_right_pos_samples = 0
-    return threshold
-
-
-cdef IntList* create_intlist(SIZE_t n_elem, bint initialize) nogil:
-    """
-    Allocate memory for:
-    -IntList object.
-    -IntList.arr object with size n_elem.
-    If `initialize` is True, Set IntList.n = n, IntList.n = 0.
-    """
-    cdef IntList* obj = <IntList *>malloc(sizeof(IntList))
-    obj.arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
-
-    # set n
-    if initialize:
-        obj.n = n_elem
-    else:
-        obj.n = 0
-
-    return obj
-
-cdef IntList* realloc_intlist(IntList* obj, SIZE_t n) nogil:
-    """
-    Resize allocted memory the IntList.arr.
-    """
-    obj.arr = <SIZE_t *>realloc(obj.arr, n * sizeof(SIZE_t))
-    return obj
-
-
-cdef void free_intlist(IntList* obj) nogil:
-    """
-    Deallocate IntList object.
-    """
-    free(obj.arr)
-    free(obj)
-    obj = NULL
-
-
-cdef SIZE_t* convert_int_ndarray(np.ndarray arr):
-    """
-    Converts a numpy array into a C int array.
-    """
-    cdef SIZE_t  n_elem = arr.shape[0]
-    cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
-
-    for i in range(n_elem):
-        new_arr[i] = arr[i]
-
-    return new_arr
-
-
-cdef INT32_t* copy_int_array(INT32_t* arr, SIZE_t n_elem) nogil:
-    """
-    Copies a C int array into a new C int array.
-    """
-    cdef INT32_t* new_arr = <INT32_t *>malloc(n_elem * sizeof(INT32_t))
-
-    for i in range(n_elem):
-        new_arr[i] = arr[i]
-
-    return new_arr
-
-
-cdef SIZE_t* copy_indices(SIZE_t* arr, SIZE_t n_elem) nogil:
-    """
-    Copies a C int array into a new C int array.
-    """
-    cdef SIZE_t* new_arr = <SIZE_t *>malloc(n_elem * sizeof(SIZE_t))
-
-    for i in range(n_elem):
-        new_arr[i] = arr[i]
-
-    return new_arr
-
-cdef void dealloc_features(Feature** features,
-                           SIZE_t n_features) nogil:
-    """
-    Deallocate a features array and all thresholds.
-    """
-    # object pointers
-    cdef Feature* feature = NULL
-
-    # loop through each feature in this array
-    for j in range(n_features):
-        feature = features[j]
-
-        # loop through each threshold for this feature
-        for k in range(feature.n_thresholds):
-
-            # free threshold
-            free(feature.thresholds[k])
-
-        # free thresholds array
-        free(feature.thresholds)
-
-        # free feature
-        free(feature)
-
-    # free features array
-    free(features)
 
 
 cdef void dealloc(Node *node) nogil:
@@ -445,3 +475,19 @@ cdef void dealloc(Node *node) nogil:
         # free children
         free(node.left)
         free(node.right)
+
+    # reset general node properties
+    node.left = NULL
+    node.right = NULL
+
+    # reset leaf properties
+    node.is_leaf = False
+    node.value = UNDEF_LEAF_VAL
+    node.leaf_samples = NULL
+
+    # reset decision node properties
+    node.features = NULL
+    node.n_features = 0
+    node.constant_features = NULL
+    node.chosen_feature = NULL
+    node.chosen_threshold = NULL

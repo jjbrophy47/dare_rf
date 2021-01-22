@@ -49,21 +49,21 @@ cdef DTYPE_t compute_entropy(DTYPE_t count,
                              SIZE_t  right_pos_count) nogil
 
 # Feature / threshold methodss
-cdef Feature* copy_feature(Feature* feature) nogil
-cdef Threshold* copy_threshold(Threshold* threshold) nogil
 cdef Feature* create_feature(SIZE_t feature_index) nogil
 cdef Threshold* create_threshold(DTYPE_t value,
                                  SIZE_t n_left_samples,
                                  SIZE_t n_right_samples) nogil
+cdef Feature* copy_feature(Feature* feature) nogil
+cdef Threshold* copy_threshold(Threshold* threshold) nogil
 cdef void dealloc_features(Feature** features,
                            SIZE_t n_features) nogil
 
 # IntList methods
 cdef IntList* create_intlist(SIZE_t n_elem, bint initialize) nogil
-cdef IntList* realloc_intlist(IntList* obj, SIZE_t n) nogil
+cdef IntList* copy_intlist(IntList* obj, SIZE_t n_elem) nogil
 cdef void free_intlist(IntList* obj) nogil
 
-# helper methods
+# Array methods
 cdef SIZE_t* convert_int_ndarray(np.ndarray arr)
 cdef INT32_t* copy_int_array(INT32_t* arr,
                              SIZE_t n_elem) nogil

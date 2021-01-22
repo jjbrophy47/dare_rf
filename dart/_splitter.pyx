@@ -23,13 +23,12 @@ from ._utils cimport create_intlist
 from ._utils cimport create_feature
 from ._utils cimport create_threshold
 from ._utils cimport free_intlist
-from ._utils cimport realloc_intlist
+from ._utils cimport copy_intlist
 from ._utils cimport copy_feature
 from ._utils cimport copy_threshold
 from ._argsort cimport sort
 
-# constants
-cdef double UNDEF_LEAF_VAL = 0.5
+# cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
 cdef double FEATURE_THRESHOLD = 1e-7
 
 cdef class _Splitter:
@@ -141,7 +140,7 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
     features = <Feature **>malloc(max_features * sizeof(Feature *))
 
     # variables to keep track of constant and sampled features
-    constant_features = realloc_intlist(node.constant_features, n_total_features)
+    constant_features = copy_intlist(node.constant_features, n_total_features)
     sampled_features = create_intlist(n_total_features, 0)
 
     # sample features until `max_features` is reached or there are no features left
@@ -255,16 +254,20 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         # free sampled indices array
         free_intlist(sampled_indices)
 
+    # free previous constant features array
+    free_intlist(node.constant_features)
+
     # set node properties
     if n_usable_thresholds > 0:
         node.features = <Feature **>realloc(features, n_features * sizeof(Feature *))
         node.n_features = n_features
-        node.constant_features = realloc_intlist(constant_features, constant_features.n)
+        node.constant_features = copy_intlist(constant_features, constant_features.n)
         node.chosen_feature = copy_feature(chosen_feature)
         node.chosen_threshold = copy_threshold(chosen_threshold)
 
     # free features array
     else:
+        node.constant_features = copy_intlist(constant_features, constant_features.n)
         free(features)
 
     # clean up
@@ -303,7 +306,7 @@ cdef SIZE_t select_random_threshold(Node*     node,
     cdef SIZE_t  n_max_val = 0
 
     # arrays to keep track of invalid features
-    cdef IntList* constant_features = realloc_intlist(node.constant_features, n_total_features)
+    cdef IntList* constant_features = copy_intlist(node.constant_features, n_total_features)
     cdef IntList* sampled_features = create_intlist(n_total_features, 0)
 
     # feature / threshold information
@@ -397,10 +400,13 @@ cdef SIZE_t select_random_threshold(Node*     node,
             # create threshold object
             threshold = create_threshold(threshold_value, n_left_samples, n_right_samples)
 
+            # free previous constant thresholds array
+            free_intlist(node.constant_features)
+
             # save node properties
             node.chosen_feature = feature
             node.chosen_threshold = threshold
-            node.constant_features = realloc_intlist(constant_features, constant_features.n)
+            node.constant_features = copy_intlist(constant_features, constant_features.n)
 
             # increment no. usable thresholds
             n_usable_thresholds += 1
