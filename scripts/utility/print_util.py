@@ -59,8 +59,8 @@ def stdout_stderr_to_log(filename):
     """
     logfile = open(filename, 'w')
 
-    original_stderr = sys.stderr
-    original_stdout = sys.stdout
+    stderr = sys.stderr
+    stdout = sys.stdout
 
     sys.stdout = Tee(sys.stdout, logfile)
     sys.stderr = sys.stdout
