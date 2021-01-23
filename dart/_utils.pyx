@@ -57,8 +57,15 @@ cdef inline UINT32_t our_rand_r(UINT32_t* seed) nogil:
     return seed[0] % <UINT32_t>(RAND_R_MAX + 1)
 
 
-cdef inline double rand_uniform(double low,
-                                double high,
+cdef inline SIZE_t rand_int(SIZE_t low, SIZE_t high,
+                            UINT32_t* random_state) nogil:
+    """
+    Generate a random integer in [low; end).
+    """
+    return low + our_rand_r(random_state) % (high - low)
+
+
+cdef inline double rand_uniform(double low, double high,
                                 UINT32_t* random_state) nogil:
     """
     Generate a random double in [low; high).
@@ -67,11 +74,21 @@ cdef inline double rand_uniform(double low,
             <double> RAND_R_MAX) + low
 
 
-cdef inline INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil:
-    """
-    Generates a random integer between 0 and `upper`.
-    """
-    return <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / upper))
+# cdef inline double rand_uniform(double low,
+#                                 double high,
+#                                 UINT32_t* random_state) nogil:
+#     """
+#     Generate a random double in [low; high].
+#     """
+#     return ((high - low) * <double> our_rand_r(random_state) /
+#             <double> RAND_R_MAX) + low
+
+
+# cdef inline INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil:
+#     """
+#     Generates a random integer between 0 and `upper`.
+#     """
+#     return <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / upper))
 
 # SCORING METHODS
 

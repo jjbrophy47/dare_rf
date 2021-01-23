@@ -22,11 +22,12 @@ cdef enum:
 # sampling methods
 cdef UINT32_t our_rand_r(UINT32_t* seed) nogil
 
+cdef SIZE_t rand_int(SIZE_t low, SIZE_t high,
+                     UINT32_t* random_state) nogil
+
 cdef double rand_uniform(double    low,
                          double    high,
                          UINT32_t* random_state) nogil
-
-cdef INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil
 
 # split score methods
 cdef DTYPE_t compute_split_score(bint    use_gini,

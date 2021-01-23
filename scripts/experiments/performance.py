@@ -185,7 +185,7 @@ def performance(args, out_dir, logger):
     start = time.time()
     model = _get_model(args)
 
-    # tune hyperparametrers
+    # tune hyperparameters
     if not args.no_tune:
         logger.info('param_grid: {}'.format(param_grid))
 

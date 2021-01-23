@@ -94,6 +94,9 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
     cdef SIZE_t  i = 0
     cdef SIZE_t  j = 0
     cdef SIZE_t  k = 0
+
+    # samplers
+    cdef INT32_t feature_index = 0
     cdef INT32_t ndx = 0
 
     # get number of features to sample
@@ -147,7 +150,7 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
     while n_features < max_features and (sampled_features.n + constant_features.n) < n_total_features:
 
         # sample feature index
-        feature_index = rand_int(n_total_features, random_state)
+        feature_index = rand_int(0, n_total_features, random_state)
 
         # already sampled feature
         for i in range(sampled_features.n):
@@ -158,6 +161,8 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         for i in range(constant_features.n):
             if constant_features.arr[i] == feature_index:
                 continue
+
+        # printf('[S - SGT] feature_index: %d\n', feature_index)
 
         # copy values and labels into new arrays, and count no. pos. labels
         for i in range(samples.n):
@@ -198,6 +203,8 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         else:
             n_candidate_thresholds_to_sample = k_samples
 
+        # printf('[S - SGT] n_candidate_thresholds_to_sample: %ld\n', n_candidate_thresholds_to_sample)
+
         # create new (smaller) thresholds array
         final_thresholds = <Threshold **>malloc(n_candidate_thresholds_to_sample * sizeof(Threshold *))
         sampled_indices = create_intlist(n_candidate_thresholds_to_sample, 0)
@@ -207,7 +214,7 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
             valid = True
 
             # sample a threshold index
-            ndx = rand_int(n_candidate_thresholds, random_state)
+            ndx = rand_int(0, n_candidate_thresholds, random_state)
 
             # invalid: already sampled
             for i in range(sampled_indices.n):
@@ -237,6 +244,8 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
                     best_score = split_score
                     chosen_feature = feature
                     chosen_threshold = threshold
+
+        # printf('[S - SGT] n_candidate_thresholds_to_sample: %ld\n', n_candidate_thresholds_to_sample)
 
         # set threshold properties for this feature
         feature.thresholds = final_thresholds
@@ -327,7 +336,7 @@ cdef SIZE_t select_random_threshold(Node*     node,
     while sampled_features.n + constant_features.n < n_total_features:
 
         # sample feature index
-        feature_index = rand_int(n_total_features, random_state)
+        feature_index = rand_int(0, n_total_features, random_state)
 
         # check if feature has already been sampled
         for i in range(sampled_features.n):

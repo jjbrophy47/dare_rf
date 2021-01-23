@@ -103,7 +103,9 @@ cdef class _TreeBuilder:
         else:
 
             # select a threshold to to split the samples
+            # printf('[B] select threshold\n')
             n_usable_thresholds = self.splitter.select_threshold(node, X, y, samples, n_total_features)
+            # printf('[B] no_usable_thresholds: %ld\n', n_usable_thresholds)
 
             # no usable thresholds, create leaf
             if n_usable_thresholds == 0:
@@ -114,6 +116,7 @@ cdef class _TreeBuilder:
 
             # decision node
             else:
+                # printf('[B] split samples\n')
                 split_samples(node, X, y, samples, &split)
                 # printf('[B] depth: %ld, chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
                 #       node.depth, node.chosen_feature.index, node.chosen_threshold.value)
