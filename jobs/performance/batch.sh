@@ -1,6 +1,6 @@
 # D-DART
 ./jobs/performance/primer.sh 'surgical' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
-./jobs/performance/primer.sh 'vaccine' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'vaccine' 'dart' 1.0 'accuracy' 'gini' 6 1440 short
 ./jobs/performance/primer.sh 'adult' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
 ./jobs/performance/primer.sh 'bank_marketing' 'dart' 1.0 'roc_auc' 'gini' 3 1440 short
 ./jobs/performance/primer.sh 'flight_delays' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short

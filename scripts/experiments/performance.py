@@ -165,9 +165,9 @@ def performance(args, out_dir, logger):
     max_depth = [1, 3, 5, 10, 20]
 
     # reduce search space for Higgs
-    if args.dataset == 'higgs':
-        n_estimators.remove(250)
-        max_depth.remove(20)
+    # if args.dataset in ['higgs', 'ctr']
+    #     n_estimators.remove(250)
+    #     max_depth.remove(20)
 
     # set hyperparameter grid
     param_grid = {'max_depth': max_depth,
