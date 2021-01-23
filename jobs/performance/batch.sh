@@ -1,15 +1,15 @@
 # D-DART
-# ./jobs/performance/primer.sh 'surgical' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
-# ./jobs/performance/primer.sh 'vaccine' 'dart' 1.0 'accuracy' 'gini' 6 1440 short
-# ./jobs/performance/primer.sh 'adult' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
-# ./jobs/performance/primer.sh 'bank_marketing' 'dart' 1.0 'roc_auc' 'gini' 3 1440 short
-# ./jobs/performance/primer.sh 'flight_delays' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-# ./jobs/performance/primer.sh 'diabetes' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
-# ./jobs/performance/primer.sh 'no_show' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-# ./jobs/performance/primer.sh 'olympics' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-# ./jobs/performance/primer.sh 'census' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-# ./jobs/performance/primer.sh 'credit_card' 'dart' 1.0 'average_precision' 'gini' 6 1440 short
-# ./jobs/performance/primer.sh 'twitter' 'dart' 0.5 'roc_auc' 'gini' 35 1440 short
+./jobs/performance/primer.sh 'surgical' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'vaccine' 'dart' 1.0 'accuracy' 'gini' 6 1440 short
+./jobs/performance/primer.sh 'adult' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'bank_marketing' 'dart' 1.0 'roc_auc' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'flight_delays' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'diabetes' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'no_show' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'olympics' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'census' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'credit_card' 'dart' 1.0 'average_precision' 'gini' 6 1440 short
+./jobs/performance/primer.sh 'twitter' 'dart' 0.5 'roc_auc' 'gini' 35 1440 short
 ./jobs/performance/primer.sh 'synthetic' 'dart' 0.5 'accuracy' 'gini' 60 1440 short
 ./jobs/performance/primer.sh 'higgs' 'dart' 0.1 'accuracy' 'gini' 60 1440 short
 ./jobs/performance/primer.sh 'ctr' 'dart' 0.005 'roc_auc' 'gini' 70 1440 short
