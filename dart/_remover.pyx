@@ -587,8 +587,6 @@ cdef class _Remover:
                 if not valid_threshold:
                     n_invalid_thresholds += 1
 
-                    # printf('[R - UM] testing\n')
-
                     # if the chosen feature / threshold is invalid, clear those properties
                     if ((node.chosen_feature != NULL and feature.index == node.chosen_feature.index) and
                         (node.chosen_threshold != NULL and threshold.value == node.chosen_threshold.value)):
@@ -603,28 +601,26 @@ cdef class _Remover:
                         node.chosen_feature = NULL
                         node.chosen_threshold = NULL
 
-                    # printf('[R - UM] done testing\n')
-
                 # valid threshold
                 else:
                     n_valid_thresholds += 1
                     n_usable_thresholds += 1
 
-            # printf('[R - UM] feature.index: %ld, n_valid_thresholds: %ld, n_invalid_thresholds: %ld\n',
-            #        feature.index, n_valid_thresholds, n_invalid_thresholds)
-
-            # sample new viable thresholds, if any
+            # invalid thresholds, sample new viable thresholds, if any
             if n_invalid_thresholds > 0:
-                # printf('[R - UM] sample new thresholds, feauture.n_thresholds: %ld, k_samples: %ld\n',
-                #        feature.n_thresholds, k_samples)
 
-                # no other candidate thresholds, constant feature, replace feature
-                if feature.n_thresholds < k_samples and n_invalid_thresholds == feature.n_thresholds:
-                    # add to constant features
-                    pass
+                # no. thresholds does not fill up no. allowable thresholds
+                if feature.n_thresholds < k_samples:
 
-                # if no. original thresholds < k, there are no other candidate thresholds
-                if feature.n_thresholds == k_samples:
+                    # no other candidate thresholds, remove invalid thresholds
+                    if n_invalid_thresholds < feature.n_thresholds:
+                        pass
+
+                    # no candidate thresholds at all, replace feature
+                    else:
+                        pass
+
+                    n sample_new_thresholds
 
                     # printf('[R - UM] node.n_samples: %ld\n', node.n_samples)
 

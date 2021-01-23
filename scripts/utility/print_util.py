@@ -5,6 +5,24 @@ import sys
 import logging
 
 
+class Tee(object):
+    """
+    Class to control where output is printed to.
+    """
+
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+            f.flush()   # output to be visible immediately
+
+    def flush(self) :
+        for f in self.files:
+            f.flush()
+
+
 def get_logger(filename=''):
     """
     Return a logger object to easily save textual output.
@@ -33,3 +51,26 @@ def remove_logger(logger):
     Remove handlers from logger.
     """
     logger.handlers = []
+
+def stdout_stderr_to_log(filename):
+    """
+    Log everything printed to stdout or
+    stderr to this specified `filename`.
+    """
+    logfile = open(filename, 'w')
+
+    original_stderr = sys.stderr
+    original_stdout = sys.stdout
+
+    sys.stdout = Tee(sys.stdout, logfile)
+    sys.stderr = sys.stdout
+
+    return logfile, stdout, stderr
+
+def reset_stdout_stderr(logfile, stdout, stderr):
+    """
+    Restore original stdout and stderr
+    """
+    sys.stdout = stdout
+    sys.stderr = stderr
+    logfile.close()

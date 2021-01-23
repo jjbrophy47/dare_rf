@@ -259,8 +259,14 @@ def main(args):
     logger.info(args)
     logger.info(datetime.now())
 
+    # write everything printed to stdout to this log file
+    logfile, stdout, stderr = print_util.stdout_stderr_to_log(os.path.join(out_dir, 'log+.txt'))
+
     # run experiment
     performance(args, out_dir, logger)
+
+    # restore original stdout and stderr settings
+    print_util.reset_stdout_stderr(logfile, stdout, stderr)
 
 
 if __name__ == '__main__':
