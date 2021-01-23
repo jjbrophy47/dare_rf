@@ -64,8 +64,8 @@ cdef struct Feature:
     SIZE_t      n_thresholds          # Number of candidate thresholds for this feature
 
     # Random node properties
-    SIZE_t      n_min_val             # Number of minimum value samples
-    SIZE_t      n_max_val             # Number of maximum value samples
+    # SIZE_t      n_min_val             # Number of minimum value samples
+    # SIZE_t      n_max_val             # Number of maximum value samples
 
 """
 Struct to hold metadata pertaining to a particular feature threshold.

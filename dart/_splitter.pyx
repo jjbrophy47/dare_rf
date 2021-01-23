@@ -270,6 +270,9 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         node.constant_features = copy_intlist(constant_features, constant_features.n)
         free(features)
 
+    # free constant features
+    free_intlist(constant_features)
+
     # clean up
     free(values)
     free(labels)
@@ -302,8 +305,6 @@ cdef SIZE_t select_random_threshold(Node*     node,
     cdef DTYPE_t cur_val = 0
     cdef DTYPE_t min_val = 0
     cdef DTYPE_t max_val = 0
-    cdef SIZE_t  n_min_val = 0
-    cdef SIZE_t  n_max_val = 0
 
     # arrays to keep track of invalid features
     cdef IntList* constant_features = copy_intlist(node.constant_features, n_total_features)
@@ -342,25 +343,14 @@ cdef SIZE_t select_random_threshold(Node*     node,
         min_val = X[samples.arr[0]][feature_index]
         max_val = min_val
 
-        n_min_val = 0
-        n_max_val = 0
-
         for i in range(samples.n):
             cur_val = X[samples.arr[i]][feature_index]
 
             if cur_val < min_val:
                 min_val = cur_val
-                n_min_val = 1
 
             elif cur_val > max_val:
                 max_val = cur_val
-                n_max_val = 1
-
-            elif cur_val == min_val:
-                n_min_val += 1
-
-            elif cur_val == max_val:
-                n_max_val += 1
 
         # constant feature
         if max_val <= min_val + FEATURE_THRESHOLD:
@@ -392,21 +382,17 @@ cdef SIZE_t select_random_threshold(Node*     node,
                 sampled_features.n += 1
                 continue
 
-            # create feature object
-            feature = create_feature(feature_index)
-            feature.n_min_val = n_min_val
-            feature.n_max_val = n_max_val
-
-            # create threshold object
-            threshold = create_threshold(threshold_value, n_left_samples, n_right_samples)
-
             # free previous constant thresholds array
             free_intlist(node.constant_features)
 
             # save node properties
-            node.chosen_feature = feature
-            node.chosen_threshold = threshold
+            # printf('saving node\n')
+            node.chosen_feature = create_feature(feature_index)
+            node.chosen_threshold = create_threshold(threshold_value, n_left_samples, n_right_samples)
             node.constant_features = copy_intlist(constant_features, constant_features.n)
+
+            # free constant features
+            free_intlist(constant_features)
 
             # increment no. usable thresholds
             n_usable_thresholds += 1

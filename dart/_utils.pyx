@@ -186,8 +186,8 @@ cdef Feature* create_feature(SIZE_t feature_index) nogil:
     feature.index = feature_index
     feature.thresholds = NULL
     feature.n_thresholds = 0
-    feature.n_min_val = 0
-    feature.n_max_val = 0
+    # feature.n_min_val = 0
+    # feature.n_max_val = 0
     return feature
 
 
@@ -445,6 +445,31 @@ cdef void dealloc(Node *node) nogil:
     # decision node
     else:
 
+        # printf('freeing chosen feature\n')
+        # printf('n_thresholds: %ld\n', node.chosen_feature.n_thresholds)
+        # for k in range(node.chosen_feature.n_thresholds):
+        #     free(node.chosen_feature.thresholds[k])
+        # free(node.chosen_feature.thresholds)
+        # free(node.chosen_feature)
+
+        # printf('freeing chosen threshold\n')
+        # free(node.chosen_threshold)
+
+        # printf('freeing constant features\n')
+        # free_intlist(node.constant_features)
+
+        # printf('freeing features\n')
+        # for j in range(node.n_features):
+        #     for k in range(node.features[j].n_thresholds):
+        #         free(node.features[j].thresholds[k])
+        #     free(node.features[j].thresholds)
+        #     free(node.features[j])
+        # free(node.features)
+
+        # printf('freeing left right\n')
+        # free(node.left)
+        # free(node.right)
+
         # clear chosen feature
         if node.chosen_feature != NULL:
             if node.chosen_feature.thresholds != NULL:
@@ -468,8 +493,10 @@ cdef void dealloc(Node *node) nogil:
                 if node.features[j] != NULL:
                     for k in range(node.features[j].n_thresholds):
                         free(node.features[j].thresholds[k])
+
                     free(node.features[j].thresholds)
                     free(node.features[j])
+
             free(node.features)
 
         # free children

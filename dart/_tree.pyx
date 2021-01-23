@@ -20,6 +20,7 @@ cimport numpy as np
 np.import_array()
 
 from ._utils cimport split_samples
+from ._utils cimport copy_indices
 from ._utils cimport create_intlist
 from ._utils cimport free_intlist
 from ._utils cimport dealloc
@@ -94,6 +95,7 @@ cdef class _TreeBuilder:
 
         # leaf node
         if is_bottom_leaf or is_middle_leaf:
+            # printf('[B] bottom / middle leaf\n')
             self.set_leaf_node(node, samples)
             # printf('[B] leaf.value: %.2f\n', node.value)
 
@@ -131,7 +133,7 @@ cdef class _TreeBuilder:
 
         # set leaf node properties
         node.is_leaf = True
-        node.leaf_samples = samples.arr
+        node.leaf_samples = copy_indices(samples.arr, samples.n)
         node.value = node.n_pos_samples / <double> node.n_samples
 
         # set greedy node properties
@@ -149,8 +151,8 @@ cdef class _TreeBuilder:
         node.left = NULL
         node.right = NULL
 
-        # free container but not contents
-        free(samples)
+        # free samples
+        free_intlist(samples)
 
     cdef Node* initialize_node(self,
                                SIZE_t   depth,
@@ -211,6 +213,7 @@ cdef class _Tree:
         """
         Destructor.
         """
+        # printf('deallocing tree\n')
         if self.root:
             dealloc(self.root)
             free(self.root)

@@ -54,9 +54,9 @@ def main(args):
     print(X_train.shape)
 
     # settings
-    topd = 20
+    topd = 0
     k = 100
-    max_depth = 20
+    max_depth = 2
     seed = 1
     n_delete = 20
 

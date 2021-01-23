@@ -55,8 +55,8 @@ def main(args):
     X_train, X_test, y_train, y_test = load_data(args.dataset, args.data_dir)
 
     # train
-    topd = 20
-    k = 100
+    topd = 30
+    k = 10
     n_estimators = 100
     max_depth = 20
     seed = 1
@@ -71,6 +71,8 @@ def main(args):
                                        random_state=seed)
 
     start = time.time()
+    model = dart.Forest(topd=topd, k=k, n_estimators=n_estimators,
+                        max_depth=max_depth, random_state=seed)
     model = model.fit(X_train, y_train)
     train_time = time.time() - start
     print('train time: {:.3f}s'.format(train_time))
