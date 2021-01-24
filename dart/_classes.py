@@ -21,7 +21,7 @@ from ._manager import _DataManager
 from ._config import _Config
 from ._splitter import _Splitter
 # from ._adder import _Adder
-# from ._remover import _Remover
+from ._remover import _Remover
 # from ._simulator import _Simulator
 from ._tree import _Tree
 from ._tree import _TreeBuilder
@@ -204,26 +204,26 @@ class Forest(object):
     #     else:
     #         self.manager_.clear_add_indices()
 
-    # def delete(self, remove_indices):
-    #     """
-    #     Removes instances from the database and updates the model.
-    #     """
+    def delete(self, remove_indices):
+        """
+        Removes instances from the database and updates the model.
+        """
 
-    #     # copy indices to an int array
-    #     if isinstance(remove_indices, int):
-    #         remove_indices = [remove_indices]
+        # copy indices to an int array
+        if isinstance(remove_indices, int):
+            remove_indices = [remove_indices]
 
-    #     if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
-    #         remove_indices = np.array(remove_indices, dtype=np.int32)
+        if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
+            remove_indices = np.array(remove_indices, dtype=np.int32)
 
-    #     remove_indices = np.unique(remove_indices).astype(np.int32)
+        remove_indices = np.unique(remove_indices).astype(np.int32)
 
-    #     # update trees
-    #     for i in range(len(self.trees_)):
-    #         self.trees_[i].delete(remove_indices)
+        # update trees
+        for i in range(len(self.trees_)):
+            self.trees_[i].delete(remove_indices)
 
-    #     # remove data from the database
-    #     self.manager_.remove_data(remove_indices)
+        # remove data from the database
+        self.manager_.remove_data(remove_indices)
 
     # def sim_delete(self, remove_index):
     #     """
@@ -273,43 +273,25 @@ class Forest(object):
 
     #     return types, depths
 
-    # def get_delete_metrics(self):
-    #     """
-    #     Retrieve deletion statistics.
-    #     """
-    #     types_list, depths_list, costs_list = [], [], []
+    def get_delete_metrics(self):
+        """
+        Retrieve deletion statistics.
+        """
+        types_list, depths_list, costs_list = [], [], []
 
-    #     # get metrics for each tree
-    #     for tree in self.trees_:
-    #         types, depths, costs = tree.get_delete_metrics()
-    #         types_list.append(types)
-    #         depths_list.append(depths)
-    #         costs_list.append(costs)
+        # get metrics for each tree
+        for tree in self.trees_:
+            types, depths, costs = tree.get_delete_metrics()
+            types_list.append(types)
+            depths_list.append(depths)
+            costs_list.append(costs)
 
-    #     # process metrics from all trees
-    #     types = np.concatenate(types_list)
-    #     depths = np.concatenate(depths_list)
-    #     costs = np.concatenate(costs_list)
+        # process metrics from all trees
+        types = np.concatenate(types_list)
+        depths = np.concatenate(depths_list)
+        costs = np.concatenate(costs_list)
 
-    #     return types, depths, costs
-
-    # def get_add_retrain_sample_count(self):
-    #     """
-    #     Retrieve number of samples used for retrainings.
-    #     """
-    #     result = 0
-    #     for tree in self.trees_:
-    #         result += tree.get_add_retrain_sample_count()
-    #     return result
-
-    # def get_removal_retrain_sample_count(self):
-    #     """
-    #     Retrieve number of samples used for retrainings.
-    #     """
-    #     result = 0
-    #     for tree in self.trees_:
-    #         result += tree.get_removal_retrain_sample_count()
-    #     return result
+        return types, depths, costs
 
     # def get_node_statistics(self):
     #     """
@@ -325,12 +307,12 @@ class Forest(object):
 
         # return n_nodes_avg, n_exact_avg, n_semi_avg
 
-    # def clear_delete_metrics(self):
-    #     """
-    #     Delete removal statistics.
-    #     """
-    #     for tree in self.trees_:
-    #         tree.clear_delete_metrics()
+    def clear_delete_metrics(self):
+        """
+        Delete removal statistics.
+        """
+        for tree in self.trees_:
+            tree.clear_delete_metrics()
 
     # def clear_add_metrics(self):
     #     """
@@ -473,9 +455,9 @@ class Tree(object):
                                           self.splitter_,
                                           self.config_)
 
-        # self.remover_ = _Remover(self.manager_,
-        #                          self.tree_builder_,
-        #                          self.config_)
+        self.remover_ = _Remover(self.manager_,
+                                 self.tree_builder_,
+                                 self.config_)
 
         # self.simulator_ = _Simulator(self.manager_,
         #                              self.config_)
@@ -546,30 +528,30 @@ class Tree(object):
     #         else:
     #             self.manager_.clear_add_indices()
 
-    # def delete(self, remove_indices):
-    #     """
-    #     Removes instances from the database and updates the model.
-    #     """
+    def delete(self, remove_indices):
+        """
+        Removes instances from the database and updates the model.
+        """
 
-    #     # copy remove indices to int array
-    #     if self.single_tree_:
+        # copy remove indices to int array
+        if self.single_tree_:
 
-    #         if isinstance(remove_indices, int):
-    #             remove_indices = [remove_indices]
+            if isinstance(remove_indices, int):
+                remove_indices = [remove_indices]
 
-    #         if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
-    #             remove_indices = np.array(remove_indices, dtype=np.int32)
+            if not (isinstance(remove_indices, np.ndarray) and remove_indices.dtype == np.int32):
+                remove_indices = np.array(remove_indices, dtype=np.int32)
 
-    #         remove_indices = np.unique(remove_indices).astype(np.int32)
+            remove_indices = np.unique(remove_indices).astype(np.int32)
 
-    #     # update model
-    #     rc = self.remover_.remove(self.tree_, remove_indices)
-    #     if rc == -1:
-    #         exit('Removal index invalid!')
+        # update model
+        rc = self.remover_.remove(self.tree_, remove_indices)
+        if rc == -1:
+            exit('Removal index invalid!')
 
-    #     # remove data from the database
-    #     if self.single_tree_:
-    #         self.manager_.remove_data(remove_indices)
+        # remove data from the database
+        if self.single_tree_:
+            self.manager_.remove_data(remove_indices)
 
     # def sim_delete(self, remove_index):
     #     """
@@ -602,34 +584,20 @@ class Tree(object):
     #     add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
     #     return add_types, add_depths
 
-    # def get_delete_metrics(self):
-    #     """
-    #     Retrieve deletion statistics.
-    #     """
-    #     remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
-    #     remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
-    #     remove_costs = np.array(self.remover_.remove_costs, dtype=np.int32)
-    #     return remove_types, remove_depths, remove_costs
+    def get_delete_metrics(self):
+        """
+        Retrieve deletion statistics.
+        """
+        remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
+        remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
+        remove_costs = np.array(self.remover_.remove_costs, dtype=np.int32)
+        return remove_types, remove_depths, remove_costs
 
-    # def get_add_retrain_sample_count(self):
-    #     """
-    #     Return number of samples used in any retrainings.
-    #     """
-    #     result = self.adder_.retrain_sample_count
-    #     return result
-
-    # def get_removal_retrain_sample_count(self):
-    #     """
-    #     Return number of samples used in any retrainings.
-    #     """
-    #     result = self.remover_.retrain_sample_count
-    #     return result
-
-    # def clear_delete_metrics(self):
-    #     """
-    #     Delete removal statistics.
-    #     """
-    #     self.remover_.clear_metrics()
+    def clear_delete_metrics(self):
+        """
+        Delete removal statistics.
+        """
+        self.remover_.clear_metrics()
 
     # def clear_add_metrics(self):
     #     """

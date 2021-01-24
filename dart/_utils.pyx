@@ -73,23 +73,6 @@ cdef inline double rand_uniform(double low, double high,
     return ((high - low) * <double> our_rand_r(random_state) /
             <double> RAND_R_MAX) + low
 
-
-# cdef inline double rand_uniform(double low,
-#                                 double high,
-#                                 UINT32_t* random_state) nogil:
-#     """
-#     Generate a random double in [low; high].
-#     """
-#     return ((high - low) * <double> our_rand_r(random_state) /
-#             <double> RAND_R_MAX) + low
-
-
-# cdef inline INT32_t rand_int(SIZE_t upper, UINT32_t* random_state) nogil:
-#     """
-#     Generates a random integer between 0 and `upper`.
-#     """
-#     return <INT32_t>(rand_uniform(0, 1, random_state) / (1.0 / upper))
-
 # SCORING METHODS
 
 cdef DTYPE_t compute_split_score(bint    use_gini,
@@ -270,9 +253,9 @@ cdef void free_features(Feature** features,
 
     # free each feature and then the array
     if features != NULL:
-    for j in range(n_features):
-        free_feature(features[j])
-    free(features)
+        for j in range(n_features):
+            free_feature(features[j])
+        free(features)
 
 
 cdef void free_feature(Feature* feature) nogil:
@@ -285,7 +268,7 @@ cdef void free_feature(Feature* feature) nogil:
         free(feature)
 
 
-cdef void free_thresholds(Threhsold** thresholds,
+cdef void free_thresholds(Threshold** thresholds,
                           SIZE_t n_thresholds) nogil:
     """
     Deallocate a thresholds array and its contents
@@ -294,9 +277,9 @@ cdef void free_thresholds(Threhsold** thresholds,
 
     # free each threshold and then the array
     if thresholds != NULL:
-    for k in range(n_thresholds):
-        free(thresholds[k])
-    free(thresholds)
+        for k in range(n_thresholds):
+            free(thresholds[k])
+        free(thresholds)
 
 
 # INTLIST METHODS
@@ -398,7 +381,8 @@ cdef void split_samples(Node*        node,
                         DTYPE_t**    X,
                         INT32_t*     y,
                         IntList*     samples,
-                        SplitRecord* split) nogil:
+                        SplitRecord* split,
+                        bint         copy_constant_features) nogil:
     """
     Split samples based on the chosen feature / threshold.
 
@@ -439,9 +423,9 @@ cdef void split_samples(Node*        node,
         free_intlist(split.right_samples)
 
     # copy constant features array for both branches
-    # printf('node.constant_features.n: %ld\n', node.constant_features.n)
-    split.left_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
-    split.right_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
+    if copy_constant_features:
+        split.left_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
+        split.right_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
 
     # clean up, no more use for the original samples array
     free_intlist(samples)

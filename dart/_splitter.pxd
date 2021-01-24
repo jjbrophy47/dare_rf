@@ -8,6 +8,9 @@ from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
 from ._utils cimport UINT32_t
 
+# constants
+cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
+
 
 """
 Object to keep track of the data parition during a split.

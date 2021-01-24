@@ -4,6 +4,8 @@ cimport numpy as np
 from ._manager cimport _DataManager
 from ._splitter cimport SplitRecord
 from ._tree cimport Node
+from ._tree cimport Feature
+from ._tree cimport Threshold
 from ._tree cimport IntList
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
@@ -60,22 +62,28 @@ cdef class _Remover:
                       Node**    node_ptr,
                       DTYPE_t** X,
                       INT32_t*  y,
-                      IntList*  samples) nogil
-
-    cdef void get_leaf_samples(self,
-                               Node*    node,
-                               IntList* remove_samples,
-                               SIZE_t** leaf_samples_ptr,
-                               SIZE_t*  leaf_samples_count_ptr) nogil
+                      IntList*  remove_samples) nogil
 
     cdef INT32_t check_optimal_split(self,
-                                 Node* node) nogil
+                                     Node* node) nogil
 
     cdef SIZE_t update_metadata(self,
                                 Node*     node,
                                 DTYPE_t** X,
                                 INT32_t*  y,
                                 IntList*  remove_samples) nogil
+
+    cdef SIZE_t update_greedy_node_metadata(self,
+                                            Node*     node,
+                                            DTYPE_t** X,
+                                            INT32_t*  y,
+                                            IntList*  remove_samples) nogil
+
+    cdef SIZE_t update_random_node_metadata(self,
+                                            Node*     node,
+                                            DTYPE_t** X,
+                                            INT32_t*  y,
+                                            IntList*  remove_samples) nogil
 
     # metric methods
     cdef void add_metric(self,
@@ -86,3 +94,32 @@ cdef class _Remover:
     cdef np.ndarray get_int_ndarray(self,
                                     INT32_t *data,
                                     SIZE_t n_elem)
+
+# helper methods
+cdef void remove_invalid_thresholds(Feature* feature,
+                                    SIZE_t   n_valid_thresholds,
+                                    SIZE_t*  threshold_validities) nogil
+
+cdef SIZE_t sample_new_thresholds(Feature*  feature,
+                                  SIZE_t    n_valid_thresholds,
+                                  SIZE_t*   threshold_validities,
+                                  Node*     node,
+                                  DTYPE_t** X,
+                                  INT32_t*  y,
+                                  IntList*  remove_samples,
+                                  bint*     is_constant_feature_ptr,
+                                  _Config   config) nogil
+
+cdef SIZE_t sample_new_features(Feature*** features_ptr,
+                                IntList**  constant_features_ptr,
+                                IntList*   invalid_features,
+                                SIZE_t     n_total_features,
+                                Node*      node,
+                                DTYPE_t**  X,
+                                INT32_t*   y,
+                                IntList*   remove_samples,
+                                _Config    config) nogil
+
+cdef void get_leaf_samples(Node*    node,
+                           IntList* remove_samples,
+                           IntList* leaf_samples) nogil

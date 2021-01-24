@@ -18,7 +18,6 @@ np.import_array()
 from ._utils cimport compute_split_score
 from ._utils cimport rand_uniform
 from ._utils cimport rand_int
-from ._utils cimport split_samples
 from ._utils cimport create_intlist
 from ._utils cimport create_feature
 from ._utils cimport create_threshold
@@ -27,9 +26,6 @@ from ._utils cimport copy_intlist
 from ._utils cimport copy_feature
 from ._utils cimport copy_threshold
 from ._argsort cimport sort
-
-# cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
-cdef double FEATURE_THRESHOLD = 1e-7
 
 cdef class _Splitter:
     """

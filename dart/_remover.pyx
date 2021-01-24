@@ -22,17 +22,32 @@ np.import_array()
 
 from ._tree cimport Feature
 from ._tree cimport Threshold
+from ._splitter cimport FEATURE_THRESHOLD
 from ._splitter cimport get_candidate_thresholds
-from ._utils cimport compute_split_score
+
+from ._utils cimport rand_int
 from ._utils cimport rand_uniform
+from ._utils cimport compute_split_score
 from ._utils cimport split_samples
-from ._utils cimport create_intlist
-from ._utils cimport free_intlist
+
+from ._utils cimport create_feature
+from ._utils cimport copy_feature
+from ._utils cimport free_feature
+from ._utils cimport free_features
+
 from ._utils cimport copy_threshold
+from ._utils cimport free_thresholds
+
+from ._utils cimport create_intlist
+from ._utils cimport copy_intlist
+from ._utils cimport free_intlist
+
+from ._utils cimport copy_indices
 from ._utils cimport convert_int_ndarray
 from ._utils cimport copy_int_array
+
 from ._utils cimport dealloc
-from ._utils cimport RAND_R_MAX
+from ._argsort cimport sort
 
 cdef INT32_t UNDEF = -1
 cdef DTYPE_t UNDEF_LEAF_VAL = 0.5
@@ -182,8 +197,8 @@ cdef class _Remover:
                 # no retraining necessary, split samples and recurse
                 else:
 
-                    # split deleted samples and free original samples
-                    split_samples(node, X, y, remove_samples, &split)
+                    # split deleted samples and free original deleted samples
+                    split_samples(node, X, y, remove_samples, &split, 0)
                     # printf('[R] split samples, split.n_left_samples: %ld, split.n_right_samples: %ld\n',
                     #        split.n_left_samples, split.n_right_samples)
 
@@ -232,7 +247,7 @@ cdef class _Remover:
 
         # remove deleted samples from leaf
         node.n_samples += remove_samples.n  # must check ALL leaf samples, even deleted ones
-        self.get_leaf_samples(node, remove_samples, leaf_samples)
+        get_leaf_samples(node, remove_samples, leaf_samples)
         node.n_samples -= remove_samples.n
 
         # free old leaf samples array
@@ -259,8 +274,8 @@ cdef class _Remover:
         """
 
         # get leaf samples and remove deleted samples
-        cdef IntList* leaf_samples = create_intlist(node.n_samples)
-        self.get_leaf_samples(node, remove_samples, leaf_samples)
+        cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
+        get_leaf_samples(node, remove_samples, leaf_samples)
 
         # deallocate node / subtree
         dealloc(node)
@@ -305,7 +320,7 @@ cdef class _Remover:
 
         # updated array of leaf samples
         cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
-        self.get_leaf_samples(node, remove_samples, leaf_samples)
+        get_leaf_samples(node, remove_samples, leaf_samples)
 
         # printf('[R - R] retrain, leaf_samples_count: %ld\n', leaf_samples_count)
 
@@ -322,52 +337,6 @@ cdef class _Remover:
         # printf('[R - R] retrain, node.depth: %ld\n', node.depth)
         self.add_metric(1, node_ptr[0].depth, node_ptr[0].n_samples)
         free_intlist(remove_samples)
-
-    cdef void get_leaf_samples(self,
-                               Node*    node,
-                               IntList* remove_samples,
-                               IntList* leaf_samples) nogil:
-        """
-        Recursively obtain the samples at the leaves and filter out
-        deleted samples.
-        """
-        cdef bint   add_sample = True
-        cdef SIZE_t i = 0
-        cdef SIZE_t j = 0
-
-        # leaf
-        if node.is_leaf:
-
-            # loop through all samples at this leaf
-            for i in range(node.n_samples):
-                add_sample = True
-
-                # loop through all deleted samples
-                for j in range(remove_samples.n):
-
-                    # printf('[R - GLS] node.leaf_samples[%ld]: %ld, remove_samples[%ld]: %ld\n',
-                    #        i, node.leaf_samples[i], j, remove_samples[j])
-
-                    # do not add sample to results if it has been deleted
-                    if node.leaf_samples[i] == remove_samples.arr[j]:
-                        add_sample = False
-                        break
-
-                # add sample to results if it has not been deleted
-                if add_sample:
-                    leaf_samples.arr[leaf_samples.n] = node.leaf_samples[i]
-                    leaf_samples.n += 1
-
-        # decision node
-        else:
-
-            # traverse left
-            if node.left:
-                self.get_leaf_samples(node.left, remove_samples, leaf_samples)
-
-            # traverse right
-            if node.right:
-                self.get_leaf_samples(node.right, remove_samples, leaf_samples)
 
     cdef INT32_t check_optimal_split(self,
                                      Node* node) nogil:
@@ -467,11 +436,11 @@ cdef class _Remover:
 
         # greedy node
         if node.depth >= self.config.topd:
-            n_usable_thresholds = update_greedy_node_metadata(node, X, y, remove_samples)
+            n_usable_thresholds = self.update_greedy_node_metadata(node, X, y, remove_samples)
 
         # random node
         else:
-            n_usable_thresholds = update_random_node_metadata(node, X, y, remove_samples)
+            n_usable_thresholds = self.update_random_node_metadata(node, X, y, remove_samples)
 
         return n_usable_thresholds
 
@@ -602,7 +571,7 @@ cdef class _Remover:
                 else:
                     n_viable_thresholds = sample_new_thresholds(feature, n_valid_thresholds,
                                                                 threshold_validities, node, X, y,
-                                                                remove_samples, self.config)
+                                                                remove_samples, NULL, self.config)
 
                     # all thresholds invalid, flag feature for replacement
                     if n_viable_thresholds == 0:
@@ -619,7 +588,7 @@ cdef class _Remover:
         if invalid_features.n > 0:
             n_usable_thresholds += sample_new_features(&node.features, &node.constant_features,
                                                        invalid_features, n_total_features, node, X, y,
-                                                       remove_samples, config)
+                                                       remove_samples, self.config)
 
             # no usable thresholds if there are no valid features
             if node.n_features == 0:
@@ -722,29 +691,32 @@ cdef class _Remover:
 # helper methods
 cdef void remove_invalid_thresholds(Feature* feature,
                                     SIZE_t   n_valid_thresholds,
-                                    SIZE_t*  threshold_validities)
+                                    SIZE_t*  threshold_validities) nogil:
     """
     Removes the invalid thresholds from this feature.
     """
 
     # create final thresholds array
     cdef Threshold** new_thresholds = <Threshold **>malloc(n_valid_thresholds  * sizeof(Threshold *))
+    cdef SIZE_t      n_new_thresholds = 0
+
+    # counters
+    cdef SIZE_t k = 0
 
     # filter out invalid thresholds and free original thresholds array
-    i = 0
     for k in range(feature.n_thresholds):
 
         # add valid threshold to final thresholds
         if threshold_validities[k] == 1:
-            valid_thresholds[i] = copy_threshold(feature.thresholds[k])
-            i +=1
+            new_thresholds[n_new_thresholds] = copy_threshold(feature.thresholds[k])
+            n_new_thresholds += 1
 
     # free thresholds array
     free_thresholds(feature.thresholds, feature.n_thresholds)
 
     # save new thresholds array to the feature
     feature.thresholds = new_thresholds
-    feature.n_thresholds = n_valid_thresholds
+    feature.n_thresholds = n_new_thresholds
 
 
 cdef SIZE_t sample_new_thresholds(Feature*  feature,
@@ -754,6 +726,7 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
                                   DTYPE_t** X,
                                   INT32_t*  y,
                                   IntList*  remove_samples,
+                                  bint*     is_constant_feature_ptr,
                                   _Config   config) nogil:
     """
     Try to sample new thresholds for all invalid thresholds for this feature.
@@ -786,21 +759,21 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
     cdef bint        valid = True
 
     # result variables
-    cdef Threhsold** new_thresholds = NULL
+    cdef Threshold** new_thresholds = NULL
     cdef SIZE_t      n_new_thresholds = 0
 
     # return variable
     cdef SIZE_t n_usable_thresholds = 0
+
+    # get updated samples for this node
+    cdef IntList* samples = create_intlist(node.n_samples, 0)
+    get_leaf_samples(node, remove_samples, samples)
 
     # helper variables
     cdef DTYPE_t* values = <DTYPE_t *>malloc(samples.n * sizeof(DTYPE_t))
     cdef INT32_t* labels = <INT32_t *>malloc(samples.n * sizeof(INT32_t))
     cdef SIZE_t*  indices = <SIZE_t *>malloc(samples.n * sizeof(SIZE_t))
     cdef SIZE_t   n_pos_samples = 0
-
-    # get updated samples for this node
-    cdef IntList* samples = create_intlist(node.n_samples, 0)
-    self.get_leaf_samples(node, remove_samples, samples)
 
     # copy values and labels into new arrays, and count no. pos. labels
     for i in range(samples.n):
@@ -811,6 +784,11 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
 
     # sort feature values, and their corresponding indices
     sort(values, indices, samples.n)
+
+    # constant feature
+    if values[samples.n - 1] <= values[0] + FEATURE_THRESHOLD:
+        if is_constant_feature_ptr != NULL:
+            is_constant_feature_ptr[0] = True
 
     # get candidate thresholds
     candidate_thresholds = <Threshold **>malloc(samples.n * sizeof(Threshold *))
@@ -912,6 +890,7 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
 
     # configuration
     cdef SIZE_t max_features = config.max_features
+    cdef UINT32_t* random_state = &config.rand_r_state
 
     # indexers
     cdef SIZE_t feature_index = 0
@@ -927,6 +906,7 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
     cdef IntList* constant_features = copy_intlist(constant_features_ptr[0], n_total_features)
     cdef IntList* sampled_features = copy_intlist(invalid_features, n_total_features)
     cdef SIZE_t   n_features = node.n_features - invalid_features.n
+    cdef bint     is_constant_feature = False
 
     # old and new features array
     cdef Feature** features = features_ptr[0]
@@ -952,18 +932,18 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
             if constant_features.arr[i] == feature_index:
                 continue
 
+        # create a feature and sample thresholds
+        feature = create_feature(feature_index)
+        sample_new_thresholds(feature, 0, NULL, node, X, y, remove_samples, &is_constant_feature, config)
+
         # constant feature
-        if values[samples.n - 1] <= values[0] + FEATURE_THRESHOLD:
+        if is_constant_feature:
             constant_features.arr[constant_features.n] = feature_index
             constant_features.n += 1
             continue
 
-        # create a feature and sample thresholds
-        feature = create_feature(feature_index)
-        sample_new_thresholds(feature, 0, NULL, node, X, y, remove_samples, config)
-
         # no valid thresholds
-        if feature.n_thresholds == 0:
+        elif feature.n_thresholds == 0:
             sampled_features.arr[sampled_features.n] = feature_index
             sampled_features.n += 1
             free_feature(feature)
@@ -1003,7 +983,7 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
                 n_new_features += 1
 
         # free previous features
-        free_features(features)
+        free_features(features, node.n_features)
 
         # set features to new features array
         features_ptr[0] = new_features
@@ -1021,3 +1001,49 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
     free_intlist(constant_features)
 
     return n_usable_thresholds
+
+
+cdef void get_leaf_samples(Node*    node,
+                           IntList* remove_samples,
+                           IntList* leaf_samples) nogil:
+    """
+    Recursively obtain the samples at the leaves and filter out
+    deleted samples.
+    """
+    cdef bint   add_sample = True
+    cdef SIZE_t i = 0
+    cdef SIZE_t j = 0
+
+    # leaf
+    if node.is_leaf:
+
+        # loop through all samples at this leaf
+        for i in range(node.n_samples):
+            add_sample = True
+
+            # loop through all deleted samples
+            for j in range(remove_samples.n):
+
+                # printf('[R - GLS] node.leaf_samples[%ld]: %ld, remove_samples[%ld]: %ld\n',
+                #        i, node.leaf_samples[i], j, remove_samples[j])
+
+                # do not add sample to results if it has been deleted
+                if node.leaf_samples[i] == remove_samples.arr[j]:
+                    add_sample = False
+                    break
+
+            # add sample to results if it has not been deleted
+            if add_sample:
+                leaf_samples.arr[leaf_samples.n] = node.leaf_samples[i]
+                leaf_samples.n += 1
+
+    # decision node
+    else:
+
+        # traverse left
+        if node.left:
+            get_leaf_samples(node.left, remove_samples, leaf_samples)
+
+        # traverse right
+        if node.right:
+            get_leaf_samples(node.right, remove_samples, leaf_samples)

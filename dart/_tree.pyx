@@ -117,7 +117,7 @@ cdef class _TreeBuilder:
             # decision node
             else:
                 # printf('[B] split samples\n')
-                split_samples(node, X, y, samples, &split)
+                split_samples(node, X, y, samples, &split, 1)
                 # printf('[B] depth: %ld, chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
                 #       node.depth, node.chosen_feature.index, node.chosen_threshold.value)
 
