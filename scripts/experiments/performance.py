@@ -172,11 +172,6 @@ def performance(args, out_dir, logger):
     n_estimators = [10, 50, 100, 250]
     max_depth = [1, 3, 5, 10, 20]
 
-    # reduce search space for Higgs
-    # if args.dataset in ['higgs', 'ctr']
-    #     n_estimators.remove(250)
-    #     max_depth.remove(20)
-
     # set hyperparameter grid
     param_grid = {'max_depth': max_depth,
                   'n_estimators': n_estimators}
@@ -254,7 +249,7 @@ def main(args):
         assert args.topd == 0
         out_dir = os.path.join(out_dir, args.model)
 
-    elif args.model in ['random', 'extra_trees', 'borat']:
+    elif args.model in ['extra_trees', 'extra_trees_k1', 'borat']:
         out_dir = os.path.join(out_dir, args.model)
 
     else:
