@@ -12,7 +12,7 @@
 # ./jobs/performance/primer.sh 'twitter' 'dart' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'dart' 0.5 'accuracy' 'gini' 60 1440 short
 # ./jobs/performance/primer.sh 'higgs' 'dart' 0.1 'accuracy' 'gini' 60 1440 short
-./jobs/performance/primer.sh 'ctr' 'dart' 0.01 'roc_auc' 'gini' 70 1440 short
+# ./jobs/performance/primer.sh 'ctr' 'dart' 0.01 'roc_auc' 'gini' 70 1440 short
 
 # ExtraTrees
 # ./jobs/performance/primer.sh 'surgical' 'extra_trees' 1.0 'accuracy' 'gini' 3 1440 short
@@ -29,7 +29,24 @@
 # ./jobs/performance/primer.sh 'gas_sensor' 'extra_trees' 1.0 'roc_auc' 'gini' 30 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'extra_trees' 0.5 'accuracy' 'gini' 40 1440 short
 # ./jobs/performance/primer.sh 'higgs' 'extra_trees' 0.1 'accuracy' 'gini' 45 1440 short
-# ./jobs/performance/primer.sh 'ctr' 'extra_trees' 0.005 'roc_auc' 'gini' 70 1440 short
+./jobs/performance/primer.sh 'ctr' 'extra_trees' 0.01 'roc_auc' 'gini' 70 1440 short
+
+# ExtraTrees (k=1)
+./jobs/performance/primer.sh 'surgical' 'extra_trees_k1' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'vaccine' 'extra_trees_k1' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'adult' 'extra_trees_k1' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'bank_marketing' 'extra_trees_k1' 1.0 'roc_auc' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'flight_delays' 'extra_trees_k1' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'diabetes' 'extra_trees_k1' 1.0 'accuracy' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'no_show' 'extra_trees_k1' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'olympics' 'extra_trees_k1' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'census' 'extra_trees_k1' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'credit_card' 'extra_trees_k1' 1.0 'average_precision' 'gini' 6 1440 short
+./jobs/performance/primer.sh 'twitter' 'extra_trees_k1' 0.5 'roc_auc' 'gini' 35 1440 short
+./jobs/performance/primer.sh 'gas_sensor' 'extra_trees_k1' 1.0 'roc_auc' 'gini' 30 1440 short
+./jobs/performance/primer.sh 'synthetic' 'extra_trees_k1' 0.5 'accuracy' 'gini' 40 1440 short
+./jobs/performance/primer.sh 'higgs' 'extra_trees_k1' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/primer.sh 'ctr' 'extra_trees_k1' 0.01 'roc_auc' 'gini' 70 1440 short
 
 # BORAT
 # ./jobs/performance/primer.sh surgical 'borat' 1.0 accuracy $criterion 3 1440 short
@@ -61,7 +78,7 @@
 # ./jobs/performance/primer.sh 'twitter' 'sklearn' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'sklearn' 0.5 'accuracy' 'gini' 60 4320 long
 # ./jobs/performance/primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
-./jobs/performance/primer.sh 'ctr' 'sklearn' 0.01 'roc_auc' 'gini' 60 1440 short
+# ./jobs/performance/primer.sh 'ctr' 'sklearn' 0.01 'roc_auc' 'gini' 60 1440 short
 
 # Sklearn w/ bootstrap
 # ./jobs/performance/bootstrap_primer.sh 'surgical' 'sklearn' 1.0 'accuracy' 'gini' 3 1440 short
@@ -77,4 +94,4 @@
 # ./jobs/performance/bootstrap_primer.sh 'twitter' 'sklearn' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/bootstrap_primer.sh 'synthetic' 'sklearn' 0.5 'accuracy' 'gini' 40 1440 short
 # ./jobs/performance/bootstrap_primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
-./jobs/performance/bootstrap_primer.sh 'ctr' 'sklearn' 0.01 'roc_auc' 'gini' 60 1440 short
+# ./jobs/performance/bootstrap_primer.sh 'ctr' 'sklearn' 0.01 'roc_auc' 'gini' 60 1440 short
