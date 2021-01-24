@@ -54,9 +54,6 @@ def _get_model(args):
                                      criterion=args.criterion,
                                      random_state=args.rs)
 
-    elif args.model == 'random':
-        pass
-
     elif args.model == 'borat':
         pass
 
@@ -95,8 +92,12 @@ def _get_model_dict(args, params):
                                      criterion=args.criterion,
                                      random_state=args.rs)
 
-    elif args.model == 'random':
-        pass
+    elif args.model == 'extra_trees_k1':
+        model = ExtraTreesClassifier(n_estimators=params['n_estimators'],
+                                     max_depth=params['max_depth'],
+                                     max_features=1,
+                                     criterion=args.criterion,
+                                     random_state=args.rs)
 
     elif args.model == 'borat':
         pass
