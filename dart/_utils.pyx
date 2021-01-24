@@ -203,8 +203,6 @@ cdef Feature* create_feature(SIZE_t feature_index) nogil:
     feature.index = feature_index
     feature.thresholds = NULL
     feature.n_thresholds = 0
-    # feature.n_min_val = 0
-    # feature.n_max_val = 0
     return feature
 
 
@@ -234,13 +232,11 @@ cdef Feature* copy_feature(Feature* feature) nogil:
     Copies the contents of a feature to a new feature.
     """
     cdef Feature* f2 = <Feature *>malloc(sizeof(Feature))
-
     f2.index = feature.index
     f2.n_thresholds = feature.n_thresholds
     f2.thresholds = <Threshold **>malloc(feature.n_thresholds * sizeof(Threshold *))
     for k in range(feature.n_thresholds):
         f2.thresholds[k] = copy_threshold(feature.thresholds[k])
-
     return f2
 
 
@@ -265,32 +261,42 @@ cdef Threshold* copy_threshold(Threshold* threshold) nogil:
     return t2
 
 
-cdef void dealloc_features(Feature** features,
+cdef void free_features(Feature** features,
                            SIZE_t n_features) nogil:
     """
     Deallocate a features array and all thresholds.
     """
-    # object pointers
-    cdef Feature* feature = NULL
+    cdef SIZE_t j = 0
 
-    # loop through each feature in this array
+    # free each feature and then the array
+    if features != NULL:
     for j in range(n_features):
-        feature = features[j]
+        free_feature(features[j])
+    free(features)
 
-        # loop through each threshold for this feature
-        for k in range(feature.n_thresholds):
 
-            # free threshold
-            free(feature.thresholds[k])
-
-        # free thresholds array
-        free(feature.thresholds)
-
-        # free feature
+cdef void free_feature(Feature* feature) nogil:
+    """
+    Frees all properties of this feature, and then the feature.
+    """
+    if feature != NULL:
+        if feature.thresholds != NULL:
+            free_thresholds(feature.thresholds, feature.n_thresholds)
         free(feature)
 
-    # free features array
-    free(features)
+
+cdef void free_thresholds(Threhsold** thresholds,
+                          SIZE_t n_thresholds) nogil:
+    """
+    Deallocate a thresholds array and its contents
+    """
+    cdef SIZE_t k = 0
+
+    # free each threshold and then the array
+    if thresholds != NULL:
+    for k in range(n_thresholds):
+        free(thresholds[k])
+    free(thresholds)
 
 
 # INTLIST METHODS

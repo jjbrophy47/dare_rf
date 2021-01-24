@@ -486,6 +486,7 @@ cdef class _Remover:
 
         # class properties
         cdef SIZE_t k_samples = self.config.k
+        cdef SIZE_t n_total_features = self.manager.n_features
 
         # counters
         cdef SIZE_t i = 0
@@ -502,7 +503,10 @@ cdef class _Remover:
         cdef SIZE_t* threshold_validities = NULL
         cdef SIZE_t  n_invalid_thresholds = 0
         cdef SIZE_t  n_valid_thresholds = 0
-        cdef bint    valid_threshold = False
+        cdef SIZE_t  n_viable_thresholds = 0
+
+        # invalid features
+        cdef IntList* invalid_features = create_intlist(node.n_features, 0)
 
         # return variable
         cdef SIZE_t n_usable_thresholds = 0
@@ -553,19 +557,16 @@ cdef class _Remover:
                 v2_label_ratio = threshold.n_v2_pos_samples / (1.0 * threshold.n_v2_samples)
 
                 # check to see if threshold is still valid
-                valid_threshold = ((threshold.n_left_samples > 0 and threshold.n_right_samples > 0) and
-                                  ((v1_label_ratio != v2_label_ratio) or
-                                   (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
-                                   (v2_label_ratio > 0.0 and v2_label_ratio < 1.0)))
-
-                # save whether this threshold was valid or not
-                threshold_validities[k] = valid_threshold
+                threshold_validities[k] = ((threshold.n_left_samples > 0 and threshold.n_right_samples > 0) and
+                                          ((v1_label_ratio != v2_label_ratio) or
+                                           (v1_label_ratio > 0.0 and v1_label_ratio < 1.0) or
+                                           (v2_label_ratio > 0.0 and v2_label_ratio < 1.0)))
 
                 # printf('[R - UM] threshold %.5f, n_left_samples: %ld, n_right_samples: %ld, valid: %ld\n',
                 #        threshold.value, threshold.n_left_samples, threshold.n_right_samples, threshold_validities[k])
 
                 # invalid threshold
-                if not valid_threshold:
+                if not threshold_validities[k]:
                     n_invalid_thresholds += 1
 
                     # if the chosen feature / threshold is invalid, retrain
@@ -574,6 +575,7 @@ cdef class _Remover:
 
                         # clean up
                         free(threshold_validities)
+                        free_intlist(invalid_features)
                         return -1
 
                 # valid threshold
@@ -584,29 +586,47 @@ cdef class _Remover:
             # invalid thresholds, sample new viable thresholds, if any
             if n_invalid_thresholds > 0:
 
-                # no. thresholds is not equal to no. allowable thresholds
+                # no other candidate thresholds for this feature
                 if feature.n_thresholds < k_samples:
 
-                    # no other candidate thresholds, remove invalid thresholds from this feature
+                    # remove invalid thresholds from this feature
                     if n_invalid_thresholds < feature.n_thresholds:
-                        remove_invalid_thresholds(feature, n_invalid_thresholds, threshold_validities)
+                        remove_invalid_thresholds(feature, n_valid_thresholds, threshold_validities)
 
-                    # no candidate thresholds at all, replace feature
+                    # no candidate thresholds remain, flag feature for replacement
                     else:
-                        pass
+                        invalid_features.arr[invalid_features.n] = feature.index
+                        invalid_features.n += 1
 
                 # possibly other thresholds, sample new thresholds for this feature
                 else:
-                    n_viable_thresholds = sample_new_thresholds(feature, n_invalid_thresholds,
+                    n_viable_thresholds = sample_new_thresholds(feature, n_valid_thresholds,
                                                                 threshold_validities, node, X, y,
                                                                 remove_samples, self.config)
 
-                    # all thresholds invalid, replace feature
+                    # all thresholds invalid, flag feature for replacement
                     if n_viable_thresholds == 0:
-                        pass
+                        invalid_features.arr[invalid_features.n] = feature.index
+                        invalid_features.n += 1
+
+                    # increment no. usable thresholds
+                    n_usable_thresholds += n_viable_thresholds
 
             # clean up
             free(threshold_validities)
+
+        # replace invalid features
+        if invalid_features.n > 0:
+            n_usable_thresholds += sample_new_features(&node.features, &node.constant_features,
+                                                       invalid_features, n_total_features, node, X, y,
+                                                       remove_samples, config)
+
+            # no usable thresholds if there are no valid features
+            if node.n_features == 0:
+                n_usable_thresholds = 0
+
+        # clean up
+        free_intlist(invalid_features)
 
         return n_usable_thresholds
 
@@ -645,7 +665,6 @@ cdef class _Remover:
             n_usable_thresholds = -1
 
         return n_usable_thresholds
-
 
     cdef void add_metric(self,
                          INT32_t remove_type,
@@ -702,15 +721,14 @@ cdef class _Remover:
 
 # helper methods
 cdef void remove_invalid_thresholds(Feature* feature,
-                                    SIZE_t   n_invalid_thresholds,
+                                    SIZE_t   n_valid_thresholds,
                                     SIZE_t*  threshold_validities)
     """
     Removes the invalid thresholds from this feature.
     """
 
     # create final thresholds array
-    n_valid_thresholds = feature.n_thresholds - n_invalid_thresholds
-    final_thresholds = <Threshold **>malloc(n_valid_thresholds  * sizeof(Threshold *))
+    cdef Threshold** new_thresholds = <Threshold **>malloc(n_valid_thresholds  * sizeof(Threshold *))
 
     # filter out invalid thresholds and free original thresholds array
     i = 0
@@ -721,15 +739,12 @@ cdef void remove_invalid_thresholds(Feature* feature,
             valid_thresholds[i] = copy_threshold(feature.thresholds[k])
             i +=1
 
-        # free threshold
-        free(feature.thresholds[k])
-
     # free thresholds array
-    free(feature.thresholds)
+    free_thresholds(feature.thresholds, feature.n_thresholds)
 
     # save new thresholds array to the feature
-    feature.thresholds = final_thresholds
-    feature.n_thresholds = n_final_thresholds
+    feature.thresholds = new_thresholds
+    feature.n_thresholds = n_valid_thresholds
 
 
 cdef SIZE_t sample_new_thresholds(Feature*  feature,
@@ -741,7 +756,7 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
                                   IntList*  remove_samples,
                                   _Config   config) nogil:
     """
-    Try to sample new thresholds for all in invalid thresholds for this feature.
+    Try to sample new thresholds for all invalid thresholds for this feature.
     """
 
     # configuration
@@ -830,7 +845,7 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
         n_unused_thresholds_to_sample = n_unused_thresholds
 
     # allocate memory for the new thresholds array
-    n_new_thresholds = n_thresholds_to_sample + n_valid_thresholds
+    n_new_thresholds = n_unused_thresholds_to_sample + n_valid_thresholds
     new_thresholds = <Threshold **>malloc(n_new_thresholds * sizeof(Threshold *))
     sampled_indices = create_intlist(n_unused_thresholds_to_sample, 0)
 
@@ -848,7 +863,7 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
                 valid = False
                 break
 
-        # valid: add copied threshold to sampled list of candidate thresholds
+        # valid: copy threshold to new thresholds
         if valid:
             new_thresholds[sampled_indices.n] = copy_threshold(unused_thresholds[ndx])
             sampled_indices.arr[sampled_indices.n] = ndx
@@ -863,16 +878,9 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
             new_thresholds[i] = copy_threshold(feature.thresholds[k])
             i += 1
 
-        # free threshold
-        free(feature.thresholds[k])
-
-    # free thresholds array
-    free(feature.thresholds)
-
-    # free candidate thresholds contents and array
-    for k in range(n_candidate_thresholds):
-        free(candidate_thresholds[k])
-    free(candidate_thresholds)
+    # free previous thresholds and candidate thresholds arrays
+    free_thresholds(feature.thresholds, feature.n_thresholds)
+    free_thresholds(candidate_thresholds, n_candidate_thresholds)
 
     # clean up
     free(values)
@@ -886,19 +894,47 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
     feature.thresholds = new_thresholds
     feature.n_thresholds = n_new_thresholds
 
-    return n_candidate_thresholds
+    return n_unused_thresholds_to_sample
 
 
+cdef SIZE_t sample_new_features(Feature*** features_ptr,
+                                IntList**  constant_features_ptr,
+                                IntList*   invalid_features,
+                                SIZE_t     n_total_features,
+                                Node*      node,
+                                DTYPE_t**  X,
+                                INT32_t*   y,
+                                IntList*   remove_samples,
+                                _Config    config) nogil:
+    """
+    Sample new unused features to replace the invalid features.
+    """
 
+    # configuration
+    cdef SIZE_t max_features = config.max_features
 
-    # compute no. pos. samples
-    # for i in range(samples.n):
-    #     labels[i] = y[samples.arr[i]]
-    #     n_pos_samples += y[samples.arr[i]]
+    # indexers
+    cdef SIZE_t feature_index = 0
+    cdef SIZE_t invalid_feature_index = 0
 
-    # variables to keep track of constant and sampled features
-    constant_features = copy_intlist(node.constant_features, n_total_features)
-    sampled_features = create_intlist(n_total_features, 0)
+    # counters
+    cdef SIZE_t i = 0
+    cdef SIZE_t j = 0
+    cdef SIZE_t k = 0
+    cdef SIZE_t n_used_invalid_features = 0
+
+    # keeps track of invalid features
+    cdef IntList* constant_features = copy_intlist(constant_features_ptr[0], n_total_features)
+    cdef IntList* sampled_features = copy_intlist(invalid_features, n_total_features)
+    cdef SIZE_t   n_features = node.n_features - invalid_features.n
+
+    # old and new features array
+    cdef Feature** features = features_ptr[0]
+    cdef Feature** new_features = NULL
+    cdef SIZE_t    n_new_features = 0
+
+    # return variable
+    cdef SIZE_t n_usable_thresholds = 0
 
     # sample features until `max_features` is reached or there are no features left
     while n_features < max_features and (sampled_features.n + constant_features.n) < n_total_features:
@@ -916,130 +952,72 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
             if constant_features.arr[i] == feature_index:
                 continue
 
-        # printf('[S - SGT] feature_index: %d\n', feature_index)
-
-        # copy values and labels into new arrays, and count no. pos. labels
-        for i in range(samples.n):
-            values[i] = X[samples.arr[i]][feature_index]
-            indices[i] = i
-
-        # sort feature values, and their corresponding indices
-        sort(values, indices, samples.n)
-
         # constant feature
         if values[samples.n - 1] <= values[0] + FEATURE_THRESHOLD:
             constant_features.arr[constant_features.n] = feature_index
             constant_features.n += 1
             continue
 
-        # get candidate thresholds for this feature
-        candidate_thresholds = <Threshold **>malloc(samples.n * sizeof(Threshold *))
-        n_candidate_thresholds = get_candidate_thresholds(values, labels, indices, samples.n,
-                                                          n_pos_samples, min_samples_leaf,
-                                                          candidate_thresholds)
+        # create a feature and sample thresholds
+        feature = create_feature(feature_index)
+        sample_new_thresholds(feature, 0, NULL, node, X, y, remove_samples, config)
 
-        # no valid thresholds, candidate thresholds is freed in the method
-        if n_candidate_thresholds == 0:
+        # no valid thresholds
+        if feature.n_thresholds == 0:
             sampled_features.arr[sampled_features.n] = feature_index
             sampled_features.n += 1
+            free_feature(feature)
             continue
 
-        # increment total no. of valid thresholds
-        n_usable_thresholds += n_candidate_thresholds
+        # get invalid feature index
+        invalid_feature_index = invalid_features.arr[n_used_invalid_features]
+        n_used_invalid_features += 1
 
-        # create feature object
-        feature = <Feature *>malloc(sizeof(Feature))
-        feature.index = feature_index
+        # replace the invalid feature with a valid one
+        for j in range(node.n_features):
+            if features[j].index == invalid_feature_index:
+                free_feature(features[j])
+                features[j] = feature
+                n_features += 1
+                n_usable_thresholds += feature.n_thresholds
 
-        # sample k candidate thresholds uniformly at random
-        if n_candidate_thresholds < k_samples:
-            n_candidate_thresholds_to_sample = n_candidate_thresholds
-        else:
-            n_candidate_thresholds_to_sample = k_samples
+    # could not replace all invalid features, remove remaining invalid features
+    if n_features < node.n_features:
 
-        # printf('[S - SGT] n_candidate_thresholds_to_sample: %ld\n', n_candidate_thresholds_to_sample)
+        # new (smaller) features array
+        new_features = <Feature **>malloc(n_features * sizeof(Feature *))
+        n_new_features = 0
 
-        # create new (smaller) thresholds array
-        final_thresholds = <Threshold **>malloc(n_candidate_thresholds_to_sample * sizeof(Threshold *))
-        sampled_indices = create_intlist(n_candidate_thresholds_to_sample, 0)
-
-        # sample threshold indices uniformly at random
-        while sampled_indices.n < n_candidate_thresholds_to_sample:
+        # copy valid features to this new array
+        for j in range(node.n_features):
             valid = True
 
-            # sample a threshold index
-            ndx = rand_int(0, n_candidate_thresholds, random_state)
-
-            # invalid: already sampled
-            for i in range(sampled_indices.n):
-                if ndx == sampled_indices.arr[i]:
+            # invalid feature
+            for k in range(invalid_features.n):
+                if features[j].index == invalid_features.arr[k]:
                     valid = False
-                    break
 
-            # valid threshold
+            # copy valid feature to new features array
             if valid:
+                new_features[n_new_features] = copy_feature(features[j])
+                n_new_features += 1
 
-                # add copied threshold to thresholds array
-                threshold = copy_threshold(candidate_thresholds[ndx])
-                final_thresholds[sampled_indices.n] = threshold
-                sampled_indices.arr[sampled_indices.n] = ndx
-                sampled_indices.n += 1
+        # free previous features
+        free_features(features)
 
-                # compute split score
-                split_score = compute_split_score(use_gini,
-                                                  node.n_samples,
-                                                  threshold.n_left_samples,
-                                                  threshold.n_right_samples,
-                                                  threshold.n_left_pos_samples,
-                                                  threshold.n_right_pos_samples)
+        # set features to new features array
+        features_ptr[0] = new_features
+        node.n_features = n_new_features
 
-                # save if its the best score
-                if split_score < best_score:
-                    best_score = split_score
-                    chosen_feature = feature
-                    chosen_threshold = threshold
+    # free previous constant features array and set new constant features array
+    free_intlist(constant_features_ptr[0])
+    constant_features_ptr[0] = copy_intlist(constant_features, constant_features.n)
 
-        # printf('[S - SGT] n_candidate_thresholds_to_sample: %ld\n', n_candidate_thresholds_to_sample)
-
-        # set threshold properties for this feature
-        feature.thresholds = final_thresholds
-        feature.n_thresholds = n_candidate_thresholds_to_sample
-
-        # add feature to features array
-        features[n_features] = feature
-        n_features += 1
-
-        # free candidate thresholds array
-        for i in range(n_candidate_thresholds):
-            free(candidate_thresholds[i])
-        free(candidate_thresholds)
-
-        # free sampled indices array
-        free_intlist(sampled_indices)
-
-    # free previous constant features array
-    free_intlist(node.constant_features)
-
-    # set node properties
-    if n_usable_thresholds > 0:
-        node.features = <Feature **>realloc(features, n_features * sizeof(Feature *))
-        node.n_features = n_features
-        node.constant_features = copy_intlist(constant_features, constant_features.n)
-        node.chosen_feature = copy_feature(chosen_feature)
-        node.chosen_threshold = copy_threshold(chosen_threshold)
-
-    # free features array
-    else:
-        node.constant_features = copy_intlist(constant_features, constant_features.n)
-        free(features)
-
-    # free constant features
-    free_intlist(constant_features)
+    # set no. features
+    node.n_features = n_features
 
     # clean up
-    free(values)
-    free(labels)
-    free(indices)
     free_intlist(sampled_features)
+    free_intlist(constant_features)
 
     return n_usable_thresholds

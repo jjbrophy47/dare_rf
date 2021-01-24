@@ -56,8 +56,9 @@ cdef Threshold* create_threshold(DTYPE_t value,
                                  SIZE_t n_right_samples) nogil
 cdef Feature* copy_feature(Feature* feature) nogil
 cdef Threshold* copy_threshold(Threshold* threshold) nogil
-cdef void dealloc_features(Feature** features,
-                           SIZE_t n_features) nogil
+cdef void free_feature(Feature* feature) nogil
+cdef void free_features(Feature** features,
+                        SIZE_t n_features) nogil
 
 # IntList methods
 cdef IntList* create_intlist(SIZE_t n_elem, bint initialize) nogil
