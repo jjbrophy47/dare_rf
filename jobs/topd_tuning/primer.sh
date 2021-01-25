@@ -1,10 +1,10 @@
 dataset=$1
-n_estimators=$2
-max_depth=$3
-max_features=$4
-tune_frac=$5
+criterion=$2
+n_estimators=$3
+max_depth=$4
+k=$5
 scoring=$6
-criterion=$7
+tune_frac=$7
 mem=$8
 time=$9
 partition=${10}
@@ -15,10 +15,9 @@ for rs in ${rs_list[@]}; do
     sbatch --mem=${mem}G \
            --time=$time \
            --partition=$partition \
-           --job-name=TT_$dataset \
+           --job-name=TOPD_$dataset \
            --output=jobs/logs/topd_tuning/$dataset \
            --error=jobs/errors/topd_tuning/$dataset \
            jobs/topd_tuning/runner.sh $dataset \
-           $n_estimators $max_depth $max_features \
-           $tune_frac $scoring $criterion $rs
+           $n_estimators $max_depth $k $tune_frac $scoring $criterion $rs
 done

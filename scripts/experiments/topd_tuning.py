@@ -1,6 +1,6 @@
 """
-This experiment tunes the hyperparameters of the
-addition/removal-enabled trees.
+This experiment tunes the `topd` hyperparameter of
+the DaRE trees.
 """
 import os
 import sys
@@ -21,32 +21,18 @@ from utility import data_util
 from utility import print_util
 
 
-def _get_model(args, topd=1):
+def _get_model(args, topd=0):
     """
-    Return the appropriate model CeDAR model.
+    Return model with the specified `topd`.
     """
 
-    model = dart.Forest(topd=topd,
-                        min_support=args.min_support,
-                        max_depth=args.max_depth,
+    model = dart.Forest(max_depth=args.max_depth,
                         criterion=args.criterion,
+                        topd=topd,
+                        k=args.k,
                         n_estimators=args.n_estimators,
                         max_features=args.max_features,
-                        random_state=args.rs)
-
-    return model
-
-
-def _get_exact_model(args):
-    """
-    Exact unlearner.
-    """
-    model = dart.Forest(topd=0,
-                        min_support=args.min_support,
-                        max_depth=args.max_depth,
-                        criterion=args.criterion,
-                        n_estimators=args.n_estimators,
-                        max_features=args.max_features,
+                        verbose=args.verbose,
                         random_state=args.rs)
 
     return model
@@ -60,10 +46,11 @@ def performance(args, out_dir, logger):
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
     # dataset statistics
-    logger.info('train instances: {:,}'.format(X_train.shape[0]))
-    logger.info('test instances: {:,}'.format(X_test.shape[0]))
-    logger.info('attributes: {:,}'.format(X_train.shape[1]))
+    logger.info('\nno. train instances: {:,}'.format(X_train.shape[0]))
+    logger.info('no. test instances: {:,}'.format(X_test.shape[0]))
+    logger.info('no. features: {:,}'.format(X_train.shape[1]))
     logger.info('split criterion: {}'.format(args.criterion))
+    logger.info('scoring: {}'.format(args.scoring))
 
     # tune on a fraction of the training data
     if args.tune_frac < 1.0:
@@ -81,9 +68,8 @@ def performance(args, out_dir, logger):
 
     # train exact model
     start = time.time()
-    model = _get_exact_model(args)
-    exact_score = cross_val_score(model, X_train_sub, y_train_sub,
-                                  scoring=args.scoring, cv=skf).mean()
+    model = _get_model(args, topd=0)
+    exact_score = cross_val_score(model, X_train_sub, y_train_sub, scoring=args.scoring, cv=skf).mean()
     logger.info('\n[topd=0] CV score: {:.5f}, time: {:.3f}s'.format(exact_score, time.time() - start))
 
     # train DART model
@@ -96,8 +82,7 @@ def performance(args, out_dir, logger):
 
         # obtain score for this topd
         model = _get_model(args, topd=topd)
-        score = cross_val_score(model, X_train_sub, y_train_sub,
-                                scoring=args.scoring, cv=skf).mean()
+        score = cross_val_score(model, X_train_sub, y_train_sub, scoring=args.scoring, cv=skf).mean()
         score_diff = exact_score - score
         scores[topd] = score
         end = time.time() - start
@@ -128,7 +113,7 @@ def main(args):
     # create logger
     logger = print_util.get_logger(os.path.join(out_dir, 'log.txt'))
     logger.info(args)
-    logger.info(datetime.now())
+    logger.info('timestamp: {}'.format(datetime.now()))
 
     # run experiment
     performance(args, out_dir, logger)
@@ -151,7 +136,7 @@ if __name__ == '__main__':
 
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_features', type=float, default=0.25, help='maximum features to sample.')
+    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
     parser.add_argument('--k', type=int, default=10, help='no. thresholds to sample for greedy nodes.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')

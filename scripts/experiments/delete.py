@@ -260,7 +260,7 @@ def experiment(args, logger, out_dir, seed):
         n_deleted += int(allotted_time) / average_delete_time
 
     # get model statistics
-    # n_nodes_avg, n_exact_avg, n_semi_avg = model.get_node_statistics()
+    n_nodes_avg, n_random_nodes_avg, n_greedy_nodes_avg = model.get_node_statistics()
     delete_types = np.concatenate(delete_types_list)
     delete_depths = np.concatenate(delete_depths_list)
     delete_costs = np.concatenate(delete_costs_list)
@@ -279,9 +279,9 @@ def experiment(args, logger, out_dir, seed):
     results['model_auc'] = model_auc
     results['model_acc'] = model_acc
     results['model_ap'] = model_ap
-    # results['model_n_avg_nodes'] = n_nodes_avg
-    # results['model_n_exact_avg'] = n_exact_avg
-    # results['model_n_semi_avg'] = n_semi_avg
+    results['model_n_nodes_avg'] = n_nodes_avg
+    results['model_n_random_nodes_avg'] = n_random_nodes_avg
+    results['model_n_greedy_nodes_avg'] = n_greedy_nodes_avg
 
     logger.info('\nResults:\n{}'.format(results))
     np.save(os.path.join(out_dir, 'results.npy'), results)

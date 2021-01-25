@@ -1,13 +1,14 @@
-criterion='gini'
-
-# ./jobs/topd_tuning/primer.sh surgical 250 10 0.25 1.0 accuracy $criterion 3 1440 short
-# ./jobs/topd_tuning/primer.sh vaccine 250 20 -1 1.0 accuracy $criterion 3 1440 short
-# ./jobs/topd_tuning/primer.sh adult 250 20 -1 1.0 accuracy $criterion 3 1440 short
-# ./jobs/topd_tuning/primer.sh bank_marketing 250 10 0.25 1.0 roc_auc $criterion 3 1440 short
-# ./jobs/topd_tuning/primer.sh flight_delays 250 20 -1 1.0 roc_auc $criterion 18 1440 short
-# ./jobs/topd_tuning/primer.sh diabetes 250 20 -1 1.0 accuracy $criterion 18 1440 short
-# ./jobs/topd_tuning/primer.sh olympics 250 20 0.25 1.0 roc_auc $criterion 35 4320 long
-# ./jobs/topd_tuning/primer.sh census 250 20 -1 1.0 roc_auc $criterion 18 1440 short
-# ./jobs/topd_tuning/primer.sh credit_card 250 10 0.25 1.0 average_precision $criterion 9 1440 short
-./jobs/topd_tuning/primer.sh synthetic 250 20 0.25 0.5 accuracy $criterion 60 4320 long
-# ./jobs/topd_tuning/primer.sh higgs 100 10 0.25 0.05 accuracy $criterion 40 1440 short
+./jobs/topd_tuning/primer.sh 'surgical' 'gini' 50 20 10 'accuracy' 1.0 3 1440 'short'
+./jobs/topd_tuning/primer.sh 'vaccine' 'gini' 250 20 10 'accuracy' 1.0 6 1440 'short'
+./jobs/topd_tuning/primer.sh 'adult' 'gini' 50 20 10 'accuracy' 1.0 3 1440 'short'
+./jobs/topd_tuning/primer.sh 'bank_marketing' 'gini' 100 20 5 'roc_auc' 1.0 3 1440 'short'
+./jobs/topd_tuning/primer.sh 'flight_delays' 'gini' 250 20 25 'roc_auc' 1.0 18 1440 'short'
+./jobs/topd_tuning/primer.sh 'diabetes' 'gini' 100 20 5 'accuracy' 1.0 18 1440 'short'
+./jobs/topd_tuning/primer.sh 'no_show' 'gini' 100 20 25 'roc_auc' 1.0 18 1440 'short'
+./jobs/topd_tuning/primer.sh 'olympics' 'gini' 100 20 25 'roc_auc' 1.0 35 1440 'short'
+./jobs/topd_tuning/primer.sh 'census' 'gini' 100 20 10 'roc_auc' 1.0 18 1440 'short'
+./jobs/topd_tuning/primer.sh 'credit_card' 'gini' 50 20 25 'average_precision' 1.0 9 1440 'short'
+./jobs/topd_tuning/primer.sh 'twitter' 'gini' 50 20 50 'roc_auc' 0.5 35 1440 'short'
+./jobs/topd_tuning/primer.sh 'synthetic' 'gini' 50 20 50 'accuracy' 0.5 60 1440 'short'
+./jobs/topd_tuning/primer.sh 'higgs' 'gini' 100 20 10 'accuracy' 0.1 60 1440 'short'
+./jobs/topd_tuning/primer.sh 'ctr' 'gini' 50 10 50 'roc_auc' 0.01 70 1440 'short'

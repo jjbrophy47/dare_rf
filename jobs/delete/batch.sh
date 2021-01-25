@@ -1,5 +1,3 @@
-
-# DART (Gini, Deletion)
 ./jobs/delete/dart_primer.sh 'surgical' 'gini' 50 20 10 3 1440 short
 ./jobs/delete/dart_primer.sh 'vaccine' 'gini' 250 20 10 6 1440 short
 ./jobs/delete/dart_primer.sh 'adult' 'gini' 50 20 10 3 1440 short
