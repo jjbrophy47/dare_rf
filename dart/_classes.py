@@ -568,7 +568,7 @@ class Tree(object):
     #     if n_samples_to_retrain == -1:
     #         exit('Removal index invalid!')
 
-        return n_samples_to_retrain
+        # return n_samples_to_retrain
 
     # def clear_add_indices(self):
     #     """

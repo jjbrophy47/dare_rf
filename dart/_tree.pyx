@@ -121,6 +121,9 @@ cdef class _TreeBuilder:
                 # printf('[B] depth: %ld, chosen_feature.index: %ld, chosen_threshold.value: %.2f\n',
                 #       node.depth, node.chosen_feature.index, node.chosen_threshold.value)
 
+                # printf('[B] split.left_samples.n: %ld, split.right_samples.n: %ld\n',
+                #        split.left_samples.n, split.right_samples.n)
+
                 # traverse to left and right branches
                 node.left = self._build(X, y, split.left_samples, split.left_constant_features, depth + 1, 1)
                 node.right = self._build(X, y, split.right_samples, split.right_constant_features, depth + 1, 0)

@@ -149,14 +149,22 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         feature_index = rand_int(0, n_total_features, random_state)
 
         # already sampled feature
+        valid = True
         for i in range(sampled_features.n):
             if sampled_features.arr[i] == feature_index:
-                continue
+                valid = False
+                break
+        if not valid:
+            continue
 
         # known constant feature
+        valid = True
         for i in range(constant_features.n):
             if constant_features.arr[i] == feature_index:
-                continue
+                valid = False
+                break
+        if not valid:
+            continue
 
         # printf('[S - SGT] feature_index: %d\n', feature_index)
 
@@ -174,6 +182,11 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
             constant_features.n += 1
             continue
 
+        # add feature index to list of sampled features
+        else:
+            sampled_features.arr[sampled_features.n] = feature_index
+            sampled_features.n += 1
+
         # get candidate thresholds for this feature
         candidate_thresholds = <Threshold **>malloc(samples.n * sizeof(Threshold *))
         n_candidate_thresholds = get_candidate_thresholds(values, labels, indices, samples.n,
@@ -182,8 +195,6 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
 
         # no valid thresholds, candidate thresholds is freed in the method
         if n_candidate_thresholds == 0:
-            sampled_features.arr[sampled_features.n] = feature_index
-            sampled_features.n += 1
             continue
 
         # increment total no. of valid thresholds
@@ -192,6 +203,8 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         # create feature object
         feature = <Feature *>malloc(sizeof(Feature))
         feature.index = feature_index
+
+        # printf('[S - SGT] feature_index: %d\n', feature_index)
 
         # sample k candidate thresholds uniformly at random
         if n_candidate_thresholds < k_samples:
@@ -335,14 +348,22 @@ cdef SIZE_t select_random_threshold(Node*     node,
         feature_index = rand_int(0, n_total_features, random_state)
 
         # check if feature has already been sampled
+        valid = True
         for i in range(sampled_features.n):
             if sampled_features.arr[i] == feature_index:
-                continue
+                valid = False
+                break
+        if not valid:
+            continue
 
         # check if feature is a known constant
+        valid = True
         for i in range(constant_features.n):
             if constant_features.arr[i] == feature_index:
-                continue
+                valid = False
+                break
+        if not valid:
+            continue
 
         # find min. max. values, and their counts
         min_val = X[samples.arr[0]][feature_index]
@@ -365,6 +386,10 @@ cdef SIZE_t select_random_threshold(Node*     node,
         # non-constant feature
         else:
 
+            # add feature to list of sampled features
+            sampled_features.arr[sampled_features.n] = feature_index
+            sampled_features.n += 1
+
             # select a threshold uniformly at random
             threshold_value = <DTYPE_t>rand_uniform(min_val, max_val, random_state)
 
@@ -383,8 +408,6 @@ cdef SIZE_t select_random_threshold(Node*     node,
 
             # not enough samples in both branches, invalid threshold
             if n_left_samples < min_samples_leaf or n_right_samples < min_samples_leaf:
-                sampled_features.arr[sampled_features.n] = feature_index
-                sampled_features.n += 1
                 continue
 
             # free previous constant thresholds array

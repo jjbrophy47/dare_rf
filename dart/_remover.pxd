@@ -39,7 +39,7 @@ cdef class _Remover:
 
     # C API
     cdef void _remove(self,
-                      Node*     node,
+                      Node**    node_ptr,
                       DTYPE_t** X,
                       INT32_t*  y,
                       IntList*  remove_samples) nogil
@@ -55,8 +55,13 @@ cdef class _Remover:
 
     cdef void convert_to_leaf(self,
                               Node*        node,
-                              IntList*     remove_samples,
-                              SplitRecord* split) nogil
+                              IntList*     remove_samples) nogil
+
+    # cdef void retrain(self,
+    #                   Node***   node_ptr_ptr,
+    #                   DTYPE_t** X,
+    #                   INT32_t*  y,
+    #                   IntList*  remove_samples) nogil
 
     cdef void retrain(self,
                       Node**    node_ptr,

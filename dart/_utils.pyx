@@ -411,16 +411,16 @@ cdef void split_samples(Node*        node,
         split.left_samples.arr = <SIZE_t *>realloc(split.left_samples.arr,
                                                    split.left_samples.n * sizeof(SIZE_t))
     else:
-        split.left_samples.n = 0
         free_intlist(split.left_samples)
+        split.left_samples = NULL
 
     # assign right branch deleted samples
     if split.right_samples.n > 0:
         split.right_samples.arr = <SIZE_t *>realloc(split.right_samples.arr,
                                                     split.right_samples.n * sizeof(SIZE_t))
     else:
-        split.right_samples.n = 0
         free_intlist(split.right_samples)
+        split.right_samples = NULL
 
     # copy constant features array for both branches
     if copy_constant_features:

@@ -56,9 +56,9 @@ def main(args):
     # settings
     topd = 0
     k = 100
-    max_depth = 2
+    max_depth = 10
     seed = 1
-    n_delete = 20
+    n_delete = 50
 
     # train decision tree
     model = dart.Tree(topd=topd, k=k, max_depth=max_depth, random_state=seed)
@@ -78,9 +78,10 @@ def main(args):
             print('\ninstance to delete, {}'.format(delete_ndx))
             model.delete(delete_ndx)
 
-        types, depths = model.get_removal_types_depths()
+        types, depths, costs = model.get_delete_metrics()
         print('types: {}'.format(types))
         print('depths: {}'.format(depths))
+        print('costs: {}'.format(costs))
 
     # simulate the deletion of each instance
     elif args.delete and args.simulate:

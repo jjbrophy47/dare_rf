@@ -81,6 +81,7 @@ cdef class _DataManager:
         """
         Destructor.
         """
+        # printf('[M] dealloc\n')
         for i in range(self.n_samples + self.n_vacant):
             if self.X[i]:
                 free(self.X[i])

@@ -178,7 +178,7 @@ if __name__ == '__main__':
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--model', type=int, nargs='+', help='model to extract the results.',
-                        default=['dart', 'sklearn', 'extra_trees', 'random', 'borat'])
+                        default=['dart', 'sklearn', 'extra_trees', 'extra_trees_k1'])
     parser.add_argument('--tuning', type=int, nargs='+', default=['tuned', 'no_tune'], help='tuning option.')
 
     args = parser.parse_args()
