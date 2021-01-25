@@ -55,12 +55,12 @@ def main(args):
     X_train, X_test, y_train, y_test = load_data(args.dataset, args.data_dir)
 
     # train
-    topd = 10
+    topd = 0
     k = 100
-    n_estimators = 250
+    n_estimators = 100
     max_depth = 20
     seed = 1
-    n_delete = 500
+    n_delete = 100
 
     if args.model == 'dart':
         model = dart.Forest(topd=topd, k=k, n_estimators=n_estimators,
@@ -92,6 +92,7 @@ def main(args):
         delete_indices = np.random.default_rng(seed=seed).choice(X_train.shape[0], size=n_delete, replace=False)
         print('instances to delete: {}'.format(delete_indices))
 
+        # delete each sample
         for delete_ndx in delete_indices:
             start = time.time()
             model.delete(delete_ndx)
@@ -123,6 +124,8 @@ def main(args):
             # simulate the deletion
             start = time.time()
             n_samples_to_retrain = model.sim_delete(delete_ndx)
+            if args.test_idempotency:
+                n_samples_to_retrain = model.sim_delete(delete_ndx)
             sim_time = time.time() - start
             cum_sim_time += sim_time
             print('\nsimulated instance, {}: {:.3f}s, no. samples: {:,}'.format(
@@ -135,9 +138,10 @@ def main(args):
             cum_delete_time += delete_time
             print('deleted instance, {}: {:.3f}s'.format(delete_ndx, delete_time))
 
-        types, depths = model.get_removal_types_depths()
+        types, depths, costs = model.get_delete_metrics()
         print('types: {}'.format(types))
         print('depths: {}'.format(depths))
+        print('costs: {}'.format(costs.shape))
 
         avg_sim_time = cum_sim_time / len(delete_indices)
         avg_delete_time = cum_delete_time / len(delete_indices)
@@ -155,5 +159,6 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default='dart', help='dart or sklearn')
     parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
     parser.add_argument('--simulate', action='store_true', help='whether to simulate deletions or not.')
+    parser.add_argument('--test_idempotency', action='store_true', help='simulate deletion multiple times.')
     args = parser.parse_args()
     main(args)

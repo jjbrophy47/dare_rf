@@ -341,9 +341,9 @@ if __name__ == '__main__':
 
     # tree hyperparameters
     parser.add_argument('--criterion', type=str, default='gini', help='gini or entropy.')
-    parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_depth', type=int, default=10, help='maximum depth of the tree.')
-    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
+    parser.add_argument('--n_estimators', type=int, default=100, help='no. trees in the forest.')
+    parser.add_argument('--max_depth', type=int, default=10, help='max. depth of the tree.')
+    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum no. features to sample.')
 
     # DART
     parser.add_argument('--topd', type=int, default=0, help='no. top layers to be random.')

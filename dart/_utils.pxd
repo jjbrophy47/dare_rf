@@ -54,7 +54,11 @@ cdef Feature* create_feature(SIZE_t feature_index) nogil
 cdef Threshold* create_threshold(DTYPE_t value,
                                  SIZE_t n_left_samples,
                                  SIZE_t n_right_samples) nogil
+cdef Feature** copy_features(Feature** features,
+                             SIZE_t n_features) nogil
 cdef Feature* copy_feature(Feature* feature) nogil
+cdef Threshold** copy_thresholds(Threshold** thresholds,
+                                 SIZE_t n_thresholds) nogil
 cdef Threshold* copy_threshold(Threshold* threshold) nogil
 cdef void free_features(Feature** features,
                         SIZE_t n_features) nogil

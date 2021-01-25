@@ -20,9 +20,8 @@ import numpy as np
 from ._manager import _DataManager
 from ._config import _Config
 from ._splitter import _Splitter
-# from ._adder import _Adder
 from ._remover import _Remover
-# from ._simulator import _Simulator
+from ._simulator import _Simulator
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -183,27 +182,6 @@ class Forest(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
-    # def add(self, X, y, get_indices=False):
-    #     """
-    #     Adds instances to the database and updates the model.
-    #     """
-    #     assert X.ndim == 2 and y.ndim == 1
-    #     assert X.shape[1] == self.n_features_
-    #     X, y = check_data(X, y)
-
-    #     # add data to the database
-    #     self.manager_.add_data(X, y)
-
-    #     # update trees
-    #     for i in range(len(self.trees_)):
-    #         self.trees_[i].add()
-
-    #     # cleanup
-    #     if get_indices:
-    #         return np.array(self.manager_.add_indices, dtype=np.int32)
-    #     else:
-    #         self.manager_.clear_add_indices()
-
     def delete(self, remove_indices):
         """
         Removes instances from the database and updates the model.
@@ -225,24 +203,24 @@ class Forest(object):
         # remove data from the database
         self.manager_.remove_data(remove_indices)
 
-    # def sim_delete(self, remove_index):
-    #     """
-    #     Simulate the deletion of a SINGLE example.
+    def sim_delete(self, remove_index):
+        """
+        Simulate the deletion of a SINGLE example.
 
-    #     Returns the number of samples that needs to be retrained
-    #       if this example were to be deleted.
-    #     """
+        Returns the number of samples that needs to be retrained
+          if this example were to be deleted.
+        """
 
-    #     # change `remove_index` into the right data type
-    #     if not isinstance(remove_index, np.int64):
-    #         remove_index = np.int64(remove_index)
+        # change `remove_index` into the right data type
+        if not isinstance(remove_index, np.int64):
+            remove_index = np.int64(remove_index)
 
-    #     # simulate a deletion for each tree
-    #     n_samples_to_retrain = 0
-    #     for i in range(len(self.trees_)):
-    #         n_samples_to_retrain += self.trees_[i].sim_delete(remove_index)
+        # simulate a deletion for each tree
+        n_samples_to_retrain = 0
+        for i in range(len(self.trees_)):
+            n_samples_to_retrain += self.trees_[i].sim_delete(remove_index)
 
-    #     return n_samples_to_retrain
+        return n_samples_to_retrain
 
     def print(self, show_nodes=False):
         """
@@ -250,28 +228,6 @@ class Forest(object):
         """
         for tree in self.trees_:
             tree.print(show_nodes=show_nodes)
-
-    # def clear_add_indices(self):
-    #     """
-    #     Delete the add index statistics.
-    #     """
-    #     self.manager_.clear_add_indices()
-
-    # def get_add_retrain_depths(self):
-    #     """
-    #     Retrieve addition statistics.
-    #     """
-    #     types_list, depths_list = [], []
-
-    #     for tree in self.trees_:
-    #         types, depths = tree.get_add_retrain_depths()
-    #         types_list.append(types)
-    #         depths_list.append(depths)
-
-    #     types = np.concatenate(types_list)
-    #     depths = np.concatenate(depths_list)
-
-    #     return types, depths
 
     def get_delete_metrics(self):
         """
@@ -293,19 +249,36 @@ class Forest(object):
 
         return types, depths, costs
 
-    # def get_node_statistics(self):
-    #     """
-    #     Return average node counts, exact node counts, and
-    #     semi-random node counts among all trees.
-    #     """
-    #     counts = [tree.get_node_statistics() for tree in self.trees_]
-    #     n_nodes, n_exact, n_semi = tuple(zip(*counts))
+    def get_node_statistics(self):
+        """
+        Return average no. random, greedy, and total node counts over all trees.
+        """
+        n_nodes_list, n_random_nodes_list, n_greedy_nodes_list = [], [], []
 
-    #     n_nodes_avg = sum(n_nodes) / len(n_nodes)
-    #     n_exact_avg = sum(n_exact) / len(n_exact)
-    #     n_semi_avg = sum(n_semi) / len(n_semi)
+        # get metrics for each tree
+        for tree in self.trees_:
+            n_nodes, n_random_nodes, n_greedy_nodes = tree.get_node_statistics()
+            n_nodes_list.append(n_nodes)
+            n_random_nodes_list.append(n_random_nodes)
+            n_greedy_nodes_list.append(n_greedy_nodes)
 
-        # return n_nodes_avg, n_exact_avg, n_semi_avg
+        avg_n_nodes = np.mean(n_nodes_list)
+        avg_n_random_nodes = np.mean(n_random_nodes_list)
+        avg_n_greedy_nodes = np.mean(n_greedy_nodes_list)
+
+        return avg_n_nodes, avg_n_random_nodes, avg_n_greedy_nodes
+
+    def get_node_statistics(self):
+        n_nodes_list, n_random_nodes_list, n_greedy_nodes_list = [], [], []
+
+        counts = [tree.get_node_statistics() for tree in self.trees_]
+         = tuple(zip(*counts))
+
+        n_nodes_avg = sum(n_nodes) / len(n_nodes)
+        n_random_avg = sum(n_semi) / len(n_semi)
+        n_greedy_avg = sum(n_exact) / len(n_exact)
+
+        return n_nodes_avg, n_exact_avg, n_semi_avg
 
     def clear_delete_metrics(self):
         """
@@ -313,13 +286,6 @@ class Forest(object):
         """
         for tree in self.trees_:
             tree.clear_delete_metrics()
-
-    # def clear_add_metrics(self):
-    #     """
-    #     Delete add statistics.
-    #     """
-    #     for tree in self.trees_:
-    #         tree.clear_add_metrics()
 
     def get_params(self, deep=False):
         """
@@ -459,12 +425,8 @@ class Tree(object):
                                  self.tree_builder_,
                                  self.config_)
 
-        # self.simulator_ = _Simulator(self.manager_,
-        #                              self.config_)
-
-        # self.adder_ = _Adder(self.manager_,
-        #                      self.tree_builder_,
-        #                      self.use_gini_)
+        self.simulator_ = _Simulator(self.manager_,
+                                     self.config_)
 
         self.tree_builder_.build(self.tree_)
 
@@ -502,32 +464,6 @@ class Tree(object):
             self.tree_.print_value()
             print()
 
-    # def add(self, X=None, y=None, get_indices=False):
-    #     """
-    #     Adds instances to the database and updates the model.
-    #     """
-
-    #     if X is None:
-    #         assert not self.single_tree_
-
-    #     else:
-    #         assert self.single_tree_
-    #         assert X.ndim == 2 and y.ndim == 1
-    #         assert X.shape[1] == self.n_features_
-
-    #         X, y = check_data(X, y)
-    #         self.manager_.add_data(X, y)
-
-    #     # # update model
-    #     # self.adder_.add(self.tree_)
-
-    #     # cleanup
-    #     if self.single_tree_:
-    #         if get_indices:
-    #             return np.array(self.manager_.add_indices, dtype=np.int32)
-    #         else:
-    #             self.manager_.clear_add_indices()
-
     def delete(self, remove_indices):
         """
         Removes instances from the database and updates the model.
@@ -553,36 +489,22 @@ class Tree(object):
         if self.single_tree_:
             self.manager_.remove_data(remove_indices)
 
-    # def sim_delete(self, remove_index):
-    #     """
-    #     Removes instances from the database and updates the model.
-    #     """
+    def sim_delete(self, remove_index):
+        """
+        Removes instances from the database and updates the model.
+        """
 
-    #     # change `remove_index` into the right data type
-    #     if self.single_tree_:
-    #         if not isinstance(remove_index, np.int64):
-    #             remove_index = np.int64(remove_index)
+        # change `remove_index` into the right data type
+        if self.single_tree_:
+            if not isinstance(remove_index, np.int64):
+                remove_index = np.int64(remove_index)
 
-    #     # update model
-    #     n_samples_to_retrain = self.simulator_.sim_delete(self.tree_, remove_index)
-    #     if n_samples_to_retrain == -1:
-    #         exit('Removal index invalid!')
+        # update model
+        n_samples_to_retrain = self.simulator_.sim_delete(self.tree_, remove_index)
+        if n_samples_to_retrain == -1:
+            exit('Removal index invalid!')
 
-        # return n_samples_to_retrain
-
-    # def clear_add_indices(self):
-    #     """
-    #     Delete the add index statistics.
-    #     """
-    #     self.manager_.clear_add_indices()
-
-    # def get_add_retrain_depths(self):
-    #     """
-    #     Retrieve addition statistics.
-    #     """
-    #     add_types = np.array(self.adder_.add_types, dtype=np.int32)
-    #     add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
-    #     return add_types, add_depths
+        return n_samples_to_retrain
 
     def get_delete_metrics(self):
         """
@@ -599,23 +521,14 @@ class Tree(object):
         """
         self.remover_.clear_metrics()
 
-    # def clear_add_metrics(self):
-    #     """
-    #     Delete add statistics.
-    #     """
-    #     self.adder_.clear_add_metrics()
-
     def get_node_statistics(self):
         """
-        Retrieve:
-            Total node count.
-            Exact node count in the top d layers.
-            Semi-random node count in the top d layers.
+        Returns the no. total nodes, no. random nodes, and no. greedy nodes.
         """
         n_nodes = self.tree_.get_node_count()
-        n_exact_nodes = self.tree_.get_exact_node_count(self.topd_)
-        n_semi_random_nodes = self.tree_.get_random_node_count(self.topd_)
-        return n_nodes, n_exact_nodes, n_semi_random_nodes
+        n_random_nodes = self.tree_.get_random_node_count(self.topd_)
+        n_greedy_nodes = self.tree_.get_greedy_node_count(self.topd_)
+        return n_nodes, n_random_nodes, n_greedy_nodes
 
     def set_sim_mode(self, sim_mode=False):
         """

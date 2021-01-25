@@ -172,7 +172,7 @@ cdef class _Remover:
 
             # chosen feature / threshold is now invalid, check complete
             if n_usable_thresholds < 0:
-                # printf('[R] no usable thresholds, retrain\n')
+                # printf('[R] chosen feature / threshold invalid, retrain\n')
                 self.retrain(node_ptr, X, y, remove_samples)
 
             # greedy node in which there are no more usable thresholds, convert to leaf, check complete

@@ -58,7 +58,7 @@ def main(args):
     k = 100
     max_depth = 20
     seed = 1
-    n_delete = 650
+    n_delete = 500
 
     # train decision tree
     model = dart.Tree(topd=topd, k=k, max_depth=max_depth, random_state=seed)
@@ -98,6 +98,8 @@ def main(args):
             # simulate the deletion
             start = time.time()
             n_samples_to_retrain = model.sim_delete(delete_ndx)
+            if args.test_idempotency:
+                n_samples_to_retrain = model.sim_delete(delete_ndx)
             sim_time = time.time() - start
             cum_sim_time += sim_time
             print('\nsimulated instance, {}: {:.3f}s, no. samples: {:,}'.format(
@@ -110,9 +112,10 @@ def main(args):
             cum_delete_time += delete_time
             print('deleted instance, {}: {:.3f}s'.format(delete_ndx, delete_time))
 
-        types, depths = model.get_removal_types_depths()
+        types, depths, costs = model.get_delete_metrics()
         print('types: {}'.format(types))
         print('depths: {}'.format(depths))
+        print('costs: {}'.format(costs))
 
         avg_sim_time = cum_sim_time / len(delete_indices)
         avg_delete_time = cum_delete_time / len(delete_indices)
@@ -129,5 +132,6 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, default='iris', help='dataset to use for the experiment.')
     parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
     parser.add_argument('--simulate', action='store_true', help='whether to simulate deletions or not.')
+    parser.add_argument('--test_idempotency', action='store_true', help='simulate deletion multiple times.')
     args = parser.parse_args()
     main(args)

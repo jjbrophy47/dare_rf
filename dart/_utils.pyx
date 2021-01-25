@@ -210,38 +210,54 @@ cdef Threshold* create_threshold(DTYPE_t value,
     return threshold
 
 
+cdef Feature** copy_features(Feature** features, SIZE_t n_features) nogil:
+    """
+    Copies the contents of a features array to a new array.
+    """
+    new_features = <Feature **>malloc(n_features * sizeof(Feature *))
+    for j in range(n_features):
+        new_features[j] = copy_feature(features[j])
+    return new_features
+
+
 cdef Feature* copy_feature(Feature* feature) nogil:
     """
     Copies the contents of a feature to a new feature.
     """
-    cdef Feature* f2 = <Feature *>malloc(sizeof(Feature))
-    f2.index = feature.index
-    f2.n_thresholds = feature.n_thresholds
-    f2.thresholds = <Threshold **>malloc(feature.n_thresholds * sizeof(Threshold *))
-    for k in range(feature.n_thresholds):
-        f2.thresholds[k] = copy_threshold(feature.thresholds[k])
-    return f2
+    cdef Feature* new_feature = <Feature *>malloc(sizeof(Feature))
+    new_feature.index = feature.index
+    new_feature.n_thresholds = feature.n_thresholds
+    new_feature.thresholds = copy_thresholds(feature.thresholds, feature.n_thresholds)
+    return new_feature
+
+
+cdef Threshold** copy_thresholds(Threshold** thresholds, SIZE_t n_thresholds) nogil:
+    """
+    Copies the contents of a thresholds array to a new array.
+    """
+    new_thresholds = <Threshold **>malloc(n_thresholds * sizeof(Threshold *))
+    for j in range(n_thresholds):
+        new_thresholds[j] = copy_threshold(thresholds[j])
+    return new_thresholds
 
 
 cdef Threshold* copy_threshold(Threshold* threshold) nogil:
     """
     Copies the contents of a threshold to a new threshold.
     """
-    cdef Threshold* t2 = <Threshold *>malloc(sizeof(Threshold))
-
-    t2.v1 = threshold.v1
-    t2.v2 = threshold.v2
-    t2.value = threshold.value
-    t2.n_v1_samples = threshold.n_v1_samples
-    t2.n_v1_pos_samples = threshold.n_v1_pos_samples
-    t2.n_v2_samples = threshold.n_v2_samples
-    t2.n_v2_pos_samples = threshold.n_v2_pos_samples
-    t2.n_left_samples = threshold.n_left_samples
-    t2.n_left_pos_samples = threshold.n_left_pos_samples
-    t2.n_right_samples = threshold.n_right_samples
-    t2.n_right_pos_samples = threshold.n_right_pos_samples
-
-    return t2
+    cdef Threshold* new_threshold = <Threshold *>malloc(sizeof(Threshold))
+    new_threshold.v1 = threshold.v1
+    new_threshold.v2 = threshold.v2
+    new_threshold.value = threshold.value
+    new_threshold.n_v1_samples = threshold.n_v1_samples
+    new_threshold.n_v1_pos_samples = threshold.n_v1_pos_samples
+    new_threshold.n_v2_samples = threshold.n_v2_samples
+    new_threshold.n_v2_pos_samples = threshold.n_v2_pos_samples
+    new_threshold.n_left_samples = threshold.n_left_samples
+    new_threshold.n_left_pos_samples = threshold.n_left_pos_samples
+    new_threshold.n_right_samples = threshold.n_right_samples
+    new_threshold.n_right_pos_samples = threshold.n_right_pos_samples
+    return new_threshold
 
 
 cdef void free_features(Feature** features,

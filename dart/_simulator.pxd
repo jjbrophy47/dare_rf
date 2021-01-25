@@ -13,10 +13,9 @@ from ._utils cimport SIZE_t
 from ._utils cimport INT32_t
 from ._utils cimport UINT32_t
 
-cdef class _Remover:
+cdef class _Simulator:
     """
-    Recursively removes data from a _Tree built using _TreeBuilder;
-    retrains a node / subtree when a better feature / threshold is optimal.
+    Class to simulate the deletion of a training sample.
     """
 
     # Inner structures
@@ -24,40 +23,14 @@ cdef class _Remover:
     cdef _Config      config                 # Configuration object
 
     # Python API
-    cpdef INT32_t _sim_delete(self, _Tree tree, SIZE_t remove_index)
-    # cpdef void clear_metrics(self)
+    cpdef INT32_t sim_delete(self, _Tree tree, SIZE_t remove_index)
 
     # C API
-    cdef void _sim_delete(self,
-                          Node**    node_ptr,
-                          DTYPE_t** X,
-                          INT32_t*  y,
-                          IntList*  remove_samples) nogil
-
-    # cdef void update_node(self,
-    #                       Node*    node,
-    #                       INT32_t* y,
-    #                       IntList* remove_samples) nogil
-
-    # cdef void update_leaf(self,
-    #                       Node*    node,
-    #                       IntList* remove_samples) nogil
-
-    # cdef void convert_to_leaf(self,
-    #                           Node*        node,
-    #                           IntList*     remove_samples) nogil
-
-    # cdef void retrain(self,
-    #                   Node***   node_ptr_ptr,
-    #                   DTYPE_t** X,
-    #                   INT32_t*  y,
-    #                   IntList*  remove_samples) nogil
-
-    # cdef void retrain(self,
-    #                   Node**    node_ptr,
-    #                   DTYPE_t** X,
-    #                   INT32_t*  y,
-    #                   IntList*  remove_samples) nogil
+    cdef INT32_t _sim_delete(self,
+                             Node*     node,
+                             DTYPE_t** X,
+                             INT32_t*  y,
+                             SIZE_t    remove_index) nogil
 
     cdef INT32_t check_optimal_split(self,
                                      Node*     node,
@@ -65,22 +38,26 @@ cdef class _Remover:
                                      SIZE_t    n_features) nogil
 
     cdef SIZE_t update_metadata(self,
-                                Node*     node,
-                                DTYPE_t** X,
-                                INT32_t*  y,
-                                IntList*  remove_samples) nogil
+                                Node*      node,
+                                DTYPE_t**  X,
+                                INT32_t*   y,
+                                SIZE_t     remove_index,
+                                Feature*** features_ptr,
+                                SIZE_t*    n_features_ptr) nogil
 
     cdef SIZE_t update_greedy_node_metadata(self,
-                                            Node*     node,
-                                            DTYPE_t** X,
-                                            INT32_t*  y,
-                                            IntList*  remove_samples) nogil
+                                            Node*      node,
+                                            DTYPE_t**  X,
+                                            INT32_t*   y,
+                                            SIZE_t     remove_index,
+                                            Feature*** features_ptr,
+                                            SIZE_t*    n_features_ptr) nogil
 
     cdef SIZE_t update_random_node_metadata(self,
                                             Node*     node,
                                             DTYPE_t** X,
                                             INT32_t*  y,
-                                            IntList*  remove_samples) nogil
+                                            SIZE_t    remove_index) nogil
 
 # helper methods
 cdef void remove_invalid_thresholds(Feature* feature,
@@ -93,18 +70,18 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
                                   Node*     node,
                                   DTYPE_t** X,
                                   INT32_t*  y,
-                                  IntList*  remove_samples,
+                                  SIZE_t    remove_index,
                                   bint*     is_constant_feature_ptr,
                                   _Config   config) nogil
 
 cdef SIZE_t sample_new_features(Feature*** features_ptr,
-                                IntList**  constant_features_ptr,
+                                SIZE_t*    n_features_ptr,
                                 IntList*   invalid_features,
                                 SIZE_t     n_total_features,
                                 Node*      node,
                                 DTYPE_t**  X,
                                 INT32_t*   y,
-                                IntList*   remove_samples,
+                                SIZE_t     remove_index,
                                 _Config    config) nogil
 
 cdef void get_leaf_samples(Node*    node,
