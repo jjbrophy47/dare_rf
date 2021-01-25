@@ -57,4 +57,4 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
                                      SIZE_t       n_samples,
                                      SIZE_t       n_pos_samples,
                                      SIZE_t       min_samples_leaf,
-                                     Threshold**  thresholds) nogil
+                                     Threshold*** thresholds_ptr) nogil

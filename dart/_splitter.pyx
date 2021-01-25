@@ -191,7 +191,7 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         candidate_thresholds = <Threshold **>malloc(samples.n * sizeof(Threshold *))
         n_candidate_thresholds = get_candidate_thresholds(values, labels, indices, samples.n,
                                                           n_pos_samples, min_samples_leaf,
-                                                          candidate_thresholds)
+                                                          &candidate_thresholds)
 
         # no valid thresholds, candidate thresholds is freed in the method
         if n_candidate_thresholds == 0:
@@ -287,6 +287,8 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
     else:
         node.constant_features = copy_intlist(constant_features, constant_features.n)
         free(features)
+
+    # printf('[R - SNF] node.n_features: %ld\n', node.n_features)
 
     # free constant features
     free_intlist(constant_features)
@@ -440,7 +442,7 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
                                      SIZE_t       n_samples,
                                      SIZE_t       n_pos_samples,
                                      SIZE_t       min_samples_leaf,
-                                     Threshold**  thresholds) nogil:
+                                     Threshold*** thresholds_ptr) nogil:
     """
     For this feature:
 
@@ -498,6 +500,7 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
 
     # object pointers
     cdef Threshold*  threshold = NULL
+    cdef Threshold** thresholds = thresholds_ptr[0]
 
     # save statistics about each adjacent feature value
     for i in range(1, n_samples):
@@ -592,6 +595,7 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
     # if no viable thresholds, free thresholds array container
     if thresholds_count == 0:
         free(thresholds)
+        thresholds_ptr[0] = NULL
 
     # clean up
     free(threshold_values)

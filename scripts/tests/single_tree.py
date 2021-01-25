@@ -58,7 +58,7 @@ def main(args):
     k = 100
     max_depth = 20
     seed = 1
-    n_delete = 100
+    n_delete = 5000
 
     # train decision tree
     model = dart.Tree(topd=topd, k=k, max_depth=max_depth, random_state=seed)
