@@ -384,12 +384,12 @@ cdef class _Remover:
             # find the best feature / threshold
             best_score = 1000000
 
-            # printf('[R] node.n_features: %ld\n', node.n_features)
+            printf('[R] node.n_features: %ld\n', node.n_features)
 
             # get thresholds for each feature
             for j in range(node.n_features):
                 feature = node.features[j]
-                # printf('[R] feature: %ld\n', j)
+                printf('[R] feature: %ld\n', feature.index)
 
                 # compute split score for each threshold
                 for k in range(feature.n_thresholds):
@@ -403,8 +403,8 @@ cdef class _Remover:
                                                       threshold.n_left_pos_samples,
                                                       threshold.n_right_pos_samples)
 
-                    # printf('[SN] feature.index: %ld, threshold.value: %.3f, split_score: %.3f\n',
-                    #        feature.index, threshold.value, split_score)
+                    printf('[SN] feature.index: %ld, threshold.value: %.3f, split_score: %.3f\n',
+                           feature.index, threshold.value, split_score)
 
                     # keep threshold with the best score
                     if split_score < best_score:
@@ -412,10 +412,10 @@ cdef class _Remover:
                         chosen_feature_ndx = feature.index
                         chosen_threshold_value = threshold.value
 
-            # printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
-            #       node.chosen_feature.index, node.chosen_threshold.value)
-            # printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
-            #       chosen_feature_ndx, chosen_threshold_value)
+            printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
+                  node.chosen_feature.index, node.chosen_threshold.value)
+            printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
+                  chosen_feature_ndx, chosen_threshold_value)
 
             # check to see if the same feature / threshold is still the best
             result = not (node.chosen_feature.index == chosen_feature_ndx and
@@ -936,8 +936,8 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
     # return variable
     cdef SIZE_t n_usable_thresholds = 0
 
-    # sample features until `max_features` is reached or there are no features left
-    while n_features < max_features and (sampled_features.n + constant_features.n) < n_total_features:
+    # sample features until the previous no. features is reached or there are no features left
+    while n_features < node.n_features and (sampled_features.n + constant_features.n) < n_total_features:
 
         # sample feature index
         feature_index = rand_int(0, n_total_features, random_state)
@@ -991,6 +991,7 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
                 features[j] = feature
                 n_features += 1
                 n_usable_thresholds += feature.n_thresholds
+                break
 
     # could not replace all invalid features, remove remaining invalid features
     if n_features < node.n_features:
