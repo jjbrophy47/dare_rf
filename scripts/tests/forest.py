@@ -55,12 +55,12 @@ def main(args):
     X_train, X_test, y_train, y_test = load_data(args.dataset, args.data_dir)
 
     # train
-    topd = 30
-    k = 10
-    n_estimators = 100
+    topd = 10
+    k = 100
+    n_estimators = 250
     max_depth = 20
     seed = 1
-    n_delete = 100
+    n_delete = 500
 
     if args.model == 'dart':
         model = dart.Forest(topd=topd, k=k, n_estimators=n_estimators,
@@ -99,9 +99,10 @@ def main(args):
             cum_delete_time += delete_time
             print('\ndeleted instance, {}: {:.3f}s'.format(delete_ndx, delete_time))
 
-        types, depths = model.get_removal_types_depths()
+        types, depths, costs = model.get_delete_metrics()
         print('types: {}'.format(types))
         print('depths: {}'.format(depths))
+        print('costs: {}'.format(costs))
 
         avg_delete_time = cum_delete_time / len(delete_indices)
         print('train time: {:.3f}s'.format(train_time))

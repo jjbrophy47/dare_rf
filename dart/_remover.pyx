@@ -152,40 +152,40 @@ cdef class _Remover:
 
         # leaf, check complete
         if node.is_leaf:
-            printf('[R] update leaf\n')
+            # printf('[R] update leaf\n')
             self.update_leaf(node, remove_samples)
-            printf('[R] leaf.value: %.2f\n', node.value)
+            # printf('[R] leaf.value: %.2f\n', node.value)
 
         # decision node, but samples in same class, convert to leaf, check complete
         elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
-            printf('[R] convert to leaf\n')
+            # printf('[R] convert to leaf\n')
             self.convert_to_leaf(node, remove_samples)
-            printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
+            # printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
         # decision node
         else:
 
             # update metadata
-            printf('[R] update metadata\n')
+            # printf('[R] update metadata\n')
             n_usable_thresholds = self.update_metadata(node, X, y, remove_samples)
-            printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
+            # printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
 
             # chosen feature / threshold is now invalid, check complete
             if n_usable_thresholds < 0:
-                printf('[R] no usable thresholds, retrain\n')
+                # printf('[R] no usable thresholds, retrain\n')
                 self.retrain(node_ptr, X, y, remove_samples)
 
             # greedy node in which there are no more usable thresholds, convert to leaf, check complete
             elif n_usable_thresholds == 0:
-                printf('[R] convert to leaf\n')
+                # printf('[R] convert to leaf\n')
                 self.convert_to_leaf(node, remove_samples)
-                printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
+                # printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
             # viable decision node
             else:
 
                 # check if optimal feature / threshold has changed
-                printf('[R] check optimal split\n')
+                # printf('[R] check optimal split\n')
                 result = self.check_optimal_split(node)
 
                 # optimal split has changed, retrain, check complete
@@ -199,7 +199,7 @@ cdef class _Remover:
                 else:
 
                     # split deleted samples and free original deleted samples
-                    printf('[R] split samples\n')
+                    # printf('[R] split samples\n')
                     split_samples(node, X, y, remove_samples, &split, 0)
                     # printf('[R] split samples, split.left_samples.n: %ld, split.right_samples.n: %ld\n',
                     #        split.left_samples.n, split.right_samples.n)
