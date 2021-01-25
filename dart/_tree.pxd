@@ -99,26 +99,16 @@ cdef class _Tree:
     # Inner structures
     cdef Node*   root                    # Root node
 
-    # Python/C API
+    # Python API
     cpdef np.ndarray predict(self, float[:, :] X)
     cpdef SIZE_t get_node_count(self)
-    cpdef SIZE_t get_exact_node_count(self, SIZE_t topd)
     cpdef SIZE_t get_random_node_count(self, SIZE_t topd)
-    cpdef void print_node_count(self)
-    cpdef void print_node_type_count(self, SIZE_t topd)
-    cpdef void print_n_samples(self)
-    cpdef void print_depth(self)
-    cpdef void print_feature(self)
-    cpdef void print_value(self)
+    cpdef SIZE_t get_greedy_node_count(self, SIZE_t topd)
 
     # C API
     cdef SIZE_t _get_node_count(self, Node* node) nogil
-    cdef SIZE_t _get_exact_node_count(self, Node* node, SIZE_t topd) nogil
     cdef SIZE_t _get_random_node_count(self, Node* node, SIZE_t topd) nogil
-    cdef void _print_n_samples(self, Node* node) nogil
-    cdef void _print_depth(self, Node* node) nogil
-    cdef void _print_feature(self, Node* node) nogil
-    cdef void _print_value(self, Node* node) nogil
+    cdef SIZE_t _get_greedy_node_count(self, Node* node, SIZE_t topd) nogil
 
 cdef class _TreeBuilder:
     """

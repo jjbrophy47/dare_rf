@@ -84,10 +84,10 @@ def performance(args, out_dir, logger):
     model = _get_exact_model(args)
     exact_score = cross_val_score(model, X_train_sub, y_train_sub,
                                   scoring=args.scoring, cv=skf).mean()
-    logger.info('\n[EXACT] CV score: {:.5f}, time: {:.3f}s'.format(exact_score, time.time() - start))
+    logger.info('\n[topd=0] CV score: {:.5f}, time: {:.3f}s'.format(exact_score, time.time() - start))
 
     # train DART model
-    s = '[DART] CV score: {:.5f}, CV diff: {:.5f}, time: {:.3f}s, topd: {}'
+    s = '[topd={}] CV score: {:.5f}, CV diff: {:.5f}, time: {:.3f}s'
     scores = {}
     best_scores = {tol: 0 for tol in args.tol}
 
@@ -102,7 +102,7 @@ def performance(args, out_dir, logger):
         scores[topd] = score
         end = time.time() - start
 
-        logger.info(s.format(score, score_diff, end, topd))
+        logger.info(s.format(topd, score, score_diff, end))
 
         # update best score for each tolerance
         for tol in args.tol:
@@ -153,8 +153,8 @@ if __name__ == '__main__':
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=float, default=0.25, help='maximum features to sample.')
     parser.add_argument('--max_depth', type=int, default=1, help='maximum depth of the tree.')
+    parser.add_argument('--k', type=int, default=10, help='no. thresholds to sample for greedy nodes.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
-    parser.add_argument('--min_support', type=int, default=2, help='minimum number of samples for stochastic.')
 
     # display settings
     parser.add_argument('--verbose', type=int, default=2, help='verbosity level.')

@@ -253,96 +253,38 @@ cdef class _Tree:
         return out
 
     # tree information
-    cpdef void print_node_count(self):
-        """
-        Get number of nodes total.
-        """
-        cdef SIZE_t node_count = self._get_node_count(self.root)
-        printf('node_count: %ld\n', node_count)
-
     cpdef SIZE_t get_node_count(self):
         """
         Get number of nodes total.
         """
         return self._get_node_count(self.root)
 
-    cpdef SIZE_t get_exact_node_count(self, SIZE_t topd):
-        """
-        Get number of exact nodes in the top d layers.
-        """
-        return self._get_exact_node_count(self.root, topd)
-
     cpdef SIZE_t get_random_node_count(self, SIZE_t topd):
         """
-        Get number of semi-random nodes in the top d layers.
+        Count number of exact nodes in the top d layers.
         """
         return self._get_random_node_count(self.root, topd)
 
-    cpdef void print_node_type_count(self, SIZE_t topd):
+    cpdef SIZE_t get_greedy_node_count(self, SIZE_t topd):
         """
-        Print the number of exact and semi-random nodes in the
-        top d layers.
+        Count number of greedy nodes.
         """
-        cdef SIZE_t exact_node_count = self._get_exact_node_count(self.root, topd)
-        cdef SIZE_t random_node_count = self._get_random_node_count(self.root, topd)
-        printf('no. exact: %ld, no. semi-random: %ld\n', exact_node_count, random_node_count)
-
-    # node information
-    cpdef void print_n_samples(self):
-        """
-        Get number of samples for each node.
-        """
-        printf('n_samples: [ ')
-        self._print_n_samples(self.root)
-        printf(']\n')
-
-    cpdef void print_depth(self):
-        """
-        Print depth of each node.
-        """
-        printf('depth: [ ')
-        self._print_depth(self.root)
-        printf(']\n')
-
-    cpdef void print_feature(self):
-        """
-        Print depth of each node.
-        """
-        printf('feature: [ ')
-        self._print_feature(self.root)
-        printf(']\n')
-
-    cpdef void print_value(self):
-        """
-        Print value of each node.
-        """
-        printf('value: [ ')
-        self._print_value(self.root)
-        printf(']\n')
+        return self._get_greedy_node_count(self.root, topd)
 
     # private
     cdef SIZE_t _get_node_count(self, Node* node) nogil:
+        """
+        Count total no. of nodes in the tree.
+        """
         if not node:
             return 0
         else:
             return 1 + self._get_node_count(node.left) + self._get_node_count(node.right)
 
-    cdef SIZE_t _get_exact_node_count(self, Node* node, SIZE_t topd) nogil:
-        cdef SIZE_t result = 0
-
-        if not node or node.is_leaf:
-            result = 0
-
-        else:
-            if node.depth >= topd:
-                result = 1
-
-            result += self._get_exact_node_count(node.left, topd)
-            result += self._get_exact_node_count(node.right, topd)
-
-        return result
-
     cdef SIZE_t _get_random_node_count(self, Node* node, SIZE_t topd) nogil:
+        """
+        Count no. random nodes in the tree.
+        """
         cdef SIZE_t result = 0
 
         if not node or node.is_leaf:
@@ -357,26 +299,20 @@ cdef class _Tree:
 
         return result
 
-    cdef void _print_n_samples(self, Node* node) nogil:
-        if node:
-            printf('%ld ', node.n_samples)
-            self._print_n_samples(node.left)
-            self._print_n_samples(node.right)
+    cdef SIZE_t _get_greedy_node_count(self, Node* node, SIZE_t topd) nogil:
+        """
+        Count no. greedy nodes in the tree.
+        """
+        cdef SIZE_t result = 0
 
-    cdef void _print_depth(self, Node* node) nogil:
-        if node:
-            printf('%ld ', node.depth)
-            self._print_depth(node.left)
-            self._print_depth(node.right)
+        if not node or node.is_leaf:
+            result = 0
 
-    cdef void _print_feature(self, Node* node) nogil:
-        if node:
-            printf('%ld ', node.chosen_feature.index)
-            self._print_feature(node.left)
-            self._print_feature(node.right)
+        else:
+            if node.depth >= topd:
+                result = 1
 
-    cdef void _print_value(self, Node* node) nogil:
-        if node:
-            printf('%.3f ', node.value)
-            self._print_value(node.left)
-            self._print_value(node.right)
+            result += self._get_greedy_node_count(node.left, topd)
+            result += self._get_greedy_node_count(node.right, topd)
+
+        return result

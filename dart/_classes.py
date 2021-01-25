@@ -1,9 +1,8 @@
 """
-DART (Data Addition and Removal Trees).
+DaRE (Data Removal-Enabled) Trees.
 
--The nodes in the top d layers that meet the minimum
- sample support are completely random, all other nodes
- use exact unlearning.
+-The nodes in the `topd` layers of each tree
+ are completely random, all other decision nodes are greedy.
 
 -Special cases:
 
@@ -262,23 +261,12 @@ class Forest(object):
             n_random_nodes_list.append(n_random_nodes)
             n_greedy_nodes_list.append(n_greedy_nodes)
 
+        # take the avg. of the counts
         avg_n_nodes = np.mean(n_nodes_list)
         avg_n_random_nodes = np.mean(n_random_nodes_list)
         avg_n_greedy_nodes = np.mean(n_greedy_nodes_list)
 
         return avg_n_nodes, avg_n_random_nodes, avg_n_greedy_nodes
-
-    def get_node_statistics(self):
-        n_nodes_list, n_random_nodes_list, n_greedy_nodes_list = [], [], []
-
-        counts = [tree.get_node_statistics() for tree in self.trees_]
-         = tuple(zip(*counts))
-
-        n_nodes_avg = sum(n_nodes) / len(n_nodes)
-        n_random_avg = sum(n_semi) / len(n_semi)
-        n_greedy_avg = sum(n_exact) / len(n_exact)
-
-        return n_nodes_avg, n_exact_avg, n_semi_avg
 
     def clear_delete_metrics(self):
         """
@@ -330,11 +318,11 @@ class Tree(object):
     k: int (default=25)
         No. candidate thresholds to consider through uniform sampling.
     max_depth: int (default=None)
-        The maximum depth of a tree.
+        The maximum depth of the tree.
     criterion: str (default='gini')
         Splitting criterion to use.
     min_samples_split: int (default=2)
-        The minimum number of samples needed to make a split when building a tree.
+        The minimum number of samples needed to make a split when building the tree.
     min_samples_leaf: int (default=1)
         The minimum number of samples needed to make a leaf.
     random_state: int (default=None)
