@@ -10,7 +10,7 @@ DaRE
 Install
 ---
 1. Install Python 3.7+.
-1. Install dependencies. Run `make all`.
+1. Install dependencies and compile project. Run `make all`.
 
 Simple Example
 ---

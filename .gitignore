@@ -11,6 +11,10 @@ jobs/logs/
 **.temp/
 **.ipynb_checkpoints/
 
+# dare adder
+dare/_adder.pxd
+dare/_adder.pyx
+
 # files
 **temp*
 **save*
