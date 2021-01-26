@@ -1,11 +1,12 @@
 """
-Preprocesses dataset but keep continuous variables.
+Preprocess dataset.
 """
 import os
 
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
@@ -13,16 +14,20 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    df = pd.read_csv('flight_delays_train.csv')
+    df = pd.read_csv('athlete_events.csv')
+
+    pd.set_option('display.max_columns', 100)
+
+    # remove select columns
+    remove_cols = ['ID', 'Name', 'Team']
+    df = df.drop(columns=remove_cols)
+
+    df['Medal'] = df['Medal'].fillna(0)
+    df['Medal'] = df['Medal'].apply(lambda x: 0 if x == 0 else 1)
 
     print(df)
     for c in df.columns:
-        print(c, len(df[c].unique()))
-
-    # remove select columns
-    remove_cols = []
-    if len(remove_cols) > 0:
-        df = df.drop(columns=remove_cols)
+        print(c, len(df[c].unique()), df[c].dtype)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
@@ -42,8 +47,8 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['dep_delayed_15min']
-    numeric = ['DepTime', 'Distance']
+    label = ['Medal']
+    numeric = ['Age', 'Height', 'Weight']
     categorical = list(set(columns) - set(numeric) - set(label))
     print('label', label)
     print('numeric', numeric)
@@ -52,13 +57,13 @@ def dataset_specific(random_state, test_size):
     return train_df, test_df, label, numeric, categorical
 
 
-def main(random_state=1, test_size=0.2, out_dir='continuous'):
+def main(random_state=1, test_size=0.2, n_bins=5):
 
     train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
                                                                       test_size=test_size)
 
-    # encode categorical inputs
-    ct = ColumnTransformer([('kbd', 'passthrough', numeric),
+    # binarize inputs
+    ct = ColumnTransformer([('kbd', KBinsDiscretizer(n_bins=n_bins, encode='onehot-dense'), numeric),
                             ('ohe', OneHotEncoder(sparse=False, handle_unknown='ignore'), categorical)])
     train = ct.fit_transform(train_df)
     test = ct.transform(test_df)
@@ -68,21 +73,17 @@ def main(random_state=1, test_size=0.2, out_dir='continuous'):
     train_label = le.fit_transform(train_df[label].to_numpy().ravel()).reshape(-1, 1)
     test_label = le.transform(test_df[label].to_numpy().ravel()).reshape(-1, 1)
 
-    # add labels
-    train = np.hstack([train, train_label])
-    test = np.hstack([test, test_label])
+    # combine binarized data
+    train = np.hstack([train, train_label]).astype(np.int32)
+    test = np.hstack([test, test_label]).astype(np.int32)
 
-    print('\ntrain:\n{}'.format(train))
     print('train.shape: {}, label sum: {}'.format(train.shape, train[:, -1].sum()))
-
-    print('\ntest:\n{}'.format(test))
     print('test.shape: {}, label sum: {}'.format(test.shape, test[:, -1].sum()))
 
     # save to numpy format
     print('saving...')
-    os.makedirs(out_dir, exist_ok=True)
-    np.save(os.path.join(out_dir, 'train.npy'), train)
-    np.save(os.path.join(out_dir, 'test.npy'), test)
+    np.save('train.npy', train)
+    np.save('test.npy', test)
 
 
 if __name__ == '__main__':

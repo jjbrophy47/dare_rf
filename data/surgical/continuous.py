@@ -46,7 +46,7 @@ def main(random_state=1, test_size=0.2, out_dir='continuous'):
     train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
                                                                       test_size=test_size)
 
-    # binarize inputs
+    # encode categorical inputs
     ct = ColumnTransformer([('kbd', 'passthrough', numeric),
                             ('ohe', OneHotEncoder(sparse=False, handle_unknown='ignore'), categorical)])
     train = ct.fit_transform(train_df)
@@ -57,11 +57,14 @@ def main(random_state=1, test_size=0.2, out_dir='continuous'):
     train_label = le.fit_transform(train_df[label].to_numpy().ravel()).reshape(-1, 1)
     test_label = le.transform(test_df[label].to_numpy().ravel()).reshape(-1, 1)
 
-    # combine binarized data
-    train = np.hstack([train, train_label]).astype(np.int32)
-    test = np.hstack([test, test_label]).astype(np.int32)
+    # add labels
+    train = np.hstack([train, train_label])
+    test = np.hstack([test, test_label])
 
+    print('\ntrain:\n{}'.format(train))
     print('train.shape: {}, label sum: {}'.format(train.shape, train[:, -1].sum()))
+
+    print('\ntest:\n{}'.format(test))
     print('test.shape: {}, label sum: {}'.format(test.shape, test[:, -1].sum()))
 
     # save to numpy format

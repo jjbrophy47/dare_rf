@@ -13,6 +13,7 @@ sys.path.insert(0, here + '/../../')
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 
 # selected hyperparameters
 dataset_dict = {'surgical': ('acc', 50, 20, 10, [0, 0, 0, 0, 0]),
@@ -75,7 +76,7 @@ def main(args):
     # get retrain results
     if args.cost:
         retrain_fp = os.path.join(args.in_dir, 'retrain_cost.csv')
-        retrain_y_label = 'Cost (no. samples)'
+        retrain_y_label = 'No. samples'
     else:
         retrain_fp = os.path.join(args.in_dir, 'n_retrain.csv')
         retrain_y_label = 'No. retrains'
@@ -169,6 +170,8 @@ def main(args):
             ax.set_xlabel('Retrain depth')
         if max_depth in [10, 20]:
             handles, labels = ax.get_legend_handles_labels()
+
+        plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 
     os.makedirs(args.out_dir, exist_ok=True)
 

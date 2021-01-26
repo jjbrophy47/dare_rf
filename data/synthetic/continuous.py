@@ -40,8 +40,6 @@ def main(random_state=1,
     # cleanup
     train = np.hstack([X_train, y_train.reshape(-1, 1)])
     test = np.hstack([X_test, y_test.reshape(-1, 1)])
-    train = train.astype(np.int32)
-    test = test.astype(np.int32)
 
     print(train.shape, train[:, -1].sum())
     print(test.shape, test[:, -1].sum())

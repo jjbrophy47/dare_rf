@@ -13,16 +13,20 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    df = pd.read_csv('flight_delays_train.csv')
+    df = pd.read_csv('athlete_events.csv')
+
+    pd.set_option('display.max_columns', 100)
+
+    # remove select columns
+    remove_cols = ['ID', 'Name', 'Team']
+    df = df.drop(columns=remove_cols)
+
+    df['Medal'] = df['Medal'].fillna(0)
+    df['Medal'] = df['Medal'].apply(lambda x: 0 if x == 0 else 1)
 
     print(df)
     for c in df.columns:
-        print(c, len(df[c].unique()))
-
-    # remove select columns
-    remove_cols = []
-    if len(remove_cols) > 0:
-        df = df.drop(columns=remove_cols)
+        print(c, len(df[c].unique()), df[c].dtype)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
@@ -42,8 +46,8 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['dep_delayed_15min']
-    numeric = ['DepTime', 'Distance']
+    label = ['Medal']
+    numeric = ['Age', 'Height', 'Weight']
     categorical = list(set(columns) - set(numeric) - set(label))
     print('label', label)
     print('numeric', numeric)
