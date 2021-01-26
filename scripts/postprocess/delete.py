@@ -35,66 +35,6 @@ def get_result(template, in_dir):
     return result
 
 
-# def process_periodic_utility(gf):
-#     """
-#     Processes utility differences BEFORE and DURING addition/deletion,
-#     and averages the results over different random states.
-#     """
-#     result = {}
-
-#     acc_mean_list, acc_std_list = [], []
-#     auc_mean_list, auc_std_list = [], []
-#     ap_mean_list, ap_std_list = [], []
-
-#     acc_diff_mean_list, acc_diff_std_list = [], []
-#     auc_diff_mean_list, auc_diff_std_list = [], []
-#     ap_diff_mean_list, ap_diff_std_list = [], []
-
-#     deletion_time_list = []
-
-#     for row in gf.itertuples(index=False):
-
-#         acc_mean_list.append(np.mean(row.acc))
-#         auc_mean_list.append(np.mean(row.auc))
-#         ap_mean_list.append(np.mean(row.ap))
-
-#         acc_std_list.append(np.std(row.acc))
-#         auc_std_list.append(np.std(row.auc))
-#         ap_std_list.append(np.std(row.ap))
-
-#         acc_diff = row.exact_acc - row.acc
-#         auc_diff = row.exact_auc - row.auc
-#         ap_diff = row.exact_ap - row.ap
-
-#         acc_diff_mean_list.append(np.mean(acc_diff))
-#         auc_diff_mean_list.append(np.mean(auc_diff))
-#         ap_diff_mean_list.append(np.mean(ap_diff))
-
-#         acc_diff_std_list.append(np.std(acc_diff))
-#         auc_diff_std_list.append(np.std(auc_diff))
-#         ap_diff_std_list.append(np.std(ap_diff))
-
-#         deletion_time_list.append(row.allotted_time / row.n_model)
-
-#     result['acc_mean'] = np.mean(acc_mean_list)
-#     result['auc_mean'] = np.mean(auc_mean_list)
-#     result['ap_mean'] = np.mean(ap_mean_list)
-#     result['acc_std'] = np.mean(acc_std_list)
-#     result['auc_std'] = np.mean(auc_std_list)
-#     result['ap_std'] = np.mean(ap_std_list)
-#     result['deletion_time_mean'] = np.mean(deletion_time_list)
-
-#     result['acc_diff_mean'] = np.mean(acc_diff_mean_list)
-#     result['auc_diff_mean'] = np.mean(auc_diff_mean_list)
-#     result['ap_diff_mean'] = np.mean(ap_diff_mean_list)
-#     result['acc_diff_std'] = np.mean(acc_diff_std_list)
-#     result['auc_diff_std'] = np.mean(auc_diff_std_list)
-#     result['ap_diff_std'] = np.mean(ap_diff_std_list)
-#     result['deletion_time_std'] = sem(deletion_time_list)
-
-    return result
-
-
 def process_utility(gf):
     """
     Processes utility differences BEFORE deletion,
@@ -128,14 +68,14 @@ def process_utility(gf):
         model_delete_time_list.append(row.naive_avg_delete_time / row.model_n_deleted)
 
     # compute mean and sem for predictive performances
-    result['model_acc_mean'] = np.mean(acc_list)
-    result['model_auc_mean'] = np.mean(auc_list)
-    result['model_ap_mean'] = np.mean(ap_list)
-    result['model_acc_sem'] = sem(acc_list)
-    result['model_auc_sem'] = sem(auc_list)
-    result['model_ap_sem'] = sem(ap_list)
-    result['model_delete_time_mean'] = np.mean(deletion_time_list)
-    result['model_delete_time_sem'] = sem(deletion_time_list)
+    result['model_acc_mean'] = np.mean(model_acc_list)
+    result['model_auc_mean'] = np.mean(model_auc_list)
+    result['model_ap_mean'] = np.mean(model_ap_list)
+    result['model_acc_sem'] = sem(model_acc_list)
+    result['model_auc_sem'] = sem(model_auc_list)
+    result['model_ap_sem'] = sem(model_ap_list)
+    result['model_delete_time_mean'] = np.mean(model_delete_time_list)
+    result['model_delete_time_sem'] = sem(model_delete_time_list)
 
     # compute mean and sem for predictive performance differences
     result['acc_diff_mean'] = np.mean(acc_diff_list)
@@ -148,23 +88,34 @@ def process_utility(gf):
     return result
 
 
-def process_retrains(gf):
+def process_retrains(gf, max_depth=20):
     """
-    Averages retrain results over multiple runs.
+    Averages no. retrains and retrain costs over multiple runs for each depth.
     """
-    retrains = np.zeros(shape=(len(gf), max(args.max_depth)))
+    n_retrains = np.zeros(shape=(len(gf), max_depth))
+    retrain_costs = np.zeros(shape=(len(gf), max_depth))
 
     i = 0
     for row in gf.itertuples(index=False):
 
-        if 1 in row.retrains:
-            for j in range(max(args.max_depth)):
-                retrains[i][j] = row.retrains[1][j]
+        for j in range(max_depth):
 
-    retrains_mean = np.mean(retrains, axis=0)
-    result = {k: v for k, v in zip(range(retrains_mean.shape[0]), retrains_mean)}
+            # add deletions to this depth
+            if 1 in row.model_delete_depths and j in row.model_delete_depths[1]:
+                n_retrains[i][j] = row.model_delete_depths[1][j]
 
-    return result
+            if j in row.model_delete_costs:
+                retrain_costs[i][j] = row.model_delete_costs[j]
+
+    # compute average no. rertains and retrain costs for each depths
+    n_retrains_mean = np.mean(n_retrains, axis=0)
+    retrain_costs_mean = np.mean(retrain_costs, axis=0)
+
+    # build results
+    n_retrains_result = {k: v for k, v in zip(range(n_retrains_mean.shape[0]), n_retrains_mean)}
+    retrain_costs_result = {k: v for k, v in zip(range(retrain_costs_mean.shape[0]), retrain_costs_mean)}
+
+    return n_retrains_result, retrain_costs_result
 
 
 def process_results(df):
@@ -178,14 +129,15 @@ def process_results(df):
     keep_cols = ['naive_avg_delete_time',
                  'naive_n_deleted',
                  'model_n_deleted',
-                 'model_train_%_deleted']
-                 # 'n_nodes_avg',
-                 # 'n_exact_avg',
-                 # 'n_semi_avg']
+                 'model_train_%_deleted',
+                 'model_n_nodes_avg',
+                 'model_n_random_nodes_avg',
+                 'model_n_greedy_nodes_avg']
 
     # result containers
     main_result_list = []
-    # retrain_result_list = []
+    n_retrain_result_list = []
+    retrain_cost_result_list = []
 
     # loop through each experiment setting
     i = 0
@@ -200,19 +152,24 @@ def process_results(df):
             main_result['{}_std'.format(c)] = gf[c].std()
         main_result_list.append(main_result)
 
-        # # create retrain result
-        # retrain_result = {'id': i}
-        # retrain_result.update(process_retrains(gf))
-        # retrain_result_list.append(retrain_result)
+        # process retrain results
+        n_retrain_result, retrain_cost_result = process_retrains(gf)
+
+        # create no. retrain result
+        n_retrain_result['id'] = i
+        n_retrain_result_list.append(n_retrain_result)
+
+        # create retrain cost result
+        retrain_cost_result['id'] = i
+        retrain_cost_result_list.append(retrain_cost_result)
         i += 1
 
     # compile results
     main_df = pd.DataFrame(main_result_list)
-    # retrain_df = pd.DataFrame(retrain_result_list)
+    n_retrain_df = pd.DataFrame(n_retrain_result_list)
+    retrain_cost_df = pd.DataFrame(retrain_cost_result_list)
 
-    # return main_df, retrain_df
-
-    return main_df
+    return main_df, n_retrain_df, retrain_cost_df
 
 
 
@@ -220,30 +177,25 @@ def create_csv(args, out_dir, logger):
 
     logger.info('\nGathering results...')
 
-    experiment_settings = list(product(*[args.dataset, args.criterion, args.rs, args.n_estimators,
-                                         args.max_depth, args.topd, args.k, args.subsample_size]))
+    experiment_settings = list(product(*[args.dataset, args.criterion, args.rs,
+                                         args.topd, args.subsample_size]))
 
     # cedar_settings = list(product(*[args.epsilon, args.lmbda]))
 
     results = []
-    for items in tqdm(experiment_settings):
-        dataset, criterion, rs, n_trees, depth, topd, k, sub_size = items
+    for dataset, criterion, rs, topd, sub_size in tqdm(experiment_settings):
 
         template = {'dataset': dataset,
                     'criterion': criterion,
                     'rs': rs,
-                    'n_estimators': n_trees,
-                    'max_depth': depth,
                     'topd': topd,
-                    'k': k,
                     'subsample_size': sub_size}
 
-        experiment_dir = os.path.join(args.in_dir, dataset, criterion,
+        experiment_dir = os.path.join(args.in_dir,
+                                      dataset,
+                                      criterion,
                                       'rs_{}'.format(rs),
-                                      'trees_{}'.format(n_trees),
-                                      'depth_{}'.format(depth),
                                       'topd_{}'.format(topd),
-                                      'k_{}'.format(k),
                                       'sub_{}'.format(sub_size))
 
         # skip empty experiments
@@ -251,42 +203,34 @@ def create_csv(args, out_dir, logger):
             continue
 
         # add results to result dict
-        dart_result = get_result(template, experiment_dir)
-        if dart_result is not None:
-            results.append(dart_result)
+        result = get_result(template, experiment_dir)
+        if result is not None:
+            results.append(result)
 
-        # get cedar results
-        # for epsilon, lmbda in cedar_settings:
-        #     template['epsilon'] = epsilon
-        #     template['lmbda'] = lmbda
-
-        #     extended_dir = os.path.join(experiment_dir,
-        #                                 'epsilon_{}'.format(epsilon),
-        #                                 'lmbda_{}'.format(lmbda))
-
-        #     cedar_result = get_result(template, extended_dir)
-        #     if cedar_result is not None:
-        #         results.append(cedar_result)
-
+    # display more columns
     pd.set_option('display.max_columns', 100)
     pd.set_option('display.width', 180)
 
+    # collect raw results
     df = pd.DataFrame(results)
-    # if 'epsilon' in df:
-    #     df['epsilon'] = df['epsilon'].fillna(-1)
-    #     df['lmbda'] = df['lmbda'].fillna(-1)
     logger.info('\nRaw results:\n{}'.format(df))
 
+    # process results
     logger.info('\nProcessing results...')
-    main_df = process_results(df)
+    main_df, n_retrain_df, retrain_cost_df = process_results(df)
     logger.info('\nProcessed results:\n{}'.format(main_df))
-    # logger.info('\nRetrain results:\n{}'.format(retrain_df))
+    logger.info('\nNo. retrain results:\n{}'.format(n_retrain_df))
+    logger.info('\nRetrain cost results:\n{}'.format(retrain_cost_df))
 
+    # create filepaths
     main_fp = os.path.join(out_dir, 'results.csv')
-    # retrain_fp = os.path.join(out_dir, 'retrain.csv')
+    n_retrain_fp = os.path.join(out_dir, 'n_retrain.csv')
+    retrain_cost_fp = os.path.join(out_dir, 'retrain_cost.csv')
 
+    # save processed results
     main_df.to_csv(main_fp, index=None)
-    # retrain_df.to_csv(retrain_fp, index=None)
+    n_retrain_df.to_csv(n_retrain_fp, index=None)
+    retrain_cost_df.to_csv(retrain_cost_fp, index=None)
 
 
 def main(args):
@@ -312,20 +256,20 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
-                                 'olympics', 'census', 'credit_card', 'no_show', 'twitter' 'synthetic',
+                                 'census', 'credit_card', 'no_show', 'twitter', 'synthetic',
                                  'higgs', 'ctr'], help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--subsample_size', type=int, nargs='+', default=[1, 1000], help='subsampling size.')
 
     # hyperparameter settings
-    parser.add_argument('--n_estimators', type=int, nargs='+', default=[10, 50, 100, 250], help='no. trees.')
-    parser.add_argument('--max_depth', type=int, nargs='+', default=[1, 3, 5, 10, 20], help='max depth.')
+    # parser.add_argument('--n_estimators', type=int, nargs='+', default=[10, 50, 100, 250], help='no. trees.')
+    # parser.add_argument('--max_depth', type=int, nargs='+', default=[1, 3, 5, 10, 20], help='max depth.')
     parser.add_argument('--topd', type=int, nargs='+', default=list(range(21)), help='top d.')
-    parser.add_argument('--k', type=int, nargs='+', default=[5, 10, 25, 50, 100], help='no. thresholds.')
+    # parser.add_argument('--k', type=int, nargs='+', default=[5, 10, 25, 50, 100], help='no. thresholds.')
 
     # analysis settings
-    parser.add_argument('--periodic', action='store_true', default=False, help='measure periodic utility.')
+    # parser.add_argument('--periodic', action='store_true', default=False, help='measure periodic utility.')
 
     args = parser.parse_args()
     main(args)

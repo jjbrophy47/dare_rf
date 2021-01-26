@@ -110,7 +110,8 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
-                                 'olympics', 'census', 'credit_card', 'synthetic', 'higgs'], help='dataset.')
+                                 'no_show', 'census', 'credit_card', 'synthetic', 'twitter',
+                                 'higgs', 'ctr'], help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
     parser.add_argument('--tol', type=float, nargs='+', default=[0.001, 0.0025, 0.005, 0.01], help='tolerance.')
