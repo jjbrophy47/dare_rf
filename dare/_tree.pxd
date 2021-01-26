@@ -84,7 +84,7 @@ cdef struct Threshold:
     SIZE_t     n_right_pos_samples   # Number of positive samples for the right branch
 
 """
-Structure to hold an SIZE_t pointer and the no. elements.
+Structure to hold a SIZE_t pointer and the no. elements.
 """
 cdef struct IntList:
     SIZE_t* arr
