@@ -1,12 +1,11 @@
 """
-Preprocess dataset.
+Preprocesses dataset but keep continuous variables.
 """
 import os
 
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
@@ -14,20 +13,29 @@ from sklearn.preprocessing import LabelEncoder
 def dataset_specific(random_state, test_size):
 
     # retrieve dataset
-    df = pd.read_csv(os.path.join('Skin_NonSkin.txt'), header=None, sep='\t')
-    df.columns = ['b', 'g', 'r', 'label']
-
-    # remove select columns
-    remove_cols = []
-    if len(remove_cols) > 0:
-        df = df.drop(columns=remove_cols)
+    df = pd.read_csv('KaggleV2-May-2016.csv')
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
     print('nan rows: {}'.format(len(nan_rows)))
     df = df.dropna()
 
-    df['label'] = df['label'].apply(lambda x: 0 if x == 2 else 1)
+    # transform timestamps into separate year, month, and day columns
+    scheduled_date = pd.to_datetime(df['ScheduledDay'])
+    df['scheduled_day'] = scheduled_date.dt.day
+    df['scheduled_month'] = scheduled_date.dt.month
+    df['scheduled_year'] = scheduled_date.dt.year
+    df['scheduled_hour'] = scheduled_date.dt.hour
+
+    appointment_date = pd.to_datetime(df['AppointmentDay'])
+    df['appointment_day'] = appointment_date.dt.day
+    df['appointment_month'] = appointment_date.dt.month
+    df['appointment_year'] = appointment_date.dt.year
+    df['appointment_hour'] = appointment_date.dt.hour
+
+    # remove columns
+    remove_cols = ['PatientId', 'AppointmentID', 'ScheduledDay', 'AppointmentDay']
+    df = df.drop(remove_cols, axis=1)
 
     # split into train and test
     indices = np.arange(len(df))
@@ -42,23 +50,23 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['label']
-    numeric = []
+    label = ['No-show']
+    numeric = ['Age', 'Scholarship', 'Hipertension', 'Diabetes',
+               'Alcoholism', 'Handcap', 'SMS_received',
+               'scheduled_day', 'scheduled_month', 'scheduled_year', 'scheduled_hour',
+               'appointment_day', 'appointment_month', 'appointment_year', 'appointment_hour']
     categorical = list(set(columns) - set(numeric) - set(label))
-    print('label', label)
-    print('numeric', numeric)
-    print('categorical', categorical)
 
     return train_df, test_df, label, numeric, categorical
 
 
-def main(random_state=1, test_size=0.2, n_bins=5):
+def main(random_state=1, test_size=0.2, out_dir='continuous'):
 
     train_df, test_df, label, numeric, categorical = dataset_specific(random_state=random_state,
                                                                       test_size=test_size)
 
     # binarize inputs
-    ct = ColumnTransformer([('kbd', KBinsDiscretizer(n_bins=n_bins, encode='onehot-dense'), numeric),
+    ct = ColumnTransformer([('kbd', 'passthrough', numeric),
                             ('ohe', OneHotEncoder(sparse=False, handle_unknown='ignore'), categorical)])
     train = ct.fit_transform(train_df)
     test = ct.transform(test_df)
@@ -77,8 +85,9 @@ def main(random_state=1, test_size=0.2, n_bins=5):
 
     # save to numpy format
     print('saving...')
-    np.save('train.npy', train)
-    np.save('test.npy', test)
+    os.makedirs(out_dir, exist_ok=True)
+    np.save(os.path.join(out_dir, 'train.npy'), train)
+    np.save(os.path.join(out_dir, 'test.npy'), test)
 
 
 if __name__ == '__main__':

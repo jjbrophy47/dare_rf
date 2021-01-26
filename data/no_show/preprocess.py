@@ -12,33 +12,22 @@ from sklearn.preprocessing import LabelEncoder
 
 
 def dataset_specific(random_state, test_size):
-    dataset_cols = ['id', 'time', 'R1', 'R2', 'R3', 'R4', 'R5',
-                    'R6', 'R7', 'R8', 'Temp.', 'Humidity']
-    metadata_cols = ['id', 'date', 'class', 't0', 'dt']
 
     # retrieve dataset
-    dataset = np.loadtxt(os.path.join('HT_Sensor_dataset.dat'), skiprows=1)
-    metadata = np.loadtxt(os.path.join('HT_Sensor_metadata.dat'), skiprows=1, dtype=str)
-    df = pd.DataFrame(dataset, columns=dataset_cols)
-    meta_df = pd.DataFrame(metadata, columns=metadata_cols)
+    df = pd.read_csv('KaggleV2-May-2016.csv')
 
-    df['id'] = df['id'].astype(int)
-    meta_df['id'] = meta_df['id'].astype(int)
-
-    df = df.merge(meta_df)
+    print(df)
+    for c in df.columns:
+        print(c, len(df[c].unique()), df[c].dtype)
 
     # remove select columns
-    remove_cols = ['id', 'date', 't0', 'dt', 'time']
-    if len(remove_cols) > 0:
-        df = df.drop(columns=remove_cols)
+    remove_cols = ['PatientId', 'AppointmentID', 'ScheduledDay', 'AppointmentDay']
+    df = df.drop(columns=remove_cols)
 
     # remove nan rows
     nan_rows = df[df.isnull().any(axis=1)]
     print('nan rows: {}'.format(len(nan_rows)))
     df = df.dropna()
-
-    # # combine two of the classes: wine, banana, or background
-    df['class'] = df['class'].apply(lambda x: 1 if x in ['wine', 'banana'] else 0)
 
     # split into train and test
     indices = np.arange(len(df))
@@ -53,8 +42,8 @@ def dataset_specific(random_state, test_size):
 
     # categorize attributes
     columns = list(df.columns)
-    label = ['class']
-    numeric = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'Temp.', 'Humidity']
+    label = ['No-show']
+    numeric = ['Age']
     categorical = list(set(columns) - set(numeric) - set(label))
     print('label', label)
     print('numeric', numeric)

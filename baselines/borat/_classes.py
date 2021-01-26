@@ -1,9 +1,8 @@
 """
-BORAT (BOttom-up Removal and Addition Trees).
+DaRE (Data Removal-Enabled) Trees.
 
--The nodes in the bttom d layers that meet the minimum
- sample support are completely random, all other nodes
- use exact unlearning.
+-The nodes in the `topd` layers of each tree
+ are completely random, all other decision nodes are greedy.
 
 -Special cases:
 
@@ -18,9 +17,10 @@ import numbers
 import numpy as np
 
 from ._manager import _DataManager
+from ._config import _Config
 from ._splitter import _Splitter
-from ._adder import _Adder
 from ._remover import _Remover
+from ._simulator import _Simulator
 from ._tree import _Tree
 from ._tree import _TreeBuilder
 
@@ -35,11 +35,11 @@ class Forest(object):
 
     Parameters:
     -----------
-    topd: int (default=1)
+    topd: int (default=0)
         Number of non-random layers that share the indistinguishability budget.
-    min_support: int (default=2,500)
-        Minimum number of samples in a node to enable a stochastic split; otherwise
-        exact unlearning is used instead.
+    k: int (default=25)
+        Number of candidate thresholds per feature to consider
+        through uniform sampling.
     n_estimators: int (default=100)
         Number of trees in the forest.
     max_features: int float, or str (default='sqrt')
@@ -60,8 +60,8 @@ class Forest(object):
         Verbosity level.
     """
     def __init__(self,
-                 topd=1,
-                 min_support=2500,
+                 topd=0,
+                 k=25,
                  n_estimators=100,
                  max_features='sqrt',
                  max_depth=10,
@@ -71,7 +71,7 @@ class Forest(object):
                  random_state=None,
                  verbose=0):
         self.topd = topd
-        self.min_support = min_support
+        self.k = k
         self.n_estimators = n_estimators
         self.max_features = max_features
         self.max_depth = max_depth
@@ -84,7 +84,7 @@ class Forest(object):
     def __str__(self):
         s = 'Forest:'
         s += '\ntopd={}'.format(self.topd)
-        s += '\nmin_support={}'.format(self.min_support)
+        s += '\nk={}'.format(self.k)
         s += '\nn_estimators={}'.format(self.n_estimators)
         s += '\nmax_features={}'.format(self.max_features)
         s += '\nmax_depth={}'.format(self.max_depth)
@@ -109,7 +109,7 @@ class Forest(object):
         self.random_state_ = get_random_int(self.random_state)
 
         # set max_features
-        if self.max_features == -1 or not self.max_features or self.max_features == 'sqrt':
+        if self.max_features in [-1, None, 'sqrt']:
             self.max_features_ = int(np.sqrt(self.n_features_))
 
         elif isinstance(self.max_features, int):
@@ -129,16 +129,20 @@ class Forest(object):
         # set top d
         self.topd_ = min(self.topd, self.max_depth_ + 1)
 
-        # # one central location for the data
+        # make sure k is positive
+        assert self.k > 0
+
+        # one central location for the data
         self.manager_ = _DataManager(X, y)
 
         # build forest
         self.trees_ = []
         for i in range(self.n_estimators):
+            # print('\n\nTree {:,}'.format(i))
 
             # build tree
             tree = Tree(topd=self.topd_,
-                        min_support=self.min_support,
+                        k=self.k,
                         max_depth=self.max_depth_,
                         criterion=self.criterion,
                         min_samples_split=self.min_samples_split,
@@ -177,27 +181,6 @@ class Forest(object):
         y_proba = np.hstack([1 - y_mean, y_mean])
         return y_proba
 
-    def add(self, X, y, get_indices=False):
-        """
-        Adds instances to the database and updates the model.
-        """
-        assert X.ndim == 2 and y.ndim == 1
-        assert X.shape[1] == self.n_features_
-        X, y = check_data(X, y)
-
-        # add data to the database
-        self.manager_.add_data(X, y)
-
-        # update trees
-        for i in range(len(self.trees_)):
-            self.trees_[i].add()
-
-        # cleanup
-        if get_indices:
-            return np.array(self.manager_.add_indices, dtype=np.int32)
-        else:
-            self.manager_.clear_add_indices()
-
     def delete(self, remove_indices):
         """
         Removes instances from the database and updates the model.
@@ -219,6 +202,25 @@ class Forest(object):
         # remove data from the database
         self.manager_.remove_data(remove_indices)
 
+    def sim_delete(self, remove_index):
+        """
+        Simulate the deletion of a SINGLE example.
+
+        Returns the number of samples that needs to be retrained
+          if this example were to be deleted.
+        """
+
+        # change `remove_index` into the right data type
+        if not isinstance(remove_index, np.int64):
+            remove_index = np.int64(remove_index)
+
+        # simulate a deletion for each tree
+        n_samples_to_retrain = 0
+        for i in range(len(self.trees_)):
+            n_samples_to_retrain += self.trees_[i].sim_delete(remove_index)
+
+        return n_samples_to_retrain
+
     def print(self, show_nodes=False):
         """
         Show representation of forest by showing each tree.
@@ -226,96 +228,52 @@ class Forest(object):
         for tree in self.trees_:
             tree.print(show_nodes=show_nodes)
 
-    def clear_add_indices(self):
-        """
-        Delete the add index statistics.
-        """
-        self.manager_.clear_add_indices()
-
-    def get_add_retrain_depths(self):
-        """
-        Retrieve addition statistics.
-        """
-        types_list, depths_list = [], []
-
-        for tree in self.trees_:
-            types, depths = tree.get_add_retrain_depths()
-            types_list.append(types)
-            depths_list.append(depths)
-
-        types = np.concatenate(types_list)
-        depths = np.concatenate(depths_list)
-
-        return types, depths
-
-    def get_removal_retrain_depths(self):
+    def get_delete_metrics(self):
         """
         Retrieve deletion statistics.
         """
-        types_list, depths_list = [], []
+        types_list, depths_list, costs_list = [], [], []
 
+        # get metrics for each tree
         for tree in self.trees_:
-            types, depths = tree.get_removal_retrain_depths()
+            types, depths, costs = tree.get_delete_metrics()
             types_list.append(types)
             depths_list.append(depths)
+            costs_list.append(costs)
 
+        # process metrics from all trees
         types = np.concatenate(types_list)
         depths = np.concatenate(depths_list)
+        costs = np.concatenate(costs_list)
 
-        return types, depths
-
-    def get_add_retrain_sample_count(self):
-        """
-        Retrieve number of samples used for retrainings.
-        """
-        result = 0
-        for tree in self.trees_:
-            result += tree.get_add_retrain_sample_count()
-        return result
-
-    def get_removal_retrain_sample_count(self):
-        """
-        Retrieve number of samples used for retrainings.
-        """
-        result = 0
-        for tree in self.trees_:
-            result += tree.get_removal_retrain_sample_count()
-        return result
+        return types, depths, costs
 
     def get_node_statistics(self):
         """
-        Return average node counts, exact node counts, and
-        semi-random node counts among all trees.
+        Return average no. random, greedy, and total node counts over all trees.
         """
-        counts = [tree.get_node_statistics() for tree in self.trees_]
-        n_nodes, n_exact, n_semi = tuple(zip(*counts))
+        n_nodes_list, n_random_nodes_list, n_greedy_nodes_list = [], [], []
 
-        n_nodes_avg = sum(n_nodes) / len(n_nodes)
-        n_exact_avg = sum(n_exact) / len(n_exact)
-        n_semi_avg = sum(n_semi) / len(n_semi)
+        # get metrics for each tree
+        for tree in self.trees_:
+            n_nodes, n_random_nodes, n_greedy_nodes = tree.get_node_statistics()
+            n_nodes_list.append(n_nodes)
+            n_random_nodes_list.append(n_random_nodes)
+            n_greedy_nodes_list.append(n_greedy_nodes)
 
-        return n_nodes_avg, n_exact_avg, n_semi_avg
+        # take the avg. of the counts
+        avg_n_nodes = np.mean(n_nodes_list)
+        avg_n_random_nodes = np.mean(n_random_nodes_list)
+        avg_n_greedy_nodes = np.mean(n_greedy_nodes_list)
 
-    def clear_removal_metrics(self):
+        return avg_n_nodes, avg_n_random_nodes, avg_n_greedy_nodes
+
+    def clear_delete_metrics(self):
         """
         Delete removal statistics.
         """
         for tree in self.trees_:
-            tree.clear_removal_metrics()
-
-    def clear_add_metrics(self):
-        """
-        Delete add statistics.
-        """
-        for tree in self.trees_:
-            tree.clear_add_metrics()
-
-    def set_sim_mode(self, sim_mode=False):
-        """
-        Turns simulation mode on/off.
-        """
-        for tree in self.trees_:
-            tree.set_sim_mode(sim_mode=sim_mode)
+            tree.clear_delete_metrics()
 
     def get_params(self, deep=False):
         """
@@ -323,7 +281,7 @@ class Forest(object):
         """
         d = {}
         d['topd'] = self.topd
-        d['min_support'] = self.min_support
+        d['k'] = self.k
         d['n_estimators'] = self.n_estimators
         d['max_features'] = self.max_features
         d['max_depth'] = self.max_depth
@@ -355,17 +313,16 @@ class Tree(object):
 
     Parameters:
     -----------
-    topd: int (default=1)
-        Number of non-random layers that share the indistinguishability budget.
-    min_support: int (default=2,500)
-        Minimum number of samples in a node to enable a stochastic split; otherwise
-        exact unlearning is used instead.
+    topd: int (default=0)
+        Number of non-random layers that contain random nodes.
+    k: int (default=25)
+        No. candidate thresholds to consider through uniform sampling.
     max_depth: int (default=None)
-        The maximum depth of a tree.
+        The maximum depth of the tree.
     criterion: str (default='gini')
         Splitting criterion to use.
     min_samples_split: int (default=2)
-        The minimum number of samples needed to make a split when building a tree.
+        The minimum number of samples needed to make a split when building the tree.
     min_samples_leaf: int (default=1)
         The minimum number of samples needed to make a leaf.
     random_state: int (default=None)
@@ -374,8 +331,8 @@ class Tree(object):
         Verbosity level.
     """
     def __init__(self,
-                 topd=1,
-                 min_support=2,
+                 topd=0,
+                 k=25,
                  max_depth=10,
                  criterion='gini',
                  min_samples_split=2,
@@ -383,7 +340,7 @@ class Tree(object):
                  random_state=None,
                  verbose=0):
         self.topd = topd
-        self.min_support = min_support
+        self.k = k
         self.max_depth = max_depth
         self.criterion = criterion
         self.min_samples_split = min_samples_split
@@ -394,7 +351,7 @@ class Tree(object):
     def __str__(self):
         s = 'Tree:'
         s += '\ntopd={}'.format(self.topd)
-        s += '\nmin_support={}'.format(self.min_support)
+        s += '\nk={}'.format(self.k)
         s += '\nmax_depth={}'.format(self.max_depth)
         s += '\ncriterion={}'.format(self.criterion)
         s += '\nmin_samples_split={}'.format(self.min_samples_split)
@@ -431,29 +388,33 @@ class Tree(object):
         self.topd_ = min(self.topd, self.max_depth_ + 1)
         self.use_gini_ = True if self.criterion == 'gini' else False
 
+        # make sure k is positive
+        assert self.k > 0, 'k must be greater than zero!'
+
         # create tree objects
         self.tree_ = _Tree()
 
-        self.splitter_ = _Splitter(self.min_samples_leaf,
-                                   self.use_gini_)
+        self.config_ = _Config(self.min_samples_split,
+                               self.min_samples_leaf,
+                               self.max_depth_,
+                               self.topd_,
+                               self.k,
+                               self.max_features_,
+                               self.use_gini_,
+                               self.random_state_)
+
+        self.splitter_ = _Splitter(self.config_)
 
         self.tree_builder_ = _TreeBuilder(self.manager_,
                                           self.splitter_,
-                                          self.min_samples_split,
-                                          self.min_samples_leaf,
-                                          self.max_depth_,
-                                          self.topd_,
-                                          self.min_support,
-                                          self.max_features_,
-                                          self.random_state_)
+                                          self.config_)
 
         self.remover_ = _Remover(self.manager_,
                                  self.tree_builder_,
-                                 self.use_gini_)
+                                 self.config_)
 
-        self.adder_ = _Adder(self.manager_,
-                             self.tree_builder_,
-                             self.use_gini_)
+        self.simulator_ = _Simulator(self.manager_,
+                                     self.config_)
 
         self.tree_builder_.build(self.tree_)
 
@@ -483,39 +444,13 @@ class Tree(object):
         """
         print('\nTREE:')
         self.tree_.print_node_count()
-        self.tree_.print_node_type_count(self.lmbda, self.topd_, self.min_support)
+        self.tree_.print_node_type_count(self.lmbda, self.topd_)
         if show_nodes:
             self.tree_.print_n_samples()
             self.tree_.print_depth()
             self.tree_.print_feature()
             self.tree_.print_value()
             print()
-
-    def add(self, X=None, y=None, get_indices=False):
-        """
-        Adds instances to the database and updates the model.
-        """
-
-        if X is None:
-            assert not self.single_tree_
-
-        else:
-            assert self.single_tree_
-            assert X.ndim == 2 and y.ndim == 1
-            assert X.shape[1] == self.n_features_
-
-            X, y = check_data(X, y)
-            self.manager_.add_data(X, y)
-
-        # update model
-        self.adder_.add(self.tree_)
-
-        # cleanup
-        if self.single_tree_:
-            if get_indices:
-                return np.array(self.manager_.add_indices, dtype=np.int32)
-            else:
-                self.manager_.clear_add_indices()
 
     def delete(self, remove_indices):
         """
@@ -538,71 +473,50 @@ class Tree(object):
         if rc == -1:
             exit('Removal index invalid!')
 
-        # remove data
+        # remove data from the database
         if self.single_tree_:
             self.manager_.remove_data(remove_indices)
 
-    def clear_add_indices(self):
+    def sim_delete(self, remove_index):
         """
-        Delete the add index statistics.
+        Removes instances from the database and updates the model.
         """
-        self.manager_.clear_add_indices()
 
-    def get_add_retrain_depths(self):
-        """
-        Retrieve addition statistics.
-        """
-        add_types = np.array(self.adder_.add_types, dtype=np.int32)
-        add_depths = np.array(self.adder_.add_depths, dtype=np.int32)
-        return add_types, add_depths
+        # change `remove_index` into the right data type
+        if self.single_tree_:
+            if not isinstance(remove_index, np.int64):
+                remove_index = np.int64(remove_index)
 
-    def get_removal_retrain_depths(self):
+        # update model
+        n_samples_to_retrain = self.simulator_.sim_delete(self.tree_, remove_index)
+        if n_samples_to_retrain == -1:
+            exit('Removal index invalid!')
+
+        return n_samples_to_retrain
+
+    def get_delete_metrics(self):
         """
         Retrieve deletion statistics.
         """
         remove_types = np.array(self.remover_.remove_types, dtype=np.int32)
         remove_depths = np.array(self.remover_.remove_depths, dtype=np.int32)
-        return remove_types, remove_depths
+        remove_costs = np.array(self.remover_.remove_costs, dtype=np.int32)
+        return remove_types, remove_depths, remove_costs
 
-    def get_add_retrain_sample_count(self):
-        """
-        Return number of samples used in any retrainings.
-        """
-        result = self.adder_.retrain_sample_count
-        return result
-
-    def get_removal_retrain_sample_count(self):
-        """
-        Return number of samples used in any retrainings.
-        """
-        result = self.remover_.retrain_sample_count
-        return result
-
-    def clear_removal_metrics(self):
+    def clear_delete_metrics(self):
         """
         Delete removal statistics.
         """
-        self.remover_.clear_remove_metrics()
-
-    def clear_add_metrics(self):
-        """
-        Delete add statistics.
-        """
-        self.adder_.clear_add_metrics()
+        self.remover_.clear_metrics()
 
     def get_node_statistics(self):
         """
-        Retrieve:
-            Total node count.
-            Exact node count in the top d layers.
-            Semi-random node count in the top d layers.
+        Returns the no. total nodes, no. random nodes, and no. greedy nodes.
         """
         n_nodes = self.tree_.get_node_count()
-        n_exact_nodes = self.tree_.get_exact_node_count(self.topd_,
-                                                        self.min_support)
-        n_semi_random_nodes = self.tree_.get_random_node_count(self.topd_,
-                                                               self.min_support)
-        return n_nodes, n_exact_nodes, n_semi_random_nodes
+        n_random_nodes = self.tree_.get_random_node_count(self.topd_)
+        n_greedy_nodes = self.tree_.get_greedy_node_count(self.topd_)
+        return n_nodes, n_random_nodes, n_greedy_nodes
 
     def set_sim_mode(self, sim_mode=False):
         """
@@ -616,7 +530,7 @@ class Tree(object):
         """
         d = {}
         d['topd'] = self.topd
-        d['min_support'] = self.min_support
+        d['k'] = self.k
         d['max_depth'] = self.max_depth
         d['criterion'] = self.criterion
         d['min_samples_split'] = self.min_samples_split
@@ -676,12 +590,13 @@ def check_random_state(seed):
 
 def check_data(X, y=None):
     """
-    Makes sure data is an integer type.
+    Makes sure data is of double type,
+    and labels are of integer type.
     """
     result = None
 
-    if X.dtype != np.int32:
-        X = X.astype(np.int32)
+    if X.dtype != np.float32:
+        X = X.astype(np.float32)
 
     if y is not None:
         if y.dtype != np.int32:

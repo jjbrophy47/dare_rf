@@ -31,18 +31,21 @@ data/*/*.txt
 data/*/*.data
 data/*/*.test
 data/ctr/train
+
+# datasets to ignore
 data/5xor
 data/6xor
 data/activity
 data/amazon
 data/dota2
+data/gas_sensor
 data/mfc18
 data/mfc18_mfc19
 data/mfc19
 data/mfc20
 data/mushroom
 data/nc17
-data/no_show
+data/olympics
 data/skin
 data/spect
 data/summary.txt

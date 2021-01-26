@@ -4,59 +4,127 @@ cimport numpy as np
 from ._manager cimport _DataManager
 from ._splitter cimport SplitRecord
 from ._tree cimport Node
+from ._tree cimport Feature
+from ._tree cimport Threshold
+from ._tree cimport IntList
 from ._tree cimport _Tree
 from ._tree cimport _TreeBuilder
+from ._config cimport _Config
+from ._utils cimport DTYPE_t
+from ._utils cimport SIZE_t
+from ._utils cimport INT32_t
+from ._utils cimport UINT32_t
 
 cdef class _Remover:
     """
-    Recursively removes data from a _Tree built using _TreeBuilder; retrains
-    when the indistinguishability bounds epsilon has been violated.
+    Recursively removes data from a _Tree built using _TreeBuilder;
+    retrains a node / subtree when a better feature / threshold is optimal.
     """
 
     # Inner structures
-    cdef _DataManager manager        # Database manager
-    cdef _TreeBuilder tree_builder   # Tree Builder
-    cdef bint use_gini               # Controls splitting criterion
-    cdef int min_samples_leaf        # Minimum number of samples for a leaf
-    cdef int min_samples_split       # Minimum number of samples for a split
+    cdef _DataManager manager                # Database manager
+    cdef _TreeBuilder tree_builder           # Tree Builder
+    cdef _Config      config                 # Configuration object
 
     # Metric structures
-    cdef int  capacity               # Number of removal allocations for space
-    cdef int  remove_count           # Number of removals
-    cdef int* remove_types           # Removal type
-    cdef int* remove_depths          # Depth of leaf or node needing retraining
-    cdef int  retrain_sample_count   # Number of samples used for retraining
+    cdef SIZE_t   capacity                   # Number of removal allocations for space
+    cdef SIZE_t   remove_count               # Number of removals
+    cdef INT32_t* remove_types               # Type of deletion that occurs
+    cdef INT32_t* remove_depths              # Depth of leaf or node needing retraining
+    cdef INT32_t* remove_costs               # No. samples that need to be retrained
 
     # Python API
-    cpdef int remove(self, _Tree tree, np.ndarray remove_indices)
-    cpdef void clear_remove_metrics(self)
+    cpdef INT32_t remove(self, _Tree tree, np.ndarray remove_indices)
+    cpdef void clear_metrics(self)
 
     # C API
-    cdef void _remove(self, Node** node_ptr,
-                      int** X, int* y,
-                      int* samples, int n_samples) nogil
+    cdef void _remove(self,
+                      Node**    node_ptr,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      IntList*  remove_samples) nogil
 
-    cdef int _check_node(self, Node* node, int** X, int* y,
-                          int* samples, int n_samples, int pos_count,
-                          SplitRecord *split) nogil
+    cdef void update_node(self,
+                          Node*    node,
+                          INT32_t* y,
+                          IntList* remove_samples) nogil
 
-    cdef int _update_splits(self, Node** node_ptr, int** X, int* y,
-                            int* samples, int n_samples, int pos_count) nogil
+    cdef void update_leaf(self,
+                          Node*    node,
+                          IntList* remove_samples) nogil
 
-    cdef void _update_leaf(self, Node** node_ptr, int* y, int* samples,
-                           int n_samples, int pos_count) nogil
+    cdef void convert_to_leaf(self,
+                              Node*        node,
+                              IntList*     remove_samples) nogil
 
-    cdef void _convert_to_leaf(self, Node** node_ptr, int* samples, int n_samples,
-                               SplitRecord *split) nogil
+    # cdef void retrain(self,
+    #                   Node***   node_ptr_ptr,
+    #                   DTYPE_t** X,
+    #                   INT32_t*  y,
+    #                   IntList*  remove_samples) nogil
 
-    cdef void _retrain(self, Node*** node_ptr, int** X, int* y, int* samples,
-                       int n_samples) nogil
+    cdef void retrain(self,
+                      Node**    node_ptr,
+                      DTYPE_t** X,
+                      INT32_t*  y,
+                      IntList*  remove_samples) nogil
 
-    cdef void _get_leaf_samples(self, Node* node, int* remove_samples,
-                                int n_remove_samples, int** leaf_samples_ptr,
-                                int* leaf_samples_count_ptr) nogil
+    cdef INT32_t check_optimal_split(self,
+                                     Node* node) nogil
 
-    cdef void _update_decision_node(self, Node** node_ptr, SplitRecord *split) nogil
+    cdef SIZE_t update_metadata(self,
+                                Node*     node,
+                                DTYPE_t** X,
+                                INT32_t*  y,
+                                IntList*  remove_samples) nogil
 
-    cdef void _add_removal_type(self, int remove_type, int remove_depth) nogil
-    cdef np.ndarray _get_int_ndarray(self, int *data, int n_elem)
+    cdef SIZE_t update_greedy_node_metadata(self,
+                                            Node*     node,
+                                            DTYPE_t** X,
+                                            INT32_t*  y,
+                                            IntList*  remove_samples) nogil
+
+    cdef SIZE_t update_random_node_metadata(self,
+                                            Node*     node,
+                                            DTYPE_t** X,
+                                            INT32_t*  y,
+                                            IntList*  remove_samples) nogil
+
+    # metric methods
+    cdef void add_metric(self,
+                         INT32_t remove_type,
+                         INT32_t remove_depth,
+                         INT32_t remove_cost) nogil
+
+    cdef np.ndarray get_int_ndarray(self,
+                                    INT32_t *data,
+                                    SIZE_t n_elem)
+
+# helper methods
+cdef void remove_invalid_thresholds(Feature* feature,
+                                    SIZE_t   n_valid_thresholds,
+                                    SIZE_t*  threshold_validities) nogil
+
+cdef SIZE_t sample_new_thresholds(Feature*  feature,
+                                  SIZE_t    n_valid_thresholds,
+                                  SIZE_t*   threshold_validities,
+                                  Node*     node,
+                                  DTYPE_t** X,
+                                  INT32_t*  y,
+                                  IntList*  remove_samples,
+                                  bint*     is_constant_feature_ptr,
+                                  _Config   config) nogil
+
+cdef SIZE_t sample_new_features(Feature*** features_ptr,
+                                IntList**  constant_features_ptr,
+                                IntList*   invalid_features,
+                                SIZE_t     n_total_features,
+                                Node*      node,
+                                DTYPE_t**  X,
+                                INT32_t*   y,
+                                IntList*   remove_samples,
+                                _Config    config) nogil
+
+cdef void get_leaf_samples(Node*    node,
+                           IntList* remove_samples,
+                           IntList* leaf_samples) nogil

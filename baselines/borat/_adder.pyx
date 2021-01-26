@@ -83,7 +83,7 @@ cdef class _Adder:
         cdef int  n_samples = self.manager.n_add_indices
 
         # Data containers
-        cdef int** X = NULL
+        cdef double** X = NULL
         cdef int* y = NULL
         self.manager.get_data(&X, &y)
 
@@ -92,7 +92,7 @@ cdef class _Adder:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _add(self, Node** node_ptr, int** X, int* y,
+    cdef void _add(self, Node** node_ptr, double** X, int* y,
                    int* samples, int n_samples) nogil:
         """
         Recursively add the samples to this subtree.
@@ -104,7 +104,7 @@ cdef class _Adder:
         cdef int result = 0
 
         cdef int topd = self.tree_builder.topd
-        cdef int min_support = self.tree_builder.min_support
+        # cdef int min_support = self.tree_builder.min_support
 
         cdef bint is_bottom_leaf = node.is_leaf and not node.features
 
@@ -136,13 +136,13 @@ cdef class _Adder:
                 free(samples)
 
             # retrain
-            if result == 2:
+            elif result == 2:
                 self._add_add_type(result, node.depth)
                 self._retrain(&node_ptr, X, y, samples, n_samples)
                 free(samples)
 
             # update and recurse
-            if result == 0:
+            elif result == 0:
 
                 # leaf node
                 if node.is_leaf:
@@ -157,21 +157,21 @@ cdef class _Adder:
 
                     # prevent sim mode from updating beyond the deletion point
                     if self.tree_builder.sim_mode and node.depth == self.tree_builder.sim_depth:
-                        free(split.left_indices)
-                        free(split.right_indices)
+                        free(split.left_samples)
+                        free(split.right_samples)
                         return
 
                     # traverse left
-                    if split.left_count > 0:
-                        self._add(&node.left, X, y, split.left_indices, split.left_count)
+                    if split.n_left_samples > 0:
+                        self._add(&node.left, X, y, split.left_samples, split.n_left_samples)
                     else:
-                        free(split.left_indices)
+                        free(split.left_samples)
 
                     # traverse right
-                    if split.right_count > 0:
-                        self._add(&node.right, X, y, split.right_indices, split.right_count)
+                    if split.n_right_samples > 0:
+                        self._add(&node.right, X, y, split.right_samples, split.n_right_samples)
                     else:
-                        free(split.right_indices)
+                        free(split.right_samples)
 
     # private
     @cython.boundscheck(False)
@@ -189,20 +189,20 @@ cdef class _Adder:
             return
 
         # add samples to leaf
-        cdef int* leaf_samples = <int *>malloc((node.count + n_samples) * sizeof(int))
+        cdef int* leaf_samples = <int *>malloc((node.n_samples + n_samples) * sizeof(int))
         cdef int  leaf_samples_count = 0
         self._get_leaf_samples(node, &leaf_samples, &leaf_samples_count)
         self._add_leaf_samples(samples, n_samples, &leaf_samples, &leaf_samples_count)
         free(node.leaf_samples)
 
-        node.count += n_samples
-        node.pos_count += pos_count
-        node.value = node.pos_count / <double> node.count
+        node.n_samples += n_samples
+        node.n_pos_samples += pos_count
+        node.value = node.n_pos_samples / <double> node.n_samples
         node.leaf_samples = leaf_samples
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _retrain(self, Node*** node_pp, int** X, int* y, int* samples,
+    cdef void _retrain(self, Node*** node_pp, double** X, int* y, int* samples,
                        int n_samples) nogil:
         """
         Rebuild subtree at this node.
@@ -211,19 +211,19 @@ cdef class _Adder:
 
         if self.tree_builder.sim_mode:
             self.tree_builder.sim_depth = node.depth
-            self.retrain_sample_count += node.count + n_samples
+            self.retrain_sample_count += node.n_samples + n_samples
             return
 
         cdef Node** node_ptr = node_pp[0]
 
-        cdef int* leaf_samples = <int *>malloc((node.count + n_samples) * sizeof(int))
+        cdef int* leaf_samples = <int *>malloc((node.n_samples + n_samples) * sizeof(int))
         cdef int  leaf_samples_count = 0
 
         cdef int depth = node.depth
         cdef int is_left = node.is_left
 
-        cdef int* invalid_features = NULL
-        cdef int  invalid_features_count = node.invalid_features_count
+        # cdef int* invalid_features = NULL
+        # cdef int  invalid_features_count = node.invalid_features_count
 
         self._get_leaf_samples(node, &leaf_samples, &leaf_samples_count)
         self._add_samples(samples, n_samples, &leaf_samples, &leaf_samples_count)
@@ -231,14 +231,14 @@ cdef class _Adder:
 
         self.retrain_sample_count += leaf_samples_count
 
-        invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
-        self.tree_builder.features = copy_int_array(node.features, node.features_count)
+        # invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
+        # self.tree_builder.features = copy_int_array(node.features, node.features_count)
 
         dealloc(node)
         free(node)
 
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
-                                               invalid_features, invalid_features_count,
+                                               # invalid_features, invalid_features_count,
                                                depth, is_left)
 
     @cython.boundscheck(False)
@@ -250,7 +250,7 @@ cdef class _Adder:
         """
 
         if node.is_leaf:
-            for i in range(node.count):
+            for i in range(node.n_samples):
                 leaf_samples_ptr[0][leaf_samples_count_ptr[0]] = node.leaf_samples[i]
                 leaf_samples_count_ptr[0] += 1
 
@@ -310,13 +310,13 @@ cdef class _Adder:
             return
 
         cdef Node* node = node_ptr[0]
-        node.count = split.count
-        node.pos_count = split.pos_count
+        # node.n_samples = split.n_samples
+        # node.n_pos_samples = split.n_pos_samples
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
-    cdef int _check_node(self, Node* node, int** X, int* y,
+    cdef int _check_node(self, Node* node, double** X, int* y,
                           int* samples, int n_samples, int pos_count,
                           SplitRecord *split) nogil:
         """
@@ -330,38 +330,40 @@ cdef class _Adder:
         cdef double best_score = -1
         cdef int chosen_ndx = -1
 
-        cdef int updated_count = node.count + n_samples
-        cdef int updated_pos_count = node.pos_count + pos_count
+        cdef int updated_count = node.n_samples + n_samples
+        cdef int updated_pos_count = node.n_pos_samples + pos_count
 
         cdef int i
         cdef int j
         cdef int k
 
         cdef int topd = self.tree_builder.topd
-        cdef int min_support = self.tree_builder.min_support
+        # cdef int min_support = self.tree_builder.min_support
 
         cdef int result = 0
 
         if updated_pos_count > 0 and updated_pos_count < updated_count:
 
-            if node.feature != -1:
+            if node.chosen_feature:
 
                 # exact, check if best feature has changed
-                if node.depth < topd or node.count < min_support:
+                if node.depth >= topd:
                     best_score = 1
                     chosen_ndx = -1
 
-                    for j in range(node.features_count):
-                        split_score = compute_split_score(use_gini, updated_count, node.left_counts[j],
-                                                          node.right_counts[j], node.left_pos_counts[j],
-                                                          node.right_pos_counts[j])
+                    for j in range(node.n_features):
+                        # split_score = compute_split_score(use_gini, updated_count, node.left_counts[j],
+                        #                                   node.right_counts[j], node.left_pos_counts[j],
+                        #                                   node.right_pos_counts[j])
+                        # TODO
+                        split_score = 1.0
 
                         if split_score < best_score:
                             best_score = split_score
                             chosen_ndx = j
 
                     # same feature
-                    if node.feature == node.features[chosen_ndx]:
+                    if node.chosen_feature.index == node.features[chosen_ndx].index:
                         result = 0
                         split_samples(node, X, y, samples, n_samples, split)
 
@@ -382,14 +384,14 @@ cdef class _Adder:
         else:
             result = 0
 
-        split.count = updated_count
-        split.pos_count = updated_pos_count
+        # split.n_samples = updated_count
+        # split.n_pos_samples = updated_pos_count
 
         return result
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int _update_splits(self, Node** node_ptr, int** X, int* y,
+    cdef int _update_splits(self, Node** node_ptr, double** X, int* y,
                             int* samples, int n_samples, int pos_count) nogil:
         """
         Update the metadata of this node.
@@ -402,21 +404,21 @@ cdef class _Adder:
         cdef int i
 
         # compute statistics for each attribute
-        for j in range(node.features_count):
+        for j in range(node.n_features):
 
             left_count = 0
             left_pos_count = 0
 
             for i in range(n_samples):
 
-                if X[samples[i]][node.features[j]] == 1:
+                if X[samples[i]][node.features[j].index] == 1:
                     left_count += 1
                     left_pos_count += y[samples[i]]
 
-            node.left_counts[j] += left_count
-            node.left_pos_counts[j] += left_pos_count
-            node.right_counts[j] += (n_samples - left_count)
-            node.right_pos_counts[j] += (pos_count - left_pos_count)
+            # node.left_counts[j] += left_count
+            # node.left_pos_counts[j] += left_pos_count
+            # node.right_counts[j] += (n_samples - left_count)
+            # node.right_pos_counts[j] += (pos_count - left_pos_count)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)

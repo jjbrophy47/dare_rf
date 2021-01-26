@@ -219,11 +219,11 @@ cdef class _Adder:
         cdef int* leaf_samples = <int *>malloc((node.count + n_samples) * sizeof(int))
         cdef int  leaf_samples_count = 0
 
-        cdef int* rebuild_features = NULL
-
         cdef int depth = node.depth
         cdef int is_left = node.is_left
-        cdef int features_count = node.features_count
+
+        cdef int* invalid_features = NULL
+        cdef int  invalid_features_count = node.invalid_features_count
 
         self._get_leaf_samples(node, &leaf_samples, &leaf_samples_count)
         self._add_samples(samples, n_samples, &leaf_samples, &leaf_samples_count)
@@ -231,12 +231,14 @@ cdef class _Adder:
 
         self.retrain_sample_count += leaf_samples_count
 
-        rebuild_features = copy_int_array(node.features, node.features_count)
+        invalid_features = copy_int_array(node.invalid_features, node.invalid_features_count)
+        self.tree_builder.features = copy_int_array(node.features, node.features_count)
+
         dealloc(node)
         free(node)
 
         node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, leaf_samples_count,
-                                               rebuild_features, features_count,
+                                               invalid_features, invalid_features_count,
                                                depth, is_left)
 
     @cython.boundscheck(False)
@@ -345,7 +347,7 @@ cdef class _Adder:
             if node.feature != -1:
 
                 # exact, check if best feature has changed
-                if node.depth >= topd or node.count < min_support:
+                if node.depth < topd or node.count < min_support:
                     best_score = 1
                     chosen_ndx = -1
 

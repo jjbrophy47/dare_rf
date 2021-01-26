@@ -339,7 +339,7 @@ cdef class _Tree:
             result = 0
 
         else:
-            if node.depth >= topd:
+            if node.depth < topd:
                 result = 1
 
             result += self._get_exact_node_count(node.left, topd, min_support)
@@ -354,7 +354,7 @@ cdef class _Tree:
             result = 0
 
         else:
-            if node.depth < topd and node.count >= min_support:
+            if node.depth >= topd and node.count >= min_support:
                 result = 1
 
             result += self._get_random_node_count(node.left, topd, min_support)
