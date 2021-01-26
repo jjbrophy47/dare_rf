@@ -2,6 +2,7 @@
 output
 myenv
 notes
+scripts/notebooks/
 
 # build and log directories
 jobs/errors/
