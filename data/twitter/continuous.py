@@ -80,13 +80,13 @@ def main(random_state=1, test_size=0.2, n_instances=1000000, out_dir='continuous
     test_label = le.transform(test_df[label].to_numpy().ravel()).reshape(-1, 1)
 
     # add labels
-    train = np.hstack([train, train_label])
-    test = np.hstack([test, test_label])
+    train = np.hstack([train, train_label]).astype(np.float32)
+    test = np.hstack([test, test_label]).astype(np.float32)
 
-    print('\ntrain:\n{}'.format(train))
+    print('\ntrain:\n{}, dtype: {}'.format(train, train.dtype))
     print('train.shape: {}, label sum: {}'.format(train.shape, train[:, -1].sum()))
 
-    print('\ntest:\n{}'.format(test))
+    print('\ntest:\n{}, dtype: {}'.format(test, test.dtype))
     print('test.shape: {}, label sum: {}'.format(test.shape, test[:, -1].sum()))
 
     # save to numpy format

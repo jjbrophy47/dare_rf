@@ -19,7 +19,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
 import dare
-from baselines import borat
 from utility import data_util
 from utility import exp_util
 from utility import print_util

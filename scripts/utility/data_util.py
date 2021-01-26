@@ -17,8 +17,8 @@ def get_data(dataset, data_dir='data', continuous=True):
 
     assert os.path.exists(in_dir)
 
-    train = np.load(os.path.join(in_dir, 'train.npy'))
-    test = np.load(os.path.join(in_dir, 'test.npy'))
+    train = np.load(os.path.join(in_dir, 'train.npy')).astype(np.float32)
+    test = np.load(os.path.join(in_dir, 'test.npy')).astype(np.float32)
 
     if not continuous:
         assert np.all(np.unique(train) == np.array([0, 1]))
