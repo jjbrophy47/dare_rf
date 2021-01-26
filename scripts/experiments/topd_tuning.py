@@ -16,7 +16,7 @@ from sklearn.model_selection import cross_val_score
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart
+import dare
 from utility import data_util
 from utility import print_util
 
@@ -26,7 +26,7 @@ def _get_model(args, topd=0):
     Return model with the specified `topd`.
     """
 
-    model = dart.Forest(max_depth=args.max_depth,
+    model = dare.Forest(max_depth=args.max_depth,
                         criterion=args.criterion,
                         topd=topd,
                         k=args.k,
@@ -72,7 +72,7 @@ def performance(args, out_dir, logger):
     exact_score = cross_val_score(model, X_train_sub, y_train_sub, scoring=args.scoring, cv=skf).mean()
     logger.info('\n[topd=0] CV score: {:.5f}, time: {:.3f}s'.format(exact_score, time.time() - start))
 
-    # train DART model
+    # train topd=0 model
     s = '[topd={}] CV score: {:.5f}, CV diff: {:.5f}, time: {:.3f}s'
     scores = {}
     best_scores = {tol: 0 for tol in args.tol}

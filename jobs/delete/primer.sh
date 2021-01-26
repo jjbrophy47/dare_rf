@@ -20,7 +20,7 @@ for rs in ${rs_list[@]}; do
                --job-name=DEL_$dataset \
                --output=jobs/logs/delete/$dataset \
                --error=jobs/errors/delete/$dataset \
-               jobs/delete/dart_runner.sh $dataset $rs $criterion \
+               jobs/delete/runner.sh $dataset $rs $criterion \
                $n_estimators $max_depth $topd $k $subsample_size
     done
     # done

@@ -18,7 +18,7 @@ from sklearn.ensemble import ExtraTreesClassifier
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart
+import dare
 from baselines import borat
 from utility import data_util
 from utility import exp_util
@@ -30,8 +30,8 @@ def _get_model(args):
     Return the appropriate model.
     """
 
-    if args.model in ['dart']:
-        model = dart.Forest(criterion=args.criterion,
+    if args.model in ['dare']:
+        model = dare.Forest(criterion=args.criterion,
                             max_depth=args.max_depth,
                             n_estimators=args.n_estimators,
                             max_features=args.max_features,
@@ -75,8 +75,8 @@ def _get_model_dict(args, params):
     Return the appropriate model.
     """
 
-    if args.model == 'dart':
-        model = dart.Forest(criterion=args.criterion,
+    if args.model == 'dare':
+        model = dare.Forest(criterion=args.criterion,
                             max_depth=params['max_depth'],
                             n_estimators=params['n_estimators'],
                             max_features=args.max_features,
@@ -176,8 +176,8 @@ def performance(args, out_dir, logger):
     param_grid = {'max_depth': max_depth,
                   'n_estimators': n_estimators}
 
-    # add additional parameter for DART
-    if args.model == 'dart':
+    # add additional parameter for DaRE
+    if args.model == 'dare':
         param_grid['k'] = [5, 10, 25, 50]
 
     # get hyperparameter names
@@ -245,7 +245,7 @@ def main(args):
         if args.bootstrap:
             out_dir = os.path.join(out_dir, 'bootstrap')
 
-    elif args.model == 'dart':
+    elif args.model == 'dare':
         assert args.topd == 0
         out_dir = os.path.join(out_dir, args.model)
 
@@ -282,7 +282,7 @@ if __name__ == '__main__':
 
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='random state.')
-    parser.add_argument('--model', type=str, default='dart', help='type of model.')
+    parser.add_argument('--model', type=str, default='dare', help='type of model.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     parser.add_argument('--topd', type=int, default=0, help='0 for exact, 1000 for random.')
     parser.add_argument('--k', type=int, default=10, help='no. of candidate thresholds to sample.')

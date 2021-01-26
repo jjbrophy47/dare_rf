@@ -19,7 +19,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart
+import dare
 from utility import data_util
 from utility import exp_util
 from utility import print_util
@@ -66,7 +66,7 @@ def get_model(args):
     """
     Return model.
     """
-    model = dart.Forest(max_depth=args.max_depth,
+    model = dare.Forest(max_depth=args.max_depth,
                         criterion=args.criterion,
                         topd=args.topd,
                         k=args.k,
@@ -82,7 +82,7 @@ def get_naive(args):
     """
     Return naive model.
     """
-    model = dart.Forest(max_depth=args.max_depth,
+    model = dare.Forest(max_depth=args.max_depth,
                         criterion=args.criterion,
                         topd=0,
                         k=args.k,
@@ -299,10 +299,7 @@ def main(args):
                            args.dataset,
                            args.criterion,
                            'rs_{}'.format(args.rs),
-                           'trees_{}'.format(args.n_estimators),
-                           'depth_{}'.format(args.max_depth),
                            'topd_{}'.format(args.topd),
-                           'k_{}'.format(args.k),
                            'sub_{}'.format(args.subsample_size))
 
     log_fp = os.path.join(out_dir, 'log.txt')
@@ -345,7 +342,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_depth', type=int, default=10, help='max. depth of the tree.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum no. features to sample.')
 
-    # DART
+    # DARE parameters
     parser.add_argument('--topd', type=int, default=0, help='no. top layers to be random.')
     parser.add_argument('--k', type=int, default=10, help='no. thresholds to sample.')
 

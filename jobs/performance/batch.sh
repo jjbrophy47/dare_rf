@@ -1,18 +1,18 @@
-# D-DART
-./jobs/performance/primer.sh 'surgical' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
-./jobs/performance/primer.sh 'vaccine' 'dart' 1.0 'accuracy' 'gini' 6 1440 short
-./jobs/performance/primer.sh 'adult' 'dart' 1.0 'accuracy' 'gini' 3 1440 short
-./jobs/performance/primer.sh 'bank_marketing' 'dart' 1.0 'roc_auc' 'gini' 3 1440 short
-./jobs/performance/primer.sh 'flight_delays' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'diabetes' 'dart' 1.0 'accuracy' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'no_show' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'olympics' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'census' 'dart' 1.0 'roc_auc' 'gini' 20 1440 short
-./jobs/performance/primer.sh 'credit_card' 'dart' 1.0 'average_precision' 'gini' 6 1440 short
-./jobs/performance/primer.sh 'twitter' 'dart' 0.5 'roc_auc' 'gini' 35 1440 short
-./jobs/performance/primer.sh 'synthetic' 'dart' 0.5 'accuracy' 'gini' 60 1440 short
-./jobs/performance/primer.sh 'higgs' 'dart' 0.1 'accuracy' 'gini' 60 1440 short
-./jobs/performance/primer.sh 'ctr' 'dart' 0.01 'roc_auc' 'gini' 70 1440 short
+# DARE (topd=0)
+./jobs/performance/primer.sh 'surgical' 'dare' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'vaccine' 'dare' 1.0 'accuracy' 'gini' 6 1440 short
+./jobs/performance/primer.sh 'adult' 'dare' 1.0 'accuracy' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'bank_marketing' 'dare' 1.0 'roc_auc' 'gini' 3 1440 short
+./jobs/performance/primer.sh 'flight_delays' 'dare' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'diabetes' 'dare' 1.0 'accuracy' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'no_show' 'dare' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'olympics' 'dare' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'census' 'dare' 1.0 'roc_auc' 'gini' 20 1440 short
+./jobs/performance/primer.sh 'credit_card' 'dare' 1.0 'average_precision' 'gini' 6 1440 short
+./jobs/performance/primer.sh 'twitter' 'dare' 0.5 'roc_auc' 'gini' 35 1440 short
+./jobs/performance/primer.sh 'synthetic' 'dare' 0.5 'accuracy' 'gini' 60 1440 short
+./jobs/performance/primer.sh 'higgs' 'dare' 0.1 'accuracy' 'gini' 60 1440 short
+./jobs/performance/primer.sh 'ctr' 'dare' 0.01 'roc_auc' 'gini' 70 1440 short
 
 # ExtraTrees
 # ./jobs/performance/primer.sh 'surgical' 'extra_trees' 1.0 'accuracy' 'gini' 3 1440 short

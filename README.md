@@ -1,10 +1,11 @@
-<p align="center">
+<!--<p align="center">
   <img src=images/logo.png?raw=true" alt="logo"/>
-</p>
+</p>-->
 
+DaRE
 ---
 
-**DART** (**D**ata **A**ddition and **R**emoval **T**rees) are stochastic variants of decision trees / random forests that provide efficient _addition_ and _removal_ of training data without having to retrain from scratch.
+**DaRE** (**Da**ta **R**emoval-**E**nabled) trees are stochastic variants of decision trees / random forests that provide efficient _removal_ of training data without having to retrain from scratch.
 
 Install
 ---
@@ -14,7 +15,7 @@ Install
 Simple Example
 ---
 ```
-import dart
+import dare
 import numpy as np
 
 # initialize some training data
@@ -24,9 +25,8 @@ y = np.array([1, 1, 1, 0, 1])
 # create a test sample
 X_test = np.array([[1, 0]])
 
-# train a deletion-enabled RF model
-rf = dart.Forest(topd=0,  # no random nodes => exact unlearner
-                 n_estimators=100,
+# train a data deletion-enabled RF model
+rf = dare.Forest(n_estimators=100,
                  max_depth=3,
                  criterion='gini',
                  random_state=1)
@@ -44,7 +44,7 @@ rf.predict_proba(X_test)
 
 Paper
 ---
-For further details please refer to the paper [Dart: Data Addition and Removal Trees](https://arxiv.org/abs/2009.05567).
+For further details please refer to the paper: [Dart: Data Addition and Removal Trees](https://arxiv.org/abs/2009.05567).
 
 ```
 @article{brophy2020dart,
