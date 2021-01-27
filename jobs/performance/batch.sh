@@ -14,6 +14,8 @@
 ./jobs/performance/primer.sh 'higgs' 'dare' 0.1 'accuracy' 'gini' 60 1440 short
 # ./jobs/performance/primer.sh 'ctr' 'dare' 0.01 'roc_auc' 'gini' 70 1440 short
 
+./jobs/performance/primer.sh 'credit_card' 'dare' 50 20 10 'average_precision' 'gini' 60 1440 short
+
 # ExtraTrees
 ./jobs/performance/primer.sh 'surgical' 'extra_trees' 1.0 'accuracy' 'gini' 3 1440 short
 ./jobs/performance/primer.sh 'vaccine' 'extra_trees' 1.0 'accuracy' 'gini' 3 1440 short
@@ -47,7 +49,7 @@
 # ./jobs/performance/primer.sh 'ctr' 'extra_trees_k1' 0.01 'roc_auc' 'gini' 70 1440 short
 
 # Sklearn
-./jobs/performance/primer.sh 'surgical' 'sklearn' 1.0 'accuracy' 'gini' 3 1440 shorts
+./jobs/performance/primer.sh 'surgical' 'sklearn' 1.0 'accuracy' 'gini' 3 1440 short
 ./jobs/performance/primer.sh 'vaccine' 'sklearn' 1.0 'accuracy' 'gini' 3 1440 short
 ./jobs/performance/primer.sh 'adult' 'sklearn' 1.0 'accuracy' 'gini' 3 1440 short
 ./jobs/performance/primer.sh 'bank_marketing' 'sklearn' 1.0 'roc_auc' 'gini' 3 1440 short

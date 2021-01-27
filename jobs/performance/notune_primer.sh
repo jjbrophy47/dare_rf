@@ -1,8 +1,8 @@
 dataset=$1
-n_estimators=$2
-max_depth=$3
-max_features=$4
-model=$5
+model=$2
+n_estimators=$3
+max_depth=$4
+k=$5
 scoring=$6
 criterion=$7
 mem=$8
@@ -19,5 +19,5 @@ for rs in ${rs_list[@]}; do
            --output=jobs/logs/performance/$dataset \
            --error=jobs/errors/performance/$dataset \
            jobs/performance/notune_runner.sh $dataset \
-           $n_estimators $max_depth $max_features $model $scoring $criterion $rs
+           $model $n_estimators $max_depth $k $scoring $criterion $rs
 done
