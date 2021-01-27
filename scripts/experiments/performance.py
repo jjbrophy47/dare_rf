@@ -189,19 +189,22 @@ def performance(args, out_dir, logger):
     start = time.time()
     model = _get_model(args)
 
-    # TEMPORARY
-    skf = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=args.rs)
-    i = 0
-    for train_indices, test_indices in skf.split(X_train_sub, y_train_sub):
-        start = time.time()
-        X_train_sub_temp, y_train_sub_temp = X_train_sub[train_indices], y_train_sub[train_indices]
-        X_test_sub_temp, y_test_sub_temp = X_train_sub[test_indices], y_train_sub[test_indices]
-        model = _get_model(args)
-        model.fit(X_train_sub_temp, y_train_sub_temp)
-        print('{}: {:.3f}s'.format(i, time.time() - start))
-        np.save(os.path.join(out_dir, 'train_indices.npy'), train_indices)
-        i += 1
-    exit(0)
+    # # TEMPORARY
+    # skf = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=args.rs)
+    # i = 0
+    # for train_indices, test_indices in skf.split(X_train_sub, y_train_sub):
+    #     if i != 3:
+    #         i += 1
+    #         continue
+    #     start = time.time()
+    #     X_train_sub_temp, y_train_sub_temp = X_train_sub[train_indices], y_train_sub[train_indices]
+    #     X_test_sub_temp, y_test_sub_temp = X_train_sub[test_indices], y_train_sub[test_indices]
+    #     model = _get_model(args)
+    #     model.fit(X_train_sub_temp, y_train_sub_temp)
+    #     print('{}: {:.3f}s'.format(i, time.time() - start))
+    #     np.save(os.path.join(out_dir, 'train_indices.npy'), train_indices)
+    #     i += 1
+    # exit(0)
 
     # tune hyperparameters
     if not args.no_tune:

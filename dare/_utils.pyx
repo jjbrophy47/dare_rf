@@ -409,8 +409,16 @@ cdef void split_samples(Node*        node,
     split.left_samples = create_intlist(samples.n, 0)
     split.right_samples = create_intlist(samples.n, 0)
 
+    # printf('[U - SS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
+    #        node.chosen_feature.index, node.chosen_threshold.value)
+    # printf('[U - SS] node.chosen_threshold.n_left_samples: %ld, node.chosen_threshold.n_right_samples: %ld\n',
+    #        node.chosen_threshold.n_left_samples, node.chosen_threshold.n_right_samples)
+
     # loop through the deleted samples
     for i in range(samples.n):
+
+        # printf('[U - SS] X[samples.arr[%ld]][%ld]: %.32f, node.chosen_threshold.value: %.32f\n',
+        #        i, node.chosen_feature.index, X[samples.arr[i]][node.chosen_feature.index], node.chosen_threshold.value)
 
         # add sample to the left branch
         if X[samples.arr[i]][node.chosen_feature.index] <= node.chosen_threshold.value:
@@ -422,11 +430,15 @@ cdef void split_samples(Node*        node,
             split.right_samples.arr[split.right_samples.n] = samples.arr[i]
             split.right_samples.n += 1
 
+    # printf('[U - SS] split.left_samples.n: %ld, split.right_samples.n: %ld\n',
+    #        split.left_samples.n, split.right_samples.n)
+
     # assign left branch deleted samples
     if split.left_samples.n > 0:
         split.left_samples.arr = <SIZE_t *>realloc(split.left_samples.arr,
                                                    split.left_samples.n * sizeof(SIZE_t))
     else:
+        # printf('[U - SS] NO LEFT SAMPLES\n')
         free_intlist(split.left_samples)
         split.left_samples = NULL
 
@@ -435,16 +447,23 @@ cdef void split_samples(Node*        node,
         split.right_samples.arr = <SIZE_t *>realloc(split.right_samples.arr,
                                                     split.right_samples.n * sizeof(SIZE_t))
     else:
+        # printf('[U - SS] NO RIGHT SAMPLES\n')
         free_intlist(split.right_samples)
         split.right_samples = NULL
+
+    # printf('[U - SS] copy constant features\n')
 
     # copy constant features array for both branches
     if copy_constant_features:
         split.left_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
         split.right_constant_features = copy_intlist(node.constant_features, node.constant_features.n)
 
+    # printf('[U - SS] freeing samples\n')
+
     # clean up, no more use for the original samples array
     free_intlist(samples)
+
+    # printf('[U - SS] done freeing samples\n')
 
 
 cdef void dealloc(Node *node) nogil:
