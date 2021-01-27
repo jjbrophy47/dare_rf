@@ -35,6 +35,7 @@ from ._utils cimport copy_feature
 from ._utils cimport copy_features
 from ._utils cimport free_feature
 from ._utils cimport free_features
+from libc.math cimport fabs
 
 from ._utils cimport copy_threshold
 from ._utils cimport free_thresholds
@@ -587,7 +588,7 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
     sort(values, indices, samples.n)
 
     # constant feature
-    if values[samples.n - 1] <= values[0] + FEATURE_THRESHOLD:
+    if fabs(values[samples.n - 1] - values[0]) <  FEATURE_THRESHOLD:
         if is_constant_feature_ptr != NULL:
             is_constant_feature_ptr[0] = True
 
