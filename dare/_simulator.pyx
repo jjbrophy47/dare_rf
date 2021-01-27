@@ -588,7 +588,7 @@ cdef SIZE_t sample_new_thresholds(Feature*  feature,
     sort(values, indices, samples.n)
 
     # constant feature
-    if fabs(values[samples.n - 1] - values[0]) <  FEATURE_THRESHOLD:
+    if fabs(values[samples.n - 1] - values[0]) <= FEATURE_THRESHOLD:
         if is_constant_feature_ptr != NULL:
             is_constant_feature_ptr[0] = True
 

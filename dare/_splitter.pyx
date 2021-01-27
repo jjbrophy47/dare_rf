@@ -178,7 +178,7 @@ cdef SIZE_t select_greedy_threshold(Node*     node,
         sort(values, indices, samples.n)
 
         # constant feature
-        if fabs(values[samples.n - 1] - values[0]) < FEATURE_THRESHOLD:
+        if fabs(values[samples.n - 1] - values[0]) <= FEATURE_THRESHOLD:
             constant_features.arr[constant_features.n] = feature_index
             constant_features.n += 1
             continue
@@ -387,7 +387,7 @@ cdef SIZE_t select_random_threshold(Node*     node,
                 max_val = cur_val
 
         # constant feature
-        if fabs(max_val - min_val) < FEATURE_THRESHOLD:
+        if fabs(max_val - min_val) <= FEATURE_THRESHOLD:
             constant_features.arr[constant_features.n] = feature_index
             constant_features.n += 1
 
@@ -517,7 +517,7 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
         cur_label = labels[indices[i]]
 
         # same feature, increment counts
-        if fabs(cur_val - prev_val) < FEATURE_THRESHOLD:
+        if fabs(cur_val - prev_val) <= FEATURE_THRESHOLD:
             v_count += 1
             v_pos_count += cur_label
 
@@ -598,7 +598,7 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
             threshold.n_right_samples = n_right_samples
             threshold.n_right_pos_samples = n_right_pos_samples
 
-            # printf('[S - GCT] v1: %.32f, v2: %.32f, v1 + v2: %.32f, threshold.value: %.32f\n',
+            # printf('[S - GCT] v1: %.5f, v2: %.5f, v1 + v2: %.5f, threshold.value: %.5f\n',
             #        v1, v2, v2 + v1, threshold.value)
 
             # save threshold to thresholds array

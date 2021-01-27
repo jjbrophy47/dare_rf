@@ -27,7 +27,7 @@
 # ./jobs/performance/primer.sh 'credit_card' 'extra_trees' 1.0 'average_precision' 'gini' 6 1440 short
 # ./jobs/performance/primer.sh 'twitter' 'extra_trees' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'extra_trees' 0.5 'accuracy' 'gini' 40 1440 short
-# ./jobs/performance/primer.sh 'higgs' 'extra_trees' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/primer.sh 'higgs' 'extra_trees' 0.05 'accuracy' 'gini' 45 1440 short
 ./jobs/performance/primer.sh 'ctr' 'extra_trees' 0.005 'roc_auc' 'gini' 60 1440 short
 
 # ExtraTrees (k=1)
@@ -43,7 +43,7 @@
 # ./jobs/performance/primer.sh 'credit_card' 'extra_trees_k1' 1.0 'average_precision' 'gini' 6 1440 short
 # ./jobs/performance/primer.sh 'twitter' 'extra_trees_k1' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'extra_trees_k1' 0.5 'accuracy' 'gini' 40 1440 short
-# ./jobs/performance/primer.sh 'higgs' 'extra_trees_k1' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/primer.sh 'higgs' 'extra_trees_k1' 0.05 'accuracy' 'gini' 45 1440 short
 ./jobs/performance/primer.sh 'ctr' 'extra_trees_k1' 0.005 'roc_auc' 'gini' 60 1440 short
 
 # Sklearn
@@ -59,7 +59,7 @@
 # ./jobs/performance/primer.sh 'credit_card' 'sklearn' 1.0 'average_precision' 'gini' 6 1440 short
 # ./jobs/performance/primer.sh 'twitter' 'sklearn' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/primer.sh 'synthetic' 'sklearn' 0.5 'accuracy' 'gini' 60 4320 long
-# ./jobs/performance/primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/primer.sh 'higgs' 'sklearn' 0.05 'accuracy' 'gini' 45 1440 short
 ./jobs/performance/primer.sh 'ctr' 'sklearn' 0.005 'roc_auc' 'gini' 60 1440 short
 
 # Sklearn w/ bootstrap
@@ -75,5 +75,5 @@
 # ./jobs/performance/bootstrap_primer.sh 'credit_card' 'sklearn' 1.0 'average_precision' 'gini' 6 1440 short
 # ./jobs/performance/bootstrap_primer.sh 'twitter' 'sklearn' 0.5 'roc_auc' 'gini' 35 1440 short
 # ./jobs/performance/bootstrap_primer.sh 'synthetic' 'sklearn' 0.5 'accuracy' 'gini' 40 1440 short
-# ./jobs/performance/bootstrap_primer.sh 'higgs' 'sklearn' 0.1 'accuracy' 'gini' 45 1440 short
+./jobs/performance/bootstrap_primer.sh 'higgs' 'sklearn' 0.05 'accuracy' 'gini' 45 1440 short
 ./jobs/performance/bootstrap_primer.sh 'ctr' 'sklearn' 0.005 'roc_auc' 'gini' 60 1440 short
