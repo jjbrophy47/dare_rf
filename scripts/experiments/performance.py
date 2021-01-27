@@ -166,6 +166,8 @@ def performance(args, out_dir, logger):
 
         else:
             X_train_sub, y_train_sub = X_train, y_train
+    else:
+        X_train_sub, y_train_sub = X_train, y_train
 
     # hyperparameter values
     n_estimators = [10, 50, 100, 250]
