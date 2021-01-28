@@ -1,7 +1,9 @@
 """
 Utility methods for displaying data.
 """
+import os
 import sys
+import shutil
 import logging
 
 
@@ -74,3 +76,24 @@ def reset_stdout_stderr(logfile, stdout, stderr):
     sys.stdout = stdout
     sys.stderr = stderr
     logfile.close()
+
+def clear_dir(in_dir):
+    """
+    Clear contents of directory.
+    """
+    if not os.path.exists(in_dir):
+        return -1
+
+    # remove contents of the directory
+    for fn in os.listdir(in_dir):
+        fp = os.path.join(in_dir, fn)
+
+        # directory
+        if os.path.isdir(fp):
+            shutil.rmtree(fp)
+
+        # file
+        else:
+            os.remove(fp)
+
+    return 0

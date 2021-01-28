@@ -308,8 +308,9 @@ def main(args):
                            'topd_{}'.format(args.topd),
                            'sub_{}'.format(args.subsample_size))
 
-    log_fp = os.path.join(out_dir, 'log.txt')
+    # create output directory and clear previous contents
     os.makedirs(out_dir, exist_ok=True)
+    print_util.clear_dir(out_dir)
 
     # skip experiment if results already exist
     if args.append_results and os.path.exists(os.path.join(out_dir, 'results.npy')):
@@ -317,6 +318,7 @@ def main(args):
         return
 
     # create logger
+    log_fp = os.path.join(out_dir, 'log.txt')
     logger = print_util.get_logger(log_fp)
     logger.info(args)
     logger.info(datetime.now())

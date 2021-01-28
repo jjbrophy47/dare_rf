@@ -108,7 +108,9 @@ def main(args):
                            args.criterion,
                            'rs_{}'.format(args.rs))
 
+    # create output directory and clear previous contents
     os.makedirs(out_dir, exist_ok=True)
+    print_util.clear_dir(out_dir)
 
     # create logger
     logger = print_util.get_logger(os.path.join(out_dir, 'log.txt'))
