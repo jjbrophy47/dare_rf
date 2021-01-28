@@ -485,9 +485,6 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
     cdef SIZE_t  i = 0
     cdef SIZE_t  k = 0
 
-    # divisor
-    cdef DTYPE_t divisor = 2.0
-
     # intermediate variables
     cdef DTYPE_t v1_label_ratio = 0
     cdef DTYPE_t v2_label_ratio = 0
