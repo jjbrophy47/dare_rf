@@ -194,9 +194,7 @@ def performance(args, out_dir, logger):
         skf = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=args.rs)
         i = 0
         for train_indices, test_indices in skf.split(X_train_sub, y_train_sub):
-            if i != 3:
-                i += 1
-                continue
+            print(i)
             start = time.time()
             X_train_sub_temp, y_train_sub_temp = X_train_sub[train_indices], y_train_sub[train_indices]
             X_test_sub_temp, y_test_sub_temp = X_train_sub[test_indices], y_train_sub[test_indices]
