@@ -28,6 +28,9 @@ from ._utils cimport copy_threshold
 from libc.math cimport fabs
 from ._argsort cimport sort
 
+# constants
+cdef DTYPE_t FEATURE_THRESHOLD = 0.0000001
+
 cdef class _Splitter:
     """
     Splitter class.
@@ -518,6 +521,8 @@ cdef SIZE_t get_candidate_thresholds(DTYPE_t*     values,
 
         # same feature, increment counts
         if fabs(cur_val - prev_val) <= FEATURE_THRESHOLD:
+            # printf('[S - GCT] %.32f, %.32f\n', cur_val, prev_val)
+            # printf('[S - GCT] %.32f <= %.32f\n', fabs(cur_val - prev_val), FEATURE_THRESHOLD)
             v_count += 1
             v_pos_count += cur_label
 

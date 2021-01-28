@@ -22,7 +22,6 @@ np.import_array()
 
 from ._tree cimport Feature
 from ._tree cimport Threshold
-from ._splitter cimport FEATURE_THRESHOLD
 from ._splitter cimport get_candidate_thresholds
 
 from ._utils cimport rand_int
@@ -51,8 +50,10 @@ from libc.math cimport fabs
 from ._utils cimport dealloc
 from ._argsort cimport sort
 
+# constants
 cdef INT32_t UNDEF = -1
 cdef DTYPE_t UNDEF_LEAF_VAL = 0.5
+cdef DTYPE_t FEATURE_THRESHOLD = 0.0000001
 
 # =====================================
 # Remover

@@ -22,7 +22,6 @@ np.import_array()
 
 from ._tree cimport Feature
 from ._tree cimport Threshold
-from ._splitter cimport FEATURE_THRESHOLD
 from ._splitter cimport get_candidate_thresholds
 
 from ._utils cimport rand_int
@@ -50,6 +49,9 @@ from ._utils cimport copy_int_array
 
 from ._utils cimport dealloc
 from ._argsort cimport sort
+
+# constants
+cdef DTYPE_t FEATURE_THRESHOLD = 0.0000001
 
 # =====================================
 # Remover

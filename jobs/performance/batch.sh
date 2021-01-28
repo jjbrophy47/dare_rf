@@ -14,7 +14,7 @@
 ./jobs/performance/primer.sh 'higgs' 'dare' 0.05 'accuracy' 'gini' 60 1440 short
 ./jobs/performance/primer.sh 'ctr' 'dare' 0.005 'roc_auc' 'gini' 70 1440 short
 
-./jobs/performance/notune_primer.sh 'credit_card' 'dare' 250 10 5 'average_precision' 'gini' 6 1440 short
+# ./jobs/performance/notune_primer.sh 'credit_card' 'dare' 250 10 5 'average_precision' 'gini' 6 1440 short
 
 # ExtraTrees
 # ./jobs/performance/primer.sh 'surgical' 'extra_trees' 1.0 'accuracy' 'gini' 3 1440 short
