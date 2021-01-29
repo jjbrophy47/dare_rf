@@ -306,6 +306,7 @@ def main(args):
                            args.criterion,
                            'rs_{}'.format(args.rs),
                            'topd_{}'.format(args.topd),
+                           'k_{}'.format(args.k),
                            'sub_{}'.format(args.subsample_size))
 
     # create output directory and clear previous contents

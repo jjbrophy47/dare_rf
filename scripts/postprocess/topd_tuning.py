@@ -43,9 +43,12 @@ def process_results(df):
     main_result_list = []
 
     for tup, gf in tqdm(df.groupby(groups)):
+        print(gf)
         main_result = {k: v for k, v in zip(groups, tup)}
         for tol in args.tol:
-            main_result[tol] = gf[tol].mode()[0]
+            print(tol)
+            # main_result[tol] = gf[tol].mean()[0]
+            main_result[tol] = gf[tol].mean()
         main_result['num_runs'] = len(gf)
         main_result_list.append(main_result)
 
@@ -74,7 +77,9 @@ def create_csv(args, out_dir, logger):
         if result is not None:
             results.append(result)
 
+    # pandas display settings
     pd.set_option('display.max_columns', 100)
+    pd.set_option('display.max_rows', 100)
     pd.set_option('display.width', 180)
 
     df = pd.DataFrame(results)
@@ -110,7 +115,7 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
-                                 'no_show', 'census', 'credit_card', 'synthetic', 'twitter',
+                                 'no_show', 'olympics', 'census', 'credit_card', 'synthetic', 'twitter',
                                  'higgs', 'ctr'], help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')

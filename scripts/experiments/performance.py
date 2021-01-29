@@ -53,9 +53,6 @@ def _get_model(args):
                                      criterion=args.criterion,
                                      random_state=args.rs)
 
-    elif args.model == 'borat':
-        pass
-
     elif args.model == 'sklearn':
         model = RandomForestClassifier(n_estimators=args.n_estimators,
                                        max_depth=args.max_depth,
@@ -98,9 +95,6 @@ def _get_model_dict(args, params):
                                      criterion=args.criterion,
                                      random_state=args.rs)
 
-    elif args.model == 'borat':
-        pass
-
     elif args.model == 'sklearn':
         model = RandomForestClassifier(n_estimators=params['n_estimators'],
                                        max_depth=params['max_depth'],
@@ -120,6 +114,7 @@ def _get_best_params(gs, param_grid, keys, logger, tol=1e-3):
     `tol` of the best `mean_fit_score` and has the lowest `mean_fit_time`.
     """
     pd.set_option('display.max_columns', 100)
+    pd.set_option('display.max_rows', 100)
 
     cols = ['mean_fit_time', 'mean_test_score', 'rank_test_score']
     cols += ['param_{}'.format(param) for param in keys]

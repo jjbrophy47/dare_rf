@@ -12,7 +12,7 @@ subsample_size_list=(1 1000)
 # topd=0
 
 for rs in ${rs_list[@]}; do
-    for topd in $( seq 1 $max_depth ); do
+    for topd in $( seq 0 $max_depth ); do
         for subsample_size in ${subsample_size_list[@]}; do
             sbatch --mem=${mem}G \
                    --time=$time \
