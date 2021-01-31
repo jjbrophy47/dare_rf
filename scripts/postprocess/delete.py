@@ -178,17 +178,18 @@ def create_csv(args, out_dir, logger):
     logger.info('\nGathering results...')
 
     experiment_settings = list(product(*[args.dataset, args.criterion, args.rs,
-                                         args.topd, args.subsample_size]))
+                                         args.topd, args.k, args.subsample_size]))
 
     # cedar_settings = list(product(*[args.epsilon, args.lmbda]))
 
     results = []
-    for dataset, criterion, rs, topd, sub_size in tqdm(experiment_settings):
+    for dataset, criterion, rs, topd, k, sub_size in tqdm(experiment_settings):
 
         template = {'dataset': dataset,
                     'criterion': criterion,
                     'rs': rs,
                     'topd': topd,
+                    'k': k,
                     'subsample_size': sub_size}
 
         experiment_dir = os.path.join(args.in_dir,
@@ -196,6 +197,7 @@ def create_csv(args, out_dir, logger):
                                       criterion,
                                       'rs_{}'.format(rs),
                                       'topd_{}'.format(topd),
+                                      'k_{}'.format(k),
                                       'sub_{}'.format(sub_size))
 
         # skip empty experiments
@@ -256,7 +258,7 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--dataset', type=str, nargs='+',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
-                                 'census', 'credit_card', 'no_show', 'twitter', 'synthetic',
+                                 'census', 'credit_card', 'no_show', 'olympics', 'twitter', 'synthetic',
                                  'higgs', 'ctr'], help='dataset.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
@@ -266,7 +268,7 @@ if __name__ == '__main__':
     # parser.add_argument('--n_estimators', type=int, nargs='+', default=[10, 50, 100, 250], help='no. trees.')
     # parser.add_argument('--max_depth', type=int, nargs='+', default=[1, 3, 5, 10, 20], help='max depth.')
     parser.add_argument('--topd', type=int, nargs='+', default=list(range(21)), help='top d.')
-    # parser.add_argument('--k', type=int, nargs='+', default=[5, 10, 25, 50, 100], help='no. thresholds.')
+    parser.add_argument('--k', type=int, nargs='+', default=[5, 10, 25, 50], help='no. thresholds.')
 
     # analysis settings
     # parser.add_argument('--periodic', action='store_true', default=False, help='measure periodic utility.')

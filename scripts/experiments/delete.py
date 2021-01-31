@@ -173,12 +173,6 @@ def experiment(args, logger, out_dir, seed):
     # get data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
-    X_train = X_train[:1000000]
-    y_train = y_train[:1000000]
-
-    X_test = X_test[:1000000]
-    y_test = y_test[:1000000]
-
     # dataset statistics
     logger.info('\ntrain instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))

@@ -43,11 +43,8 @@ def process_results(df):
     main_result_list = []
 
     for tup, gf in tqdm(df.groupby(groups)):
-        print(gf)
         main_result = {k: v for k, v in zip(groups, tup)}
         for tol in args.tol:
-            print(tol)
-            # main_result[tol] = gf[tol].mean()[0]
             main_result[tol] = gf[tol].mean()
         main_result['num_runs'] = len(gf)
         main_result_list.append(main_result)

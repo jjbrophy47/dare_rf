@@ -1,7 +1,5 @@
 """
 Plot detailed results for a single dataset using both adversaries.
-
-TODO: plot retrain numbers in terms of percentages.
 """
 import os
 import argparse
@@ -16,19 +14,21 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
 # selected hyperparameters
-dataset_dict = {'surgical': ('acc', 50, 20, 10, [0, 0, 0, 0, 0]),
-                'vaccine': ('acc', 250, 20, 10, [0, 5, 9, 13, 16]),
-                'adult': ('acc', 50, 20, 10, [0, 1, 13, 15, 16]),
-                'bank_marketing': ('auc', 100, 20, 5, [0, 7, 8, 12, 14]),
-                'flight_delays': ('auc', 250, 20, 25, [0, 0, 2, 5, 9]),
-                'diabetes': ('acc', 100, 20, 5, [0, 10, 11, 12, 15]),
-                'no_show': ('auc', 100, 20, 25, [0, 1, 3, 6, 9]),
-                'census': ('auc', 100, 20, 10, [0, 5, 9, 12, 17]),
-                'credit_card': ('ap', 50, 20, 25, [0, 0, 0, 12, 16]),
-                'twitter': ('auc', 50, 20, 50, [0, 8, 9, 11, 14]),
+dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
+                'vaccine': ('acc', 50, 20, 5, [0, 5, 7, 11, 14]),
+                'adult': ('acc', 50, 20, 5, [0, 10, 13, 14, 16]),
+                'bank_marketing': ('auc', 100, 20, 25, [0, 6, 9, 12, 14]),
+                'flight_delays': ('auc', 250, 20, 25, [0, 1, 3, 5, 10]),
+                'diabetes': ('acc', 250, 20, 5, [0, 7, 10, 12, 15]),
+                'no_show': ('auc', 250, 20, 10, [0, 1, 3, 6, 10]),
+                'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 3]),
+                'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
+                'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
+                'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
                 'synthetic': ('acc', 50, 20, 50, [0, 0, 2, 3, 5]),
-                'higgs': ('acc', 100, 20, 10, [0, 8, 10, 12, 15]),
-                'ctr': ('auc', 50, 10, 50, [0, 1, 2, 3, 5])}
+                'ctr': ('auc', 100, 10, 25, [0, 3, 5, 6, 7]),
+                'higgs': ('acc', 50, 20, 10, [0, 8, 10, 12, 15])
+               }
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
@@ -108,7 +108,7 @@ def main(args):
 
         ax.set_ylabel('({})\nSpeedup vs Naive'.format(adversaries[i], subsample_size))
         ax.errorbar(df['topd'], df['model_n_deleted'], yerr=df['model_n_deleted_std'],
-                    label='R-DART', color='k')
+                    label='R-DaRE', color='k')
 
         for tol, topd, shape in zip(tol_list, dataset_dict[args.dataset][4], shape_list):
             x = df['topd'].iloc[topd]
@@ -119,7 +119,7 @@ def main(args):
         ax.set_yscale('log')
 
         if i == 0:
-            ax.legend(ncol=2, frameon=False)
+            # ax.legend(ncol=2, frameon=False)
             ax.set_title('Deletion Efficiency')
         elif i == n_rows - 1:
             ax.set_xlabel(r'$topd$')
@@ -129,16 +129,17 @@ def main(args):
             ax = fig.add_subplot(gs[:, 1])
             ax.set_ylabel(r'Test error $\Delta$ (%)')
             ax.errorbar(df['topd'], df['{}_diff_mean'.format(metric)] * 100,
-                        yerr=df['{}_diff_sem'.format(metric)] * 100, color='k')
+                        yerr=df['{}_diff_sem'.format(metric)] * 100, color='k', label='R-DaRE')
 
             for tol, topd, shape in zip(tol_list, dataset_dict[args.dataset][4], shape_list):
                 x = df['topd'].iloc[topd]
                 y = df['{}_diff_mean'.format(metric)].iloc[topd] * 100
                 ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
 
-            ax.axhline(0, color='k', linestyle='--')
+            ax.axhline(0, color='k', linestyle='--', label='D-DaRE')
 
             if i == 0:
+                ax.legend(ncol=1, frameon=False)
                 ax.set_title('Prediction Degradation')
             ax.set_xlabel(r'$topd$')
 

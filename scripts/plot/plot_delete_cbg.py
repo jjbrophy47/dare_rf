@@ -20,19 +20,21 @@ from scipy.stats import gmean
 N_TOL = 5
 
 # selected hyperparameters
-dataset_dict = {'surgical': ('acc', 50, 20, 10, [0, 0, 0, 0, 0]),
-                'vaccine': ('acc', 250, 20, 10, [0, 5, 9, 13, 16]),
-                'adult': ('acc', 50, 20, 10, [0, 1, 13, 15, 16]),
-                'bank_marketing': ('auc', 100, 20, 5, [0, 7, 8, 12, 14]),
-                'flight_delays': ('auc', 250, 20, 5, [0, 0, 2, 5, 9]),
-                'diabetes': ('acc', 100, 20, 5, [0, 10, 11, 12, 15]),
-                'no_show': ('auc', 100, 20, 25, [0, 1, 3, 6, 9]),
-                'census': ('auc', 100, 20, 10, [0, 5, 9, 12, 17]),
-                'credit_card': ('ap', 50, 20, 25, [0, 0, 0, 12, 16]),
-                'twitter': ('auc', 50, 20, 50, [0, 8, 9, 11, 14]),
+dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
+                'vaccine': ('acc', 50, 20, 5, [0, 5, 7, 11, 14]),
+                'adult': ('acc', 50, 20, 5, [0, 10, 13, 14, 16]),
+                'bank_marketing': ('auc', 100, 20, 25, [0, 6, 9, 12, 14]),
+                'flight_delays': ('auc', 250, 20, 25, [0, 1, 3, 5, 10]),
+                'diabetes': ('acc', 250, 20, 5, [0, 7, 10, 12, 15]),
+                'no_show': ('auc', 250, 20, 10, [0, 1, 3, 6, 10]),
+                'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 3]),
+                'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
+                'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
+                'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
                 'synthetic': ('acc', 50, 20, 50, [0, 0, 2, 3, 5]),
-                'higgs': ('acc', 100, 20, 10, [0, 8, 10, 12, 15]),
-                'ctr': ('auc', 50, 10, 50, [0, 1, 2, 3, 5])}
+                'ctr': ('auc', 100, 10, 25, [0, 3, 5, 6, 7]),
+                'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
+               }
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
