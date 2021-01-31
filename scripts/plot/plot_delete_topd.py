@@ -50,7 +50,7 @@ def main(args):
     plt.rc('axes', labelsize=17)
     plt.rc('axes', titlesize=17)
     plt.rc('legend', fontsize=11)
-    plt.rc('legend', title_fontsize=9)
+    plt.rc('legend', title_fontsize=15)
     plt.rc('lines', linewidth=2)
     plt.rc('lines', markersize=5)
 
@@ -122,7 +122,7 @@ def main(args):
             # ax.legend(ncol=2, frameon=False)
             ax.set_title('Deletion Efficiency')
         elif i == n_rows - 1:
-            ax.set_xlabel(r'$topd$')
+            ax.set_xlabel(r'$d_{\mathrm{rmax}}$')
 
         # plot utility
         if subsample_size == 1:
@@ -141,7 +141,7 @@ def main(args):
             if i == 0:
                 ax.legend(ncol=1, frameon=False)
                 ax.set_title('Prediction Degradation')
-            ax.set_xlabel(r'$topd$')
+            ax.set_xlabel(r'$d_{\mathrm{rmax}}$')
 
         # plot retrains
         if i == 0:
@@ -158,7 +158,7 @@ def main(args):
             retrains = temp.iloc[0].values[1:]
             depths = np.arange(retrains.shape[0])
             ax.plot(depths[:max_depth], retrains[:max_depth], linestyle=linestyle,
-                    label=r'$topd={}$'.format(row.topd))
+                    label='{}'.format(row.topd))
 
         temp = retrain_df[retrain_df['id'].isin(topd0_df['id'])]
         retrains = temp.iloc[0].values[1:]
@@ -178,9 +178,10 @@ def main(args):
 
     # set retrain legend
     y_loc = 0.965 if max_depth == 20 else 0.800
-    fig.legend(handles, labels, bbox_to_anchor=(0.995, y_loc), ncol=1)
+    fig.legend(handles, labels, bbox_to_anchor=(0.995, y_loc), ncol=1,
+               title=r'$d_{\mathrm{rmax}}$')
 
-    fig.tight_layout(rect=[0, 0, 0.90, 1])
+    fig.tight_layout(rect=[0, 0, 0.935, 1])
     fp = os.path.join(args.out_dir, '{}.pdf'.format(args.dataset))
     plt.savefig(fp)
     plt.show()

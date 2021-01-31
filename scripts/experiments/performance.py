@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import argparse
+import resource
 from datetime import datetime
 
 import numpy as np
@@ -234,15 +235,16 @@ def performance(args, out_dir, logger):
     auc, acc, ap = exp_util.performance(model, X_test, y_test, name=args.model, logger=logger)
 
     # save results
-    results = model.get_params()
-    results['model'] = args.model
-    results['bootstrap'] = args.bootstrap
-    results['auc'] = auc
-    results['acc'] = acc
-    results['ap'] = ap
-    results['train_time'] = train_time
-    results['tune_train_time'] = tune_time + train_time
-    np.save(os.path.join(out_dir, 'results.npy'), results)
+    result = model.get_params()
+    result['model'] = args.model
+    result['bootstrap'] = args.bootstrap
+    result['auc'] = auc
+    result['acc'] = acc
+    result['ap'] = ap
+    result['train_time'] = train_time
+    result['tune_train_time'] = tune_time + train_time
+    result['max_rss'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    np.save(os.path.join(out_dir, 'results.npy'), result)
 
     logger.info('total time: {:.3f}s'.format(time.time() - begin))
 

@@ -9,6 +9,6 @@
 # ./jobs/topd_tuning/primer.sh 'census' 'gini' 100 20 25 'roc_auc' 1.0 18 1440 'short'
 # ./jobs/topd_tuning/primer.sh 'credit_card' 'gini' 250 20 5 'average_precision' 1.0 9 1440 'short'
 # ./jobs/topd_tuning/primer.sh 'twitter' 'gini' 100 20 5 'roc_auc' 0.5 35 1440 'short'
-./jobs/topd_tuning/primer.sh 'synthetic' 'gini' 50 20 10 'accuracy' 0.25 60 1440 'short'
+./jobs/topd_tuning/primer.sh 'synthetic' 'gini' 50 20 10 'accuracy' 0.25 30 1440 'short'
 # ./jobs/topd_tuning/primer.sh 'ctr' 'gini' 100 10 25 'roc_auc' 0.01 70 1440 'short'
 # ./jobs/topd_tuning/primer.sh 'higgs' 'gini' 50 20 10 'accuracy' 0.025 70 1440 'short'

@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import argparse
+import resource
 from datetime import datetime
 
 import numpy as np
@@ -97,6 +98,7 @@ def performance(args, out_dir, logger):
         total_time = time.time() - begin
 
     logger.info('{}, total time: {:.3f}s'.format(best_scores, total_time))
+    logger.info('max_rss: {:,} bytes'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
     np.save(os.path.join(out_dir, 'results.npy'), best_scores)
 
 

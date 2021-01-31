@@ -11,6 +11,7 @@ import os
 import sys
 import time
 import argparse
+import resource
 from datetime import datetime
 from collections import defaultdict
 
@@ -266,27 +267,28 @@ def experiment(args, logger, out_dir, seed):
     delete_costs = np.concatenate(delete_costs_list)
 
     # save model results
-    results = model.get_params()
-    results['naive_auc'] = naive_auc
-    results['naive_acc'] = naive_acc
-    results['naive_ap'] = naive_ap
-    results['naive_avg_delete_time'] = naive_avg_delete_time
-    results['naive_n_deleted'] = args.n_delete
-    results['model_n_deleted'] = n_deleted
-    results['model_train_%_deleted'] = n_deleted / len(X_train)
-    results['model_delete_depths'] = count_depths(delete_types, delete_depths)
-    results['model_delete_costs'] = count_costs(delete_types, delete_depths, delete_costs)
-    results['model_auc'] = model_auc
-    results['model_acc'] = model_acc
-    results['model_ap'] = model_ap
-    results['model_n_nodes_avg'] = n_nodes_avg
-    results['model_n_random_nodes_avg'] = n_random_nodes_avg
-    results['model_n_greedy_nodes_avg'] = n_greedy_nodes_avg
+    result = model.get_params()
+    result['naive_auc'] = naive_auc
+    result['naive_acc'] = naive_acc
+    result['naive_ap'] = naive_ap
+    result['naive_avg_delete_time'] = naive_avg_delete_time
+    result['naive_n_deleted'] = args.n_delete
+    result['model_n_deleted'] = n_deleted
+    result['model_train_%_deleted'] = n_deleted / len(X_train)
+    result['model_delete_depths'] = count_depths(delete_types, delete_depths)
+    result['model_delete_costs'] = count_costs(delete_types, delete_depths, delete_costs)
+    result['model_auc'] = model_auc
+    result['model_acc'] = model_acc
+    result['model_ap'] = model_ap
+    result['model_n_nodes_avg'] = n_nodes_avg
+    result['model_n_random_nodes_avg'] = n_random_nodes_avg
+    result['model_n_greedy_nodes_avg'] = n_greedy_nodes_avg
+    result['max_rss'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-    logger.info('\nResults:\n{}'.format(results))
-    np.save(os.path.join(out_dir, 'results.npy'), results)
+    logger.info('\nResults:\n{}'.format(result))
+    np.save(os.path.join(out_dir, 'results.npy'), result)
 
-    return results
+    return result
 
 
 def main(args):
