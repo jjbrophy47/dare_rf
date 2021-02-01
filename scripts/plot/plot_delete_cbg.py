@@ -100,7 +100,7 @@ def organize_results(args, df):
         temp1 = df[df['dataset'] == dataset]
 
         # skip dataset
-        if len(temp1) < 10 or dataset == 'census':
+        if len(temp1) < 10:
             print('{}, skip'.format(dataset))
             continue
         else:
@@ -164,6 +164,7 @@ def main(args):
     fig = plt.figure(figsize=(width, height * 1.25))
 
     ax1 = fig.add_subplot(311)
+    ax1.set_ylim(1, 1e5)
     ax2 = fig.add_subplot(312, sharey=ax1, sharex=ax1)
     ax3 = fig.add_subplot(313, sharex=ax1)
 

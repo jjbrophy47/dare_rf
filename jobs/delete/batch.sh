@@ -9,6 +9,9 @@
 # ./jobs/delete/primer.sh 'census' 'gini' 100 20 25 18 1440 short
 # ./jobs/delete/primer.sh 'credit_card' 'gini' 250 20 5 9 1440 short
 # ./jobs/delete/primer.sh 'twitter' 'gini' 100 20 5 35 1440 short
-./jobs/delete/primer.sh 'synthetic' 'gini' 50 20 10 30 1440 short
-./jobs/delete/primer.sh 'ctr' 'gini' 100 10 25 70 1440 short
-./jobs/delete/primer.sh 'higgs' 'gini' 50 20 10 70 1440 short
+# ./jobs/delete/primer.sh 'synthetic' 'gini' 50 20 10 30 1440 short
+./jobs/delete/primer.sh 'ctr' 'gini' 100 10 25 30 1440 short
+./jobs/delete/primer.sh 'higgs' 'gini' 50 20 10 80 1440 short
+
+./jobs/delete/primer.sh 'ctr' 'gini' 100 10 25 0 30 1440 short
+./jobs/delete/primer.sh 'higgs' 'gini' 50 20 10 0 70 1440 short
