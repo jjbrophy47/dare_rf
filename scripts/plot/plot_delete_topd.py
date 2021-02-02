@@ -115,7 +115,7 @@ def main(args):
             y = df['model_n_deleted'].iloc[topd]
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
 
-        ax.axhline(topd0_df['model_n_deleted'].values[0], color='k', linestyle='--', label='D-DaRE')
+        ax.axhline(topd0_df['model_n_deleted'].values[0], color='k', linestyle='--', label='G-DaRE')
         ax.set_yscale('log')
 
         if i == 0:
@@ -136,7 +136,7 @@ def main(args):
                 y = df['{}_diff_mean'.format(metric)].iloc[topd] * 100
                 ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
 
-            ax.axhline(0, color='k', linestyle='--', label='D-DaRE')
+            ax.axhline(0, color='k', linestyle='--', label='G-DaRE')
 
             if i == 0:
                 ax.legend(ncol=1, frameon=False)

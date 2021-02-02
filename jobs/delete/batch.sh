@@ -13,5 +13,5 @@
 ./jobs/delete/primer.sh 'ctr' 'gini' 100 10 25 30 1440 short
 ./jobs/delete/primer.sh 'higgs' 'gini' 50 20 10 80 1440 short
 
-./jobs/delete/primer.sh 'ctr' 'gini' 100 10 25 0 30 1440 short
-./jobs/delete/primer.sh 'higgs' 'gini' 50 20 10 0 70 1440 short
+./jobs/delete/single_primer.sh 'ctr' 'gini' 100 10 25 6 20 1440 long
+./jobs/delete/single_primer.sh 'higgs' 'gini' 50 20 10 9 70 1440 short

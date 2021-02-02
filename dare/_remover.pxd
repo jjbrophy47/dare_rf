@@ -128,3 +128,8 @@ cdef SIZE_t sample_new_features(Feature*** features_ptr,
 cdef void get_leaf_samples(Node*    node,
                            IntList* remove_samples,
                            IntList* leaf_samples) nogil
+
+cdef void get_leaf_samples2(Node*    node,
+                            IntList* remove_samples,
+                            SIZE_t*  leaf_samples,
+                            SIZE_t*  n_leaf_samples_ptr) nogil

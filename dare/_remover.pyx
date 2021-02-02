@@ -233,6 +233,44 @@ cdef class _Remover:
         node.n_samples -= remove_samples.n
         node.n_pos_samples -= n_pos_remove_samples
 
+    # cdef void update_leaf(self,
+    #                       Node*    node,
+    #                       IntList* remove_samples) nogil:
+    #     """
+    #     Update leaf node properties: value and leaf_samples. Check complete.
+    #     """
+
+    #     # update leaf value
+    #     if node.n_samples > 0:
+    #         node.value = node.n_pos_samples / <double> node.n_samples
+
+    #     # no samples left
+    #     else:
+    #         node.value = UNDEF_LEAF_VAL
+
+    #     # update leaf samples array
+    #     cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
+
+    #     # remove deleted samples from leaf
+    #     node.n_samples += remove_samples.n  # must check ALL leaf samples, even deleted ones
+    #     get_leaf_samples(node, remove_samples, leaf_samples)
+    #     node.n_samples -= remove_samples.n
+
+    #     # free old leaf samples array
+    #     free(node.leaf_samples)
+
+    #     # assign new leaf samples and value
+    #     node.leaf_samples = copy_indices(leaf_samples.arr, leaf_samples.n)
+
+    #     # free leaf samples
+    #     free_intlist(leaf_samples)
+
+    #     # check complete: add deletion type and depth, and clean up
+    #     self.add_metric(0, node.depth, 0)
+
+    #     # free remove samples
+    #     free_intlist(remove_samples)
+
     cdef void update_leaf(self,
                           Node*    node,
                           IntList* remove_samples) nogil:
@@ -249,27 +287,65 @@ cdef class _Remover:
             node.value = UNDEF_LEAF_VAL
 
         # update leaf samples array
-        cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
+        # cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
+        cdef SIZE_t* leaf_samples = <SIZE_t *>malloc(node.n_samples * sizeof(SIZE_t))
+        cdef SIZE_t  n_leaf_samples = 0
 
         # remove deleted samples from leaf
         node.n_samples += remove_samples.n  # must check ALL leaf samples, even deleted ones
-        get_leaf_samples(node, remove_samples, leaf_samples)
+        get_leaf_samples2(node, remove_samples, leaf_samples, &n_leaf_samples)
         node.n_samples -= remove_samples.n
 
         # free old leaf samples array
         free(node.leaf_samples)
 
         # assign new leaf samples and value
-        node.leaf_samples = copy_indices(leaf_samples.arr, leaf_samples.n)
+        # node.leaf_samples = copy_indices(leaf_samples.arr, leaf_samples.n)
+        node.leaf_samples = leaf_samples
 
         # free leaf samples
-        free_intlist(leaf_samples)
+        # free_intlist(leaf_samples)
 
         # check complete: add deletion type and depth, and clean up
         self.add_metric(0, node.depth, 0)
 
         # free remove samples
         free_intlist(remove_samples)
+
+    # cdef void convert_to_leaf(self,
+    #                           Node*        node,
+    #                           IntList*     remove_samples) nogil:
+    #     """
+    #     Convert decision node to a leaf node. Check complete.
+    #     """
+
+    #     # get leaf samples and remove deleted samples
+    #     cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
+    #     get_leaf_samples(node, remove_samples, leaf_samples)
+
+    #     # deallocate node / subtree
+    #     dealloc(node)
+
+    #     # set leaf properties
+    #     node.is_leaf = True
+    #     node.value = node.n_pos_samples / <DTYPE_t> node.n_samples
+    #     node.leaf_samples = copy_indices(leaf_samples.arr, leaf_samples.n)
+
+    #     # reset decision node properties
+    #     node.features = NULL
+    #     node.n_features = 0
+    #     node.constant_features = NULL
+    #     node.chosen_feature = NULL
+    #     node.chosen_threshold = NULL
+
+    #     # reset children properties
+    #     node.left = NULL
+    #     node.right = NULL
+
+    #     # check complete: add deletion type and depth, and clean up
+    #     self.add_metric(0, node.depth, 0)
+    #     free_intlist(remove_samples)
+    #     free_intlist(leaf_samples)
 
     cdef void convert_to_leaf(self,
                               Node*        node,
@@ -279,8 +355,10 @@ cdef class _Remover:
         """
 
         # get leaf samples and remove deleted samples
-        cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
-        get_leaf_samples(node, remove_samples, leaf_samples)
+        cdef SIZE_t* leaf_samples = <SIZE_t *>malloc(node.n_samples * sizeof(SIZE_t))
+        cdef SIZE_t  n_leaf_samples = 0
+        # cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
+        get_leaf_samples2(node, remove_samples, leaf_samples, &n_leaf_samples)
 
         # deallocate node / subtree
         dealloc(node)
@@ -288,7 +366,8 @@ cdef class _Remover:
         # set leaf properties
         node.is_leaf = True
         node.value = node.n_pos_samples / <DTYPE_t> node.n_samples
-        node.leaf_samples = copy_indices(leaf_samples.arr, leaf_samples.n)
+        # node.leaf_samples = copy_indices(leaf_samples.arr, leaf_samples.n)
+        node.leaf_samples = leaf_samples
 
         # reset decision node properties
         node.features = NULL
@@ -304,7 +383,7 @@ cdef class _Remover:
         # check complete: add deletion type and depth, and clean up
         self.add_metric(0, node.depth, 0)
         free_intlist(remove_samples)
-        free_intlist(leaf_samples)
+        # free_intlist(leaf_samples)
 
     cdef void retrain(self,
                       Node**    node_ptr,
@@ -1101,3 +1180,46 @@ cdef void get_leaf_samples(Node*    node,
         # traverse right
         if node.right:
             get_leaf_samples(node.right, remove_samples, leaf_samples)
+
+cdef void get_leaf_samples2(Node*    node,
+                            IntList* remove_samples,
+                            SIZE_t*  leaf_samples,
+                            SIZE_t*  n_leaf_samples_ptr) nogil:
+    """
+    Recursively obtain the samples at the leaves and filter out
+    deleted samples.
+    """
+    cdef bint   add_sample = True
+    cdef SIZE_t i = 0
+    cdef SIZE_t j = 0
+
+    # leaf
+    if node.is_leaf:
+
+        # loop through all samples at this leaf
+        for i in range(node.n_samples):
+            add_sample = True
+
+            # loop through all deleted samples
+            for j in range(remove_samples.n):
+
+                # do not add sample to results if it has been deleted
+                if node.leaf_samples[i] == remove_samples.arr[j]:
+                    add_sample = False
+                    break
+
+            # add sample to results if it has not been deleted
+            if add_sample:
+                leaf_samples[n_leaf_samples_ptr[0]] = node.leaf_samples[i]
+                n_leaf_samples_ptr[0] += 1
+
+    # decision node
+    else:
+
+        # traverse left
+        if node.left:
+            get_leaf_samples2(node.left, remove_samples, leaf_samples, n_leaf_samples_ptr)
+
+        # traverse right
+        if node.right:
+            get_leaf_samples2(node.right, remove_samples, leaf_samples, n_leaf_samples_ptr)
