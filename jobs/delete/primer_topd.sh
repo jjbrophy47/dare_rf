@@ -9,7 +9,6 @@ partition=$8
 
 rs_list=(1 2 3 4 5)
 subsample_size_list=(1 1000)
-# topd=0
 
 for rs in ${rs_list[@]}; do
     for topd in $( seq 0 $max_depth ); do

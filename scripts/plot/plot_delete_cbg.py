@@ -32,7 +32,7 @@ dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
                 'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
                 'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
                 'synthetic': ('acc', 50, 20, 50, [0, 0, 2, 3, 5]),
-                'ctr': ('auc', 100, 10, 25, [0, 3, 5, 6, 7]),
+                'ctr': ('auc', 100, 10, 50, [0, 2, 3, 4, 6]),
                 'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
                }
 
@@ -164,14 +164,15 @@ def main(args):
     fig = plt.figure(figsize=(width, height * 1.25))
 
     ax1 = fig.add_subplot(311)
-    ax1.set_ylim(1, 1e5)
+    ax1.set_ylim(1, 1e6)
     ax2 = fig.add_subplot(312, sharey=ax1, sharex=ax1)
     ax3 = fig.add_subplot(313, sharex=ax1)
 
     tol_list = ['0.0%', '0.1%', '0.25%', '0.5%', '1.0%']
     tol_list = tol_list[:N_TOL]
 
-    labels = ['DaRE (tol={})'.format(tol) for tol in tol_list]
+    labels = ['G-DaRE']
+    labels += ['R-DaRE (tol={})'.format(tol) for tol in tol_list[1:]]
 
     titles = ['Efficiency Using the Random Adversary (higher is better)',
               'Efficiency Using the Worst-of-{} Adversary (higher is better)',
@@ -187,7 +188,6 @@ def main(args):
     main_df = pd.read_csv(main_fp)
 
     # filter results
-    # df = main_df[main_df['operation'] == args.operation]
     df = main_df[main_df['criterion'] == args.criterion]
     sub1_df = df[df['subsample_size'] == 1]
     subX_df = df[df['subsample_size'] == args.subsample_size]
@@ -250,6 +250,7 @@ def main(args):
     x_labels = [label.get_text().replace('_', ' ').title() if i % 2 == 0 else \
                 '\n' + label.get_text().replace('_', ' ').title() for i, label in
                 enumerate(ax3.xaxis.get_majorticklabels())]
+    x_labels = [x.upper() if 'Ctr' in x else x for x in x_labels]
     ax3.set_xticklabels(x_labels, rotation=0)
     ax3.set_xlabel('Dataset')
     ax3.set_ylabel(r'Test error $\Delta$ (%)')

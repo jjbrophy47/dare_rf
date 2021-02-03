@@ -265,13 +265,8 @@ if __name__ == '__main__':
     parser.add_argument('--subsample_size', type=int, nargs='+', default=[1, 1000], help='subsampling size.')
 
     # hyperparameter settings
-    # parser.add_argument('--n_estimators', type=int, nargs='+', default=[10, 50, 100, 250], help='no. trees.')
-    # parser.add_argument('--max_depth', type=int, nargs='+', default=[1, 3, 5, 10, 20], help='max depth.')
     parser.add_argument('--topd', type=int, nargs='+', default=list(range(21)), help='top d.')
-    parser.add_argument('--k', type=int, nargs='+', default=[5, 10, 25, 50], help='no. thresholds.')
-
-    # analysis settings
-    # parser.add_argument('--periodic', action='store_true', default=False, help='measure periodic utility.')
+    parser.add_argument('--k', type=int, nargs='+', default=[1, 5, 10, 25, 50, 100], help='no. thresholds.')
 
     args = parser.parse_args()
     main(args)

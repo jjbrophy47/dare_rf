@@ -1,17 +1,39 @@
-# ./jobs/delete/primer.sh 'surgical' 'gini' 100 20 25 3 1440 short
-# ./jobs/delete/primer.sh 'vaccine' 'gini' 50 20 5 6 1440 short
-# ./jobs/delete/primer.sh 'adult' 'gini' 50 20 5 3 1440 short
-# ./jobs/delete/primer.sh 'bank_marketing' 'gini' 100 20 25 3 1440 short
-# ./jobs/delete/primer.sh 'flight_delays' 'gini' 250 20 25 18 1440 short
-# ./jobs/delete/primer.sh 'diabetes' 'gini' 250 20 5 18 1440 short
-# ./jobs/delete/primer.sh 'no_show' 'gini' 250 20 10 18 1440 short
-# ./jobs/delete/primer.sh 'olympics' 'gini' 250 20 5 35 1440 short
-# ./jobs/delete/primer.sh 'census' 'gini' 100 20 25 18 1440 short
-# ./jobs/delete/primer.sh 'credit_card' 'gini' 250 20 5 9 1440 short
-# ./jobs/delete/primer.sh 'twitter' 'gini' 100 20 5 35 1440 short
-# ./jobs/delete/primer.sh 'synthetic' 'gini' 50 20 10 30 1440 short
-./jobs/delete/primer.sh 'ctr' 'gini' 100 10 25 30 1440 short
-./jobs/delete/primer.sh 'higgs' 'gini' 50 20 10 80 1440 short
+# increasing topd
+# ./jobs/delete/primer_topd.sh 'surgical' 'gini' 100 20 25 3 1440 short
+# ./jobs/delete/primer_topd.sh 'vaccine' 'gini' 50 20 5 6 1440 short
+# ./jobs/delete/primer_topd.sh 'adult' 'gini' 50 20 5 3 1440 short
+# ./jobs/delete/primer_topd.sh 'bank_marketing' 'gini' 100 20 25 3 1440 short
+# ./jobs/delete/primer_topd.sh 'flight_delays' 'gini' 250 20 25 18 1440 short
+# ./jobs/delete/primer_topd.sh 'diabetes' 'gini' 250 20 5 18 1440 short
+# ./jobs/delete/primer_topd.sh 'no_show' 'gini' 250 20 10 18 1440 short
+# ./jobs/delete/primer_topd.sh 'olympics' 'gini' 250 20 5 35 1440 short
+# ./jobs/delete/primer_topd.sh 'census' 'gini' 100 20 25 18 1440 short
+# ./jobs/delete/primer_topd.sh 'credit_card' 'gini' 250 20 5 9 1440 short
+# ./jobs/delete/primer_topd.sh 'twitter' 'gini' 100 20 5 35 1440 short
+# ./jobs/delete/primer_topd.sh 'synthetic' 'gini' 50 20 10 30 1440 short
+./jobs/delete/primer_topd.sh 'ctr' 'gini' 100 10 50 10 1440 short
+./jobs/delete/primer_topd.sh 'higgs' 'gini' 50 20 10 70 1440 short
 
-./jobs/delete/single_primer.sh 'ctr' 'gini' 100 10 25 6 20 1440 long
-./jobs/delete/single_primer.sh 'higgs' 'gini' 50 20 10 9 70 1440 short
+# increasing k
+# ./jobs/delete/primer_k.sh 'surgical' 'gini' 100 20 25 3 1440 short
+# ./jobs/delete/primer_k.sh 'vaccine' 'gini' 50 20 5 6 1440 short
+# ./jobs/delete/primer_k.sh 'adult' 'gini' 50 20 5 3 1440 short
+# ./jobs/delete/primer_k.sh 'bank_marketing' 'gini' 100 20 25 3 1440 short
+# ./jobs/delete/primer_k.sh 'flight_delays' 'gini' 250 20 25 18 1440 short
+# ./jobs/delete/primer_k.sh 'diabetes' 'gini' 250 20 5 18 1440 short
+# ./jobs/delete/primer_k.sh 'no_show' 'gini' 250 20 10 18 1440 short
+# ./jobs/delete/primer_k.sh 'olympics' 'gini' 250 20 5 35 1440 short
+# ./jobs/delete/primer_k.sh 'census' 'gini' 100 20 25 18 1440 short
+# ./jobs/delete/primer_k.sh 'credit_card' 'gini' 250 20 5 9 1440 short
+# ./jobs/delete/primer_k.sh 'twitter' 'gini' 100 20 5 35 1440 short
+# ./jobs/delete/primer_k.sh 'synthetic' 'gini' 50 20 10 30 1440 short
+# ./jobs/delete/primer_k.sh 'ctr' 'gini' 100 10 50 10 1440 short
+# ./jobs/delete/primer_k.sh 'higgs' 'gini' 50 20 10 70 1440 short
+
+# single settings
+./jobs/delete/primer_single.sh 'adult' 'gini' 50 20 1 0 3 1440 short
+# ./jobs/delete/primer_single.sh 'adult' 'gini' 50 20 5 0 3 1440 short
+./jobs/delete/primer_single.sh 'adult' 'gini' 50 20 10 0 3 1440 short
+./jobs/delete/primer_single.sh 'adult' 'gini' 50 20 25 0 3 1440 short
+./jobs/delete/primer_single.sh 'adult' 'gini' 50 20 50 0 3 1440 short
+./jobs/delete/primer_single.sh 'adult' 'gini' 50 20 100 0 3 1440 short

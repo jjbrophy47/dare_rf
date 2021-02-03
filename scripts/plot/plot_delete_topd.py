@@ -13,22 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
-# selected hyperparameters
-dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
-                'vaccine': ('acc', 50, 20, 5, [0, 5, 7, 11, 14]),
-                'adult': ('acc', 50, 20, 5, [0, 10, 13, 14, 16]),
-                'bank_marketing': ('auc', 100, 20, 25, [0, 6, 9, 12, 14]),
-                'flight_delays': ('auc', 250, 20, 25, [0, 1, 3, 5, 10]),
-                'diabetes': ('acc', 250, 20, 5, [0, 7, 10, 12, 15]),
-                'no_show': ('auc', 250, 20, 10, [0, 1, 3, 6, 10]),
-                'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 3]),
-                'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
-                'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
-                'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
-                'synthetic': ('acc', 50, 20, 10, [0, 0, 2, 3, 5]),
-                'ctr': ('auc', 100, 10, 25, [0, 3, 5, 6, 7]),
-                'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
-               }
+from plot_delete_cbg import dataset_dict
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):

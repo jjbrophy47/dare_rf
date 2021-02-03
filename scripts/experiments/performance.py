@@ -247,6 +247,7 @@ def performance(args, out_dir, logger):
     np.save(os.path.join(out_dir, 'results.npy'), result)
 
     logger.info('total time: {:.3f}s'.format(time.time() - begin))
+    logger.info('max_rss: {:,}'.format(result['max_rss']))
 
 
 def main(args):

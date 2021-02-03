@@ -12,7 +12,7 @@ import numpy as np
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart
+import dare
 from utility import data_util
 from utility import exp_util
 from utility import print_util
@@ -24,8 +24,9 @@ def _get_model(args):
     """
     Return model.
     """
-    model = dart.Forest(criterion=args.criterion,
+    model = dare.Forest(criterion=args.criterion,
                         topd=0,
+                        k=args.k,
                         n_estimators=args.n_estimators,
                         max_features=args.max_features,
                         max_depth=args.max_depth,
@@ -110,12 +111,13 @@ def experiment(args, logger, out_dir):
     logger.info('criterion: {}'.format(args.criterion))
     logger.info('n_estimators: {}'.format(args.n_estimators))
     logger.info('max_depth: {}'.format(args.max_depth))
+    logger.info('k: {}'.format(args.k))
     logger.info('max_features: {}'.format(args.max_features))
     logger.info('n_test: {}\n'.format(args.n_test))
 
     # train target model
     model = _get_model(args)
-    name = 'D-DART'
+    name = 'G-DaRE'
 
     start = time.time()
     model = model.fit(X_train, y_train)
@@ -134,23 +136,23 @@ def experiment(args, logger, out_dir):
         train_order = np.random.choice(np.arange(X_train.shape[0]), size=X_train.shape[0], replace=False)
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
-    # D-DART 1: ordered from biggest sum increase in positive label confidence to least
-    elif args.method == 'dart1':
-        logger.info('\nordering by D-DART...')
+    # G-DaRE 1: ordered from biggest sum increase in positive label confidence to least
+    elif args.method == 'dare1':
+        logger.info('\nordering by G-DaRE...')
         explanation = exp_util.explain_lite(model, X_train, y_train, X_test)
         train_order = np.argsort(explanation)[::-1]
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
-    # D-DART 2: ordered by most positively influential to least positively influential
-    elif args.method == 'dart2':
-        logger.info('\nordering by D-DART 2...')
+    # G-DaRE 2: ordered by most positively influential to least positively influential
+    elif args.method == 'dare2':
+        logger.info('\nordering by G-DaRE 2...')
         explanation = exp_util.explain_lite(model, X_train, y_train, X_test, y_test=y_test)
         train_order = np.argsort(explanation)[::-1]
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
 
-    # D-DART 3: ordered by biggest sum of absolute change in predictions
+    # G-DaRE 3: ordered by biggest sum of absolute change in predictions
     elif args.method == 'dart3':
-        logger.info('\nordering by D-DART 3...')
+        logger.info('\nordering by G-DaRE 3...')
         explanation = exp_util.explain_lite(model, X_train, y_train, X_test, use_abs=True)
         train_order = np.argsort(explanation)[::-1]
         results = measure_performance(train_order, percentages, X_test, y_test, X_train, y_train, logger)
@@ -201,12 +203,13 @@ if __name__ == '__main__':
     # experiment settings
     parser.add_argument('--rs', type=int, default=1, help='seed to enhance reproducibility.')
     parser.add_argument('--n_test', type=int, default=50, help='no. test instances')
-    parser.add_argument('--method', type=str, default='dart', help='method to use.')
+    parser.add_argument('--method', type=str, default='dare1', help='method to use.')
 
     # tree hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
-    parser.add_argument('--max_depth', type=int, default=10, help='maximum depth of the tree.')
-    parser.add_argument('--max_features', type=float, default=0.25, help='maximum features to sample.')
+    parser.add_argument('--max_depth', type=int, default=20, help='maximum depth of the tree.')
+    parser.add_argument('--k', type=int, default=25, help='number of thresholds to consider.')
+    parser.add_argument('--max_features', type=str, default='sqrt', help='maximum features to sample.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
     args = parser.parse_args()
