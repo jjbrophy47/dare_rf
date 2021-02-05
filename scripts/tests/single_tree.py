@@ -11,7 +11,7 @@ from sklearn.metrics import roc_auc_score
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart
+import dare
 from utility import data_util
 
 def load_data(dataset, data_dir):
@@ -61,7 +61,7 @@ def main(args):
     n_delete = 500
 
     # train decision tree
-    model = dart.Tree(topd=topd, k=k, max_depth=max_depth, random_state=seed)
+    model = dare.Tree(topd=topd, k=k, max_depth=max_depth, random_state=seed)
     model = model.fit(X_train, y_train)
 
     # predict

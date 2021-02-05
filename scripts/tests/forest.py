@@ -13,7 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../../')
 sys.path.insert(0, here + '/../')
-import dart
+import dare
 from utility import data_util
 
 def load_data(dataset, data_dir):
@@ -62,8 +62,8 @@ def main(args):
     seed = 1
     n_delete = 100
 
-    if args.model == 'dart':
-        model = dart.Forest(topd=topd, k=k, n_estimators=n_estimators,
+    if args.model == 'dare':
+        model = dare.Forest(topd=topd, k=k, n_estimators=n_estimators,
                             max_depth=max_depth, random_state=seed)
 
     elif args.model == 'sklearn':
@@ -71,7 +71,7 @@ def main(args):
                                        random_state=seed)
 
     start = time.time()
-    model = dart.Forest(topd=topd, k=k, n_estimators=n_estimators,
+    model = dare.Forest(topd=topd, k=k, n_estimators=n_estimators,
                         max_depth=max_depth, random_state=seed)
     model = model.fit(X_train, y_train)
     train_time = time.time() - start
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     # I/O settings
     parser.add_argument('--data_dir', type=str, default='data', help='data directory.')
     parser.add_argument('--dataset', type=str, default='iris', help='dataset to use for the experiment.')
-    parser.add_argument('--model', type=str, default='dart', help='dart or sklearn')
+    parser.add_argument('--model', type=str, default='dare', help='dare or sklearn')
     parser.add_argument('--delete', action='store_true', help='whether to deletion or not.')
     parser.add_argument('--simulate', action='store_true', help='whether to simulate deletions or not.')
     parser.add_argument('--test_idempotency', action='store_true', help='simulate deletion multiple times.')

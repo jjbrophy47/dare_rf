@@ -65,6 +65,9 @@ def main(args):
     df = df[df['max_depth'] == max_depth]
     df = df[df['topd'] == 0]
 
+    pd.set_option('display.max_columns', 100)
+    print(df)
+
     # plot preditive performance
     ax = axs[0]
     ax.set_ylabel(r'Test error $\Delta$ (%)')
@@ -87,6 +90,8 @@ def main(args):
     ax.set_xlabel(r'$k$')
     # ax.set_title('Deletion Efficiency')
 
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+
     # remove excess space
     fig.tight_layout()
 
@@ -104,6 +109,5 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/plots/k/', help='output directory.')
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
     parser.add_argument('--subsample_size', type=int, default=1, help='adversary strength.')
-    # parser.add_argument('--k', type=int, nargs='+', default=[1, 5, 10, 25, 50], help='no. thresholds.')
     args = parser.parse_args()
     main(args)

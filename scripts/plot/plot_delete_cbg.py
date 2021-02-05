@@ -31,7 +31,7 @@ dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
                 'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
                 'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
                 'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
-                'synthetic': ('acc', 50, 20, 50, [0, 0, 2, 3, 5]),
+                'synthetic': ('acc', 50, 20, 10, [0, 0, 2, 3, 5]),
                 'ctr': ('auc', 100, 10, 50, [0, 2, 3, 4, 6]),
                 'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
                }
@@ -93,11 +93,15 @@ def organize_results(args, df):
 
         result = {'dataset': dataset}
         metric = dataset_dict[dataset][0]
-        # n_trees = dataset_dict[dataset][1]
-        # max_depth = dataset_dict[dataset][2]
-        # max_features = dataset_dict[dataset][3]
+        n_trees = dataset_dict[dataset][1]
+        max_depth = dataset_dict[dataset][2]
+        k = dataset_dict[dataset][3]
 
+        # filter using hyperparameters
         temp1 = df[df['dataset'] == dataset]
+        temp1 = temp1[temp1['n_estimators'] == n_trees]
+        temp1 = temp1[temp1['max_depth'] == max_depth]
+        temp1 = temp1[temp1['k'] == k]
 
         # skip dataset
         if len(temp1) < 10:
@@ -105,17 +109,8 @@ def organize_results(args, df):
             continue
         else:
             print('{}'.format(dataset))
-        # temp1 = temp1[temp1['n_estimators'] == n_trees]
-        # temp1 = temp1[temp1['max_depth'] == max_depth]
-        # temp1 = temp1[temp1['max_features'] == max_features]
 
         n_datasets += 1
-
-        # add exact
-        # exact_df = temp1[temp1['model'] == 'exact']
-        # result['exact_n_model'] = exact_df['n_model'].values[0]
-        # dataset_n_model_std_list.append(exact_df['n_model_std'].values[0])
-        # summary_stats['exact'].append(exact_df['n_model'].values[0])
 
         # add dart
         for i, topd in enumerate(dataset_dict[dataset][4][:N_TOL]):
@@ -174,9 +169,9 @@ def main(args):
     labels = ['G-DaRE']
     labels += ['R-DaRE (tol={})'.format(tol) for tol in tol_list[1:]]
 
-    titles = ['Efficiency Using the Random Adversary (higher is better)',
-              'Efficiency Using the Worst-of-{} Adversary (higher is better)',
-              'Test Error Increase Relative to D-DART (lower is better)']
+    titles = ['Deletion Efficiency Using the Random Adversary (higher is better)',
+              'Deletion Efficiency Using the Worst-of-{} Adversary (higher is better)',
+              'Test Error Increase Relative to G-DaRE RF (lower is better)']
 
     colors = ['0.0', '1.0', '0.8', '0.6', '0.4']
     colors += ['0.5', '0.75']
