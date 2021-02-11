@@ -11,12 +11,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, here + '/../')
 sys.path.insert(0, here + '/../../')
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
 
-from plot_delete_cbg import dataset_dict
+from plot_delete_cbg import gini_dataset_dict
+from plot_delete_cbg import entropy_dataset_dict
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
@@ -30,6 +29,9 @@ def set_size(width, fraction=1, subplots=(1, 1)):
 
 def main(args):
     print(args)
+
+    # get selected hyperparameters
+    dataset_dict = gini_dataset_dict if args.criterion == 'gini' else entropy_dataset_dict
 
     # matplotlib settings
     plt.rc('font', family='serif')
@@ -65,9 +67,6 @@ def main(args):
     df = df[df['max_depth'] == max_depth]
     df = df[df['topd'] == 0]
 
-    pd.set_option('display.max_columns', 100)
-    print(df)
-
     # plot preditive performance
     ax = axs[0]
     ax.set_ylabel(r'Test error $\Delta$ (%)')
@@ -77,7 +76,6 @@ def main(args):
                 color='k')
     ax.set_xlabel(r'$k$')
     ax.set_ylabel('Test {}'.format(metric.upper() if metric in ['auc', 'ap'] else 'Acc.'))
-    # ax.set_title('Predictive Performance')
 
     # plot deletion efficiency
     ax = axs[1]
@@ -88,9 +86,8 @@ def main(args):
                 color='k')
     ax.set_yscale('log')
     ax.set_xlabel(r'$k$')
-    # ax.set_title('Deletion Efficiency')
 
-    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     # remove excess space
     fig.tight_layout()

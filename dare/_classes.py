@@ -108,20 +108,8 @@ class Forest(object):
         # set random state
         self.random_state_ = get_random_int(self.random_state)
 
-        # set max_features
-        if self.max_features in [-1, None, 'sqrt']:
-            self.max_features_ = int(np.sqrt(self.n_features_))
-
-        elif isinstance(self.max_features, int):
-            assert self.max_features > 0
-            self.max_features_ = min(self.n_features_, self.max_features)
-
-        elif isinstance(self.max_features, float):
-            assert self.max_features > 0 and self.max_features <= 1.0
-            self.max_features_ = int(self.max_features * self.n_features_)
-
-        else:
-            raise ValueError('max_features {} unknown!'.format(self.max_features))
+        # set max. features
+        self.max_features_ = check_max_features(self.max_features, self.n_features_)
 
         # set max_depth
         self.max_depth_ = MAX_DEPTH_LIMIT if not self.max_depth else self.max_depth
@@ -586,6 +574,53 @@ def check_random_state(seed):
     else:
         raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
                          ' instance' % seed)
+
+
+def check_max_features(max_features, n_features):
+    """
+    Takes an int, float, or str.
+      -Int > 0: Returns min(`max_features`, `n_features`)
+      -Float in range (0.0, 1.0]: Returns fration of `n_features`.
+      -[-1, None, 'sqrt']: Returns sqrt(`n_features`).
+
+    Returns a valid number for the max. features, or throws an error.
+    """
+    assert n_features > 0
+
+    result = None
+
+    # return square root of no. features
+    if max_features in [-1, None, 'sqrt']:
+        result = int(np.sqrt(n_features))
+
+    # may be an int, float, or string representation of an int or float
+    else:
+        temp_max_features = None
+
+        # try converting to an int
+        try:
+            temp_max_features = int(max_features)
+
+        # try converting to a float
+        except ValueError:
+            try:
+                temp_max_features = float(max_features)
+
+            except ValueError:
+                pass
+
+        if isinstance(temp_max_features, int):
+            assert temp_max_features > 0
+            result = min(n_features, temp_max_features)
+
+        elif isinstance(temp_max_features, float):
+            assert temp_max_features > 0 and temp_max_features <= 1.0
+            result = int(temp_max_features * n_features)
+
+        else:
+            raise ValueError('max_features {} unknown!'.format(max_features))
+
+    return result
 
 
 def check_data(X, y=None):

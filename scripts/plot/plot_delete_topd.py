@@ -11,9 +11,9 @@ sys.path.insert(0, here + '/../../')
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
 
-from plot_delete_cbg import dataset_dict
+from plot_delete_cbg import gini_dataset_dict
+from plot_delete_cbg import entropy_dataset_dict
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
@@ -27,6 +27,9 @@ def set_size(width, fraction=1, subplots=(1, 1)):
 
 def main(args):
     print(args)
+
+    # get selected hyperparameters
+    dataset_dict = gini_dataset_dict if args.criterion == 'gini' else entropy_dataset_dict
 
     # matplotlib settings
     plt.rc('font', family='serif')
@@ -157,7 +160,7 @@ def main(args):
         if max_depth in [10, 20]:
             handles, labels = ax.get_legend_handles_labels()
 
-        plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+        plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     os.makedirs(args.out_dir, exist_ok=True)
 

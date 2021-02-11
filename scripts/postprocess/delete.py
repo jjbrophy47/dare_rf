@@ -172,7 +172,6 @@ def process_results(df):
     return main_df, n_retrain_df, retrain_cost_df
 
 
-
 def create_csv(args, out_dir, logger):
 
     logger.info('\nGathering results...')

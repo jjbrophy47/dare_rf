@@ -20,21 +20,37 @@ from scipy.stats import gmean
 N_TOL = 5
 
 # selected hyperparameters
-dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
-                'vaccine': ('acc', 50, 20, 5, [0, 5, 7, 11, 14]),
-                'adult': ('acc', 50, 20, 5, [0, 10, 13, 14, 16]),
-                'bank_marketing': ('auc', 100, 20, 25, [0, 6, 9, 12, 14]),
-                'flight_delays': ('auc', 250, 20, 25, [0, 1, 3, 5, 10]),
-                'diabetes': ('acc', 250, 20, 5, [0, 7, 10, 12, 15]),
-                'no_show': ('auc', 250, 20, 10, [0, 1, 3, 6, 10]),
-                'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 3]),
-                'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
-                'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
-                'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
-                'synthetic': ('acc', 50, 20, 10, [0, 0, 2, 3, 5]),
-                'ctr': ('auc', 100, 10, 50, [0, 2, 3, 4, 6]),
-                'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
-               }
+gini_dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
+                     'vaccine': ('acc', 50, 20, 5, [0, 5, 7, 11, 14]),
+                     'adult': ('acc', 50, 20, 5, [0, 10, 13, 14, 16]),
+                     'bank_marketing': ('auc', 100, 20, 25, [0, 6, 9, 12, 14]),
+                     'flight_delays': ('auc', 250, 20, 25, [0, 1, 3, 5, 10]),
+                     'diabetes': ('acc', 250, 20, 5, [0, 7, 10, 12, 15]),
+                     'no_show': ('auc', 250, 20, 10, [0, 1, 3, 6, 10]),
+                     'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 3]),
+                     'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
+                     'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
+                     'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
+                     'synthetic': ('acc', 50, 20, 10, [0, 0, 2, 3, 5]),
+                     'ctr': ('auc', 100, 10, 50, [0, 2, 3, 4, 6]),
+                     'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
+                     }
+
+entropy_dataset_dict = {'surgical': ('acc', 100, 20, 50, [0, 1, 1, 2, 4]),
+                        'vaccine': ('acc', 250, 20, 5, [0, 6, 9, 11, 15]),
+                        'adult': ('acc', 50, 20, 5, [0, 9, 12, 14, 15]),
+                        'bank_marketing': ('auc', 100, 10, 10, [0, 1, 1, 3, 4]),
+                        'flight_delays': ('auc', 250, 20, 50, [0, 1, 3, 5, 10]),
+                        'diabetes': ('acc', 100, 20, 5, [0, 4, 10, 11, 14]),
+                        'no_show': ('auc', 250, 20, 10, [0, 1, 3, 6, 9]),
+                        'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 4]),
+                        'census': ('auc', 100, 20, 25, [0, 5, 8, 11, 15]),
+                        'credit_card': ('ap', 250, 10, 25, [0, 1, 2, 3, 4]),
+                        'ctr': ('auc', 100, 10, 25, [0, 2, 3, 4, 6]),
+                        'twitter': ('auc', 100, 20, 5, [0, 3, 5, 8, 11]),
+                        'synthetic': ('acc', 50, 20, 10, [0, 1, 2, 3, 6]),
+                        'higgs': ('acc', 50, 20, 10, [0, 0, 2, 5, 8])
+                        }
 
 
 def set_size(width, fraction=1, subplots=(1, 1)):
@@ -80,6 +96,11 @@ def organize_results(args, df):
     """
     Put results into dataset clusters.
     """
+
+    # get selected hyperparameters
+    dataset_dict = gini_dataset_dict if args.criterion == 'gini' else entropy_dataset_dict
+
+    # result containers
     results = []
     model_n_deleted_std_list = []
     metric_diff_sem_list = []
