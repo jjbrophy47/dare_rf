@@ -7,4 +7,4 @@ Vaccine Dataset
 * Preprocess the data.
 	* Run `python3 continuous.py`.
 
-This creates a `continuous/train.csv` and `continuous/test.csv`.
+This creates a `continuous/train.npy` and `continuous/test.npy`.

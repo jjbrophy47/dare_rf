@@ -11,7 +11,3 @@ pandas==0.25.2
 matplotlib==3.1.1
 seaborn==0.9.0
 tqdm==4.39.0
-jupyterlab==2.1.2
-ipywidgets==7.5.1
-cufflinks==0.17.3
-plotly==4.8.1

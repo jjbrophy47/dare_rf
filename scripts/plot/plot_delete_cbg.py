@@ -30,9 +30,9 @@ gini_dataset_dict = {'surgical': ('acc', 100, 20, 25, [0, 0, 1, 2, 4]),
                      'olympics': ('auc', 250, 20, 5, [0, 0, 1, 2, 3]),
                      'census': ('auc', 100, 20, 25, [0, 6, 9, 12, 16]),
                      'credit_card': ('ap', 250, 20, 5, [0, 5, 8, 14, 17]),
+                     'ctr': ('auc', 100, 10, 50, [0, 2, 3, 4, 6]),
                      'twitter': ('auc', 100, 20, 5, [0, 2, 4, 7, 11]),
                      'synthetic': ('acc', 50, 20, 10, [0, 0, 2, 3, 5]),
-                     'ctr': ('auc', 100, 10, 50, [0, 2, 3, 4, 6]),
                      'higgs': ('acc', 50, 20, 10, [0, 1, 3, 6, 9])
                      }
 
@@ -298,8 +298,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, nargs='+', help='datasets to use for plotting',
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays',
-                                 'diabetes', 'no_show', 'census', 'credit_card', 'synthetic',
-                                 'twitter', 'higgs', 'ctr'])
+                                 'diabetes', 'no_show', 'olympics', 'census', 'credit_card', 'ctr',
+                                 'synthetic', 'twitter', 'higgs'])
     parser.add_argument('--in_dir', type=str, default='output/delete/csv/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/plots/delete_cbg/', help='output directory.')
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
