@@ -244,7 +244,7 @@ def main(args):
     set_hatches(ax2, hatches, sub1_n_datasets)
     set_hatches(ax3, hatches, sub1_n_datasets)
 
-    # plot specific settings
+    # plot-specific settings
     ax1.set_yscale('log')
     ax1.grid(which='major', axis='y')
     ax1.set_axisbelow(True)

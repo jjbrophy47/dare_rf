@@ -1,0 +1,14 @@
+./jobs/memory/primer.sh 'surgical'       'gini' 3  1440 short
+./jobs/memory/primer.sh 'vaccine'        'gini' 6  1440 short
+./jobs/memory/primer.sh 'adult'          'gini' 3  1440 short
+./jobs/memory/primer.sh 'bank_marketing' 'gini' 3  1440 short
+./jobs/memory/primer.sh 'flight_delays'  'gini' 18 1440 short
+./jobs/memory/primer.sh 'diabetes'       'gini' 18 1440 short
+./jobs/memory/primer.sh 'no_show'        'gini' 18 1440 short
+./jobs/memory/primer.sh 'olympics'       'gini' 20 1440 short
+./jobs/memory/primer.sh 'census'         'gini' 18 1440 short
+./jobs/memory/primer.sh 'credit_card'    'gini' 9  1440 short
+./jobs/memory/primer.sh 'ctr'            'gini' 10 1440 short
+./jobs/memory/primer.sh 'twitter'        'gini' 15 1440 short
+./jobs/memory/primer.sh 'synthetic'      'gini' 18 1440 short
+./jobs/memory/primer.sh 'higgs'          'gini' 70 1440 short

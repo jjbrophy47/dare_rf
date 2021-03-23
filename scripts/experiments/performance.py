@@ -36,7 +36,7 @@ def _get_model(args):
                             n_estimators=args.n_estimators,
                             max_features=args.max_features,
                             topd=args.topd,
-                            k = args.k,
+                            k=args.k,
                             verbose=args.verbose,
                             random_state=args.rs)
 
@@ -78,7 +78,7 @@ def _get_model_dict(args, params):
                             n_estimators=params['n_estimators'],
                             max_features=args.max_features,
                             topd=args.topd,
-                            k = params['k'],
+                            k=params['k'],
                             verbose=args.verbose,
                             random_state=args.rs)
 
@@ -185,30 +185,6 @@ def performance(args, out_dir, logger):
     start = time.time()
     model = _get_model(args)
 
-    # if args.no_tune:
-    #     train_indices = np.load('train_indices.npy')
-    #     X_train_sub_temp, y_train_sub_temp = X_train_sub[train_indices], y_train_sub[train_indices]
-    #     print(X_train_sub_temp.shape)
-    #     model = _get_model(args)
-    #     model.fit(X_train_sub_temp, y_train_sub_temp)
-    # exit(0)
-
-    # TEMPORARY
-    # if args.no_tune:
-    #     skf = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=args.rs)
-    #     i = 0
-    #     for train_indices, test_indices in skf.split(X_train_sub, y_train_sub):
-    #         print(i)
-    #         start = time.time()
-    #         X_train_sub_temp, y_train_sub_temp = X_train_sub[train_indices], y_train_sub[train_indices]
-    #         X_test_sub_temp, y_test_sub_temp = X_train_sub[test_indices], y_train_sub[test_indices]
-    #         model = _get_model(args)
-    #         model.fit(X_train_sub_temp, y_train_sub_temp)
-    #         print('{}: {:.3f}s'.format(i, time.time() - start))
-    #         np.save(os.path.join(out_dir, 'train_indices.npy'), train_indices)
-    #         i += 1
-    #     exit(0)
-
     # tune hyperparameters
     if not args.no_tune:
         logger.info('param_grid: {}'.format(param_grid))
@@ -230,6 +206,13 @@ def performance(args, out_dir, logger):
     model = model.fit(X_train, y_train)
     train_time = time.time() - start
     logger.info('train time: {:.3f}s'.format(train_time))
+
+    n_nodes, n_random, n_greedy = model.trees_[0].get_node_statistics()
+    print('[Tree 0] no. nodes: {:,}, no. random: {:,}, no. greedy: {:,}'.format(n_nodes, n_random, n_greedy))
+    print('[Tree 0] memory usage: {:,} bytes'.format(model.trees_[0].get_memory_usage()))
+    print('[Forest] memory usage: {:,} bytes'.format(model.get_memory_usage()))
+    print('max_rss: {:,}'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+    exit(0)
 
     # evaluate
     auc, acc, ap = exp_util.performance(model, X_test, y_test, name=args.model, logger=logger)
@@ -310,7 +293,7 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default='dare', help='type of model.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
     parser.add_argument('--topd', type=int, default=0, help='0 for exact, 1000 for random.')
-    parser.add_argument('--k', type=int, default=10, help='no. of candidate thresholds to sample.')
+    parser.add_argument('--k', type=int, default=25, help='no. of candidate thresholds to sample.')
     parser.add_argument('--bootstrap', action='store_true', default=False, help='use bootstrapping with sklearn.')
 
     # tuning settings
@@ -323,7 +306,7 @@ if __name__ == '__main__':
     # tree/forest hyperparameters
     parser.add_argument('--n_estimators', type=int, default=100, help='number of trees in the forest.')
     parser.add_argument('--max_features', type=str, default='sqrt', help='maximum no. features to sample.')
-    parser.add_argument('--max_depth', type=int, default=10, help='maximum depth of the tree.')
+    parser.add_argument('--max_depth', type=int, default=20, help='maximum depth of the tree.')
 
     # display settings
     parser.add_argument('--verbose', type=int, default=2, help='verbosity level.')

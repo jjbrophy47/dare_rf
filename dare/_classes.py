@@ -263,6 +263,17 @@ class Forest(object):
         for tree in self.trees_:
             tree.clear_delete_metrics()
 
+    def get_memory_usage(self):
+        """
+        Return total memory (in bytes) used by the forest.
+        """
+        result = 0
+
+        for tree in self.trees_:
+            result += tree.get_memory_usage()
+
+        return result
+
     def get_params(self, deep=False):
         """
         Returns the parameter of this model as a dictionary.
@@ -511,6 +522,12 @@ class Tree(object):
         Turns simulation mode on/off.
         """
         self.tree_builder_.set_sim_mode(sim_mode)
+
+    def get_memory_usage(self):
+        """
+        Return total memory (in bytes) used by the tree.
+        """
+        return self.tree_.get_memory_usage()
 
     def get_params(self, deep=False):
         """

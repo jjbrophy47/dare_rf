@@ -253,6 +253,12 @@ cdef class _Tree:
         return out
 
     # tree information
+    cpdef SIZE_t get_memory_usage(self):
+        """
+        Return total memory (in bytes) used by the tree.
+        """
+        return self._get_memory_usage(self.root)
+
     cpdef SIZE_t get_node_count(self):
         """
         Get number of nodes total.
@@ -272,6 +278,48 @@ cdef class _Tree:
         return self._get_greedy_node_count(self.root, topd)
 
     # private
+    cdef SIZE_t _get_memory_usage(self, Node* node) nogil:
+        """
+        Return total memory (in bytes) of the tree.
+        """
+        cdef SIZE_t result = 0
+
+        # end of traversal
+        if not node:
+            return result
+
+        # current node
+        else:
+            result += sizeof(node[0])
+
+            # leaf node
+            if node.is_leaf:
+                result += sizeof(node.leaf_samples[0]) * node.n_samples
+
+            # decision node
+            else:
+
+                # add constant features memory usage
+                result += sizeof(node.constant_features[0])
+                result += sizeof(node.constant_features.arr) * node.constant_features.n
+
+                # add chosen feature memory usage
+                result += sizeof(node.chosen_feature[0])
+                result += sizeof(node.chosen_feature.thresholds[0][0]) * node.chosen_feature.n_thresholds
+
+                # add chosen threshold memory usage
+                result += sizeof(node.chosen_threshold[0])
+
+                # greedy node
+                if node.features != NULL:
+
+                    # add attribute-threshold-pairs memory-usage
+                    for i in range(node.n_features):
+                        result += sizeof(node.features[i][0])
+                        result += sizeof(node.features[i].thresholds[0][0]) * node.features[i].n_thresholds
+
+            return result + self._get_memory_usage(node.left) + self._get_memory_usage(node.right)
+
     cdef SIZE_t _get_node_count(self, Node* node) nogil:
         """
         Count total no. of nodes in the tree.

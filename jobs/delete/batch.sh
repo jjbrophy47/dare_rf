@@ -1,20 +1,20 @@
 # GINI
 
-# increasing topd - REDO
-# ./jobs/delete/primer_topd.sh 'surgical' 'gini' 100 20 25 3 1440 short
-# ./jobs/delete/primer_topd.sh 'vaccine' 'gini' 50 20 5 6 1440 short
-# ./jobs/delete/primer_topd.sh 'adult' 'gini' 50 20 5 3 1440 short
-# ./jobs/delete/primer_topd.sh 'bank_marketing' 'gini' 100 20 25 3 1440 short
-# ./jobs/delete/primer_topd.sh 'flight_delays' 'gini' 250 20 25 18 1440 short
-# ./jobs/delete/primer_topd.sh 'diabetes' 'gini' 250 20 5 18 1440 short
-# ./jobs/delete/primer_topd.sh 'no_show' 'gini' 250 20 10 18 1440 short
-# ./jobs/delete/primer_topd.sh 'olympics' 'gini' 250 20 5 20 1440 short
-# ./jobs/delete/primer_topd.sh 'census' 'gini' 100 20 25 18 1440 short
-# ./jobs/delete/primer_topd.sh 'credit_card' 'gini' 250 20 5 9 1440 short
-# ./jobs/delete/primer_topd.sh 'ctr' 'gini' 100 10 50 10 1440 short
-# ./jobs/delete/primer_topd.sh 'twitter' 'gini' 100 20 5 15 1440 short
-# ./jobs/delete/primer_topd.sh 'synthetic' 'gini' 50 20 10 18 1440 short
-# ./jobs/delete/primer_topd.sh 'higgs' 'gini' 50 20 10 70 1440 short
+# increasing topd
+./jobs/delete/primer_topd.sh 'surgical' 'gini' 100 20 25 3 1440 short
+./jobs/delete/primer_topd.sh 'vaccine' 'gini' 50 20 5 6 1440 short
+./jobs/delete/primer_topd.sh 'adult' 'gini' 50 20 5 3 1440 short
+./jobs/delete/primer_topd.sh 'bank_marketing' 'gini' 100 20 25 3 1440 short
+./jobs/delete/primer_topd.sh 'flight_delays' 'gini' 250 20 25 18 1440 short
+./jobs/delete/primer_topd.sh 'diabetes' 'gini' 250 20 5 18 1440 short
+./jobs/delete/primer_topd.sh 'no_show' 'gini' 250 20 10 18 1440 short
+./jobs/delete/primer_topd.sh 'olympics' 'gini' 250 20 5 20 1440 short
+./jobs/delete/primer_topd.sh 'census' 'gini' 100 20 25 18 1440 short
+./jobs/delete/primer_topd.sh 'credit_card' 'gini' 250 20 5 9 1440 short
+./jobs/delete/primer_topd.sh 'ctr' 'gini' 100 10 50 10 1440 short
+./jobs/delete/primer_topd.sh 'twitter' 'gini' 100 20 5 15 1440 short
+./jobs/delete/primer_topd.sh 'synthetic' 'gini' 50 20 10 18 1440 short
+./jobs/delete/primer_topd.sh 'higgs' 'gini' 50 20 10 70 1440 short
 
 # increasing k
 # ./jobs/delete/primer_k.sh 'surgical' 'gini' 100 20 25 3 1440 short

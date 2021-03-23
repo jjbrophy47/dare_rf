@@ -33,6 +33,53 @@ def performance(model, X_test, y_test, logger=None,
     return auc, acc, ap
 
 
+def get_params(dataset, criterion='gini'):
+    """
+    Return selected hyperparameters for DARE models
+    using error tolerances of 0%, 0.1%, 0.25%, 0.5%, and 1.0%.
+    """
+    # no. trees, max. depth, k, drmax for 0%, 0.1%, 0.25%, 0.5%, and 1.0%
+
+    # gini
+    gini = {}
+    gini['surgical'] = [100, 20, 25, 0, 0, 1, 2, 4]
+    gini['vaccine'] = [50, 20, 5, 0, 5, 7, 11, 14]
+    gini['adult'] = [50, 20, 5, 0, 10, 13, 14, 16]
+    gini['bank_marketing'] = [100, 20, 25, 0, 6, 9, 12, 14]
+    gini['flight_delays'] = [250, 20, 25, 0, 1, 3, 5, 10]
+    gini['diabetes'] = [250, 20, 5, 0, 7, 10, 12, 15]
+    gini['no_show'] = [250, 20, 10, 0, 1, 3, 6, 10]
+    gini['olympics'] = [250, 20, 5, 0, 0, 1, 2, 3]
+    gini['census'] = [100, 20, 25, 0, 6, 9, 12, 16]
+    gini['credit_card'] = [250, 20, 5, 0, 5, 8, 14, 17]
+    gini['ctr'] = [100, 10, 50, 0, 2, 3, 4, 6]
+    gini['twitter'] = [100, 20, 5, 0, 2, 4, 7, 11]
+    gini['synthetic'] = [50, 20, 10, 0, 0, 2, 3, 5]
+    gini['higgs'] = [50, 20, 10, 0, 1, 3, 6, 9]
+
+    # entropy
+    entropy = {}
+    entropy['surgical'] = [100, 20, 25, 0, 0, 1, 2, 4]
+    entropy['vaccine'] = [50, 20, 5, 0, 5, 7, 11, 14]
+    entropy['adult'] = [50, 20, 5, 0, 10, 13, 14, 16]
+    entropy['bank_marketing'] = [100, 20, 25, 0, 6, 9, 12, 14]
+    entropy['flight_delays'] = [250, 20, 25, 0, 1, 3, 5, 10]
+    entropy['diabetes'] = [250, 20, 5, 0, 7, 10, 12, 15]
+    entropy['no_show'] = [250, 20, 10, 0, 1, 3, 6, 10]
+    entropy['olympics'] = [250, 20, 5, 0, 0, 1, 2, 3]
+    entropy['census'] = [100, 20, 25, 0, 6, 9, 12, 16]
+    entropy['credit_card'] = [250, 20, 5, 0, 5, 8, 14, 17]
+    entropy['ctr'] = [100, 10, 50, 0, 2, 3, 4, 6]
+    entropy['twitter'] = [100, 20, 5, 0, 2, 4, 7, 11]
+    entropy['synthetic'] = [50, 20, 10, 0, 0, 2, 3, 5]
+    entropy['higgs'] = [50, 20, 10, 0, 1, 3, 6, 9]
+
+    # select params
+    params = gini[dataset] if criterion == 'gini' else entropy[dataset]
+
+    return params
+
+
 def explain(model, X_train, y_train, X_test, y_test=None):
     """
     Generate an instance-attribution explanation for each test

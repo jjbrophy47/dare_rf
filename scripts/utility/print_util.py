@@ -20,7 +20,7 @@ class Tee(object):
             f.write(obj)
             f.flush()   # output to be visible immediately
 
-    def flush(self) :
+    def flush(self):
         for f in self.files:
             f.flush()
 
@@ -54,6 +54,7 @@ def remove_logger(logger):
     """
     logger.handlers = []
 
+
 def stdout_stderr_to_log(filename):
     """
     Log everything printed to stdout or
@@ -69,6 +70,7 @@ def stdout_stderr_to_log(filename):
 
     return logfile, stdout, stderr
 
+
 def reset_stdout_stderr(logfile, stdout, stderr):
     """
     Restore original stdout and stderr
@@ -76,6 +78,7 @@ def reset_stdout_stderr(logfile, stdout, stderr):
     sys.stdout = stdout
     sys.stderr = stderr
     logfile.close()
+
 
 def clear_dir(in_dir):
     """
