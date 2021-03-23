@@ -253,11 +253,26 @@ cdef class _Tree:
         return out
 
     # tree information
-    cpdef SIZE_t get_memory_usage(self):
+    cpdef SIZE_t get_structure_memory(self):
         """
-        Return total memory (in bytes) used by the tree.
+        Return total memory (in bytes) of the tree that
+        is ONLY used for generating predictions.
         """
-        return self._get_memory_usage(self.root)
+        return self._get_structure_memory(self.root)
+
+    cpdef SIZE_t get_decision_stats_memory(self):
+        """
+        Return total memory (in bytes) of the tree that
+        is used for storing additional decision-node statistics.
+        """
+        return self._get_decision_stats_memory(self.root)
+
+    cpdef SIZE_t get_leaf_stats_memory(self):
+        """
+        Return total memory (in bytes) of the tree that
+        is used for storing additional leaf-node statistics.
+        """
+        return self._get_leaf_stats_memory(self.root)
 
     cpdef SIZE_t get_node_count(self):
         """
@@ -278,9 +293,10 @@ cdef class _Tree:
         return self._get_greedy_node_count(self.root, topd)
 
     # private
-    cdef SIZE_t _get_memory_usage(self, Node* node) nogil:
+    cdef SIZE_t _get_structure_memory(self, Node* node) nogil:
         """
-        Return total memory (in bytes) of the tree.
+        Return total memory (in bytes) of the tree that is
+        ONLY used for generating predictions.
         """
         cdef SIZE_t result = 0
 
@@ -290,35 +306,91 @@ cdef class _Tree:
 
         # current node
         else:
-            result += sizeof(node[0])
 
-            # leaf node
-            if node.is_leaf:
-                result += sizeof(node.leaf_samples[0]) * node.n_samples
+            # structual information
+            result += sizeof(node.left)
+            result += sizeof(node.right)
+
+            # leaf info
+            result += sizeof(node.is_leaf)
+            result += sizeof(node.value)
+
+            # not strictly necessary, but useful information
+            result += sizeof(node.depth)
+            result += sizeof(node.is_left)
 
             # decision node
-            else:
+            if not node.is_leaf:
+                result += sizeof(node.chosen_feature.index)
+                result += sizeof(node.chosen_threshold.value)
 
-                # add constant features memory usage
-                result += sizeof(node.constant_features[0])
-                result += sizeof(node.constant_features.arr) * node.constant_features.n
+            return result + self._get_structure_memory(node.left) + self._get_structure_memory(node.right)
 
-                # add chosen feature memory usage
-                result += sizeof(node.chosen_feature[0])
-                result += sizeof(node.chosen_feature.thresholds[0][0]) * node.chosen_feature.n_thresholds
+    cdef SIZE_t _get_decision_stats_memory(self, Node* node) nogil:
+        """
+        Return total memory (in bytes) of the tree.
+        """
+        cdef SIZE_t result = 0
 
-                # add chosen threshold memory usage
-                result += sizeof(node.chosen_threshold[0])
+        # end of traversal
+        if not node:
+            return result
 
-                # greedy node
-                if node.features != NULL:
+        # decision node
+        if not node.is_leaf:
 
-                    # add attribute-threshold-pairs memory-usage
-                    for i in range(node.n_features):
-                        result += sizeof(node.features[i][0])
-                        result += sizeof(node.features[i].thresholds[0][0]) * node.features[i].n_thresholds
+            # add instance counts
+            result += sizeof(node.n_samples)
+            result += sizeof(node.n_pos_samples)
 
-            return result + self._get_memory_usage(node.left) + self._get_memory_usage(node.right)
+            # add constant features memory usage
+            result += sizeof(node.constant_features)
+            result += sizeof(node.constant_features[0])
+            result += sizeof(node.constant_features.arr[0]) * node.constant_features.n
+
+            # add chosen feature memory usage
+            result += sizeof(node.chosen_feature)
+            result += sizeof(node.chosen_feature[0]) - sizeof(node.chosen_feature.index)
+            result += sizeof(node.chosen_feature.thresholds[0][0]) * node.chosen_feature.n_thresholds
+
+            # add chosen threshold memory usage
+            result += sizeof(node.chosen_threshold[0]) - sizeof(node.chosen_threshold.value)
+
+            # greedy node
+            if node.features != NULL:
+
+                # add attribute-threshold-pairs memory-usage
+                result += sizeof(node.features)
+                result += sizeof(node.n_features)
+
+                for i in range(node.n_features):
+                    result += sizeof(node.features[i][0])
+                    result += sizeof(node.features[i].thresholds[0][0]) * node.features[i].n_thresholds
+
+        return result + self._get_decision_stats_memory(node.left) + self._get_decision_stats_memory(node.right)
+
+    cdef SIZE_t _get_leaf_stats_memory(self, Node* node) nogil:
+        """
+        Return total memory (in bytes) of the tree.
+        """
+        cdef SIZE_t result = 0
+
+        # end of traversal
+        if not node:
+            return result
+
+        # leaf node
+        if node.is_leaf:
+
+            # add instance counts
+            result += sizeof(node.n_samples)
+            result += sizeof(node.n_pos_samples)
+
+            # add instance pointers
+            result += sizeof(node.leaf_samples)
+            result += sizeof(node.leaf_samples[0]) * node.n_samples
+
+        return result + self._get_leaf_stats_memory(node.left) + self._get_leaf_stats_memory(node.right)
 
     cdef SIZE_t _get_node_count(self, Node* node) nogil:
         """

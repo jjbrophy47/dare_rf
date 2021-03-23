@@ -59,11 +59,14 @@ def experiment(args, out_dir, logger):
     # obtain data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
+    # compute data size
+    data_mem = X_train.nbytes + y_train.nbytes
+
     # dataset statistics
     logger.info('\ntrain instances: {:,}'.format(X_train.shape[0]))
     logger.info('test instances: {:,}'.format(X_test.shape[0]))
     logger.info('attributes: {:,}'.format(X_train.shape[1]))
-    logger.info('split criterion: {}'.format(args.criterion))
+    logger.info('data size: {:,} bytes'.format(data_mem))
 
     # get hyperparameters
     params = exp_util.get_params(dataset=args.dataset, criterion=args.criterion)
@@ -92,8 +95,10 @@ def experiment(args, out_dir, logger):
         train_time = time.time() - start
 
         # get memory usage
-        memory_usage = sys.getsizeof(pickle.dumps(model))
-        logger.info('\n[SKLearn] train: {:.3f}s, model size: {:,} bytes'.format(train_time, memory_usage))
+        structure_memory = sys.getsizeof(pickle.dumps(model))
+        decision_stats_memory = -1
+        leaf_stats_memory = -1
+        logger.info('\n[SKLearn] train: {:.3f}s, structure: {:,} bytes'.format(train_time, structure_memory))
 
     # DARE model
     else:
@@ -112,12 +117,16 @@ def experiment(args, out_dir, logger):
         train_time = time.time() - start
 
         # get memory usage
-        memory_usage = model.get_memory_usage()
-        s = '\n[DARE (tol={:.2f}%, topd={:,}, k={:,})] train: {:.3f}s, model size: {:,} bytes'
-        logger.info(s.format(tol, topd, k, train_time, memory_usage))
+        structure_memory, decision_stats_memory, leaf_stats_memory = model.get_memory_usage()
+        s = '\n[DARE (tol={:.2f}%, topd={:,}, k={:,})] train: {:.3f}s'
+        s += ', structure: {:,} bytes, decision stats.: {:,} bytes, leaf stats.: {:,} bytes'
+        logger.info(s.format(tol, topd, k, train_time, structure_memory, decision_stats_memory, leaf_stats_memory))
 
     # add to results
-    result['memory_usage'] = memory_usage
+    result['data_mem'] = data_mem
+    result['structure_mem'] = structure_memory
+    result['decision_stats_mem'] = decision_stats_memory
+    result['leaf_stats_memory'] = leaf_stats_memory
     result['train_time'] = train_time
 
     # save results

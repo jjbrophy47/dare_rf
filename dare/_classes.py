@@ -267,12 +267,18 @@ class Forest(object):
         """
         Return total memory (in bytes) used by the forest.
         """
-        result = 0
+        structure_memory = 0
+        decision_stats_memory = 0
+        leaf_stats_memory = 0
 
+        # add up memory used by each tree
         for tree in self.trees_:
-            result += tree.get_memory_usage()
+            struc_mem, decision_mem, leaf_mem = tree.get_memory_usage()
+            structure_memory += struc_mem
+            decision_stats_memory += decision_mem
+            leaf_stats_memory += leaf_mem
 
-        return result
+        return structure_memory, decision_stats_memory, leaf_stats_memory
 
     def get_params(self, deep=False):
         """
@@ -527,7 +533,10 @@ class Tree(object):
         """
         Return total memory (in bytes) used by the tree.
         """
-        return self.tree_.get_memory_usage()
+        structure_memory = self.tree_.get_structure_memory()
+        decision_stats_memory = self.tree_.get_decision_stats_memory()
+        leaf_stats_memory = self.tree_.get_leaf_stats_memory()
+        return structure_memory, decision_stats_memory, leaf_stats_memory
 
     def get_params(self, deep=False):
         """

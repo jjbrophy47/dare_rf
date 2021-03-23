@@ -101,13 +101,17 @@ cdef class _Tree:
 
     # Python API
     cpdef np.ndarray predict(self, float[:, :] X)
-    cpdef SIZE_t get_memory_usage(self)
+    cpdef SIZE_t get_structure_memory(self)
+    cpdef SIZE_t get_decision_stats_memory(self)
+    cpdef SIZE_t get_leaf_stats_memory(self)
     cpdef SIZE_t get_node_count(self)
     cpdef SIZE_t get_random_node_count(self, SIZE_t topd)
     cpdef SIZE_t get_greedy_node_count(self, SIZE_t topd)
 
     # C API
-    cdef SIZE_t _get_memory_usage(self, Node* node) nogil
+    cdef SIZE_t _get_structure_memory(self, Node* node) nogil
+    cdef SIZE_t _get_decision_stats_memory(self, Node* node) nogil
+    cdef SIZE_t _get_leaf_stats_memory(self, Node* node) nogil
     cdef SIZE_t _get_node_count(self, Node* node) nogil
     cdef SIZE_t _get_random_node_count(self, Node* node, SIZE_t topd) nogil
     cdef SIZE_t _get_greedy_node_count(self, Node* node, SIZE_t topd) nogil

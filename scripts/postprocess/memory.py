@@ -74,11 +74,12 @@ def process_results(df):
         main_result.update(process_utility(gf))
         main_result['n_estimators'] = gf['n_estimators'].mode()[0]
         main_result['max_depth'] = gf['max_depth'].mode()[0]
+        main_result['max_features'] = gf['max_features'].mode()[0]
         main_result['num_runs'] = len(gf)
-        result['{}_mem_mean'] = np.mean(gf['{}_mem'.format(model)])
-        result['{}_mem_sem'.format(model)] = sem(gf['{}_mem'.format(model)])
-        result['{}_train_mean'.format(model)] = np.mean(gf['{}_train'.format(model)])
-        result['{}_train_std'.format(model)] = np.std(gf['{}_train'.format(model)])
+        main_result['memory_usage_mean'] = np.mean(gf['memory_usage'])
+        main_result['memory_usage_sem'] = sem(gf['memory_usage'])
+        main_result['train_time_mean'] = np.mean(gf['train_time'])
+        main_result['train_time_std'] = np.std(gf['train_time'])
         main_result_list.append(main_result)
 
     main_df = pd.DataFrame(main_result_list)
@@ -90,14 +91,22 @@ def create_csv(args, out_dir, logger):
 
     logger.info('\nGathering results...')
 
-    experiment_settings = list(product(*[args.dataset, args.criterion, args.rs]))
+    experiment_settings = list(product(*[args.dataset, args.criterion, args.model, args.rs]))
 
     results = []
-    for dataset, criterion, rs in tqdm(experiment_settings):
-        template = {'dataset': dataset, 'criterion': criterion, 'rs': rs}
+    for dataset, criterion, model, rs in tqdm(experiment_settings):
+
+        # create result object
+        template = {'dataset': dataset,
+                    'criterion': criterion,
+                    'model': model,
+                    'rs': rs}
+
+        # get result directory
         experiment_dir = os.path.join(args.in_dir,
                                       dataset,
                                       criterion,
+                                      model,
                                       'rs_{}'.format(rs))
 
         # skip empty experiments
