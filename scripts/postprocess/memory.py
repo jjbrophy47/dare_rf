@@ -35,7 +35,7 @@ def get_result(template, in_dir):
     return result
 
 
-def process_utility(gf, tol_list=[0.0, 0.1, 0.25, 0.5, 1.0]):
+def process_utility(gf):
     """
     Processes utility differences BEFORE addition/deletion,
     and averages the results over different random states.
@@ -65,7 +65,7 @@ def process_results(df):
     Averages utility results over different random states.
     """
 
-    groups = ['dataset', 'criterion']
+    groups = ['dataset', 'criterion', 'model']
 
     main_result_list = []
 
@@ -75,6 +75,10 @@ def process_results(df):
         main_result['n_estimators'] = gf['n_estimators'].mode()[0]
         main_result['max_depth'] = gf['max_depth'].mode()[0]
         main_result['num_runs'] = len(gf)
+        result['{}_mem_mean'] = np.mean(gf['{}_mem'.format(model)])
+        result['{}_mem_sem'.format(model)] = sem(gf['{}_mem'.format(model)])
+        result['{}_train_mean'.format(model)] = np.mean(gf['{}_train'.format(model)])
+        result['{}_train_std'.format(model)] = np.std(gf['{}_train'.format(model)])
         main_result_list.append(main_result)
 
     main_df = pd.DataFrame(main_result_list)
@@ -143,6 +147,9 @@ if __name__ == '__main__':
                         default=['surgical', 'vaccine', 'adult', 'bank_marketing', 'flight_delays', 'diabetes',
                                  'no_show', 'olympics', 'census', 'credit_card', 'twitter', 'synthetic',
                                  'higgs', 'ctr'], help='dataset.')
+    parser.add_argument('--model', type=str, nargs='+',
+                        default=['sklearn', 'dare_0', 'dare_1', 'dare_2', 'dare_3', 'dare_4'],
+                        help='criterion.')
     parser.add_argument('--criterion', type=str, nargs='+', default=['gini', 'entropy'], help='criterion.')
     parser.add_argument('--rs', type=int, nargs='+', default=[1, 2, 3, 4, 5], help='random state.')
 

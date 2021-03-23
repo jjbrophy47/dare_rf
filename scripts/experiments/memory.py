@@ -80,6 +80,7 @@ def experiment(args, out_dir, logger):
     result['max_depth'] = max_depth
     result['criterion'] = args.criterion
     result['max_features'] = args.max_features
+    result['model'] = args.model
 
     # SKLearn RF
     if 'sklearn' in args.model:
@@ -93,10 +94,6 @@ def experiment(args, out_dir, logger):
         # get memory usage
         memory_usage = sys.getsizeof(pickle.dumps(model))
         logger.info('\n[SKLearn] train: {:.3f}s, model size: {:,} bytes'.format(train_time, memory_usage))
-
-        # add to results
-        result['sklearn_mem'] = memory_usage
-        result['sklearn_train'] = train_time
 
     # DARE model
     else:
@@ -119,9 +116,9 @@ def experiment(args, out_dir, logger):
         s = '\n[DARE (tol={:.2f}%, topd={:,}, k={:,})] train: {:.3f}s, model size: {:,} bytes'
         logger.info(s.format(tol, topd, k, train_time, memory_usage))
 
-        # add to results
-        result['{}_mem'.format(args.model)] = memory_usage
-        result['{}_train'.format(args.model)] = train_time
+    # add to results
+    result['memory_usage'] = memory_usage
+    result['train_time'] = train_time
 
     # save results
     result['max_rss'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
