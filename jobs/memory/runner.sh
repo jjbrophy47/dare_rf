@@ -6,7 +6,9 @@ module load python3/3.7.5
 
 dataset=$1
 criterion=$2
+rs=$3
 
 python3 scripts/experiments/memory.py \
   --dataset $dataset \
-  --criterion $criterion
+  --criterion $criterion \
+  --rs $rs

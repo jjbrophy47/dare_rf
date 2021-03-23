@@ -130,7 +130,8 @@ def main(args):
     # create output dir
     out_dir = os.path.join(args.out_dir,
                            args.dataset,
-                           args.criterion)
+                           args.criterion,
+                           'rs_{}'.format(args.rs))
 
     # create output directory and clear any previous contents
     os.makedirs(out_dir, exist_ok=True)
