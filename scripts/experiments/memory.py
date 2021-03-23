@@ -27,7 +27,7 @@ def get_model(args, model, n_estimators, max_depth, topd=0, k=5):
     Return the appropriate model.
     """
 
-    if model == 'dare':
+    if 'dare' in args.model:
         model = dare.Forest(criterion=args.criterion,
                             max_depth=max_depth,
                             n_estimators=n_estimators,
@@ -79,25 +79,32 @@ def experiment(args, out_dir, logger):
     result['n_estimators'] = n_estimators
     result['max_depth'] = max_depth
     result['criterion'] = args.criterion
+    result['max_features'] = args.max_features
 
     # SKLearn RF
-    clf = get_model(args, model='sklearn', n_estimators=n_estimators, max_depth=max_depth)
+    if 'sklearn' in args.model:
+        clf = get_model(args, model='sklearn', n_estimators=n_estimators, max_depth=max_depth)
 
-    # train
-    start = time.time()
-    model = clf.fit(X_train, y_train)
-    train_time = time.time() - start
+        # train
+        start = time.time()
+        model = clf.fit(X_train, y_train)
+        train_time = time.time() - start
 
-    # get memory usage
-    memory_usage = sys.getsizeof(pickle.dumps(model))
-    logger.info('\n[SKLearn] train: {:.3f}s, model size: {:,} bytes'.format(train_time, memory_usage))
+        # get memory usage
+        memory_usage = sys.getsizeof(pickle.dumps(model))
+        logger.info('\n[SKLearn] train: {:.3f}s, model size: {:,} bytes'.format(train_time, memory_usage))
 
-    # add to results
-    result['sklearn_mem'] = memory_usage
-    result['sklearn_train'] = train_time
+        # add to results
+        result['sklearn_mem'] = memory_usage
+        result['sklearn_train'] = train_time
 
-    # DARE models
-    for tol, topd in list(zip(tol_list, topd_list)):
+    # DARE model
+    else:
+
+        # extract topd info
+        dare_ndx = int(args.model.split('_')[1])
+        tol = tol_list[dare_ndx]
+        topd = topd_list[dare_ndx]
 
         # get model
         clf = get_model(args, model='dare', n_estimators=n_estimators, max_depth=max_depth, k=k, topd=topd)
@@ -109,18 +116,18 @@ def experiment(args, out_dir, logger):
 
         # get memory usage
         memory_usage = model.get_memory_usage()
-        s = '[DARE (tol={:.2f}%, topd={:,}, k={:,})] train: {:.3f}s, model size: {:,} bytes'
+        s = '\n[DARE (tol={:.2f}%, topd={:,}, k={:,})] train: {:.3f}s, model size: {:,} bytes'
         logger.info(s.format(tol, topd, k, train_time, memory_usage))
 
         # add to results
-        result['dare_{}_mem'.format(tol)] = memory_usage
-        result['dare_{}_train'.format(tol)] = train_time
+        result['{}_mem'.format(args.model)] = memory_usage
+        result['{}_train'.format(args.model)] = train_time
 
     # save results
     result['max_rss'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     np.save(os.path.join(out_dir, 'results.npy'), result)
 
-    logger.info('total time: {:.3f}s'.format(time.time() - begin))
+    logger.info('\ntotal time: {:.3f}s'.format(time.time() - begin))
     logger.info('max_rss: {:,}'.format(result['max_rss']))
     logger.info('\nresults:\n{}'.format(result))
 
@@ -131,6 +138,7 @@ def main(args):
     out_dir = os.path.join(args.out_dir,
                            args.dataset,
                            args.criterion,
+                           args.model,
                            'rs_{}'.format(args.rs))
 
     # create output directory and clear any previous contents
@@ -155,6 +163,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='surgical', help='dataset to use for the experiment.')
 
     # experiment settings
+    parser.add_argument('--model', type=str, default='dare_0', help='model to test.')
     parser.add_argument('--rs', type=int, default=1, help='random state.')
     parser.add_argument('--criterion', type=str, default='gini', help='splitting criterion.')
 
