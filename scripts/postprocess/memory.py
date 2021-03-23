@@ -35,31 +35,6 @@ def get_result(template, in_dir):
     return result
 
 
-def process_utility(gf):
-    """
-    Processes utility differences BEFORE addition/deletion,
-    and averages the results over different random states.
-    """
-    result = {}
-
-    result['sklearn_mem_mean'] = np.mean(gf['sklearn_mem'])
-    result['sklearn_mem_sem'] = sem(gf['sklearn_mem'])
-
-    result['sklearn_train_mean'] = np.mean(gf['sklearn_train'])
-    result['sklearn_train_std'] = sem(gf['sklearn_train'])
-
-    for tol in tol_list:
-        model = 'dare_{}'.format(tol)
-
-        result['{}_mem_mean'.format(model)] = np.mean(gf['{}_mem'.format(model)])
-        result['{}_mem_sem'.format(model)] = sem(gf['{}_mem'.format(model)])
-
-        result['{}_train_mean'.format(model)] = np.mean(gf['{}_train'.format(model)])
-        result['{}_train_std'.format(model)] = np.std(gf['{}_train'.format(model)])
-
-    return result
-
-
 def process_results(df):
     """
     Averages utility results over different random states.
@@ -71,13 +46,17 @@ def process_results(df):
 
     for tup, gf in tqdm(df.groupby(groups)):
         main_result = {k: v for k, v in zip(groups, tup)}
-        main_result.update(process_utility(gf))
         main_result['n_estimators'] = gf['n_estimators'].mode()[0]
         main_result['max_depth'] = gf['max_depth'].mode()[0]
         main_result['max_features'] = gf['max_features'].mode()[0]
         main_result['num_runs'] = len(gf)
-        main_result['memory_usage_mean'] = np.mean(gf['memory_usage'])
-        main_result['memory_usage_sem'] = sem(gf['memory_usage'])
+        main_result['data_mem'] = gf['data_mem'].mode()[0]
+        main_result['structure_mem_mean'] = np.mean(gf['structure_mem'])
+        main_result['structure_mem'] = sem(gf['structure_mem'])
+        main_result['decision_stats_mem_mean'] = np.mean(gf['decision_stats_mem'])
+        main_result['decision_stats_mem_sem'] = sem(gf['decision_stats_mem'])
+        main_result['leaf_stats_mem_mean'] = np.mean(gf['leaf_stats_mem'])
+        main_result['leaf_stats_mem_sem'] = sem(gf['leaf_stats_mem'])
         main_result['train_time_mean'] = np.mean(gf['train_time'])
         main_result['train_time_std'] = np.std(gf['train_time'])
         main_result_list.append(main_result)
