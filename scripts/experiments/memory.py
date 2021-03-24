@@ -122,6 +122,10 @@ def experiment(args, out_dir, logger):
         s += ', structure: {:,} bytes, decision stats.: {:,} bytes, leaf stats.: {:,} bytes'
         logger.info(s.format(tol, topd, k, train_time, structure_memory, decision_stats_memory, leaf_stats_memory))
 
+        # get node statistics
+        n_nodes, n_random, n_greedy = model.get_node_statistics()
+        logger.info('no. nodes: {:,}, no. random: {:,}, no. greedy: {:,}'.format(n_nodes, n_random, n_greedy))
+
     # add to results
     result['data_mem'] = data_mem
     result['structure_mem'] = structure_memory
@@ -129,6 +133,9 @@ def experiment(args, out_dir, logger):
     result['leaf_stats_mem'] = leaf_stats_memory
     result['model_mem'] = structure_memory + decision_stats_memory + leaf_stats_memory
     result['train_time'] = train_time
+    result['n_nodes'] = n_nodes
+    result['n_random'] = n_random
+    result['n_greedy'] = n_greedy
 
     # save results
     result['max_rss'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss

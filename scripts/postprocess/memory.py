@@ -57,6 +57,8 @@ def process_results(df):
         main_result['decision_stats_mem_sem'] = sem(gf['decision_stats_mem'])
         main_result['leaf_stats_mem_mean'] = np.mean(gf['leaf_stats_mem'])
         main_result['leaf_stats_mem_sem'] = sem(gf['leaf_stats_mem'])
+        main_result['model_mem_mean'] = np.mean(gf['model_mem'])
+        main_result['model_mem_sem'] = sem(gf['model_mem'])
         main_result['train_time_mean'] = np.mean(gf['train_time'])
         main_result['train_time_std'] = np.std(gf['train_time'])
         main_result_list.append(main_result)
