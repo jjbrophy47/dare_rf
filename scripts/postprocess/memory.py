@@ -52,7 +52,7 @@ def process_results(df):
         main_result['num_runs'] = len(gf)
         main_result['data_mem'] = gf['data_mem'].mode()[0]
         main_result['structure_mem_mean'] = np.mean(gf['structure_mem'])
-        main_result['structure_mem'] = sem(gf['structure_mem'])
+        main_result['structure_mem_sem'] = sem(gf['structure_mem'])
         main_result['decision_stats_mem_mean'] = np.mean(gf['decision_stats_mem'])
         main_result['decision_stats_mem_sem'] = sem(gf['decision_stats_mem'])
         main_result['leaf_stats_mem_mean'] = np.mean(gf['leaf_stats_mem'])

@@ -127,6 +127,7 @@ def experiment(args, out_dir, logger):
     result['structure_mem'] = structure_memory
     result['decision_stats_mem'] = decision_stats_memory
     result['leaf_stats_mem'] = leaf_stats_memory
+    result['model_mem'] = structure_memory + decision_stats_memory + leaf_stats_memory
     result['train_time'] = train_time
 
     # save results
