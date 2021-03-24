@@ -124,7 +124,7 @@ def experiment(args, out_dir, logger):
 
         # get node statistics
         n_nodes, n_random, n_greedy = model.get_node_statistics()
-        logger.info('no. nodes: {:,}, no. random: {:,}, no. greedy: {:,}'.format(n_nodes, n_random, n_greedy))
+        logger.info('\nno. nodes: {:,}, no. random: {:,}, no. greedy: {:,}'.format(n_nodes, n_random, n_greedy))
 
     # add to results
     result['data_mem'] = data_mem

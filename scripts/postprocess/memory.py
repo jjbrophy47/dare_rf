@@ -61,6 +61,9 @@ def process_results(df):
         main_result['model_mem_sem'] = sem(gf['model_mem'])
         main_result['train_time_mean'] = np.mean(gf['train_time'])
         main_result['train_time_std'] = np.std(gf['train_time'])
+        main_result['n_nodes_mean'] = np.mean(gf['n_nodes'])
+        main_result['n_random_mean'] = np.mean(gf['n_random'])
+        main_result['n_greedy_mean'] = np.mean(gf['n_greedy'])
         main_result_list.append(main_result)
 
     main_df = pd.DataFrame(main_result_list)
