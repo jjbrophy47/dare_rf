@@ -25,6 +25,7 @@ dare/_adder.pyx
 **.html
 **catboost*
 **.cb.json
+README\ copy.md
 
 # data
 data/*/raw
