@@ -57,14 +57,17 @@ cdef class _Remover:
                               Node*        node,
                               IntList*     remove_samples) nogil
 
+    # cdef void retrain(self,
+    #                   Node***   node_ptr_ptr,
+    #                   DTYPE_t** X,
+    #                   INT32_t*  y,
+    #                   IntList*  remove_samples) nogil
+
     cdef void retrain(self,
                       Node**    node_ptr,
                       DTYPE_t** X,
                       INT32_t*  y,
                       IntList*  remove_samples) nogil
-
-    cdef INT32_t select_optimal_split(self,
-                                     Node* node) nogil
 
     cdef INT32_t check_optimal_split(self,
                                      Node* node) nogil

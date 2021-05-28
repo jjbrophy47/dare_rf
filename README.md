@@ -14,13 +14,13 @@ Install
 
 <!--Paper
 ---
-For further details please refer to the paper: [Dart: Data Addition and Removal Trees](https://arxiv.org/abs/2009.05567).
+For further details please refer to the paper: [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567).
 
 ```
-@article{brophy2020dart,
-  title={DART: Data Addition and Removal Trees},
+@article{brophy2021,
+  title={Machine Unlearning for Random Forests},
   author={Brophy, Jonathan and Lowd, Daniel},
   journal={arXiv preprint arXiv:2009.05567},
-  year={2020}
+  year={2021}
 }
 ```-->
