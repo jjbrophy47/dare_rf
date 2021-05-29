@@ -2,10 +2,9 @@ dataset=$1
 criterion=$2
 n_estimators=$3
 max_depth=$4
-k=$5
-mem=$6
-time=$7
-partition=$8
+mem=$5
+time=$6
+partition=$7
 
 out_dir='output/increase_k/'
 topd=0
