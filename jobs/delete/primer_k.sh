@@ -7,6 +7,7 @@ mem=$6
 time=$7
 partition=$8
 
+out_dir='output/increase_k/'
 topd=0
 rs_list=(1 2 3 4 5)
 k_list=(1 5 10 25 50 100)
@@ -19,10 +20,10 @@ for rs in ${rs_list[@]}; do
                    --time=$time \
                    --partition=$partition \
                    --job-name=DEL_$dataset \
-                   --output=jobs/logs/delete/$dataset \
-                   --error=jobs/errors/delete/$dataset \
+                   --output=jobs/logs/increase_k/$dataset \
+                   --error=jobs/errors/increase_k/$dataset \
                    jobs/delete/runner.sh $dataset $rs $criterion \
-                   $n_estimators $max_depth $topd $k $subsample_size
+                   $n_estimators $max_depth $topd $k $subsample_size $out_dir
         done
     done
 done

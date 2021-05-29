@@ -7,6 +7,7 @@ topd=$6
 mem=$7
 time=$8
 partition=$9
+out_dir=${10}
 
 rs_list=(1 2 3 4 5)
 subsample_size_list=(1 1000)
@@ -20,6 +21,6 @@ for rs in ${rs_list[@]}; do
                --output=jobs/logs/delete/$dataset \
                --error=jobs/errors/delete/$dataset \
                jobs/delete/runner.sh $dataset $rs $criterion \
-               $n_estimators $max_depth $topd $k $subsample_size
+               $n_estimators $max_depth $topd $k $subsample_size $out_dir
     done
 done

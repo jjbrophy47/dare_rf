@@ -95,7 +95,7 @@ def get_naive(args):
     return model
 
 
-def train_naive(args, X_train, y_train, X_test, y_test, logger=None):
+def train_naive(args, X_train, y_train, X_test, y_test, rng, logger=None):
     """
     Compute the time it takes to delete a specified number of
     samples from a naive model sequentially.
@@ -112,9 +112,7 @@ def train_naive(args, X_train, y_train, X_test, y_test, logger=None):
     auc, acc, ap = exp_util.performance(model, X_test, y_test, logger=logger, name='naive')
 
     # naive train after deleting data
-    np.random.seed(args.rs)
-    delete_indices = np.random.choice(np.arange(X_train.shape[0]),
-                                      size=args.n_delete, replace=False)
+    delete_indices = rng.choice(np.arange(X_train.shape[0]), size=args.n_delete, replace=False)
     new_X_train = np.delete(X_train, delete_indices, axis=0)
     new_y_train = np.delete(y_train, delete_indices)
 
@@ -132,7 +130,7 @@ def train_naive(args, X_train, y_train, X_test, y_test, logger=None):
     return total_time, initial_utility
 
 
-def get_delete_index(model, X_train, y_train, indices):
+def get_delete_index(model, X_train, y_train, indices, rng):
     """
     Randomly select a subset of samples, simulate deleting each one,
     then pick the sample that causes the largest no. samples to be retrained.
@@ -140,8 +138,7 @@ def get_delete_index(model, X_train, y_train, indices):
     start = time.time()
 
     # randomly samples a subset of indices to simulate deleting
-    np.random.seed(args.rs)
-    subsample_indices = np.random.choice(indices, size=args.subsample_size, replace=False)
+    subsample_indices = rng.choice(indices, size=args.subsample_size, replace=False)
 
     # return the only sample if the subset size is 1
     if args.subsample_size == 1:
@@ -172,6 +169,9 @@ def experiment(args, logger, out_dir, seed):
     approach to delete one sample.
     """
 
+    # random number generator
+    rng = np.random.default_rng(args.rs)
+
     # get data
     X_train, X_test, y_train, y_test = data_util.get_data(args.dataset, data_dir=args.data_dir)
 
@@ -191,7 +191,7 @@ def experiment(args, logger, out_dir, seed):
     logger.info('n_delete: {}'.format(args.n_delete))
 
     # train a naive model, before and after deleting 1 sample
-    naive_avg_delete_time, naive_utility = train_naive(args, X_train, y_train, X_test, y_test, logger=logger)
+    naive_avg_delete_time, naive_utility = train_naive(args, X_train, y_train, X_test, y_test, rng, logger=logger)
 
     # begin experiment
     begin = time.time()
@@ -229,7 +229,7 @@ def experiment(args, logger, out_dir, seed):
     while allotted_time > 0 and time.time() - begin <= args.time_limit:
 
         # adversarially select a sample out of a subset of candidate samples
-        delete_ndx, search_time = get_delete_index(model, X_train, y_train, indices)
+        delete_ndx, search_time = get_delete_index(model, X_train, y_train, indices, rng)
 
         # delete the adversarially selected sample
         start = time.time()

@@ -12,8 +12,10 @@ max_depth=$5
 topd=$6
 k=$7
 subsample_size=$8
+out_dir=$9
 
 python3 scripts/experiments/delete.py \
+  --out_dir $out_dir \
   --dataset $dataset \
   --rs $rs \
   --criterion $criterion \
