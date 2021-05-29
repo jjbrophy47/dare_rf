@@ -16,10 +16,11 @@ subsample_size_list=(1 1000)
 for rs in ${rs_list[@]}; do
     for k in ${k_list[@]}; do
         for subsample_size in ${subsample_size_list[@]}; do
+            job_name=K_${dataset}_${rs}_${topd}_${subsample_size}_${k}
             sbatch --mem=${mem}G \
                    --time=$time \
                    --partition=$partition \
-                   --job-name=DEL_$dataset \
+                   --job-name=$job_name \
                    --output=jobs/logs/increase_k/$dataset \
                    --error=jobs/errors/increase_k/$dataset \
                    jobs/delete/runner.sh $dataset $rs $criterion \

@@ -14,10 +14,11 @@ subsample_size_list=(1 1000)
 for rs in ${rs_list[@]}; do
     for topd in $( seq 0 $max_depth ); do
         for subsample_size in ${subsample_size_list[@]}; do
+            job_name=DEL_${dataset}_${rs}_${topd}_${subsample_size}
             sbatch --mem=${mem}G \
                    --time=$time \
                    --partition=$partition \
-                   --job-name=DEL_$dataset \
+                   --job-name=$job_name \
                    --output=jobs/logs/delete/$dataset \
                    --error=jobs/errors/delete/$dataset \
                    jobs/delete/runner.sh $dataset $rs $criterion \
