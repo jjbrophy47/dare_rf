@@ -63,6 +63,12 @@ cdef class _Remover:
                       INT32_t*  y,
                       IntList*  remove_samples) nogil
 
+    cdef INT32_t contains_valid_split(self,
+                                      Node*     node,
+                                      DTYPE_t** X,
+                                      INT32_t*  y,
+                                      IntList*  samples) nogil
+
     cdef INT32_t select_optimal_split(self,
                                      Node* node) nogil
 

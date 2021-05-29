@@ -401,8 +401,10 @@ cdef SIZE_t select_random_threshold(Node*     node,
             sampled_features.arr[sampled_features.n] = feature_index
             sampled_features.n += 1
 
-            # select a threshold uniformly at random
+            # keep randomly sampling until a valid threshold is found
             threshold_value = <DTYPE_t>rand_uniform(min_val, max_val, random_state)
+            while threshold_value >= max_val or threshold_value < min_val:
+                threshold_value = <DTYPE_t>rand_uniform(min_val, max_val, random_state)
 
             # make sure the min. no. samples is met for both branches
             n_left_samples = 0
@@ -416,10 +418,6 @@ cdef SIZE_t select_random_threshold(Node*     node,
 
                 else:
                     n_right_samples += 1
-
-            # not enough samples in both branches, invalid threshold
-            if n_left_samples < min_samples_leaf or n_right_samples < min_samples_leaf:
-                continue
 
             # free previous constant thresholds array
             free_intlist(node.constant_features)

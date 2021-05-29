@@ -19,6 +19,7 @@ from libc.time cimport time
 import numpy as np
 cimport numpy as np
 np.import_array()
+from numpy.math cimport INFINITY
 
 from ._tree cimport Feature
 from ._tree cimport Threshold
@@ -35,6 +36,7 @@ from ._utils cimport free_feature
 from ._utils cimport free_features
 
 from ._utils cimport copy_threshold
+from ._utils cimport create_threshold
 from ._utils cimport free_thresholds
 
 from ._utils cimport create_intlist
@@ -310,8 +312,14 @@ cdef class _Remover:
                       INT32_t*  y,
                       IntList*  remove_samples) nogil:
         """
-        Select new optimal split for this node, and then 
-        retrain subtree below this node.
+        Random Node
+            - Check if attribute is still valid.
+                * If valid, select a new threshold, retrain below this node.
+                * If not valid, retrain this node / subtree.
+
+        Greedy Node
+            - Select new optimal split for this node.
+            - Retrain subtrees below this node.
         """
         cdef Node*  node = node_ptr[0]
 
@@ -329,22 +337,28 @@ cdef class _Remover:
         # greedy node only
         cdef SplitRecord split
 
+        # if 0, only retrain descendant nodes; if 1, retrain this node / subtree
+        cdef INT32_t result = 0
+
         # random node
         if node.depth < self.config.topd:
 
-            # get constant features array
-            constant_features = copy_intlist(node.constant_features, node.constant_features.n)
+            # check if feature is still valid, if it is then only retrain descendant nodes
+            if self.contains_valid_split(node, X, y, leaf_samples):
+                result = 0
 
-            # free node / subtree
-            dealloc(node)
-            free(node)
-
-            # retrain node / subtree
-            node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, constant_features, depth, is_left)
+            # feature is invalid (constant feature), retrain this node / subtree
+            else:
+                result = 1
 
         # greedy node
         else:
             self.select_optimal_split(node)
+            result = 0
+
+        # only retrain descendant nodes
+        if result == 0:
+            # printf('[R - R] retrain descendant nodes\n')
 
             # free descendant nodes
             dealloc(node.left)
@@ -360,8 +374,86 @@ cdef class _Remover:
             node.right = self.tree_builder._build(X, y, split.right_samples, split.right_constant_features,
                                                   depth + 1, 0)
 
+        # retrain this node / subtree
+        else:
+            # printf('[R - R] retrain node / subtree\n')
+            constant_features = copy_intlist(node.constant_features, node.constant_features.n)
+            dealloc(node)  # free node / subtree
+            free(node)
+            node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, constant_features, depth, is_left)
+
+        # record retrain metric
         self.add_metric(1, node_ptr[0].depth, node_ptr[0].n_samples)
         free_intlist(remove_samples)
+
+    cdef INT32_t contains_valid_split(self,
+                                      Node*     node,
+                                      DTYPE_t** X,
+                                      INT32_t*  y,
+                                      IntList*  samples) nogil:
+        """
+        Checks to see if the chosen feature is still valid (not constant);
+        If valid, then it chooses a different threshold value,
+        If not valid, then 0 is returned.
+        """
+
+        # return 1 if valid, 0 otherwise
+        cdef INT32_t result = 1
+        cdef SIZE_t  feature_index = node.chosen_feature.index
+
+        # incrementers
+        cdef SIZE_t i = 0
+        cdef SIZE_t    n_left_samples = 0
+        cdef SIZE_t    n_right_samples = 0
+
+        # min. max. indicators
+        cdef DTYPE_t min_val = INFINITY
+        cdef DTYPE_t max_val = -INFINITY
+        cdef DTYPE_t cur_val = 0
+
+        # threshold variables
+        cdef UINT32_t* random_state = &self.config.rand_r_state
+        cdef DTYPE_t   threshold_value = 0
+
+        # find min. and max. values
+        for i in range(samples.n):
+            cur_val = X[samples.arr[i]][feature_index]
+
+            if cur_val < min_val:
+                min_val = cur_val
+
+            elif cur_val > max_val:
+                max_val = cur_val
+
+        # invalid: constant feature
+        if max_val <= min_val + FEATURE_THRESHOLD:
+            result = 0
+
+        # valid feature
+        else:
+
+            # keep sampling until a valid threshold is found
+            threshold_value = <DTYPE_t>rand_uniform(min_val, max_val, random_state)
+            while threshold_value >= max_val or threshold_value < min_val:
+                threshold_value = <DTYPE_t>rand_uniform(min_val, max_val, random_state)
+
+            # count left and right branches
+            for i in range(samples.n):
+                if X[samples.arr[i]][feature_index] <= threshold_value:
+                    n_left_samples += 1
+                else:
+                    n_right_samples += 1
+
+            printf('n_left_samples: %lu, n_right_samples: %lu\n', n_left_samples, n_right_samples)
+
+            # update node properties
+            free_feature(node.chosen_feature)
+            free(node.chosen_threshold)
+            node.chosen_feature = create_feature(feature_index)
+            node.chosen_threshold = create_threshold(threshold_value, n_left_samples, n_right_samples)
+
+        return result
+
 
     cdef INT32_t select_optimal_split(self,
                                      Node* node) nogil:
@@ -418,7 +510,7 @@ cdef class _Remover:
 
         # save node properties
         if chosen_feature != NULL and chosen_threshold != NULL:
-            free(node.chosen_feature)
+            free_feature(node.chosen_feature)
             free(node.chosen_threshold)
             node.chosen_feature = copy_feature(chosen_feature)
             node.chosen_threshold = copy_threshold(chosen_threshold)
