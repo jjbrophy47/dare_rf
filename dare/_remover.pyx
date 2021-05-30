@@ -340,6 +340,11 @@ cdef class _Remover:
         # if 0, only retrain descendant nodes; if 1, retrain this node / subtree
         cdef INT32_t result = 0
 
+        # printf('[R - R] leaf_samples.n: %ld\n', leaf_samples.n)
+        # if leaf_samples.n == 2:
+        #     for j in range(leaf_samples.n):
+        #         printf('[R - R] leaf_samples.arr[%ld]: %.5f\n', j, leaf_samples.arr[j])
+
         # random node
         if node.depth < self.config.topd:
 
@@ -353,6 +358,7 @@ cdef class _Remover:
 
         # greedy node
         else:
+            # printf('[R - R] select new optimal split\n')
             self.select_optimal_split(node)
             result = 0
 
@@ -365,9 +371,11 @@ cdef class _Remover:
             dealloc(node.right)
             free(node.left)
             free(node.right)
+            # printf('[R - R] done freeing children\n')
 
             # split instances based on new optimal split
             split_samples(node, X, y, leaf_samples, &split, 1)
+            # printf('[R - R] done splitting samples\n')
 
             # build child subtrees
             node.left = self.tree_builder._build(X, y, split.left_samples, split.left_constant_features, depth + 1, 1)
@@ -444,7 +452,7 @@ cdef class _Remover:
                 else:
                     n_right_samples += 1
 
-            printf('n_left_samples: %lu, n_right_samples: %lu\n', n_left_samples, n_right_samples)
+            # printf('n_left_samples: %lu, n_right_samples: %lu\n', n_left_samples, n_right_samples)
 
             # update node properties
             free_feature(node.chosen_feature)
@@ -516,48 +524,12 @@ cdef class _Remover:
             node.chosen_threshold = copy_threshold(chosen_threshold)
             result = 0
 
+            # printf('[R - SOS] chosen_feature: %lu, chosen_threshold %.5f\n', chosen_feature.index, chosen_threshold.value)
+
+        else:
+            printf('[R - UGNM] Did not choose a new optimal split!\n')
+
         return result
-
-    # cdef void retrain(self,
-    #                   Node**    node_ptr,
-    #                   DTYPE_t** X,
-    #                   INT32_t*  y,
-    #                   IntList*  remove_samples) nogil:
-    #     """
-    #     Rebuild subtree at this node.
-    #     """
-    #     # cdef Node** node_ptr = node_ptr_ptr[0]
-    #     cdef Node*  node = node_ptr[0]
-
-    #     # node properties
-    #     cdef SIZE_t depth = node.depth
-    #     cdef bint   is_left = node.is_left
-
-    #     # printf('[R - R] copying constant_features\n')
-
-    #     # get constant features array
-    #     cdef IntList* constant_features = copy_intlist(node.constant_features, node.constant_features.n)
-
-    #     # updated array of leaf samples
-    #     cdef IntList* leaf_samples = create_intlist(node.n_samples, 0)
-    #     get_leaf_samples(node, remove_samples, leaf_samples)
-
-    #     # printf('[R - R] retrain, leaf_samples.n: %ld\n', leaf_samples.n)
-
-    #     # free node / subtree
-    #     dealloc(node)
-    #     free(node)
-
-    #     # printf('done freeing node\n')
-
-    #     # retrain node / subtree
-    #     node_ptr[0] = self.tree_builder._build(X, y, leaf_samples, constant_features, depth, is_left)
-
-    #     # check complete: add deletion type and depth, and clean up
-    #     # printf('[R - R] retrain, node_ptr[0].depth: %ld, node_ptr[0].n_features: %ld\n',
-    #     #        node_ptr[0].depth, node_ptr[0].n_features)
-    #     self.add_metric(1, node_ptr[0].depth, node_ptr[0].n_samples)
-    #     free_intlist(remove_samples)
 
     cdef INT32_t check_optimal_split(self,
                                      Node* node) nogil:
@@ -771,7 +743,7 @@ cdef class _Remover:
                     if (feature.index == node.chosen_feature.index and
                         threshold.value == node.chosen_threshold.value):
 
-                        # printf('[R - UGNM] chosen feature / threshold has changed\n')
+                        # printf('[R - UGNM] chosen feature: %lu, threshold %.5f has changed\n', feature.index, threshold.value)
 
                         # clean up
                         # free(threshold_validities)
@@ -838,7 +810,9 @@ cdef class _Remover:
         free_intlist(invalid_features)
 
         # select return value
-        if chosen_threshold_invalid:
+        if n_usable_thresholds == 0:
+            result = 0
+        elif chosen_threshold_invalid:
             result = -1
         else:
             result = n_usable_thresholds

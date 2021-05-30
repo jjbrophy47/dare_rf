@@ -75,7 +75,9 @@ cdef class _TreeBuilder:
         """
 
         # create node
+        # printf('[B] initializing node\n')
         cdef Node *node = self.initialize_node(depth, is_left, y, samples, constant_features)
+        # printf('[B] done initializing node\n')
 
         # data variables
         cdef SIZE_t n_total_features = self.manager.n_features
@@ -172,8 +174,12 @@ cdef class _TreeBuilder:
 
         # compute number of positive samples
         cdef SIZE_t n_pos_samples = 0
+        # printf('[B - IN] computing n_pos_samples\n')
+        # printf('[B - IN] samples.n: %lu\n', samples.n)
         for i in range(samples.n):
             n_pos_samples += y[samples.arr[i]]
+
+        # printf('[B - IN] n_pos_samples: %lu\n', n_pos_samples)
 
         # create node
         cdef Node *node = <Node *>malloc(sizeof(Node))
