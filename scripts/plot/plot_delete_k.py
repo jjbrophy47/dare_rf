@@ -1,8 +1,8 @@
 """
 Plot effect k has on:
-  -Predictive performance.
-  -Deletion efficiency.
-  -Training Times.
+  -Predictive performance. YES.
+  -Deletion efficiency. YES.
+  -Training Time. NO.
 """
 import os
 import argparse
@@ -102,7 +102,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default='bank_marketing', help='dataset to use for plotting.')
-    parser.add_argument('--in_dir', type=str, default='output/delete/csv/', help='input directory.')
+    parser.add_argument('--in_dir', type=str, default='output/increase_k/csv/', help='input directory.')
     parser.add_argument('--out_dir', type=str, default='output/plots/k/', help='output directory.')
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
     parser.add_argument('--subsample_size', type=int, default=1, help='adversary strength.')

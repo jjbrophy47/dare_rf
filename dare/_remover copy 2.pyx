@@ -101,6 +101,7 @@ cdef class _Remover:
         """
         Destructor.
         """
+        # printf('[R - D] dealloc\n')
         # free removal types
         if self.remove_types:
             free(self.remove_types)
@@ -158,11 +159,13 @@ cdef class _Remover:
         if node.is_leaf:
             # printf('[R] update leaf\n')
             self.update_leaf(node, remove_samples)
+            # printf('[R] leaf.value: %.2f\n', node.value)
 
         # decision node, but samples in same class, convert to leaf, check complete
         elif node.n_pos_samples == 0 or node.n_pos_samples == node.n_samples:
             # printf('[R] convert to leaf\n')
             self.convert_to_leaf(node, remove_samples)
+            # printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
         # decision node
         else:
@@ -170,23 +173,41 @@ cdef class _Remover:
             # update metadata
             # printf('[R] update metadata, depth=%lu\n', node.depth)
             n_usable_thresholds = self.update_metadata(node, X, y, remove_samples)
+            # printf('[R] n_usable_thresholds: %ld\n', n_usable_thresholds)
+
+            # chosen feature / threshold is now invalid, check complete
+            if n_usable_thresholds < 0:
+                # printf('[R] chosen feature / threshold invalid, retrain\n')
+                self.retrain(node_ptr, X, y, remove_samples)
 
             # greedy node in which there are no more usable thresholds, convert to leaf, check complete
-            if n_usable_thresholds == 0:
+            elif n_usable_thresholds == 0:
                 # printf('[R] convert to leaf\n')
                 self.convert_to_leaf(node, remove_samples)
+                # printf('[R] convert to leaf, leaf.value: %.2f\n', node.value)
 
-            # invalid chosen split, different optimal split, or same optimal split
+            # viable decision node
             else:
-                result = self.select_optimal_split(node)
 
-                # optimal split is invalid or has changed
-                if n_usable_thresholds < 0 or result == 1:
+                # check if optimal feature / threshold has changed
+                # printf('[R] check optimal split\n')
+                result = self.check_optimal_split(node)
+
+                # optimal split has changed, retrain, check complete
+                if result == 1:
+                    # printf('[R] optimal split has changed, retrain\n')
                     self.retrain(node_ptr, X, y, remove_samples)
+                    # printf('[R] retrain, node.depth: %ld, node.n_samples: %ld, node.n_features: %ld\n',
+                    #        node_ptr[0].depth, node_ptr[0].n_samples, node_ptr[0].n_features)
 
-                # no changes
+                # no retraining necessary, split samples and recurse
                 else:
+
+                    # split deleted samples and free original deleted samples
+                    # printf('[R] split samples\n')
                     split_samples(node, X, y, remove_samples, &split, 0)
+                    # printf('[R] split samples, split.left_samples.n: %ld, split.right_samples.n: %ld\n',
+                    #        split.left_samples.n, split.right_samples.n)
 
                     # traverse left if any deleted samples go left
                     if split.left_samples != NULL:
@@ -319,6 +340,11 @@ cdef class _Remover:
         # if 0, only retrain descendant nodes; if 1, retrain this node / subtree
         cdef INT32_t result = 0
 
+        # printf('[R - R] leaf_samples.n: %ld\n', leaf_samples.n)
+        # if leaf_samples.n == 2:
+        #     for j in range(leaf_samples.n):
+        #         printf('[R - R] leaf_samples.arr[%ld]: %.5f\n', j, leaf_samples.arr[j])
+
         # random node
         if node.depth < self.config.topd:
 
@@ -332,6 +358,8 @@ cdef class _Remover:
 
         # greedy node
         else:
+            # printf('[R - R] select new optimal split\n')
+            self.select_optimal_split(node)
             result = 0
 
         # only retrain descendant nodes
@@ -343,9 +371,11 @@ cdef class _Remover:
             dealloc(node.right)
             free(node.left)
             free(node.right)
+            # printf('[R - R] done freeing children\n')
 
             # split instances based on new optimal split
             split_samples(node, X, y, leaf_samples, &split, 1)
+            # printf('[R - R] done splitting samples\n')
 
             # build child subtrees
             node.left = self.tree_builder._build(X, y, split.left_samples, split.left_constant_features, depth + 1, 1)
@@ -371,8 +401,8 @@ cdef class _Remover:
                                       IntList*  samples) nogil:
         """
         Checks to see if the chosen feature is still valid (not constant);
-            - If valid, then it chooses a different threshold value.
-            - If not valid, then 0 is returned.
+        If valid, then it chooses a different threshold value,
+        If not valid, then 0 is returned.
         """
 
         # return 1 if valid, 0 otherwise
@@ -437,8 +467,6 @@ cdef class _Remover:
                                      Node* node) nogil:
         """
         Select the optimal attribute-threshold pair.
-
-        Return 1 if the selected optimal split has changed, 0 otherwise.
         """
 
         # parameters
@@ -459,8 +487,8 @@ cdef class _Remover:
         cdef SIZE_t j = 0
         cdef SIZE_t k = 0
 
-        # return variable
-        cdef INT32_t result = 0
+        # return 0 for success, -1 otherwise
+        cdef INT32_t result = -1
 
         # greedy node, find the optimal attribute-threshold pair
         if node.depth >= topd:
@@ -488,16 +516,104 @@ cdef class _Remover:
                         chosen_feature = feature
                         chosen_threshold = threshold
 
-            # optimal split has changed
-            if not (node.chosen_feature.index == chosen_feature.index and
-                node.chosen_threshold.value == chosen_threshold.value):
-                result = 1
+        # save node properties
+        if chosen_feature != NULL and chosen_threshold != NULL:
+            free_feature(node.chosen_feature)
+            free(node.chosen_threshold)
+            node.chosen_feature = copy_feature(chosen_feature)
+            node.chosen_threshold = copy_threshold(chosen_threshold)
+            result = 0
 
-                # replace chosen split node properties
-                free_feature(node.chosen_feature)
-                free(node.chosen_threshold)
-                node.chosen_feature = copy_feature(chosen_feature)
-                node.chosen_threshold = copy_threshold(chosen_threshold)
+            # printf('[R - SOS] chosen_feature: %lu, chosen_threshold %.5f\n', chosen_feature.index, chosen_threshold.value)
+
+        else:
+            printf('[R - UGNM] Did not choose a new optimal split!\n')
+
+        return result
+
+    cdef INT32_t check_optimal_split(self,
+                                     Node* node) nogil:
+        """
+        Compare all feature thresholds against the chosen feature / threshold.
+        """
+
+        # parameters
+        cdef bint   use_gini = self.config.use_gini
+        cdef SIZE_t topd = self.config.topd
+
+        # keep track of the best feature / threshold
+        cdef DTYPE_t best_score = 1000000
+        cdef DTYPE_t split_score = -1
+
+        # record the best feature / threshold
+        cdef SIZE_t  chosen_feature_ndx = 0
+        cdef DTYPE_t chosen_threshold_value = 0
+
+        # object pointers
+        cdef Feature*   feature = NULL
+        cdef Threshold* threshold = NULL
+
+        # counters
+        cdef SIZE_t j = 0
+        cdef SIZE_t k = 0
+
+        # return 1 if retraining is necessary, 0 otherwise
+        cdef INT32_t result = 0
+
+        # greedy node, check if the best feature / threshold has changed
+        if node.depth >= topd:
+
+            # printf('[R - COS] node.depth: %ld\n', node.depth)
+
+            # retrain if the chosen feature / threshold is invalid
+            if node.chosen_feature == NULL and node.chosen_threshold == NULL:
+                return 1
+
+            # find the best feature / threshold
+            best_score = 1000000
+
+            # printf('[R] node.n_features: %ld\n', node.n_features)
+
+            # get thresholds for each feature
+            for j in range(node.n_features):
+                feature = node.features[j]
+                # printf('[R] feature: %ld\n', feature.index)
+
+                # compute split score for each threshold
+                for k in range(feature.n_thresholds):
+                    threshold = feature.thresholds[k]
+
+                    # compute split score, entropy or Gini index
+                    split_score = compute_split_score(use_gini,
+                                                      node.n_samples,
+                                                      threshold.n_left_samples,
+                                                      threshold.n_right_samples,
+                                                      threshold.n_left_pos_samples,
+                                                      threshold.n_right_pos_samples)
+
+                    # printf('[SN] feature.index: %ld, threshold.value: %.3f, split_score: %.3f\n',
+                    #        feature.index, threshold.value, split_score)
+
+                    # keep threshold with the best score
+                    if split_score < best_score:
+                        best_score = split_score
+                        chosen_feature_ndx = feature.index
+                        chosen_threshold_value = threshold.value
+
+            # printf('[R - COS] node.chosen_feature.index: %ld, node.chosen_threshold.value: %.5f\n',
+            #       node.chosen_feature.index, node.chosen_threshold.value)
+            # printf('[R - COS] chosen_feature_ndx: %ld, chosen_threshold_value: %.5f\n',
+            #       chosen_feature_ndx, chosen_threshold_value)
+
+            # check to see if the same feature / threshold is still the best
+            result = not (node.chosen_feature.index == chosen_feature_ndx and
+                          node.chosen_threshold.value == chosen_threshold_value)
+
+        # random node
+        else:
+
+            # valid threshold, no retraining
+            result = 0
 
         return result
 

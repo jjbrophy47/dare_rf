@@ -72,9 +72,6 @@ cdef class _Remover:
     cdef INT32_t select_optimal_split(self,
                                      Node* node) nogil
 
-    cdef INT32_t check_optimal_split(self,
-                                     Node* node) nogil
-
     cdef SIZE_t update_metadata(self,
                                 Node*     node,
                                 DTYPE_t** X,
