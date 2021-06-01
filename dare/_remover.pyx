@@ -583,6 +583,9 @@ cdef class _Remover:
             for k in range(feature.n_thresholds):
                 threshold = feature.thresholds[k]
 
+                # printf('\n[R - UGNM 1] threshold %.5f, n_left: %ld, n_right: %ld, n_v1_left: %ld, n_v1_right: %ld, n_v1_left_pos: %ld, n_v1_right_pos: %ld, valid: %ld\n',
+                #        threshold.value, threshold.n_left_samples, threshold.n_right_samples, threshold.n_v1_samples, threshold.n_v2_samples, threshold.n_v1_pos_samples, threshold.n_v2_pos_samples, threshold_validities[k])
+
                 # loop through each deleted sample
                 for i in range(remove_samples.n):
 
@@ -599,14 +602,14 @@ cdef class _Remover:
                     # decrement left value of this threshold
                     if X[remove_samples.arr[i]][feature.index] == threshold.v1:
                         threshold.n_v1_samples -= 1
-                        threshold.n_v1_pos_samples -= 1
+                        threshold.n_v1_pos_samples -= y[remove_samples.arr[i]]
 
                     # decrement right value of this threshold
                     elif X[remove_samples.arr[i]][feature.index] == threshold.v2:
                         threshold.n_v2_samples -= 1
-                        threshold.n_v2_pos_samples -= 1
+                        threshold.n_v2_pos_samples -= y[remove_samples.arr[i]]
 
-                # compute label ratios for both values of the threshold
+                # compute label ratios for adjacent values of the threshold
                 v1_label_ratio = threshold.n_v1_pos_samples / (1.0 * threshold.n_v1_samples)
                 v2_label_ratio = threshold.n_v2_pos_samples / (1.0 * threshold.n_v2_samples)
 
@@ -616,7 +619,7 @@ cdef class _Remover:
                                            (v1_label_ratio != v2_label_ratio or
                                            (v1_label_ratio > 0.0 and v2_label_ratio < 1.0)))
 
-                # printf('[R - UM] threshold %.5f, n_left_samples: %ld, n_right_samples: %ld, valid: %ld\n',
+                # printf('[R - UGNM] threshold %.5f, n_left_samples: %ld, n_right_samples: %ld, valid: %ld\n',
                 #        threshold.value, threshold.n_left_samples, threshold.n_right_samples, threshold_validities[k])
 
                 # invalid threshold
@@ -627,7 +630,10 @@ cdef class _Remover:
                     if (feature.index == node.chosen_feature.index and
                         threshold.value == node.chosen_threshold.value):
 
-                        # printf('[R - UGNM] chosen feature: %lu, threshold %.5f has changed\n', feature.index, threshold.value)
+                        # printf('[R - UGNM] threshold %.5f, n_left: %ld, n_right: %ld, n_v1_left: %ld, n_v1_right: %ld, n_v1_left_pos: %ld, n_v1_right_pos: %ld, valid: %ld\n',
+                        #        threshold.value, threshold.n_left_samples, threshold.n_right_samples, threshold.n_v1_samples, threshold.n_v2_samples, threshold.n_v1_pos_samples, threshold.n_v2_pos_samples, threshold_validities[k])
+
+                        # printf('[R - UGNM] chosen feature %lu, threshold %.10f is invalid, depth=%lu\n', feature.index, threshold.value, node.depth)
 
                         # clean up
                         # free(threshold_validities)

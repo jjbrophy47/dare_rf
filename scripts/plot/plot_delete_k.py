@@ -84,10 +84,10 @@ def main(args):
                 y=df['model_n_deleted'],
                 yerr=df['model_n_deleted_std'],
                 color='k')
-    ax.set_yscale('log')
+    # ax.set_yscale('log')
     ax.set_xlabel(r'$k$')
 
-    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     # remove excess space
     fig.tight_layout()
