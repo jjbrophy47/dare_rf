@@ -62,7 +62,7 @@ def main(args):
     main_df = pd.read_csv(main_fp)
 
     # get retrain results
-    if args.num_rertains:
+    if args.num_retrains:
         retrain_fp = os.path.join(args.in_dir, 'n_retrain.csv')
         retrain_y_label = 'No. retrains'
     else:
@@ -160,7 +160,9 @@ def main(args):
         if max_depth in [10, 20]:
             handles, labels = ax.get_legend_handles_labels()
 
-        plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+        # ax.set_yscale('log')
+
+        # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     os.makedirs(args.out_dir, exist_ok=True)
 
@@ -182,6 +184,6 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', type=str, default='output/plots/delete_topd/', help='output directory.')
     parser.add_argument('--criterion', type=str, default='gini', help='split criterion.')
     parser.add_argument('--subsample_size', type=int, nargs='+', default=[1, 1000], help='adversary strength.')
-    parser.add_argument('--num_rertains', action='store_true', default=False, help='plot no. retrains.')
+    parser.add_argument('--num_retrains', action='store_true', default=False, help='plot no. retrains.')
     args = parser.parse_args()
     main(args)
