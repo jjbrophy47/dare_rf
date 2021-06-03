@@ -362,12 +362,12 @@ cdef class _Simulator:
                 # decrement left value of this threshold
                 if X[remove_index][feature.index] == threshold.v1:
                     threshold.n_v1_samples -= 1
-                    threshold.n_v1_pos_samples -= 1
+                    threshold.n_v1_pos_samples -= y[remove_index]
 
                 # decrement right value of this threshold
                 elif X[remove_index][feature.index] == threshold.v2:
                     threshold.n_v2_samples -= 1
-                    threshold.n_v2_pos_samples -= 1
+                    threshold.n_v2_pos_samples -= y[remove_index]
 
                 # compute label ratios for both values of the threshold
                 v1_label_ratio = threshold.n_v1_pos_samples / (1.0 * threshold.n_v1_samples)
