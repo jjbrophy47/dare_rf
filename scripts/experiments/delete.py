@@ -48,7 +48,7 @@ def count_depths(types, depths):
 def count_costs(types, depths, costs):
     """
     For retrains (types = 1), compute the total cost
-    for each depth
+    for each depth.
     """
 
     # only use indices where a retrain occurred

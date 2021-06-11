@@ -34,6 +34,8 @@ def main(args):
     dataset_dict = gini_dataset_dict if args.criterion == 'gini' else entropy_dataset_dict
 
     # matplotlib settings
+    plt.rc('pdf', fonttype=42)
+    plt.rc('ps', fonttype=42)
     plt.rc('font', family='serif')
     plt.rc('xtick', labelsize=15)
     plt.rc('ytick', labelsize=15)

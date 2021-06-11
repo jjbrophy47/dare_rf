@@ -164,6 +164,8 @@ def main(args):
     print(args)
 
     # matplotlib settings
+    plt.rc('pdf', fonttype=42)
+    plt.rc('ps', fonttype=42)
     plt.rc('font', family='serif')
     plt.rc('xtick', labelsize=24)
     plt.rc('ytick', labelsize=24)
@@ -180,7 +182,7 @@ def main(args):
     fig = plt.figure(figsize=(width, height * 1.25))
 
     ax1 = fig.add_subplot(311)
-    ax1.set_ylim(1, 1e6)
+    ax1.set_ylim(1, 1e5)
     ax2 = fig.add_subplot(312, sharey=ax1, sharex=ax1)
     ax3 = fig.add_subplot(313, sharex=ax1)
 

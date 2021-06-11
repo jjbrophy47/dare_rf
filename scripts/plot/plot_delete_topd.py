@@ -32,6 +32,8 @@ def main(args):
     dataset_dict = gini_dataset_dict if args.criterion == 'gini' else entropy_dataset_dict
 
     # matplotlib settings
+    plt.rc('pdf', fonttype=42)
+    plt.rc('ps', fonttype=42)
     plt.rc('font', family='serif')
     plt.rc('xtick', labelsize=13)
     plt.rc('ytick', labelsize=13)
@@ -94,6 +96,7 @@ def main(args):
         else:
             ax = fig.add_subplot(gs[i, 0], sharey=prev_efficiency_ax)
 
+        ax.set_yscale('log')
         ax.set_ylabel('({})\nSpeedup vs Naive'.format(adversaries[i], subsample_size))
         ax.errorbar(df['topd'], df['model_n_deleted'], yerr=df['model_n_deleted_std'],
                     label='R-DaRE', color='k')
@@ -104,7 +107,9 @@ def main(args):
             ax.plot(x, y, 'k{}'.format(shape), label='tol={}'.format(tol), ms=shape_size)
 
         ax.axhline(topd0_df['model_n_deleted'].values[0], color='k', linestyle='--', label='G-DaRE')
-        ax.set_yscale('log')
+
+        if args.dataset == 'higgs':
+            ax.set_ylim(2e2, 1e6)
 
         if i == 0:
             # ax.legend(ncol=2, frameon=False)
@@ -160,9 +165,7 @@ def main(args):
         if max_depth in [10, 20]:
             handles, labels = ax.get_legend_handles_labels()
 
-        # ax.set_yscale('log')
-
-        # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+        ax.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     os.makedirs(args.out_dir, exist_ok=True)
 
