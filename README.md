@@ -6,7 +6,6 @@ DaRE RF
 <p align="center">
 	<img align="center" src="images/thumbnail.png" alt="thumbnail">
 </p>
-![logo](images/thumbnail.png)
 
 Install
 ---
