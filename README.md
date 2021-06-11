@@ -4,6 +4,8 @@ DaRE RF
 **DaRE** (**Da**ta **R**emoval-**E**nabled) RF is a variant of random forests that enables the efficient _removal_ of training data without having to retrain from scratch.
 
 <img src=images/thumbnail.png?raw=true" alt="logo"/>
+<img href=images/thumbnail.png?raw=true" alt="logo"/>
+![logo](images/thumbnail)
 
 Install
 ---
