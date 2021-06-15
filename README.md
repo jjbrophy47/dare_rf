@@ -14,7 +14,7 @@ Install
 
 Paper
 ---
-For further details please refer to our paper: [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567).
+For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567).
 
 ```
 @article{brophy2021darerf,
