@@ -1,7 +1,7 @@
 DaRE RF
 ---
 
-**DaRE** (**Da**ta **R**emoval-**E**nabled) RF is a variant of random forests that enables the efficient _removal_ of training data without having to retrain from scratch.
+**DaRE** (**Da**ta **R**emoval-**E**nabled) RF is a variant of random forests that enables the _efficient_ removal of training data without having to retrain from scratch.
 
 <p align="center">
 	<img align="center" src="images/thumbnail.png" alt="thumbnail">
@@ -37,7 +37,7 @@ rf.fit(X, y)
 # prediction before deletion => [0.5, 0.5]
 rf.predict_proba(X_test)
 
-# delete training sample at index 3 ([1, 0], 0)
+# delete training example at index 3 ([1, 0], 0)
 rf.delete(3)
 
 # prediction after deletion => [0.0, 1.0]
