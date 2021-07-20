@@ -46,7 +46,7 @@ rf.predict_proba(X_test)
 
 Paper
 ---
-For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567).
+For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](http://proceedings.mlr.press/v139/brophy21a.html).
 
 ```
 @inproceedings{brophy2021machine,
