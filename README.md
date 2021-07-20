@@ -49,10 +49,12 @@ Paper
 For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567).
 
 ```
-@article{brophy2021darerf,
+@inproceedings{brophy2021machine,
   title={Machine Unlearning for Random Forests},
   author={Brophy, Jonathan and Lowd, Daniel},
-  journal={arXiv preprint arXiv:2009.05567v2},
-  year={2021}
+  booktitle={International Conference on Machine Learning},
+  pages={1092--1104},
+  year={2021},
+  organization={PMLR}
 }
 ```
