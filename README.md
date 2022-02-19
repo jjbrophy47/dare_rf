@@ -41,11 +41,7 @@ rf.predict_proba(X_test)  # prediction after deletion => [0.0, 1.0]
 
 Reference
 ---
-<<<<<<< HEAD
-Brophy and Lowd. [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567). ICML 2021.
-=======
-For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](http://proceedings.mlr.press/v139/brophy21a.html).
->>>>>>> 503421b3bdfd68c326c64ff2973dc61bab024eb0
+Brophy and Lowd. [Machine Unlearning for Random Forests](http://proceedings.mlr.press/v139/brophy21a.html). ICML 2021.
 
 ```
 @inproceedings{brophy2021machine,
