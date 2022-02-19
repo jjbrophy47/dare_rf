@@ -47,13 +47,19 @@ rf.predict_proba(X_test)
 
 Reference
 ---
+<<<<<<< HEAD
 Brophy and Lowd. [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567). ICML 2021.
+=======
+For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](http://proceedings.mlr.press/v139/brophy21a.html).
+>>>>>>> 503421b3bdfd68c326c64ff2973dc61bab024eb0
 
 ```
-@article{brophy2021darerf,
+@inproceedings{brophy2021machine,
   title={Machine Unlearning for Random Forests},
   author={Brophy, Jonathan and Lowd, Daniel},
-  journal={arXiv preprint arXiv:2009.05567v2},
-  year={2021}
+  booktitle={International Conference on Machine Learning},
+  pages={1092--1104},
+  year={2021},
+  organization={PMLR}
 }
 ```
