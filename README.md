@@ -1,7 +1,7 @@
 DaRE RF: Data Removal-Enabled Random Forests
 ---
 
-**dare_rf** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
+**dare** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
 
 <p align="center">
 	<img align="center" src="images/thumbnail.png" alt="thumbnail", width="350">
@@ -20,12 +20,11 @@ Simple example of removing a single training instance:
 import dare
 import numpy as np
 
-# initialize some training data
-X = np.array([[0, 1], [0, 1], [0, 1], [1, 0], [1, 0]])
-y = np.array([1, 1, 1, 0, 1])
+# training data
+X_train = np.array([[0, 1], [0, 1], [0, 1], [1, 0], [1, 0]])
+y_train = np.array([1, 1, 1, 0, 1])
 
-# create a test example
-X_test = np.array([[1, 0]])
+X_test = np.array([[1, 0]])  # test instance
 
 # train a DaRE RF model
 rf = dare.Forest(n_estimators=100,
@@ -33,16 +32,11 @@ rf = dare.Forest(n_estimators=100,
                  k=5,  # no. thresholds to consider per attribute
                  topd=0,  # no. random node layers
                  random_state=1)
-rf.fit(X, y)
+rf.fit(X_train, y_train)
 
-# prediction before deletion => [0.5, 0.5]
-rf.predict_proba(X_test)
-
-# delete training example at index 3 ([1, 0], 0)
-rf.delete(3)
-
-# prediction after deletion => [0.0, 1.0]
-rf.predict_proba(X_test)
+rf.predict_proba(X_test)  # prediction before deletion => [0.5, 0.5]
+rf.delete(3)  # delete training example at index 3 ([1, 0], 0)
+rf.predict_proba(X_test)  # prediction after deletion => [0.0, 1.0]
 ```
 
 Reference
