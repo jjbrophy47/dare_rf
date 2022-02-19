@@ -1,21 +1,22 @@
-DaRE RF
+DaRE RF: Data Removal-Enabled Random Forests
 ---
 
-**DaRE** (**Da**ta **R**emoval-**E**nabled) RF is a variant of random forests that enables the _efficient_ removal of training data without having to retrain from scratch.
+**dare_rf** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
 
 <p align="center">
-	<img align="center" src="images/thumbnail.png" alt="thumbnail">
+	<img align="center" src="images/thumbnail.png" alt="thumbnail", width="350">
 </p>
 
-Install
+Installation
 ---
 1. Install Python 3.7+.
 1. Install dependencies and compile project. Run `make all`.
 
-Simple Example
+Usage
 ---
+Simple example of removing a single training instance:
 
-```
+```python
 import dare
 import numpy as np
 
@@ -44,9 +45,9 @@ rf.delete(3)
 rf.predict_proba(X_test)
 ```
 
-Paper
+Reference
 ---
-For further details please refer to our ICML 2021 paper: [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567).
+Brophy and Lowd. [Machine Unlearning for Random Forests](https://arxiv.org/abs/2009.05567). ICML 2021.
 
 ```
 @article{brophy2021darerf,
