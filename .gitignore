@@ -11,6 +11,8 @@ jobs/logs/
 **build/
 **.temp/
 **.ipynb_checkpoints/
+**.egg-info
+dist/
 
 # dare adder
 dare/_adder.pxd
