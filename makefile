@@ -7,4 +7,17 @@ build:
 get_deps:
 	pip3 install -r requirements.txt
 
+package:
+	rm -rf dist/
+	python3 setup.py sdist bdist_wheel
+	twine check dist/*
+
+pypi_test:
+	pacakage
+	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+pypi:
+	package
+	twine upload dist/*
+
 all: clean get_deps build
