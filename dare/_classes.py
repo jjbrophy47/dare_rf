@@ -31,12 +31,13 @@ MAX_INT = 2147483647
 
 class Forest(object):
     """
-    Random forest using Gini index as the splitting criterion.
+    DaRE forest, a random forests model that can efficiently
+    remove training data AFTER training.
 
     Parameters:
     -----------
     topd: int (default=0)
-        Number of non-random layers that share the indistinguishability budget.
+        Number of random-node layers, starting from the top.
     k: int (default=25)
         Number of candidate thresholds per feature to consider
         through uniform sampling.
@@ -97,7 +98,7 @@ class Forest(object):
 
     def fit(self, X, y):
         """
-        Build random forest.
+        Build DaRE forest.
         """
         assert X.ndim == 2
         assert y.ndim == 1
@@ -209,13 +210,6 @@ class Forest(object):
 
         return n_samples_to_retrain
 
-    def print(self, show_nodes=False):
-        """
-        Show representation of forest by showing each tree.
-        """
-        for tree in self.trees_:
-            tree.print(show_nodes=show_nodes)
-
     def get_delete_metrics(self):
         """
         Retrieve deletion statistics.
@@ -314,12 +308,13 @@ class Forest(object):
 
 class Tree(object):
     """
-    Decision Tree using Gini index for the splitting criterion.
+    Dare tree, a decision tree that can efficiently
+    remove training data AFTER training.
 
     Parameters:
     -----------
     topd: int (default=0)
-        Number of non-random layers that contain random nodes.
+        Number of random-node layers, starting from the top.
     k: int (default=25)
         No. candidate thresholds to consider through uniform sampling.
     max_depth: int (default=None)
@@ -367,7 +362,7 @@ class Tree(object):
 
     def fit(self, X, y, max_features=None, manager=None):
         """
-        Build decision tree.
+        Build DaRE tree.
         """
         assert X.ndim == 2
         assert y.ndim == 1
@@ -442,20 +437,6 @@ class Tree(object):
         y_pos = self.tree_.predict(X).reshape(-1, 1)
         y_proba = np.hstack([1 - y_pos, y_pos])
         return y_proba
-
-    def print(self, show_nodes=False):
-        """
-        Shows a representation of the tree.
-        """
-        print('\nTREE:')
-        self.tree_.print_node_count()
-        self.tree_.print_node_type_count(self.lmbda, self.topd_)
-        if show_nodes:
-            self.tree_.print_n_samples()
-            self.tree_.print_depth()
-            self.tree_.print_feature()
-            self.tree_.print_value()
-            print()
 
     def delete(self, remove_indices):
         """
