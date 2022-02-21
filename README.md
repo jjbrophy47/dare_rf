@@ -1,5 +1,9 @@
 DaRE RF: Data Removal-Enabled Random Forests
 ---
+[![PyPi version](https://img.shields.io/pypi/v/dare_rf)](https://pypi.org/project/pgbm/)
+[![Python version](https://img.shields.io/pypi/pyversions/dare_rf)](https://docs.conda.io/en/latest/miniconda.html)
+[![Github License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 
 **dare** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
 
@@ -9,8 +13,9 @@ DaRE RF: Data Removal-Enabled Random Forests
 
 Installation
 ---
-1. Install Python 3.7+.
-1. Install dependencies and compile project. Run `make all`.
+```sh
+pip install dare
+```
 
 Usage
 ---
@@ -38,6 +43,11 @@ rf.predict_proba(X_test)  # prediction before deletion => [0.5, 0.5]
 rf.delete(3)  # delete training example at index 3 ([1, 0], 0)
 rf.predict_proba(X_test)  # prediction after deletion => [0.0, 1.0]
 ```
+
+License
+---
+[Apache License 2.0](https://github.com/jjbrophy47/dare_rf/blob/master/LICENSE).
+
 
 Reference
 ---
