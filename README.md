@@ -6,7 +6,7 @@ DaRE RF: Data Removal-Enabled Random Forests
 
 
 
-**dare** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
+**dare-rf** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
 
 <p align="center">
 	<img align="center" src="images/thumbnail.png" alt="thumbnail", width="350">
@@ -15,7 +15,7 @@ DaRE RF: Data Removal-Enabled Random Forests
 Installation
 ---
 ```sh
-pip install dare
+pip install dare-rf
 ```
 
 Usage
