@@ -1,6 +1,6 @@
 DaRE RF: Data Removal-Enabled Random Forests
 ---
-[![PyPi version](https://img.shields.io/pypi/v/dare_rf)](https://pypi.org/project/pgbm/)
+[![PyPi version](https://img.shields.io/pypi/v/dare_rf)](https://pypi.org/project/dare-rf/)
 [![Python version](https://img.shields.io/pypi/pyversions/dare_rf)](/github/pipenv/locked/python-version/jjbrophy47/dare_rf)
 [![Github License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
