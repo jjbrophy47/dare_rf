@@ -5,8 +5,6 @@ DaRE RF: Data Removal-Enabled Random Forests
 [![Github License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build](https://github.com/jjbrophy47/dare_rf/actions/workflows/wheels.yml/badge.svg)](https://github.com/jjbrophy47/dare_rf/actions/workflows/wheels.yml)
 
-
-
 **dare-rf** is a python library that implements *machine unlearning* for random forests, enabling the _efficient_ removal of training data without having to retrain from scratch. It is built using Cython and is designed to be scalable to large datasets.
 
 <p align="center">
