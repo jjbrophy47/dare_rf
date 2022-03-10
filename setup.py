@@ -17,7 +17,7 @@ if os.name == 'posix':
     libraries.append('m')
 
 setup(name="dare-rf",
-      version="0.10.2",
+      version="1.0.0",
       description="Data Removal-Enabled Random Forests",
       author="Jonathan Brophy",
       author_email="jbrophy@cs.uoregon.edu",
@@ -28,6 +28,9 @@ setup(name="dare-rf",
       include_package_data=True,
       package_dir={"dare": "dare"},
       classifiers=["Programming Language :: Python :: 3.7",
+                   "Programming Language :: Python :: 3.8",
+                   "Programming Language :: Python :: 3.9",
+                   "Programming Language :: Python :: 3.10",
                    "License :: OSI Approved :: Apache Software License",
                    "Operating System :: OS Independent"],
       python_requires='>=3.7',
