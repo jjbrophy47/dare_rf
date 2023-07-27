@@ -17,7 +17,7 @@ if os.name == 'posix':
     libraries.append('m')
 
 setup(name="dare-rf",
-      version="1.0.3",
+      version="1.1.0",
       description="Data Removal-Enabled Random Forests",
       author="Jonathan Brophy",
       author_email="jbrophy@cs.uoregon.edu",
