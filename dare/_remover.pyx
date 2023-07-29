@@ -794,7 +794,7 @@ cdef class _Remover:
         shape[0] = n_elem
         cdef np.ndarray arr = np.PyArray_SimpleNewFromData(1, shape, np.NPY_INT, data)
         Py_INCREF(self)
-        arr.base = <PyObject*> self
+        np.PyArray_SetBaseObject(arr, self)
         return arr
 
 
